@@ -317,7 +317,8 @@ class ChartTemplates {
             planets: [],
             houseRect: house,
             bhavaBox: null, // Initialize bhavaBox to null
-            bhavaText: null // Initialize bhavaText to null
+            bhavaText: null, // Initialize bhavaText to null
+            lagnaLines: null // Store Lagna indicator lines
         };
 
         // Add to chart group
@@ -354,6 +355,19 @@ class ChartTemplates {
         // Store references for later updates
         this.houseData[houseNumber].bhavaBox = bhavaBoxBottomLeft;
         this.houseData[houseNumber].bhavaText = bhavaTextBottomLeft;
+
+        // Draw Lagna indicator lines if this is the Lagna house and South Indian chart
+        if (this.currentChartType === 'south-indian' && houseNumber === this.lagnaHouse) {
+            // Single diagonal line from top-left to a point near top and left sides
+            const line = new Konva.Line({
+                points: [x, y + 0, x + 0, y + height * 0.18, x + width * 0.18, y],
+                stroke: '#374151', // Match grid color
+                strokeWidth: 2,
+                name: `lagna-line-${houseNumber}`
+            });
+            this.chartGroup.add(line);
+            this.houseData[houseNumber].lagnaLines = [line];
+        }
 
         // Add right-click event for context menu
         house.on('contextmenu', (e) => {
@@ -437,9 +451,30 @@ class ChartTemplates {
 
     setLagnaHouse(houseNumber) {
         console.log('[DEBUG] setLagnaHouse called with:', houseNumber);
+        // Remove old Lagna indicator lines if present (South Indian only)
+        if (this.currentChartType === 'south-indian' && this.houseData[this.lagnaHouse] && this.houseData[this.lagnaHouse].lagnaLines) {
+            this.houseData[this.lagnaHouse].lagnaLines.forEach(line => line.destroy());
+            this.houseData[this.lagnaHouse].lagnaLines = null;
+        }
         this.lagnaHouse = houseNumber;
         this.renumberHouses();
         this.clearHighlight();
+        // Add new Lagna indicator line
+        if (this.currentChartType === 'south-indian' && this.houseData[houseNumber]) {
+            const x = this.houseData[houseNumber].x;
+            const y = this.houseData[houseNumber].y;
+            const width = this.houseData[houseNumber].width;
+            const height = this.houseData[houseNumber].height;
+            const line = new Konva.Line({
+                points: [x, y + 0, x + 0, y + height * 0.18, x + width * 0.18, y],
+                stroke: '#374151', // Match grid color
+                strokeWidth: 2,
+                name: `lagna-line-${houseNumber}`
+            });
+            this.chartGroup.add(line);
+            this.houseData[houseNumber].lagnaLines = [line];
+            this.layer.batchDraw();
+        }
         console.log(`Lagna set to house ${houseNumber}`);
     }
 
