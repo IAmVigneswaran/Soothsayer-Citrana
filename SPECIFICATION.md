@@ -38,6 +38,7 @@ Create a modern, web-based whiteboard application specifically designed for Veda
   - Selected Lagna house gets special colour highlighting
   - Tiny house numbers displayed in corner of each house
   - Setting new Lagna automatically renumbers all houses from the Lagna position
+- **Lagna Indicator:** When a Bhava is set as Lagna, a single diagonal line appears at the top-left corner of that Bhava. The line matches the grid color and its ends touch the top and left sides of the house rectangle. The indicator updates dynamically as Lagna changes.
 
 #### North Indian Chart (Diamond Chart)
 - **Structure**: Fixed Bhava (House) positions in diamond formation

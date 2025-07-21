@@ -92,6 +92,13 @@ The application is ready to use immediately - no setup required!
 | Ketu | Ke |
 | Maandi | Md |
 
+## South Indian Chart: Lagna Indicator (2024-)
+
+- When any Bhava (house) is set as Lagna in the South Indian chart, a single diagonal line appears at the top-left corner of that Bhava.
+- The line matches the grid color (`#374151`) and its ends touch the top and left sides of the house rectangle, forming a clear corner mark.
+- When Lagna is changed, the indicator is removed from the previous Bhava and drawn on the new one.
+- This provides a clear, modern, and visually consistent way to identify the Lagna Bhava.
+
 ## Technical Architecture
 
 ### Technology Stack
