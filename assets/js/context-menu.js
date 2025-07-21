@@ -85,57 +85,79 @@ class ContextMenu {
 
     showExistingChartMenu(x, y, chartType) {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
-        
-        this.menu.innerHTML = `
+        let menuHtml = `
             <div class="context-menu-header">${chartName} Chart</div>
+        `;
+        // Add 'Set as Lagna' menu item only for South Indian chart
+        if (chartType === 'south-indian') {
+            menuHtml += `
+            <div class="context-menu-item" data-action="set-lagna">
+                Set as Lagna
+            </div>
+            <div class="context-menu-separator"></div>
+            `;
+        }
+        // Always add 'Clear Chart' as the last item
+        menuHtml += `
             <div class="context-menu-item" data-action="clear-chart">
                 Clear Chart
             </div>
         `;
-
+        this.menu.innerHTML = menuHtml;
         this.show(x, y);
         this.setupMenuEventListeners();
     }
 
     showHouseMenu(x, y, houseNumber) {
+        this.currentHouseNumber = houseNumber;
+        console.log('[DEBUG] showHouseMenu called for house:', houseNumber);
         const chartType = window.app?.chartTemplates?.currentChartType;
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
-        
-        this.menu.innerHTML = `
-            <div class="context-menu-header">${chartName} Chart - House ${houseNumber}</div>
-            <div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}">
-                Set as Lagna (Ascendant)
-            </div>
-            <div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}">
-                Set as First House
-            </div>
-            <div class="context-menu-separator"></div>
-            <div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}">
-                Clear House
-            </div>
-            <div class="context-menu-separator"></div>
-            <div class="context-menu-item" data-action="clear-chart">
-                Clear Chart
-            </div>
-        `;
-
+        const menuHtml =
+            `<div class="context-menu-header">${chartName} Chart - House ${houseNumber}</div>` +
+            `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}">Set as Lagna (Ascendant)</div>` +
+            `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}">Set as First House</div>` +
+            `<div class="context-menu-separator"></div>` +
+            `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}">Clear House</div>` +
+            `<div class="context-menu-separator"></div>` +
+            `<div class="context-menu-item" data-action="clear-chart">Clear Chart</div>`;
+        console.log('[DEBUG] Menu HTML:', menuHtml);
+        this.menu.innerHTML = menuHtml;
+        // Explicitly set data-house attributes after rendering
+        const lagnaItem = this.menu.querySelector('[data-action="set-lagna"]');
+        const firstHouseItem = this.menu.querySelector('[data-action="set-first-house"]');
+        const clearHouseItem = this.menu.querySelector('[data-action="clear-house"]');
+        if (lagnaItem) {
+            lagnaItem.setAttribute('data-house', houseNumber);
+            lagnaItem._houseNumber = houseNumber;
+        }
+        if (firstHouseItem) {
+            firstHouseItem.setAttribute('data-house', houseNumber);
+            firstHouseItem._houseNumber = houseNumber;
+        }
+        if (clearHouseItem) {
+            clearHouseItem.setAttribute('data-house', houseNumber);
+            clearHouseItem._houseNumber = houseNumber;
+        }
         this.show(x, y);
         this.setupMenuEventListeners();
     }
 
     setupMenuEventListeners() {
-        const menuItems = this.menu.querySelectorAll('.context-menu-item');
-        
-        menuItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                const action = item.dataset.action;
-                const houseNumber = item.dataset.house;
-                
-                this.handleAction(action, houseNumber);
-                this.hide();
-            });
-        });
+        // Remove any previous event listener to avoid duplicates
+        this.menu.onclick = null;
+        this.menu.onclick = (e) => {
+            const item = e.target.closest('.context-menu-item');
+            console.log('[DEBUG] Click event target:', e.target);
+            console.log('[DEBUG] Closest .context-menu-item:', item);
+            if (!item) return;
+            e.preventDefault();
+            const action = item.dataset.action;
+            const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
+            console.log('[DEBUG] Menu item clicked:', action, houseNumber);
+            this.handleAction(action, houseNumber);
+            this.hide();
+        };
     }
 
     handleAction(action, houseNumber) {
@@ -153,7 +175,8 @@ class ContextMenu {
                 break;
                 
             case 'set-lagna':
-                if (houseNumber) {
+                // Set the right-clicked house as Lagna directly
+                if (window.app && window.app.chartTemplates && houseNumber) {
                     window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber));
                 }
                 break;

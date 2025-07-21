@@ -11,6 +11,7 @@ class ChartTemplates {
         this.houseData = {};
         this.lagnaHouse = 1;
         this.firstHouse = 1;
+        this.selectedHouse = null; // Track selected house for highlight
         
         if (stage && layer) {
             console.log('ChartTemplates initialized with stage and layer');
@@ -46,6 +47,9 @@ class ChartTemplates {
         this.clearChart();
         this.currentChartType = 'south-indian';
 
+        // Set Aries (house 1) as default Lagna
+        this.lagnaHouse = 1;
+
         // Create chart group
         this.chartGroup = new Konva.Group({
             name: 'south-indian-chart'
@@ -76,6 +80,9 @@ class ChartTemplates {
             { x: startX + houseSize * 2, y: startY + houseSize * 3, house: 7 },
             { x: startX + houseSize * 3, y: startY + houseSize * 3, house: 6 }
         ];
+
+        // Store the visual order for renumbering
+        this.southIndianHouseOrder = positions.map(pos => pos.house);
 
         positions.forEach(pos => {
             this.createHouse(pos.x, pos.y, houseSize, houseSize, pos.house);
@@ -307,7 +314,10 @@ class ChartTemplates {
             y: y,
             width: width,
             height: height,
-            planets: []
+            planets: [],
+            houseRect: house,
+            bhavaBox: null, // Initialize bhavaBox to null
+            bhavaText: null // Initialize bhavaText to null
         };
 
         // Add to chart group
@@ -330,7 +340,7 @@ class ChartTemplates {
             y: y + height - rashiBoxSize - 5,
             width: rashiBoxSize,
             height: rashiBoxSize,
-            text: rashiName,
+            text: houseNumber.toString(), // Will be updated by renumberHouses
             fontSize: 10,
             fontFamily: 'Arial',
             fontWeight: 'bold',
@@ -341,12 +351,38 @@ class ChartTemplates {
         });
         this.chartGroup.add(bhavaBoxBottomLeft);
         this.chartGroup.add(bhavaTextBottomLeft);
+        // Store references for later updates
+        this.houseData[houseNumber].bhavaBox = bhavaBoxBottomLeft;
+        this.houseData[houseNumber].bhavaText = bhavaTextBottomLeft;
 
         // Add right-click event for context menu
         house.on('contextmenu', (e) => {
+            console.log('[DEBUG] House right-clicked:', houseNumber);
             e.evt.preventDefault();
+            this.highlightHouse(houseNumber);
             window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
         });
+    }
+
+    highlightHouse(houseNumber) {
+        // Remove highlight from previous
+        if (this.selectedHouse && this.houseData[this.selectedHouse]) {
+            this.houseData[this.selectedHouse].houseRect.fill('#ffffff');
+        }
+        // Highlight new
+        if (this.houseData[houseNumber]) {
+            this.houseData[houseNumber].houseRect.fill('#f3f4f6'); // Tailwind gray-100
+            this.selectedHouse = houseNumber;
+            this.layer.batchDraw();
+        }
+    }
+
+    clearHighlight() {
+        if (this.selectedHouse && this.houseData[this.selectedHouse]) {
+            this.houseData[this.selectedHouse].houseRect.fill('#ffffff');
+            this.selectedHouse = null;
+            this.layer.batchDraw();
+        }
     }
 
     addPlanetToHouse(planetAbbr, houseNumber) {
@@ -400,8 +436,10 @@ class ChartTemplates {
     }
 
     setLagnaHouse(houseNumber) {
+        console.log('[DEBUG] setLagnaHouse called with:', houseNumber);
         this.lagnaHouse = houseNumber;
         this.renumberHouses();
+        this.clearHighlight();
         console.log(`Lagna set to house ${houseNumber}`);
     }
 
@@ -412,7 +450,34 @@ class ChartTemplates {
     }
 
     renumberHouses() {
-        // Implement house renumbering logic
+        // Visual order for South Indian chart (house numbers)
+        const visualOrder = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        let houseOrder;
+        if (this.currentChartType === 'south-indian') {
+            // Rotate visual order so Lagna is first
+            const lagnaIdx = visualOrder.indexOf(this.lagnaHouse);
+            houseOrder = visualOrder.slice(lagnaIdx).concat(visualOrder.slice(0, lagnaIdx));
+        } else if (this.southIndianHouseOrder) {
+            houseOrder = this.southIndianHouseOrder;
+        } else {
+            houseOrder = Object.keys(this.houseData).map(Number).sort((a, b) => a - b);
+        }
+        const rashis = [
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+        ];
+        const debugBhavas = [];
+        for (let i = 0; i < houseOrder.length; i++) {
+            const houseNum = houseOrder[i];
+            const bhavaNum = i + 1;
+            const rashiIndex = (houseNum - 1) % 12;
+            const rashiName = rashis[rashiIndex];
+            debugBhavas.push({bhavaNum, houseNum, rashiName});
+            if (this.houseData[houseNum] && this.houseData[houseNum].bhavaText) {
+                this.houseData[houseNum].bhavaText.text(bhavaNum.toString());
+            }
+        }
+        this.layer.batchDraw();
+        console.log('Bhava mapping:', debugBhavas);
         console.log('Houses renumbered');
     }
 
@@ -423,7 +488,7 @@ class ChartTemplates {
         }
         this.houseData = {};
         this.currentChartType = null;
-        
+        // Do NOT reset this.southIndianHouseOrder here
         // Reset stage scale and position
         if (this.stage) {
             this.stage.scale({ x: 1, y: 1 });
