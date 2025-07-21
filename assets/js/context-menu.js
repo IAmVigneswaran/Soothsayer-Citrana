@@ -99,7 +99,7 @@ class ContextMenu {
         }
         // Always add 'Clear Chart' as the last item
         menuHtml += `
-            <div class="context-menu-item" data-action="clear-chart">
+            <div class="context-menu-item last-item" data-action="clear-chart">
                 Clear Chart
             </div>
         `;
@@ -120,7 +120,7 @@ class ContextMenu {
             `<div class="context-menu-separator"></div>` +
             `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}">Clear House</div>` +
             `<div class="context-menu-separator"></div>` +
-            `<div class="context-menu-item" data-action="clear-chart">Clear Chart</div>`;
+            `<div class="context-menu-item last-item" data-action="clear-chart">Clear Chart</div>`;
         console.log('[DEBUG] Menu HTML:', menuHtml);
         this.menu.innerHTML = menuHtml;
         // Explicitly set data-house attributes after rendering
