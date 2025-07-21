@@ -315,6 +315,33 @@ class ChartTemplates {
         this.chartGroup.add(rashiBox);
         this.chartGroup.add(rashiText);
 
+        // Add duplicate Bhava number at bottom left
+        const bhavaBoxBottomLeft = new Konva.Rect({
+            x: x + 5,
+            y: y + height - rashiBoxSize - 5,
+            width: rashiBoxSize,
+            height: rashiBoxSize,
+            fill: '#145A32', // dark green
+            cornerRadius: 4,
+            name: `bhava-box-bottomleft-${houseNumber}`
+        });
+        const bhavaTextBottomLeft = new Konva.Text({
+            x: x + 5,
+            y: y + height - rashiBoxSize - 5,
+            width: rashiBoxSize,
+            height: rashiBoxSize,
+            text: rashiName,
+            fontSize: 10,
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            fill: '#ffffff', // white text for bhava
+            align: 'center',
+            verticalAlign: 'middle',
+            name: `bhava-bottomleft-${houseNumber}`
+        });
+        this.chartGroup.add(bhavaBoxBottomLeft);
+        this.chartGroup.add(bhavaTextBottomLeft);
+
         // Add right-click event for context menu
         house.on('contextmenu', (e) => {
             e.evt.preventDefault();

@@ -91,13 +91,6 @@ class ContextMenu {
             <div class="context-menu-item" data-action="clear-chart">
                 Clear Chart
             </div>
-            <div class="context-menu-separator"></div>
-            <div class="context-menu-item" data-action="create-south-indian">
-                Create South Indian Chart
-            </div>
-            <div class="context-menu-item" data-action="create-north-indian">
-                Create North Indian Chart
-            </div>
         `;
 
         this.show(x, y);
