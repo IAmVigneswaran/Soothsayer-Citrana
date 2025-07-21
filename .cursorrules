@@ -1,0 +1,207 @@
+# Vedic Astrology Chart Builder - Cursor Rules
+
+## Project Overview
+
+This is a Vedic Astrology Chart Builder web application built with pure HTML5, CSS3, and JavaScript. The application allows users to create both South Indian and North Indian astrological charts with drag-and-drop planet placement and drawing tools.
+
+## Technology Stack
+
+- Frontend: Pure HTML5, CSS3, JavaScript (ES6+)
+- Graphics: HTML5 Canvas API with Fabric.js
+- Styling: Tailwind CSS (CDN)
+- Libraries: Fabric.js for canvas manipulation
+- Storage: Browser localStorage for data persistence
+- No build process required - runs entirely in browser
+
+## Project Structure
+
+```
+Soothsayer-Citrana/
+├── index.html              # Main application file
+├── assets/
+│   ├── css/
+│   │   └── styles.css      # Custom styles and theme support
+│   ├── js/
+│   │   ├── utils.js        # Utility functions and constants
+│   │   ├── chart-templates.js  # Chart layout and rendering
+│   │   ├── planet-system.js    # Planet management and drag-drop
+│   │   ├── drawing-tools.js    # Drawing tools and annotations
+│   │   └── app.js          # Main application logic
+│   ├── images/             # Image assets
+│   ├── favicon/            # Favicon files
+│   └── svgs/               # SVG graphics
+├── SPECIFICATION.md        # Detailed project specification
+├── README.md              # Empty file
+├── AGENT.md               # Comprehensive documentation
+└── IMPLEMENTATION_SUMMARY.md # Implementation summary
+```
+
+## Key Components
+
+### ChartTemplates Class (assets/js/chart-templates.js)
+- Handles South Indian and North Indian chart layouts
+- Manages Lagna setting and house numbering
+- Provides chart data persistence and loading
+- Implements context menu functionality
+- Handles chart redrawing and theme changes
+
+### PlanetSystem Class (assets/js/planet-system.js)
+- Manages planet library with visual representations
+- Implements drag-and-drop functionality
+- Handles planet placement validation
+- Provides touch support for mobile devices
+- Manages planet movement between houses
+
+### DrawingTools Class (assets/js/drawing-tools.js)
+- Implements all drawing tools (arrow, line, pen, text)
+- Manages undo/redo functionality
+- Handles canvas interactions and object creation
+- Provides drawing statistics and export features
+
+### Utils Class (assets/js/utils.js)
+- Provides utility functions for common operations
+- Manages theme switching and localStorage
+- Handles export functionality and notifications
+- Implements keyboard shortcuts and tooltips
+
+### Main Application (assets/js/app.js)
+- Coordinates all components
+- Handles application initialization
+- Manages event listeners and user interactions
+- Provides error handling and debugging support
+
+## Core Features
+
+### Chart Types
+- South Indian Chart: Traditional 3x4 square grid layout
+- North Indian Chart: Diamond-shaped layout with dynamic positioning
+- Lagna Setting: Right-click context menu to set any house as Lagna (Ascendant)
+- First House Selection: For North Indian charts, designate any house as first house
+- Dynamic House Numbering: Automatic renumbering based on Lagna position
+
+### Planet Management
+- 10 Major Grahas: Sun (Su), Moon (Mo), Mercury (Me), Venus (Ve), Mars (Ma), Jupiter (Ju), Saturn (Sa), Rahu (Ra), Ketu (Ke), Maandi (Md)
+- Text-based display: Uses abbreviations instead of symbols
+- Drag & Drop: Intuitive planet placement from sidebar to chart houses
+- Multiple Instances: Same planet can be placed multiple times
+- Dynamic Text Sizing: Planet text scales based on house occupancy
+- Touch Support: Mobile-friendly touch interactions
+
+### Drawing Tools
+- Select Tool: Choose and modify existing elements
+- Arrow Tool: Create directional indicators with arrowheads
+- Line Tool: Draw straight lines and connections
+- Pen Tool: Freehand drawing for annotations
+- Text Tool: Add editable text boxes anywhere on canvas
+- Undo/Redo: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+
+### User Experience
+- Dark/Light Theme: Automatic system preference detection with manual toggle
+- Responsive Design: Optimized for desktop, tablet, and mobile
+- Keyboard Shortcuts: Power user features for efficiency
+- Context Menus: Right-click for quick actions on houses
+- Status Updates: Real-time feedback and notifications
+- Auto-Save: Automatic chart data persistence every 30 seconds
+
+### Export & Sharing
+- High-Resolution PNG: Professional quality exports (300 DPI)
+- Auto-Save: Chart data saved to localStorage
+- Cross-Platform: Works on all modern browsers
+- GitHub Pages Compatible: No build process required
+
+## Development Guidelines
+
+### Code Style
+- Use ES6+ JavaScript features
+- Follow existing naming conventions
+- Add comprehensive comments for new features
+- Maintain modular architecture
+- Use Tailwind CSS classes for styling
+
+### File Organization
+- Keep all assets in the assets/ directory
+- JavaScript files in assets/js/
+- CSS files in assets/css/
+- Images in assets/images/
+- SVGs in assets/svgs/
+- Favicons in assets/favicon/
+
+### Browser Compatibility
+- Desktop: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- Mobile: iOS Safari 13+, Android Chrome 80+
+- Features: Canvas API, localStorage, ES6 modules
+
+### Performance Considerations
+- Efficient canvas rendering with Fabric.js
+- Debounced resize handlers (250ms)
+- Optimized planet placement algorithms
+- Minimal DOM manipulation
+- Smart auto-save (30-second intervals)
+
+## Customization Guidelines
+
+### Adding New Planets
+Edit the PLANETS constant in assets/js/utils.js:
+```javascript
+const PLANETS = {
+    'Su': { name: 'Sun', color: '#FF6B35' },
+    // Add new planet here
+    'New': { name: 'New Planet', color: '#FF0000' }
+};
+```
+
+### Modifying Chart Styles
+- House colors and borders in assets/js/chart-templates.js
+- Grid line styles and text formatting
+- Layout dimensions and spacing
+
+### Theme Customization
+- Modify assets/css/styles.css for custom component styles
+- Update color schemes in JavaScript files
+- Add new theme variants
+
+## Important Notes
+
+### No Symbol Support
+- The application does NOT use planet symbols
+- All planets are displayed using text abbreviations (Su, Mo, Ma, etc.)
+- This ensures better compatibility and accessibility
+
+### No Build Process
+- Application runs entirely in the browser
+- No server-side dependencies
+- No build tools or compilation required
+- Ready for immediate deployment on GitHub Pages
+
+### Data Management
+- All data stored locally in browser localStorage
+- No external API calls or data collection
+- Privacy-first approach with no tracking
+
+## Future Enhancements
+
+### Phase 2 (Planned)
+- Aspect line drawing between planets
+- Custom planet sets and configurations
+- Multi-language support (Tamil, Hindi)
+- Advanced export options (SVG, PDF)
+
+### Phase 3 (Future)
+- Batch chart generation
+- Cloud storage integration
+- Collaborative editing features
+- API for external integrations
+
+## Support and Documentation
+
+- AGENT.md: Comprehensive project documentation
+- SPECIFICATION.md: Detailed original project specification
+- IMPLEMENTATION_SUMMARY.md: Complete implementation details
+- README.md: Empty file (as requested)
+
+## Development Commands
+
+- Open index.html in browser to run application
+- No build commands required
+- Use browser developer tools for debugging
+- All changes are immediately visible on refresh 

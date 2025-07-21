@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="478.57142" height="478.57142" viewBox="0 0 478.57142 478.57142">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-linecap: square;
+        stroke-linejoin: round;
+        stroke-width: 2.38095px;
+      }
+    </style>
+  </defs>
+  <g id="Lagna_chart_Shyam_Bhat" data-name="Lagna_chart_Shyam Bhat" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+    <polygon id="tanbhav" class="cls-1" points="239.28571 1.19048 120.23809 120.23809 239.28571 239.28571 358.33333 120.23809 239.28571 1.19048"/>
+    <polygon id="dhanbhav" class="cls-1" points="1.19048 1.19048 239.28571 1.19048 120.23809 120.23809 1.19048 1.19048"/>
+    <polygon id="anujbhav" class="cls-1" points="1.19048 1.19048 1.19048 239.28571 120.23809 120.23809 1.19048 1.19048"/>
+    <polygon id="maatabhav" class="cls-1" points="120.23809 120.23809 1.19048 239.28571 120.23809 358.33333 239.28571 239.28571 120.23809 120.23809"/>
+    <polygon id="santanbhav" class="cls-1" points="1.19048 239.28571 120.23809 358.33333 1.19048 477.38095 1.19048 239.28571"/>
+    <polygon id="rogbhav" class="cls-1" points="239.28571 477.38095 120.23809 358.33333 1.19048 477.38095 239.28571 477.38095"/>
+    <polygon id="dampathyabhav" class="cls-1" points="239.28571 477.38095 120.23809 358.33333 239.28571 239.28571 358.33333 358.33333 239.28571 477.38095"/>
+    <polygon id="aayubhav" class="cls-1" points="239.28571 477.38095 358.33333 358.33333 477.38095 477.38095 239.28571 477.38095"/>
+    <polygon id="bhagyabhav" class="cls-1" points="358.33333 358.33333 477.38095 477.38095 477.38095 239.28571 358.33333 358.33333"/>
+    <polygon id="karmabhav" class="cls-1" points="358.33333 358.33333 477.38095 239.28571 358.33333 120.23809 239.28571 239.28571 358.33333 358.33333"/>
+    <polygon id="laabbhav" class="cls-1" points="477.38095 239.28571 358.33333 120.23809 477.38095 1.19048 477.38095 239.28571"/>
+    <polygon id="karchbhav" class="cls-1" points="358.33333 120.23809 477.38095 1.19048 239.28571 1.19048 358.33333 120.23809"/>
+  </g>
+</svg>

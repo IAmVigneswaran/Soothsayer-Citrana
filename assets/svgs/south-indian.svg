@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="467.82352" height="312.5294" viewBox="0 0 467.82352 312.5294">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-miterlimit: 3.88235;
+        stroke-width: 1.94118px;
+      }
+    </style>
+  </defs>
+  <g id="Lagna_chart_Shyam_Bhat" data-name="Lagna_chart_Shyam Bhat" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+    <rect id="aries" class="cls-1" x="117.44117" y=".97059" width="116.47058" height="77.64706"/>
+    <rect id="taurus" class="cls-1" x="233.91176" y=".97059" width="116.47058" height="77.64706"/>
+    <rect id="gemini" class="cls-1" x="350.38234" y=".97059" width="116.47058" height="77.64706"/>
+    <rect id="cancer" class="cls-1" x="350.38234" y="78.61764" width="116.47058" height="77.64706"/>
+    <rect id="leo" class="cls-1" x="350.38234" y="156.2647" width="116.47058" height="77.64706"/>
+    <rect id="virgo" class="cls-1" x="350.38234" y="233.91176" width="116.47058" height="77.64706"/>
+    <rect id="libra" class="cls-1" x="233.91176" y="233.91176" width="116.47058" height="77.64706"/>
+    <rect id="scorpio" class="cls-1" x="117.44117" y="233.91176" width="116.47058" height="77.64706"/>
+    <rect id="sagittarius" class="cls-1" x=".97059" y="233.91176" width="116.47058" height="77.64706"/>
+    <rect id="capricorn" class="cls-1" x=".97059" y="156.2647" width="116.47058" height="77.64706"/>
+    <rect id="aquarius" class="cls-1" x=".97059" y="78.61764" width="116.47058" height="77.64706"/>
+    <rect id="pisces" class="cls-1" x=".97059" y=".97059" width="116.47058" height="77.64706"/>
+  </g>
+</svg>
