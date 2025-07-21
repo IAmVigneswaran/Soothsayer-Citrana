@@ -254,16 +254,51 @@ class ChartTemplates {
             name: `house-${houseNumber}`
         });
 
-        // Create house number text
-        const numberText = new Konva.Text({
-            x: x + width / 2 - 10,
-            y: y + height / 2 - 10,
-            text: houseNumber.toString(),
-            fontSize: 16,
+        // Rashi (Zodiac signs) mapping
+        const rashis = [
+            '1', // Aries
+            '2', // Taurus
+            '3', // Gemini
+            '4', // Cancer
+            '5', // Leo
+            '6', // Virgo
+            '7', // Libra
+            '8', // Scorpio
+            '9', // Sagittarius
+            '10', // Capricorn
+            '11', // Aquarius
+            '12'  // Pisces
+        ];
+
+        const rashiIndex = (houseNumber - 1) % 12;
+        const rashiName = rashis[rashiIndex];
+
+        // Create small rounded black box for Rashi
+        const rashiBoxSize = 20;
+        const rashiBox = new Konva.Rect({
+            x: x + width - rashiBoxSize - 5,
+            y: y + 5,
+            width: rashiBoxSize,
+            height: rashiBoxSize,
+            fill: '#000000',
+            cornerRadius: 4,
+            name: `rashi-box-${houseNumber}`
+        });
+
+        // Create Rashi text (white text on black background)
+        const rashiText = new Konva.Text({
+            x: x + width - rashiBoxSize - 5,
+            y: y + 5,
+            width: rashiBoxSize,
+            height: rashiBoxSize,
+            text: rashiName,
+            fontSize: 10,
             fontFamily: 'Arial',
             fontWeight: 'bold',
-            fill: '#374151',
-            name: `house-number-${houseNumber}`
+            fill: '#ffffff',
+            align: 'center',
+            verticalAlign: 'middle',
+            name: `rashi-${houseNumber}`
         });
 
         // Store house data
@@ -277,7 +312,8 @@ class ChartTemplates {
 
         // Add to chart group
         this.chartGroup.add(house);
-        this.chartGroup.add(numberText);
+        this.chartGroup.add(rashiBox);
+        this.chartGroup.add(rashiText);
 
         // Add right-click event for context menu
         house.on('contextmenu', (e) => {
