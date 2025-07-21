@@ -70,15 +70,12 @@ class ContextMenu {
 
     showCreateChartMenu(x, y) {
         this.menu.innerHTML = `
-            <div class="context-menu-header">Create Chart</div>
-            <div class="context-menu-item" data-action="create-south-indian">
-                Create South Indian Chart
-            </div>
-            <div class="context-menu-item" data-action="create-north-indian">
-                Create North Indian Chart
-            </div>
+            <div class="context-menu-create-header">CREATE CHART</div>
+            <div class="context-menu-separator"></div>
+            <div class="context-menu-item" data-action="create-south-indian"><i data-lucide="plus-circle"></i> South Indian Chart</div>
+            <div class="context-menu-item" data-action="create-north-indian"><i data-lucide="plus-circle"></i> North Indian Chart</div>
         `;
-
+        lucide.createIcons();
         this.show(x, y);
         this.setupMenuEventListeners();
     }
@@ -87,23 +84,21 @@ class ContextMenu {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
         let menuHtml = `
             <div class="context-menu-header">${chartName} Chart</div>
+            <div class="context-menu-separator"></div>
         `;
         // Add 'Set as Lagna' menu item only for South Indian chart
         if (chartType === 'south-indian') {
             menuHtml += `
-            <div class="context-menu-item" data-action="set-lagna">
-                Set as Lagna
-            </div>
+            <div class="context-menu-item" data-action="set-lagna"><i data-lucide="target"></i> Set as Lagna</div>
             <div class="context-menu-separator"></div>
             `;
         }
         // Always add 'Clear Chart' as the last item
         menuHtml += `
-            <div class="context-menu-item last-item" data-action="clear-chart">
-                Clear Chart
-            </div>
+            <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Chart</div>
         `;
         this.menu.innerHTML = menuHtml;
+        lucide.createIcons();
         this.show(x, y);
         this.setupMenuEventListeners();
     }
@@ -115,14 +110,16 @@ class ContextMenu {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
         const menuHtml =
             `<div class="context-menu-header">${chartName} Chart - House ${houseNumber}</div>` +
-            `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}">Set as Lagna (Ascendant)</div>` +
-            `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}">Set as First House</div>` +
             `<div class="context-menu-separator"></div>` +
-            `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}">Clear House</div>` +
+            `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}"><i data-lucide="target"></i> Set as Lagna (Ascendant)</div>` +
+            `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}"><i data-lucide="home"></i> Set as First House</div>` +
             `<div class="context-menu-separator"></div>` +
-            `<div class="context-menu-item last-item" data-action="clear-chart">Clear Chart</div>`;
+            `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}"><i data-lucide="broom"></i> Clear House</div>` +
+            `<div class="context-menu-separator"></div>` +
+            `<div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Chart</div>`;
         console.log('[DEBUG] Menu HTML:', menuHtml);
         this.menu.innerHTML = menuHtml;
+        lucide.createIcons();
         // Explicitly set data-house attributes after rendering
         const lagnaItem = this.menu.querySelector('[data-action="set-lagna"]');
         const firstHouseItem = this.menu.querySelector('[data-action="set-first-house"]');
