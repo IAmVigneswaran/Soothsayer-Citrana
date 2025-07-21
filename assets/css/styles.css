@@ -289,8 +289,10 @@ body {
   width: 100%;
   border: none;
   margin: 0;
+  color: #000; /* Ensure visible text */
 }
-.context-menu-item:hover {
+.context-menu-item:hover,
+.context-submenu .context-menu-item:hover {
   background: #000;
   color: #fff;
   border-radius: 0;
@@ -313,6 +315,39 @@ body {
     height: 1px;
     background: #000000;
     margin: 4px 0;
+}
+
+/* Context menu submenu styles */
+.context-menu-item.has-submenu {
+  position: relative;
+}
+.context-submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #000000; /* Match main menu border */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Match main menu shadow */
+  z-index: 2100;
+  padding: 4px 0;
+  border-radius: 8px; /* Match main menu radius */
+  font: inherit;
+  color: inherit;
+  overflow: visible;
+}
+.context-submenu .context-menu-item {
+  white-space: nowrap;
+  padding-left: 32px;
+  padding-right: 16px;
+  font: inherit;
+  color: #000; /* Ensure visible text in submenu */
+  width: 100%;
+  box-sizing: border-box;
+}
+.context-menu-item.has-submenu:hover > .context-submenu {
+  display: block;
 }
 
 /* Responsive Design */
@@ -364,4 +399,13 @@ body {
 
 .planet-grid::-webkit-scrollbar-thumb:hover {
     background: #333333;
+} 
+
+.zodiac-symbol {
+  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols', 'Symbola', 'DejaVu Sans', 'Arial Unicode MS', sans-serif;
+  font-size: 1.2em;
+  margin-right: 0.5em;
+  font-weight: normal;
+  line-height: 1;
+  vertical-align: middle;
 } 

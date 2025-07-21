@@ -93,6 +93,31 @@ class ContextMenu {
             <div class="context-menu-separator"></div>
             `;
         }
+        // Add 'Set Lagna as ...' with 12 sub-menu items for North Indian chart
+        if (chartType === 'north-indian') {
+            const rashis = [
+                { name: 'Aries', symbol: '\u2648' },
+                { name: 'Taurus', symbol: '\u2649' },
+                { name: 'Gemini', symbol: '\u264A' },
+                { name: 'Cancer', symbol: '\u264B' },
+                { name: 'Leo', symbol: '\u264C' },
+                { name: 'Virgo', symbol: '\u264D' },
+                { name: 'Libra', symbol: '\u264E' },
+                { name: 'Scorpio', symbol: '\u264F' },
+                { name: 'Sagittarius', symbol: '\u2650' },
+                { name: 'Capricorn', symbol: '\u2651' },
+                { name: 'Aquarius', symbol: '\u2652' },
+                { name: 'Pisces', symbol: '\u2653' }
+            ];
+            menuHtml += `
+            <div class="context-menu-item has-submenu" data-action="set-lagna-parent"><i data-lucide="target"></i> Set Lagna as ...
+                <div class="context-submenu context-menu">
+                    ${rashis.map((rashi, i) => `<div class='context-menu-item' data-action='set-lagna' data-house='${i+1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`).join('')}
+                </div>
+            </div>
+            <div class="context-menu-separator"></div>
+            `;
+        }
         // Always add 'Clear Chart' as the last item
         menuHtml += `
             <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Chart</div>
@@ -101,6 +126,22 @@ class ContextMenu {
         lucide.createIcons();
         this.show(x, y);
         this.setupMenuEventListeners();
+        // Setup submenu hover logic
+        this.setupSubmenuHover();
+    }
+
+    setupSubmenuHover() {
+        // Show/hide submenu on hover for .has-submenu
+        const parent = this.menu.querySelector('.has-submenu');
+        if (parent) {
+            const submenu = parent.querySelector('.context-submenu');
+            parent.addEventListener('mouseenter', () => {
+                submenu.style.display = 'block';
+            });
+            parent.addEventListener('mouseleave', () => {
+                submenu.style.display = 'none';
+            });
+        }
     }
 
     showHouseMenu(x, y, houseNumber) {
