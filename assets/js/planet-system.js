@@ -5,16 +5,16 @@
 class PlanetSystem {
     constructor() {
         this.planets = {
-            'Su': { name: 'Sun', color: '#FF6B35' },
-            'Mo': { name: 'Moon', color: '#4ECDC4' },
-            'Ma': { name: 'Mars', color: '#FF3838' },
-            'Me': { name: 'Mercury', color: '#45B7D1' },
-            'Ju': { name: 'Jupiter', color: '#96CEB4' },
-            'Ve': { name: 'Venus', color: '#FFEAA7' },
-            'Sa': { name: 'Saturn', color: '#DDA0DD' },
-            'Ra': { name: 'Rahu', color: '#2C3E50' },
-            'Ke': { name: 'Ketu', color: '#E74C3C' },
-            'Md': { name: 'Maandi', color: '#8B4513' }
+            'Su': { name: 'Sun', fullName: 'Sun', color: '#000000' },
+            'Mo': { name: 'Moon', fullName: 'Moon', color: '#000000' },
+            'Ma': { name: 'Mars', fullName: 'Mars', color: '#000000' },
+            'Me': { name: 'Mercury', fullName: 'Mercury', color: '#000000' },
+            'Ju': { name: 'Jupiter', fullName: 'Jupiter', color: '#000000' },
+            'Ve': { name: 'Venus', fullName: 'Venus', color: '#000000' },
+            'Sa': { name: 'Saturn', fullName: 'Saturn', color: '#000000' },
+            'Ra': { name: 'Rahu', fullName: 'Rahu', color: '#000000' },
+            'Ke': { name: 'Ketu', fullName: 'Ketu', color: '#000000' },
+            'Md': { name: 'Maandi', fullName: 'Maandi', color: '#000000' }
         };
         
         this.draggedPlanet = null;
@@ -29,19 +29,20 @@ class PlanetSystem {
 
     createPlanetLibrary() {
         const library = document.getElementById('planet-library');
+        console.log('Looking for planet-library element:', library);
+        
         if (!library) {
             console.error('Planet library container not found');
             return;
         }
 
         library.innerHTML = '';
+        console.log('Creating planet items for:', Object.keys(this.planets));
         
         Object.entries(this.planets).forEach(([abbr, planet]) => {
             const planetItem = document.createElement('div');
             planetItem.className = 'planet-item';
-            planetItem.textContent = abbr;
-            planetItem.style.color = planet.color;
-            planetItem.style.borderColor = planet.color;
+            planetItem.textContent = planet.fullName;
             planetItem.draggable = true;
             planetItem.dataset.planet = abbr;
             
@@ -50,9 +51,10 @@ class PlanetSystem {
             planetItem.addEventListener('dragend', (e) => this.handleDragEnd(e));
             
             library.appendChild(planetItem);
+            console.log('Added planet item:', planet.fullName);
         });
         
-        console.log('Planet library created');
+        console.log('Planet library created with', library.children.length, 'items');
     }
 
     setupDragAndDrop() {

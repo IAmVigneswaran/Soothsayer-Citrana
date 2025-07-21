@@ -3,20 +3,18 @@
  * Handles South Indian and North Indian chart layouts
  */
 class ChartTemplates {
-    constructor() {
-        this.stage = null;
-        this.layer = null;
+    constructor(stage, layer) {
+        this.stage = stage;
+        this.layer = layer;
         this.chartGroup = null;
         this.currentChartType = null;
         this.houseData = {};
         this.lagnaHouse = 1;
         this.firstHouse = 1;
-    }
-
-    setStage(stage, layer) {
-        this.stage = stage;
-        this.layer = layer;
-        console.log('Stage and layer set in ChartTemplates');
+        
+        if (stage && layer) {
+            console.log('ChartTemplates initialized with stage and layer');
+        }
     }
 
     getStage() {
@@ -437,10 +435,34 @@ class ChartTemplates {
 
     getChartData() {
         return {
-            type: this.currentChartType,
+            chartType: this.currentChartType,
             lagnaHouse: this.lagnaHouse,
             firstHouse: this.firstHouse,
             houseData: this.houseData
         };
+    }
+
+    loadChartData(data) {
+        if (!data) return;
+        
+        try {
+            this.currentChartType = data.chartType;
+            this.lagnaHouse = data.lagnaHouse || 1;
+            this.firstHouse = data.firstHouse || 1;
+            this.houseData = data.houseData || {};
+            
+            // Recreate the chart if we have a chart type
+            if (this.currentChartType) {
+                if (this.currentChartType === 'south-indian') {
+                    this.createSouthIndianChart();
+                } else if (this.currentChartType === 'north-indian') {
+                    this.createNorthIndianChart();
+                }
+            }
+            
+            console.log('Chart data loaded successfully');
+        } catch (error) {
+            console.error('Error loading chart data:', error);
+        }
     }
 } 

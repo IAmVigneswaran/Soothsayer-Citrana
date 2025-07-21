@@ -24,23 +24,26 @@ class ContextMenu {
         // Create new menu
         this.menu = document.createElement('div');
         this.menu.id = 'context-menu';
-        this.menu.className = 'hidden';
+        this.menu.className = 'context-menu hidden';
         document.body.appendChild(this.menu);
     }
 
     setupEventListeners() {
         // Prevent default context menu on canvas
         const canvas = document.getElementById('canvas-container');
+        
         if (canvas) {
             canvas.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 this.showChartMenu(e.clientX, e.clientY);
             });
+        } else {
+            console.error('Canvas container not found for context menu');
         }
 
         // Hide menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (!this.menu.contains(e.target)) {
+            if (this.menu && !this.menu.contains(e.target)) {
                 this.hide();
             }
         });
@@ -178,9 +181,11 @@ class ContextMenu {
     }
 
     show(x, y) {
-        // Position menu
+        // Ensure proper positioning
+        this.menu.style.position = 'absolute';
         this.menu.style.left = x + 'px';
         this.menu.style.top = y + 'px';
+        this.menu.style.zIndex = '2000';
         
         // Ensure menu doesn't go off-screen
         const rect = this.menu.getBoundingClientRect();

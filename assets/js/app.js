@@ -6,49 +6,56 @@ class VedicAstrologyApp {
     constructor() {
         this.stage = null;
         this.layer = null;
+        this.chartTemplates = null;
+        this.planetSystem = null;
+        this.drawingTools = null;
+        this.contextMenu = null;
+        this.grahaLibrary = null;
         this.currentTool = 'select';
         this.isDrawing = false;
         this.lastPoint = null;
-        this.zoomLevel = 1;
-        
-        // Initialize components
-        this.chartTemplates = new ChartTemplates();
-        this.planetSystem = new PlanetSystem();
-        this.drawingTools = new DrawingTools();
-        this.contextMenu = new ContextMenu();
         
         this.init();
     }
 
     init() {
-        this.setupStage();
+        console.log('Initializing Vedic Astrology App...');
+        
+        this.setupCanvas();
+        this.setupComponents();
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
-        this.planetSystem.init();
-        this.contextMenu.init();
+        this.loadSavedData();
         
-        // Auto-save every 30 seconds
-        setInterval(() => this.autoSave(), 30000);
-        
-        console.log('Vedic Astrology App initialized');
+        console.log('App initialization complete');
     }
 
-    setupStage() {
+    setupCanvas() {
         const container = document.getElementById('canvas-container');
-        
         this.stage = new Konva.Stage({
             container: 'canvas-container',
             width: container.offsetWidth,
             height: container.offsetHeight
         });
-
+        
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
         
-        // Store stage reference in chart templates
-        this.chartTemplates.setStage(this.stage, this.layer);
+        console.log('Canvas setup complete');
+    }
+
+    setupComponents() {
+        this.chartTemplates = new ChartTemplates(this.stage, this.layer);
+        this.planetSystem = new PlanetSystem(this.stage, this.layer, this.chartTemplates);
+        this.drawingTools = new DrawingTools(this.stage, this.layer);
+        this.contextMenu = new ContextMenu();
+        this.grahaLibrary = new GrahaLibrary();
         
-        console.log('Stage setup complete');
+        // Initialize components
+        this.planetSystem.init();
+        this.contextMenu.init();
+        
+        console.log('Components setup complete');
     }
 
     setupEventListeners() {
@@ -80,6 +87,51 @@ class VedicAstrologyApp {
         window.addEventListener('resize', () => this.handleResize());
 
         console.log('Event listeners setup complete');
+    }
+
+    loadSavedData() {
+        // Load saved chart data if available
+        const savedData = localStorage.getItem('vedicChartData');
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                this.chartTemplates.loadChartData(data);
+                console.log('Saved chart data loaded');
+            } catch (error) {
+                console.error('Error loading saved data:', error);
+            }
+        }
+
+        // Auto-save every 30 seconds
+        setInterval(() => this.autoSave(), 30000);
+    }
+
+    autoSave() {
+        try {
+            const chartData = this.chartTemplates.getChartData();
+            localStorage.setItem('vedicChartData', JSON.stringify(chartData));
+            console.log('Chart data auto-saved');
+        } catch (error) {
+            console.error('Error auto-saving:', error);
+        }
+    }
+
+    exportChart() {
+        try {
+            const dataURL = this.stage.toDataURL({
+                pixelRatio: 2,
+                mimeType: 'image/png'
+            });
+            
+            const link = document.createElement('a');
+            link.download = 'vedic-chart.png';
+            link.href = dataURL;
+            link.click();
+            
+            console.log('Chart exported successfully');
+        } catch (error) {
+            console.error('Error exporting chart:', error);
+        }
     }
 
     setupKeyboardShortcuts() {
@@ -207,26 +259,6 @@ class VedicAstrologyApp {
         const zoomPercent = Math.round(this.stage.scaleX() * 100);
         document.getElementById('zoom-level').textContent = `${zoomPercent}%`;
         this.zoomLevel = this.stage.scaleX();
-    }
-
-    exportChart() {
-        const dataURL = this.stage.toDataURL({
-            pixelRatio: 3,
-            mimeType: 'image/png'
-        });
-        
-        const link = document.createElement('a');
-        link.download = 'vedic-chart.png';
-        link.href = dataURL;
-        link.click();
-        
-        console.log('Chart exported');
-    }
-
-    autoSave() {
-        const chartData = this.chartTemplates.getChartData();
-        localStorage.setItem('vedicChartData', JSON.stringify(chartData));
-        console.log('Chart auto-saved');
     }
 
     clearChart() {
