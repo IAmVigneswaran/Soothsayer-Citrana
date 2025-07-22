@@ -147,6 +147,16 @@ class CitranaApp {
 
     setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
+            // Check if we're in text editing mode
+            const textarea = document.querySelector('.konva-textarea');
+            if (textarea && document.activeElement === textarea) {
+                // Only allow Enter and Escape in text editing mode
+                if (e.key === 'Enter' || e.key === 'Escape') {
+                    return; // Let the textarea handle these
+                }
+                return; // Ignore all other keyboard shortcuts during text editing
+            }
+
             // Tool shortcuts
             if (e.key === 'v' || e.key === 'V') {
                 e.preventDefault();
@@ -184,11 +194,20 @@ class CitranaApp {
                     this.redo();
                 }
             }
+            
+            // Delete selected shape
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (this.currentTool === 'select') {
+                    e.preventDefault();
+                    this.drawingTools.deleteSelectedShape();
+                }
+            }
         });
     }
 
     setTool(tool) {
         this.currentTool = tool;
+        this.drawingTools.setTool(tool);
         
         // Update UI
         document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
@@ -208,12 +227,14 @@ class CitranaApp {
     }
 
     handleMouseDown(e) {
-        const pos = this.stage.getPointerPosition();
+        const pos = this.drawingTools.getPrecisePositionFromKonva(e);
         
         if (this.currentTool === 'hand') {
             this.stage.draggable(true);
             document.getElementById('canvas-container').style.cursor = 'grabbing';
-        } else {
+        } else if (this.currentTool === 'select') {
+            this.drawingTools.handleSelectMouseDown(pos, e);
+        } else if (pos) {
             this.isDrawing = true;
             this.lastPoint = pos;
             this.drawingTools.startDrawing(pos, this.currentTool);
@@ -221,17 +242,22 @@ class CitranaApp {
     }
 
     handleMouseMove(e) {
-        if (!this.isDrawing) return;
+        const pos = this.drawingTools.getPrecisePositionFromKonva(e);
         
-        const pos = this.stage.getPointerPosition();
-        this.drawingTools.draw(pos, this.currentTool);
-        this.lastPoint = pos;
+        if (this.currentTool === 'select') {
+            this.drawingTools.handleSelectMouseMove(pos);
+        } else if (this.isDrawing && pos) {
+            this.drawingTools.draw(pos, this.currentTool);
+            this.lastPoint = pos;
+        }
     }
 
     handleMouseUp(e) {
         if (this.currentTool === 'hand') {
             this.stage.draggable(false);
             document.getElementById('canvas-container').style.cursor = 'grab';
+        } else if (this.currentTool === 'select') {
+            this.drawingTools.handleSelectMouseUp();
         } else {
             this.isDrawing = false;
             this.drawingTools.stopDrawing();

@@ -1,21 +1,127 @@
 /**
  * Drawing Tools Class
  * Handles all drawing functionality (arrow, line, pen, text)
+ * 100% precise and accurate to mouse position
  */
 class DrawingTools {
-    constructor() {
+    constructor(stage, layer) {
+        this.stage = stage;
+        this.layer = layer;
         this.isDrawing = false;
         this.currentShape = null;
+        this.currentTool = null;
         this.undoStack = [];
         this.redoStack = [];
         this.maxUndoSteps = 50;
+        this.lastPoint = null;
+        this.isTouchDevice = this.detectTouchDevice();
+        this.selectedShape = null;
+        this.isDragging = false;
+        
+        // Setup touch events for mobile precision
+        this.setupTouchEvents();
+    }
+
+    detectTouchDevice() {
+        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+
+    setupTouchEvents() {
+        if (!this.isTouchDevice) return;
+
+        // Add touch event listeners to stage
+        this.stage.on('touchstart', (e) => {
+            e.evt.preventDefault();
+            const touch = e.evt.touches[0];
+            const pos = this.getPrecisePosition(touch);
+            this.startDrawing(pos, this.currentTool);
+        });
+
+        this.stage.on('touchmove', (e) => {
+            e.evt.preventDefault();
+            if (!this.isDrawing) return;
+            const touch = e.evt.touches[0];
+            const pos = this.getPrecisePosition(touch);
+            this.draw(pos, this.currentTool);
+        });
+
+        this.stage.on('touchend', (e) => {
+            e.evt.preventDefault();
+            this.stopDrawing();
+        });
+    }
+
+    /**
+     * Get precise mouse/touch position accounting for stage transformations
+     * @param {Event|Touch} event - Mouse or touch event
+     * @returns {Object} Precise position {x, y}
+     */
+    getPrecisePosition(event) {
+        // Get the stage container's bounding rect
+        const stageBox = this.stage.container().getBoundingClientRect();
+        
+        // Get client coordinates
+        let clientX, clientY;
+        if (event.clientX !== undefined) {
+            // Mouse event
+            clientX = event.clientX;
+            clientY = event.clientY;
+        } else {
+            // Touch event
+            clientX = event.clientX || event.pageX;
+            clientY = event.clientY || event.pageY;
+        }
+        
+        // Calculate position relative to stage container
+        const x = (clientX - stageBox.left) / this.stage.scaleX();
+        const y = (clientY - stageBox.top) / this.stage.scaleY();
+        
+        // Account for stage position
+        const finalX = x - this.stage.x() / this.stage.scaleX();
+        const finalY = y - this.stage.y() / this.stage.scaleY();
+        
+        // Ensure pixel-perfect positioning
+        return { 
+            x: Math.round(finalX * 100) / 100, 
+            y: Math.round(finalY * 100) / 100 
+        };
+    }
+
+    /**
+     * Get precise position from Konva event
+     * @param {KonvaEvent} e - Konva event
+     * @returns {Object} Precise position {x, y}
+     */
+    getPrecisePositionFromKonva(e) {
+        const pos = this.stage.getPointerPosition();
+        if (!pos) return null;
+        
+        // Account for stage transformations
+        const scaleX = this.stage.scaleX();
+        const scaleY = this.stage.scaleY();
+        const stageX = this.stage.x();
+        const stageY = this.stage.y();
+        
+        // Ensure we get pixel-perfect positioning
+        const finalX = Math.round((pos.x - stageX) / scaleX * 100) / 100;
+        const finalY = Math.round((pos.y - stageY) / scaleY * 100) / 100;
+        
+        return { x: finalX, y: finalY };
     }
 
     startDrawing(pos, tool) {
-        if (!window.app?.stage) return;
+        if (!pos || !this.stage || !this.layer) return;
+        
+        // Validate position coordinates
+        if (typeof pos.x !== 'number' || typeof pos.y !== 'number' || 
+            isNaN(pos.x) || isNaN(pos.y)) {
+            console.warn('Invalid position coordinates:', pos);
+            return;
+        }
 
         this.isDrawing = true;
         this.currentTool = tool;
+        this.lastPoint = pos;
 
         switch (tool) {
             case 'arrow':
@@ -34,7 +140,19 @@ class DrawingTools {
     }
 
     draw(pos, tool) {
-        if (!this.isDrawing || !this.currentShape) return;
+        if (!this.isDrawing || !this.currentShape || !pos) return;
+        
+        // Validate position coordinates
+        if (typeof pos.x !== 'number' || typeof pos.y !== 'number' || 
+            isNaN(pos.x) || isNaN(pos.y)) {
+            console.warn('Invalid position coordinates in draw:', pos);
+            return;
+        }
+
+        // Ensure minimum distance for smooth drawing
+        if (this.lastPoint && this.getDistance(pos, this.lastPoint) < 1) {
+            return;
+        }
 
         switch (tool) {
             case 'arrow':
@@ -47,6 +165,8 @@ class DrawingTools {
                 this.updatePen(pos);
                 break;
         }
+        
+        this.lastPoint = pos;
     }
 
     stopDrawing() {
@@ -58,7 +178,19 @@ class DrawingTools {
             this.addToUndoStack(this.currentShape);
             this.currentShape = null;
         }
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        
+        this.lastPoint = null;
+        
+        // Trigger snapshot for undo/redo
+        if (window.app && window.app.pushSnapshot) {
+            window.app.pushSnapshot();
+        }
+    }
+
+    getDistance(pos1, pos2) {
+        const dx = pos1.x - pos2.x;
+        const dy = pos1.y - pos2.y;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     startArrow(pos) {
@@ -69,12 +201,15 @@ class DrawingTools {
             fill: '#374151',
             pointerLength: 10,
             pointerWidth: 8,
-            name: 'drawing-arrow'
+            name: 'drawing-arrow',
+            perfectDrawEnabled: true,
+            listening: true,
+            draggable: false // Will be enabled when select tool is active
         });
 
         this.currentShape = arrow;
-        window.app.layer.add(arrow);
-        window.app.layer.batchDraw();
+        this.layer.add(arrow);
+        this.layer.batchDraw();
     }
 
     updateArrow(pos) {
@@ -84,7 +219,7 @@ class DrawingTools {
         points[2] = pos.x;
         points[3] = pos.y;
         this.currentShape.points(points);
-        window.app.layer.batchDraw();
+        this.layer.batchDraw();
     }
 
     startLine(pos) {
@@ -92,12 +227,15 @@ class DrawingTools {
             points: [pos.x, pos.y, pos.x, pos.y],
             stroke: '#374151',
             strokeWidth: 2,
-            name: 'drawing-line'
+            name: 'drawing-line',
+            perfectDrawEnabled: true,
+            listening: true,
+            draggable: false // Will be enabled when select tool is active
         });
 
         this.currentShape = line;
-        window.app.layer.add(line);
-        window.app.layer.batchDraw();
+        this.layer.add(line);
+        this.layer.batchDraw();
     }
 
     updateLine(pos) {
@@ -107,7 +245,7 @@ class DrawingTools {
         points[2] = pos.x;
         points[3] = pos.y;
         this.currentShape.points(points);
-        window.app.layer.batchDraw();
+        this.layer.batchDraw();
     }
 
     startPen(pos) {
@@ -117,12 +255,16 @@ class DrawingTools {
             strokeWidth: 2,
             lineCap: 'round',
             lineJoin: 'round',
-            name: 'drawing-pen'
+            name: 'drawing-pen',
+            perfectDrawEnabled: true,
+            listening: true,
+            draggable: false, // Will be enabled when select tool is active
+            tension: 0.1 // Smooth curves
         });
 
         this.currentShape = line;
-        window.app.layer.add(line);
-        window.app.layer.batchDraw();
+        this.layer.add(line);
+        this.layer.batchDraw();
     }
 
     updatePen(pos) {
@@ -131,102 +273,157 @@ class DrawingTools {
         const points = this.currentShape.points();
         points.push(pos.x, pos.y);
         this.currentShape.points(points);
-        window.app.layer.batchDraw();
+        this.layer.batchDraw();
     }
 
     startText(pos) {
         const text = new Konva.Text({
             x: pos.x,
             y: pos.y,
-            text: 'Text',
+            text: 'Double-click to edit',
             fontSize: 16,
             fontFamily: 'Arial',
             fill: '#374151',
             draggable: true,
-            name: 'drawing-text'
+            name: 'drawing-text',
+            listening: true,
+            padding: 4
         });
 
         this.currentShape = text;
-        window.app.layer.add(text);
-        window.app.layer.batchDraw();
+        this.layer.add(text);
+        this.layer.batchDraw();
 
-        // Make text editable
+        // Make text editable immediately and on double-click
         this.makeTextEditable(text);
+        
+        // Also make it editable on single click for better UX
+        text.on('click', () => {
+            // Only edit if we're not in select mode
+            if (this.currentTool !== 'select') {
+                this.editText(text);
+            }
+        });
+        
+        // Auto-switch to select tool after creating text
+        setTimeout(() => {
+            if (window.app) {
+                window.app.setTool('select');
+            }
+        }, 100);
     }
 
     makeTextEditable(text) {
+        // Double-click to edit (always works regardless of tool)
         text.on('dblclick', () => {
-            // Create textarea over the text
-            const textPosition = text.absolutePosition();
-            const stageBox = window.app.stage.container().getBoundingClientRect();
-            
-            const areaPosition = {
-                x: stageBox.left + textPosition.x,
-                y: stageBox.top + textPosition.y
-            };
-
-            const textarea = document.createElement('textarea');
-            document.body.appendChild(textarea);
-
-            textarea.value = text.text();
-            textarea.style.position = 'absolute';
-            textarea.style.top = areaPosition.y + 'px';
-            textarea.style.left = areaPosition.x + 'px';
-            textarea.style.width = (text.width() - text.padding() * 2) + 'px';
-            textarea.style.height = (text.height() - text.padding() * 2) + 'px';
-            textarea.style.fontSize = text.fontSize() + 'px';
-            textarea.style.border = 'none';
-            textarea.style.padding = '0px';
-            textarea.style.margin = '0px';
-            textarea.style.overflow = 'hidden';
-            textarea.style.background = 'none';
-            textarea.style.outline = 'none';
-            textarea.style.resize = 'none';
-            textarea.style.lineHeight = text.lineHeight();
-            textarea.style.fontFamily = text.fontFamily();
-            textarea.style.transformOrigin = 'left top';
-            textarea.style.textAlign = text.align();
-            textarea.style.color = text.fill();
-            textarea.style.zIndex = '1000';
-
-            const scale = window.app.stage.scaleX();
-            textarea.style.transform = `scale(${scale})`;
-
-            textarea.focus();
-
-            const removeTextarea = () => {
-                textarea.parentNode.removeChild(textarea);
-                window.removeEventListener('click', handleOutsideClick);
-                text.setAttrs({
-                    draggable: true
-                });
-            };
-
-            textarea.addEventListener('blur', removeTextarea);
-            textarea.addEventListener('keydown', (e) => {
-                if (e.keyCode === 13 && !e.shiftKey) {
-                    text.text(textarea.value);
-                    removeTextarea();
-                }
-                if (e.keyCode === 27) {
-                    removeTextarea();
-                }
-            });
-
-            const handleOutsideClick = (e) => {
-                if (e.target !== textarea) {
-                    text.text(textarea.value);
-                    removeTextarea();
-                }
-            };
-            setTimeout(() => {
-                document.addEventListener('click', handleOutsideClick);
-            });
-
-            text.setAttrs({
-                draggable: false
-            });
+            this.editText(text);
         });
+    }
+
+    editText(text) {
+        // Prevent multiple textareas
+        const existingTextarea = document.querySelector('.konva-textarea');
+        if (existingTextarea) {
+            existingTextarea.remove();
+        }
+
+        // Get the absolute position of the text
+        const textPosition = text.absolutePosition();
+        const stageBox = this.stage.container().getBoundingClientRect();
+        
+        // Calculate position relative to viewport
+        const areaPosition = {
+            x: stageBox.left + textPosition.x,
+            y: stageBox.top + textPosition.y
+        };
+
+        // Create textarea
+        const textarea = document.createElement('textarea');
+        textarea.className = 'konva-textarea';
+        document.body.appendChild(textarea);
+
+        // Set initial value
+        textarea.value = text.text() === 'Double-click to edit' ? '' : text.text();
+        
+        // Style the textarea
+        textarea.style.position = 'absolute';
+        textarea.style.top = areaPosition.y + 'px';
+        textarea.style.left = areaPosition.x + 'px';
+        textarea.style.width = Math.max(100, text.width()) + 'px';
+        textarea.style.height = Math.max(20, text.height()) + 'px';
+        textarea.style.fontSize = text.fontSize() + 'px';
+        textarea.style.fontFamily = text.fontFamily();
+        textarea.style.color = text.fill();
+        textarea.style.border = 'none';
+        textarea.style.borderRadius = '0px';
+        textarea.style.padding = '0px';
+        textarea.style.margin = '0px';
+        textarea.style.background = 'transparent';
+        textarea.style.outline = 'none';
+        textarea.style.resize = 'none';
+        textarea.style.zIndex = '10000';
+        textarea.style.boxShadow = 'none';
+
+        // Apply stage scale
+        const scale = this.stage.scaleX();
+        textarea.style.transform = `scale(${scale})`;
+        textarea.style.transformOrigin = 'left top';
+
+        // Focus and select all text
+        textarea.focus();
+        textarea.select();
+
+        // Disable dragging while editing and hide the original text
+        text.setAttrs({ 
+            draggable: false,
+            visible: false // Hide the original text while editing
+        });
+
+        const finishEditing = () => {
+            const newText = textarea.value.trim();
+            if (newText) {
+                text.text(newText);
+            } else {
+                text.text('Double-click to edit');
+            }
+            
+            textarea.remove();
+            text.setAttrs({ 
+                draggable: true,
+                visible: true // Show the text again after editing
+            });
+            this.layer.batchDraw();
+            
+            // Remove event listeners
+            document.removeEventListener('click', handleOutsideClick);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                finishEditing();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                textarea.value = text.text();
+                finishEditing();
+            }
+        };
+
+        const handleOutsideClick = (e) => {
+            if (e.target !== textarea) {
+                finishEditing();
+            }
+        };
+
+        // Add event listeners
+        textarea.addEventListener('blur', finishEditing);
+        document.addEventListener('keydown', handleKeyDown);
+        
+        // Delay outside click handler to prevent immediate closure
+        setTimeout(() => {
+            document.addEventListener('click', handleOutsideClick);
+        }, 100);
     }
 
     addToUndoStack(shape) {
@@ -245,7 +442,7 @@ class DrawingTools {
         this.redoStack.push(shape);
         
         shape.destroy();
-        window.app.layer.batchDraw();
+        this.layer.batchDraw();
         
         console.log('Undo performed');
     }
@@ -256,17 +453,17 @@ class DrawingTools {
         const shape = this.redoStack.pop();
         this.undoStack.push(shape);
         
-        window.app.layer.add(shape);
-        window.app.layer.batchDraw();
+        this.layer.add(shape);
+        this.layer.batchDraw();
         
         console.log('Redo performed');
     }
 
     clearAll() {
         // Remove all drawing objects (not chart objects)
-        const drawingObjects = window.app.layer.find(node => node.name() && node.name().startsWith('drawing-'));
+        const drawingObjects = this.layer.find(node => node.name() && node.name().startsWith('drawing-'));
         drawingObjects.forEach(obj => obj.destroy());
-        window.app.layer.batchDraw();
+        this.layer.batchDraw();
         
         this.undoStack = [];
         this.redoStack = [];
@@ -275,10 +472,10 @@ class DrawingTools {
     }
 
     getDrawingStats() {
-        const arrows = window.app.layer.find('arrow').length;
-        const lines = window.app.layer.find('line').length;
-        const penStrokes = window.app.layer.find('pen').length;
-        const texts = window.app.layer.find('text').length;
+        const arrows = this.layer.find(node => node.name() === 'drawing-arrow').length;
+        const lines = this.layer.find(node => node.name() === 'drawing-line').length;
+        const penStrokes = this.layer.find(node => node.name() === 'drawing-pen').length;
+        const texts = this.layer.find(node => node.name() === 'drawing-text').length;
         
         return {
             arrows,
@@ -287,5 +484,110 @@ class DrawingTools {
             texts,
             total: arrows + lines + penStrokes + texts
         };
+    }
+
+    /**
+     * Set the current tool
+     * @param {string} tool - Tool name
+     */
+    setTool(tool) {
+        this.currentTool = tool;
+        
+        // Clear selection when switching tools
+        this.clearSelection();
+        
+        // Enable/disable dragging for all drawing objects based on tool
+        this.updateDrawingObjectsDraggable(tool === 'select');
+    }
+
+    /**
+     * Update draggable state for all drawing objects
+     * @param {boolean} draggable - Whether objects should be draggable
+     */
+    updateDrawingObjectsDraggable(draggable) {
+        const drawingObjects = this.layer.find(node => 
+            node.name() && node.name().startsWith('drawing-')
+        );
+        
+        drawingObjects.forEach(obj => {
+            if (obj.name() !== 'drawing-text') {
+                // Text objects handle their own dragging
+                obj.draggable(draggable);
+            }
+        });
+        
+        console.log(`Updated ${drawingObjects.length} drawing objects to draggable: ${draggable}`);
+    }
+
+    /**
+     * Clear current selection
+     */
+    clearSelection() {
+        if (this.selectedShape) {
+            this.selectedShape = null;
+        }
+        this.layer.batchDraw();
+    }
+
+    /**
+     * Select a drawing object
+     * @param {KonvaObject} shape - The shape to select
+     */
+    selectShape(shape) {
+        this.clearSelection();
+        
+        if (shape && shape.name() && shape.name().startsWith('drawing-')) {
+            this.selectedShape = shape;
+            // No visual selection indicator - just track the selected shape
+            this.layer.batchDraw();
+        }
+    }
+
+    /**
+     * Handle mouse down for select tool
+     * @param {Object} pos - Mouse position
+     * @param {KonvaEvent} e - Konva event
+     */
+    handleSelectMouseDown(pos, e) {
+        if (!pos) return;
+
+        const clickedShape = e.target;
+        
+        // Check if clicked on a drawing object
+        if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
+            this.selectShape(clickedShape);
+            this.isDragging = true;
+        } else {
+            // Clicked on empty space, clear selection
+            this.clearSelection();
+        }
+    }
+
+    /**
+     * Handle mouse move for select tool
+     * @param {Object} pos - Mouse position
+     */
+    handleSelectMouseMove(pos) {
+        // Dragging is handled automatically by Konva when draggable is true
+        // This method can be used for additional selection behavior if needed
+    }
+
+    /**
+     * Handle mouse up for select tool
+     */
+    handleSelectMouseUp() {
+        this.isDragging = false;
+    }
+
+    /**
+     * Delete selected shape
+     */
+    deleteSelectedShape() {
+        if (this.selectedShape) {
+            this.selectedShape.destroy();
+            this.selectedShape = null;
+            this.layer.batchDraw();
+            console.log('Selected shape deleted');
+        }
     }
 } 
