@@ -1,1 +1,1 @@
-# Soothsayer-Citrana
+# Citrana

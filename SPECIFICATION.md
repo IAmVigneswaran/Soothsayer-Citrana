@@ -1,8 +1,8 @@
-# Vedic Astrology Chart Builder - Project Specification
+# Citrana - Project Specification
 
 ## Project Overview
 
-**Project Name:** Vibe Coding - Vedic Astrology Chart Builder  
+**Project Name:** Citrana  
 **Type:** Interactive Web Application  
 **Domain:** Educational Tool for Vedanga Jyotisha (Vedic Astrology)
 

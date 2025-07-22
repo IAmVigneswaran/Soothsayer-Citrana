@@ -65,61 +65,61 @@ class NorthIndianChartTemplate {
                 points: [239.28571, 1.19048, 120.23809, 120.23809, 239.28571, 239.28571, 358.33333, 120.23809],
                 name: 'Lagna'
             },
-            // House 2 (Dhan)
+            // House 2
             {
                 number: 2,
                 points: [1.19048, 1.19048, 239.28571, 1.19048, 120.23809, 120.23809],
                 name: 'Dhan'
             },
-            // House 3 (Sahaj)
+            // House 3
             {
                 number: 3,
                 points: [1.19048, 1.19048, 1.19048, 239.28571, 120.23809, 120.23809],
                 name: 'Sahaj'
             },
-            // House 4 (Bandhu)
+            // House 4
             {
                 number: 4,
                 points: [120.23809, 120.23809, 1.19048, 239.28571, 120.23809, 358.33333, 239.28571, 239.28571],
                 name: 'Bandhu'
             },
-            // House 5 (Putra)
+            // House 5
             {
                 number: 5,
                 points: [1.19048, 239.28571, 120.23809, 358.33333, 1.19048, 477.38095],
                 name: 'Putra'
             },
-            // House 6 (Ripu)
+            // House 6
             {
                 number: 6,
                 points: [239.28571, 477.38095, 120.23809, 358.33333, 1.19048, 477.38095],
                 name: 'Ripu'
             },
-            // House 7 (Kalatra)
+            // House 7
             {
                 number: 7,
                 points: [239.28571, 477.38095, 120.23809, 358.33333, 239.28571, 239.28571, 358.33333, 358.33333],
                 name: 'Kalatra'
             },
-            // House 8 (Mrit)
+            // House 8
             {
                 number: 8,
                 points: [239.28571, 477.38095, 358.33333, 358.33333, 477.38095, 477.38095],
                 name: 'Mrit'
             },
-            // House 9 (Bhagya)
+            // House 9
             {
                 number: 9,
                 points: [358.33333, 358.33333, 477.38095, 477.38095, 477.38095, 239.28571],
                 name: 'Bhagya'
             },
-            // House 10 (Karma)
+            // House 10
             {
                 number: 10,
                 points: [358.33333, 358.33333, 477.38095, 239.28571, 358.33333, 120.23809, 239.28571, 239.28571],
                 name: 'Karma'
             },
-            // House 11 (Labha)
+            // House 11
             {
                 number: 11,
                 points: [477.38095, 239.28571, 358.33333, 120.23809, 477.38095, 1.19048],
@@ -142,18 +142,18 @@ class NorthIndianChartTemplate {
         // Exact rashi number box positions from reference SVG - treated as individual elements
         // These positions are fixed and independent of house polygons
         const tinyBoxPositionsNorth = {
-            1: { x: 230.8155 + globalOffsetNorth.x, y: 209.75027 + globalOffsetNorth.y }, // tanbhav - center diamond
-            2: { x: 111.8155 + globalOffsetNorth.x, y: 87.72997 + globalOffsetNorth.y },  // dhanbhav - top left triangle
-            3: { x: 90.53612 + globalOffsetNorth.x, y: 111.8155 + globalOffsetNorth.y },  // anujbhav - top left corner
-            4: { x: 208.55092 + globalOffsetNorth.x, y: 230.8155 + globalOffsetNorth.y }, // maatabhav - left side
-            5: { x: 252.67113 + globalOffsetNorth.x, y: 230.8155 + globalOffsetNorth.y }, // santanbhav - right side
-            6: { x: 230.8155 + globalOffsetNorth.x, y: 254.56586 + globalOffsetNorth.y }, // rogbhav - bottom center
-            7: { x: 90.53612 + globalOffsetNorth.x, y: 349.8655 + globalOffsetNorth.y },  // dampathyabhav - bottom left
-            8: { x: 111.7655 + globalOffsetNorth.x, y: 373.90103 + globalOffsetNorth.y }, // aayubhav - bottom left corner
-            9: { x: 349.8655 + globalOffsetNorth.x, y: 371.49796 + globalOffsetNorth.y }, // bhagyabhav - bottom right
-            10: { x: 371.09488 + globalOffsetNorth.x, y: 349.8155 + globalOffsetNorth.y }, // karmabhav - bottom right corner
-            11: { x: 371.09488 + globalOffsetNorth.x, y: 111.7655 + globalOffsetNorth.y }, // laabbhav - top right corner
-            12: { x: 349.8155 + globalOffsetNorth.x, y: 90.13304 + globalOffsetNorth.y }   // karchbhav - top right
+            1: { x: 230.8155 + globalOffsetNorth.x, y: 209.75027 + globalOffsetNorth.y }, // center diamond
+            2: { x: 111.8155 + globalOffsetNorth.x, y: 87.72997 + globalOffsetNorth.y },  // top left triangle
+            3: { x: 90.53612 + globalOffsetNorth.x, y: 111.8155 + globalOffsetNorth.y },  // top left corner
+            4: { x: 208.55092 + globalOffsetNorth.x, y: 230.8155 + globalOffsetNorth.y }, // left side
+            5: { x: 252.67113 + globalOffsetNorth.x, y: 230.8155 + globalOffsetNorth.y }, // right side
+            6: { x: 230.8155 + globalOffsetNorth.x, y: 254.56586 + globalOffsetNorth.y }, // bottom center
+            7: { x: 90.53612 + globalOffsetNorth.x, y: 349.8655 + globalOffsetNorth.y },  // bottom left
+            8: { x: 111.7655 + globalOffsetNorth.x, y: 373.90103 + globalOffsetNorth.y }, // bottom left corner
+            9: { x: 349.8655 + globalOffsetNorth.x, y: 371.49796 + globalOffsetNorth.y }, // bottom right
+            10: { x: 371.09488 + globalOffsetNorth.x, y: 349.8155 + globalOffsetNorth.y }, // bottom right corner
+            11: { x: 371.09488 + globalOffsetNorth.x, y: 111.7655 + globalOffsetNorth.y }, // top right corner
+            12: { x: 349.8155 + globalOffsetNorth.x, y: 90.13304 + globalOffsetNorth.y }   // top right
         };
 
         // Save the original positions

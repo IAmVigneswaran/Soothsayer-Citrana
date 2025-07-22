@@ -1,8 +1,8 @@
-# Vedic Astrology Chart Builder - Implementation Summary
+# Citrana - Implementation Summary
 
 ## 🎯 Project Overview
 
-I have successfully implemented a complete **Vedic Astrology Chart Builder** web application based on your detailed specification. This is a modern, interactive tool for creating Vedic astrology charts with both South Indian and North Indian layouts.
+I have successfully implemented a complete **Citrana** web application based on your detailed specification. This is a modern, interactive tool for creating Vedic astrology charts with both South Indian and North Indian layouts.
 
 ## ✅ Implemented Features
 
@@ -260,7 +260,7 @@ const PLANETS = {
 
 ## 🎉 Conclusion
 
-The Vedic Astrology Chart Builder has been successfully implemented as a complete, production-ready web application. It fulfills all the requirements specified in the original specification and provides an excellent foundation for future enhancements.
+The Citrana has been successfully implemented as a complete, production-ready web application. It fulfills all the requirements specified in the original specification and provides an excellent foundation for future enhancements.
 
 ### Key Achievements
 1. **Complete Feature Set**: All core features implemented and tested
@@ -276,4 +276,4 @@ The application is ready for immediate deployment on GitHub Pages or any web ser
 
 **Implementation completed successfully! 🚀**
 
-The Vedic Astrology Chart Builder is now ready to serve the Vedanga Jyotisha community with a modern, intuitive tool for creating professional astrological charts. 
+The Citrana is now ready to serve the Vedanga Jyotisha community with a modern, intuitive tool for creating professional astrological charts. 

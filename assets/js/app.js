@@ -1,8 +1,9 @@
 /**
  * Main Application Class - Konva.js Implementation
  * Coordinates all components and manages the application lifecycle
+ * Citrana Web Application
  */
-class VedicAstrologyApp {
+class CitranaApp {
     constructor() {
         this.stage = null;
         this.layer = null;
@@ -10,7 +11,6 @@ class VedicAstrologyApp {
         this.planetSystem = null;
         this.drawingTools = null;
         this.contextMenu = null;
-        this.grahaLibrary = null;
         this.currentTool = 'select';
         this.isDrawing = false;
         this.lastPoint = null;
@@ -19,7 +19,7 @@ class VedicAstrologyApp {
     }
 
     init() {
-        console.log('Initializing Vedic Astrology App...');
+        console.log('Initializing Citrana App...');
         
         this.setupCanvas();
         this.setupComponents();
@@ -49,7 +49,6 @@ class VedicAstrologyApp {
         this.planetSystem = new PlanetSystem(this.stage, this.layer, this.chartTemplates);
         this.drawingTools = new DrawingTools(this.stage, this.layer);
         this.contextMenu = new ContextMenu();
-        this.grahaLibrary = new GrahaLibrary();
         
         // Initialize components
         this.planetSystem.init();
@@ -91,7 +90,7 @@ class VedicAstrologyApp {
 
     loadSavedData() {
         // Load saved chart data if available
-        const savedData = localStorage.getItem('vedicChartData');
+        const savedData = localStorage.getItem('citranaChartData');
         if (savedData) {
             try {
                 const data = JSON.parse(savedData);
@@ -109,7 +108,7 @@ class VedicAstrologyApp {
     autoSave() {
         try {
             const chartData = this.chartTemplates.getChartData();
-            localStorage.setItem('vedicChartData', JSON.stringify(chartData));
+            localStorage.setItem('citranaChartData', JSON.stringify(chartData));
             console.log('Chart data auto-saved');
         } catch (error) {
             console.error('Error auto-saving:', error);
@@ -124,7 +123,7 @@ class VedicAstrologyApp {
             });
             
             const link = document.createElement('a');
-            link.download = 'vedic-chart.png';
+            link.download = 'citrana-chart.png';
             link.href = dataURL;
             link.click();
             
@@ -271,5 +270,5 @@ class VedicAstrologyApp {
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.app = new VedicAstrologyApp();
+    window.app = new CitranaApp();
 }); 

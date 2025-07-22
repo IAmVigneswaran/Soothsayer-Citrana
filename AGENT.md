@@ -1,4 +1,4 @@
-# Vedic Astrology Chart Builder
+# Citrana
 
 A modern, interactive web application for creating Vedic astrology charts, inspired by Excalidraw. Built with pure HTML5, CSS3, and JavaScript, this tool provides an intuitive interface for educators and students of Vedanga Jyotisha.
 

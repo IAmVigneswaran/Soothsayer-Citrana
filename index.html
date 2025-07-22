@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vedic Astrology Chart Builder</title>
+    <title>Citrana</title>
     <script src="https://unpkg.com/konva@9/konva.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/styles.css">
@@ -53,9 +53,9 @@
         </div>
 
         <!-- Floating Graha Library -->
-        <div class="floating-planet-library" id="graha-library" style="border-radius: 0.75rem; overflow: hidden;">
+        <div class="floating-planet-library" id="graha-library" style="border-radius: 0.75rem; overflow: visible;">
             <div class="planet-library-header" style="background: #fff; color: #000; padding: 0.5rem 1rem; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 2.5rem; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">Graha Library</div>
-            <div class="planet-grid" id="planet-library">
+            <div class="planet-grid" id="planet-library" style="overflow: visible;">
                 <!-- Grahas will be populated by JavaScript -->
             </div>
         </div>
@@ -89,7 +89,6 @@
     <script src="assets/js/planet-system.js"></script>
     <script src="assets/js/drawing-tools.js"></script>
     <script src="assets/js/context-menu.js"></script>
-    <script src="assets/js/graha-library.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
         // Initialize Lucide icons
@@ -97,8 +96,8 @@
         
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing app...');
-            window.app = new VedicAstrologyApp();
+            console.log('DOM loaded, initializing Citrana...');
+            window.app = new CitranaApp();
         });
     </script>
 </body>
