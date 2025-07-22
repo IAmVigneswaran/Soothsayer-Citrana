@@ -45,7 +45,7 @@ class VedicAstrologyApp {
     }
 
     setupComponents() {
-        this.chartTemplates = new ChartTemplates(this.stage, this.layer);
+        this.chartTemplates = new ChartCoordinator(this.stage, this.layer);
         this.planetSystem = new PlanetSystem(this.stage, this.layer, this.chartTemplates);
         this.drawingTools = new DrawingTools(this.stage, this.layer);
         this.contextMenu = new ContextMenu();

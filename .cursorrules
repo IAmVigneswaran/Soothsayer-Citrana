@@ -38,7 +38,7 @@ Soothsayer-Citrana/
 
 ## Key Components
 
-### ChartTemplates Class (assets/js/chart-templates.js)
+### ChartCoordinator Class (assets/js/chart-coordinator.js)
 - Handles South Indian and North Indian chart layouts
 - Manages Lagna setting and house numbering
 - Provides chart data persistence and loading
@@ -63,6 +63,24 @@ Soothsayer-Citrana/
 - Manages theme switching and localStorage
 - Handles export functionality and notifications
 - Implements keyboard shortcuts and tooltips
+
+### ChartCoordinator Class (assets/js/chart-coordinator.js)
+- Coordinates between South Indian and North Indian chart templates
+- Manages chart type switching and routing
+- Provides unified interface for chart operations
+- Handles data persistence and loading
+
+### South Indian Chart Template (assets/js/chart-templates-south.js)
+- Handles South Indian chart layout and functionality
+- Manages 4x4 grid layout with center empty
+- Handles Rashi and Bhava number boxes
+- Manages planet placement and Lagna indicators
+
+### North Indian Chart Template (assets/js/chart-templates-north.js)
+- Handles North Indian chart layout and functionality
+- Manages diamond-shaped polygon layout
+- Handles tiny Rashi number boxes with exact positioning
+- Manages advanced Rashi numbering logic
 
 ### Main Application (assets/js/app.js)
 - Coordinates all components
