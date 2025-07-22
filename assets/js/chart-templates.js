@@ -223,37 +223,31 @@ class ChartTemplates {
                 points: houseDef.points,
                 stroke: '#374151',
                 strokeWidth: 2,
-                fill: '#ffffff',
+                fill: '#ffffff', // Ensure fill is white for hit detection
                 closed: true,
                 lineJoin: 'round',
                 lineCap: 'round',
                 name: `house-${houseNumber}`
             });
 
-            // Calculate center for house data
-            const centerX = houseDef.points.reduce((sum, val, index) => index % 2 === 0 ? sum + val : sum, 0) / (houseDef.points.length / 2);
-            const centerY = houseDef.points.reduce((sum, val, index) => index % 2 === 1 ? sum + val : sum, 0) / (houseDef.points.length / 2);
-            
-            // Rashi (Zodiac signs) mapping
-            const rashis = [
-                '1', // Aries
-                '2', // Taurus
-                '3', // Gemini
-                '4', // Cancer
-                '5', // Leo
-                '6', // Virgo
-                '7', // Libra
-                '8', // Scorpio
-                '9', // Sagittarius
-                '10', // Capricorn
-                '11', // Aquarius
-                '12'  // Pisces
-            ];
+            // Make the polygon selectable by listening to click events
+            housePolygon.on('mousedown', (e) => {
+                this.highlightHouse(houseNumber);
+                if (this.currentChartType === 'north-indian') {
+                    console.log(`[DEBUG] North Indian chart house clicked: ${houseNumber}`);
+                }
+            });
 
-            const rashiIndex = (houseNumber - 1) % 12;
-            const rashiName = rashis[rashiIndex];
+            // Add right-click event for context menu
+            housePolygon.on('contextmenu', (e) => {
+                e.evt.preventDefault();
+                this.highlightHouse(houseNumber);
+                window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
+            });
 
             // Store house data
+            const centerX = houseDef.points.reduce((sum, val, index) => index % 2 === 0 ? sum + val : sum, 0) / (houseDef.points.length / 2);
+            const centerY = houseDef.points.reduce((sum, val, index) => index % 2 === 1 ? sum + val : sum, 0) / (houseDef.points.length / 2);
             this.houseData[houseNumber] = {
                 x: centerX,
                 y: centerY,
@@ -266,13 +260,6 @@ class ChartTemplates {
 
             // Add house polygon to chart group
             this.chartGroup.add(housePolygon);
-            
-            // Add right-click event for context menu
-            housePolygon.on('contextmenu', (e) => {
-                e.evt.preventDefault();
-                this.highlightHouse(houseNumber);
-                window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
-            });
         });
 
         // Create tiny boxes as individual elements with exact positions
