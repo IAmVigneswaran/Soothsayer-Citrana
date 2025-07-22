@@ -268,10 +268,19 @@ class ChartTemplates {
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
         ];
 
+        // Calculate correct Rashi numbers based on Lagna and First House
+        const calculateRashiNumber = (houseNumber) => {
+            // For North Indian chart, the house order is different from standard 1-12
+            // Based on the North Indian layout, the correct house order is:
+            // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] but with different Rashi mapping
+            // For now, let's use the simple mapping: House N = Rashi N
+            // This will be corrected by the renumberHouses() function later
+            return houseNumber.toString();
+        };
+
         Object.entries(tinyBoxPositions).forEach(([houseNumber, position]) => {
             const houseNum = parseInt(houseNumber);
-            const rashiIndex = (houseNum - 1) % 12;
-            const rashiName = rashis[rashiIndex];
+            const rashiName = calculateRashiNumber(houseNum);
 
             // Create tiny black box
             const tinyBox = new Konva.Rect({
@@ -281,8 +290,8 @@ class ChartTemplates {
                 height: tinyBoxSize,
                 fill: '#000000',
                 cornerRadius: 4,
-                name: `rashi-box-${houseNum}`,
-                listening: false // Disable mouse events on tiny box
+                name: `RashiBox${houseNum}`
+                // Removed listening: false to make it clickable
             });
 
             // Create Rashi text
@@ -298,8 +307,28 @@ class ChartTemplates {
                 fill: '#ffffff',
                 align: 'center',
                 verticalAlign: 'middle',
-                name: `rashi-${houseNum}`,
-                listening: false // Disable mouse events on text
+                name: `RashiText${houseNum}`
+                // Removed listening: false to make it clickable
+            });
+
+            // Add click event to tiny box for debug
+            tinyBox.on('click', (e) => {
+                e.evt.stopPropagation(); // Prevent event bubbling
+                console.log(`[DEBUG] Tiny box clicked - House: ${houseNum}, Rashi: ${rashiName}`);
+                console.log(`[DEBUG] Tiny box number displayed: ${rashiName}`);
+                console.log(`[DEBUG] Current Lagna: ${this.lagnaHouse}`);
+                console.log(`[DEBUG] Current First House: ${this.firstHouse}`);
+                console.log(`[DEBUG] Click position: x=${e.evt.clientX}, y=${e.evt.clientY}`);
+            });
+
+            // Also add click event to text for better coverage
+            rashiText.on('click', (e) => {
+                e.evt.stopPropagation(); // Prevent event bubbling
+                console.log(`[DEBUG] Rashi text clicked - House: ${houseNum}, Rashi: ${rashiName}`);
+                console.log(`[DEBUG] Tiny box number displayed: ${rashiName}`);
+                console.log(`[DEBUG] Current Lagna: ${this.lagnaHouse}`);
+                console.log(`[DEBUG] Current First House: ${this.firstHouse}`);
+                console.log(`[DEBUG] Click position: x=${e.evt.clientX}, y=${e.evt.clientY}`);
             });
 
             // Add to tiny box group
@@ -307,10 +336,18 @@ class ChartTemplates {
             this.tinyBoxGroup.add(rashiText);
         });
 
-        // Add both groups to layer
+        // Add both groups to layer - tiny boxes on top
         this.layer.add(this.chartGroup);
         this.layer.add(this.tinyBoxGroup);
+        
+        // Ensure tiny boxes are on top by moving them to the end of the layer
+        this.tinyBoxGroup.moveToTop();
         this.layer.batchDraw();
+        
+        console.log('[DEBUG] North Indian chart created with clickable tiny boxes');
+
+        // Call renumberHouses to set correct Rashi numbers based on Lagna and First House
+        this.renumberHouses();
 
         // Zoom to fit
         this.zoomToFit();
@@ -586,8 +623,20 @@ class ChartTemplates {
         for (let i = 0; i < houseOrder.length; i++) {
             const houseNum = houseOrder[i];
             const bhavaNum = i + 1;
-            const rashiIndex = (houseNum - 1) % 12;
-            const rashiName = rashis[rashiIndex];
+            
+            // Calculate Rashi number based on chart type
+            let rashiName;
+            if (this.currentChartType === 'north-indian') {
+                // For North Indian chart, Rashi number is based on the house position relative to Lagna
+                // House 1 (Lagna) = Rashi 1, House 2 = Rashi 2, etc.
+                const rashiIndex = (houseNum - this.lagnaHouse + 12) % 12;
+                rashiName = rashis[rashiIndex];
+            } else {
+                // For South Indian chart, use the original logic
+                const rashiIndex = (houseNum - 1) % 12;
+                rashiName = rashis[rashiIndex];
+            }
+            
             debugBhavas.push({bhavaNum, houseNum, rashiName});
             
             // Update South Indian chart bhava numbers
@@ -598,7 +647,7 @@ class ChartTemplates {
             // Update North Indian chart Rashi numbers
             if (this.currentChartType === 'north-indian') {
                 // Find the rashi text in the tiny box group
-                const rashiText = this.tinyBoxGroup?.findOne(`rashi-${houseNum}`);
+                const rashiText = this.tinyBoxGroup?.findOne(`RashiText${houseNum}`);
                 if (rashiText) {
                     rashiText.text(rashiName);
                 }
