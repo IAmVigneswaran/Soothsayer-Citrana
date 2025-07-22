@@ -80,12 +80,11 @@ class ChartCoordinator {
         }
     }
 
-    addPlanetToHouse(planetAbbr, houseNumber) {
+    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null) {
         if (this.currentChartType === 'south-indian') {
-            this.southIndianTemplate.addPlanetToHouse(planetAbbr, houseNumber);
+            this.southIndianTemplate.addPlanetToHouse(planetAbbr, houseNumber, label, id);
         } else if (this.currentChartType === 'north-indian') {
-            // North Indian chart planet functionality can be added here
-            console.log(`Planet ${planetAbbr} added to North Indian house ${houseNumber}`);
+            this.northIndianTemplate.addPlanetToHouse(planetAbbr, houseNumber, label, id);
         }
     }
 

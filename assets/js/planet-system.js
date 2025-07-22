@@ -149,8 +149,14 @@ class PlanetSystem {
     handleDrop(e) {
         e.preventDefault();
         if (!this.draggedPlanet) return;
-        // Check for selected bhava (South Indian)
-        let targetHouse = window.selectedBhavaSouth;
+        // Check for selected bhava (South or North Indian)
+        let targetHouse = null;
+        const chartType = window.app?.chartTemplates?.currentChartType;
+        if (chartType === 'south-indian') {
+            targetHouse = window.selectedBhavaSouth;
+        } else if (chartType === 'north-indian') {
+            targetHouse = window.selectedBhavaNorth;
+        }
         if (!targetHouse) {
             const stage = window.app?.chartTemplates?.getStage();
             if (!stage) {
@@ -179,14 +185,14 @@ class PlanetSystem {
         // For now, return a default house index
         return 1; // Place in first house by default
     }
-    placePlanetInHouse(planetAbbr, houseIndex) {
+    placePlanetInHouse(planetAbbr, houseIndex, label = null, id = null) {
         const chartTemplates = window.app?.chartTemplates;
         if (!chartTemplates) {
             console.error('Chart templates not available');
             return;
         }
         // Add planet to the specified house
-        chartTemplates.addPlanetToHouse(planetAbbr, houseIndex);
+        chartTemplates.addPlanetToHouse(planetAbbr, houseIndex, label, id);
     }
     getPlanetInfo(abbr) {
         return this.planets[abbr] || null;

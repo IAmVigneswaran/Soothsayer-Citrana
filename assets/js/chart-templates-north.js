@@ -184,7 +184,8 @@ class NorthIndianChartTemplate {
             // Make the polygon selectable by listening to click events
             housePolygonNorth.on('mousedown', (e) => {
                 this.highlightHouse(houseNumberNorth);
-                console.log(`[DEBUG] North Indian Chart House Polygon clicked: ${houseNumberNorth}`);
+                window.selectedBhavaNorth = houseNumberNorth;
+                console.log('[SELECT] North Indian Chart House selected:', houseNumberNorth);
             });
 
             // Add right-click event for context menu
@@ -467,5 +468,156 @@ class NorthIndianChartTemplate {
         }
         this.layer.batchDraw();
         console.log('All planets cleared from North Indian chart');
+    }
+
+    // --- Robust Planet Management ---
+    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null) {
+        const house = this.houseDataNorth[houseNumber];
+        if (!house) return;
+        if (!house.planets) house.planets = [];
+        // Use unique ID for each planet instance
+        const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
+        house.planets.push({ abbr: planetAbbr, label: label || planetAbbr, id: planetId });
+        this.updatePlanetsInHouse(houseNumber);
+        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
+    }
+
+    removePlanetFromHouseById(houseNumber, planetId) {
+        const house = this.houseDataNorth[houseNumber];
+        if (!house || !house.planets) return;
+        house.planets = house.planets.filter((planet) => planet.id !== planetId);
+        this.updatePlanetsInHouse(houseNumber);
+        this.layer.batchDraw();
+        this.clearSelectedPlanet && this.clearSelectedPlanet();
+        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+    }
+
+    updatePlanetsInHouse(houseNumber) {
+        const house = this.houseDataNorth[houseNumber];
+        if (!house) return;
+        // Remove all existing planet texts for this house
+        this.chartGroupNorth.getChildren(node => node.name() && node.name().startsWith(`planet-`) && node.name().includes(`-${houseNumber}-`)).forEach(node => node.destroy());
+        // Calculate font size based on number of planets
+        const n = house.planets.length;
+        const BASE_FONT = 32;
+        const MIN_FONT = 16;
+        const STEP = 4;
+        const fontSize = Math.max(MIN_FONT, BASE_FONT - (n-1)*STEP);
+        // Center all planet texts vertically in the house (approximate)
+        const totalHeight = n * fontSize + (n-1) * 4;
+        let startY = house.y - totalHeight/2;
+        house.planets.forEach((planetObj, i) => {
+            const planet = window.app.planetSystem.getPlanetInfo(planetObj.abbr);
+            // Add a transparent rectangle for easier hit area
+            const hitRect = new Konva.Rect({
+                x: house.x - fontSize,
+                y: startY + i * (fontSize + 4) - fontSize/2,
+                width: fontSize * 2,
+                height: fontSize,
+                fill: 'rgba(0,0,0,0)',
+                name: `planet-hit-${planetObj.id}`,
+                listening: true
+            });
+            // The planet text
+            const planetText = new Konva.Text({
+                x: house.x,
+                y: startY + i * (fontSize + 4),
+                text: planetObj.label,
+                fontSize: fontSize,
+                fontFamily: 'Arial Black, Arial, sans-serif',
+                fontWeight: 'bold',
+                fill: planet ? planet.color : '#000',
+                name: `planet-${planetObj.abbr}-${houseNumber}-${planetObj.id}`,
+                draggable: true,
+                align: 'center',
+                verticalAlign: 'middle',
+                offsetX: fontSize/2,
+                offsetY: fontSize/2,
+            });
+            // Selection logic
+            const selectHandler = (e) => {
+                e.cancelBubble = true;
+                this.selectPlanet && this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
+            };
+            hitRect.on('click', selectHandler);
+            planetText.on('click', selectHandler);
+            // Right-click context menu
+            const contextHandler = (e) => {
+                e.evt.preventDefault();
+                this.selectPlanet && this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
+                window.app.contextMenu.showPlanetMenu(e.evt.clientX, e.evt.clientY, houseNumber, planetObj.abbr, planetObj.id);
+            };
+            hitRect.on('contextmenu', contextHandler);
+            planetText.on('contextmenu', contextHandler);
+            // Drag-and-drop between bhavas
+            planetText.on('dragstart', (e) => {
+                this._dragSource = { houseNumber, abbr: planetObj.abbr, id: planetObj.id, label: planetObj.label };
+                planetText.opacity(0.5);
+                planetText.moveToTop();
+                hitRect.moveToTop();
+                this.layer.batchDraw();
+                console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
+            });
+            planetText.on('dragend', (e) => {
+                planetText.opacity(1);
+                // Find which bhava (if any) the drop is over
+                const pointer = this.stage.getPointerPosition();
+                let targetHouse = null;
+                for (const hNum in this.houseDataNorth) {
+                    const h = this.houseDataNorth[hNum];
+                    // Use bounding box for hit detection (approximate)
+                    if (
+                        pointer.x >= h.x - h.width/2 && pointer.x <= h.x + h.width/2 &&
+                        pointer.y >= h.y - h.height/2 && pointer.y <= h.y + h.height/2
+                    ) {
+                        targetHouse = parseInt(hNum);
+                        break;
+                    }
+                }
+                if (targetHouse && targetHouse !== houseNumber) {
+                    // Move planet to new bhava by ID
+                    this.removePlanetFromHouseById(houseNumber, planetObj.id);
+                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id);
+                    this.updatePlanetsInHouse(targetHouse);
+                    if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+                    console.log(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}`);
+                } else {
+                    // Snap back to original position
+                    this.updatePlanetsInHouse(houseNumber);
+                    console.log(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id})`);
+                }
+                this._dragSource = null;
+                this.layer.batchDraw();
+            });
+            this.chartGroupNorth.add(hitRect);
+            this.chartGroupNorth.add(planetText);
+            hitRect.moveToTop();
+            planetText.moveToTop();
+        });
+        this.layer.batchDraw();
+    }
+
+    selectPlanet(planetText, houseNumber, abbr, id) {
+        this.clearSelectedPlanet();
+        this.selectedPlanet = { planetText, houseNumber, abbr, id };
+        planetText.stroke('#f59e42');
+        planetText.strokeWidth(2);
+        this.layer.batchDraw();
+        if (!this._deleteKeyListener) {
+            this._deleteKeyListener = (e) => {
+                if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedPlanet) {
+                    this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
+                }
+            };
+            window.addEventListener('keydown', this._deleteKeyListener);
+        }
+    }
+    clearSelectedPlanet() {
+        if (this.selectedPlanet && this.selectedPlanet.planetText) {
+            this.selectedPlanet.planetText.strokeEnabled(false);
+            this.selectedPlanet.planetText.strokeWidth(0);
+        }
+        this.selectedPlanet = null;
     }
 } 
