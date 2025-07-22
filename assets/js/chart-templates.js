@@ -7,9 +7,12 @@ class ChartTemplates {
         this.stage = stage;
         this.layer = layer;
         this.chartGroupSouth = null;
+        this.chartGroupNorth = null;
         this.currentChartType = null;
         this.houseDataSouth = {};
+        this.houseDataNorth = {};
         this.lagnaHouseSouth = 1;
+        this.lagnaHouseNorth = 1;
         this.firstHouse = 1;
         this.selectedHouse = null; // Track selected house for highlight
         
@@ -107,13 +110,13 @@ class ChartTemplates {
         this.currentChartType = 'north-indian';
 
         // Create chart group
-        this.chartGroup = new Konva.Group({
+        this.chartGroupNorth = new Konva.Group({
             name: 'north-indian-chart'
         });
 
-        // Create separate group for tiny boxes to ensure they render on top
-        this.tinyBoxGroup = new Konva.Group({
-            name: 'tiny-boxes-group'
+        // Create separate group for rashi number boxes to ensure they render on top
+        this.tinyBoxGroupNorth = new Konva.Group({
+            name: 'rashi-number-boxes-group-north'
         });
 
         // House definitions based on SVG polygon coordinates
@@ -192,13 +195,13 @@ class ChartTemplates {
             }
         ];
 
-        // Global offset for tiny boxes - adjust these values to move all tiny boxes
+        // Global offset for rashi number boxes - adjust these values to move all rashi number boxes
         const globalOffset = {
             x: 8,  // Adjust X offset (positive = right, negative = left)
             y: 8   // Adjust Y offset (positive = down, negative = up)
         };
 
-        // Exact tiny box positions from reference SVG - treated as individual elements
+        // Exact rashi number box positions from reference SVG - treated as individual elements
         // These positions are fixed and independent of house polygons
         const tinyBoxPositions = {
             1: { x: 230.8155 + globalOffset.x, y: 209.75027 + globalOffset.y }, // tanbhav - center diamond
@@ -234,7 +237,7 @@ class ChartTemplates {
             housePolygon.on('mousedown', (e) => {
                 this.highlightHouse(houseNumber);
                 if (this.currentChartType === 'north-indian') {
-                    console.log(`[DEBUG] North Indian chart house clicked: ${houseNumber}`);
+                    console.log(`[DEBUG] North Indian Chart House Polygon clicked: ${houseNumber}`);
                 }
             });
 
@@ -248,21 +251,21 @@ class ChartTemplates {
             // Store house data
             const centerX = houseDef.points.reduce((sum, val, index) => index % 2 === 0 ? sum + val : sum, 0) / (houseDef.points.length / 2);
             const centerY = houseDef.points.reduce((sum, val, index) => index % 2 === 1 ? sum + val : sum, 0) / (houseDef.points.length / 2);
-            this.houseData[houseNumber] = {
+            this.houseDataNorth[houseNumber] = {
                 x: centerX,
                 y: centerY,
                 width: 100, // Approximate for hit detection
                 height: 100, // Approximate for hit detection
                 planets: [],
                 points: houseDef.points,
-                housePolygon: housePolygon
+                housePolygonNorth: housePolygon
             };
 
             // Add house polygon to chart group
-            this.chartGroup.add(housePolygon);
+            this.chartGroupNorth.add(housePolygon);
         });
 
-        // Create tiny boxes as individual elements with exact positions
+        // Create rashi number boxes as individual elements with exact positions
         const tinyBoxSize = 17; // Match the reference SVG size (16.95)
         const rashis = [
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
@@ -283,19 +286,18 @@ class ChartTemplates {
             const rashiName = calculateRashiNumber(houseNum);
 
             // Create tiny black box
-            const tinyBox = new Konva.Rect({
+            const rashiNumberBoxNorth = new Konva.Rect({
                 x: position.x - tinyBoxSize/2,
                 y: position.y - tinyBoxSize/2,
                 width: tinyBoxSize,
                 height: tinyBoxSize,
                 fill: '#000000',
                 cornerRadius: 4,
-                name: `RashiBox${houseNum}`
-                // Removed listening: false to make it clickable
+                name: `RashiNumberBoxNorth${houseNum}`
             });
 
             // Create Rashi text
-            const rashiText = new Konva.Text({
+            const rashiNumberTextNorth = new Konva.Text({
                 x: position.x - tinyBoxSize/2,
                 y: position.y - tinyBoxSize/2,
                 width: tinyBoxSize,
@@ -307,44 +309,43 @@ class ChartTemplates {
                 fill: '#ffffff',
                 align: 'center',
                 verticalAlign: 'middle',
-                name: `RashiText${houseNum}`
-                // Removed listening: false to make it clickable
+                name: `RashiNumberTextNorth${houseNum}`
             });
 
-            // Add click event to tiny box for debug
-            tinyBox.on('click', (e) => {
+            // Add click event to rashi number box for debug
+            rashiNumberBoxNorth.on('click', (e) => {
                 e.evt.stopPropagation(); // Prevent event bubbling
-                console.log(`[DEBUG] Tiny box clicked - House: ${houseNum}, Rashi: ${rashiName}`);
-                console.log(`[DEBUG] Tiny box number displayed: ${rashiName}`);
-                console.log(`[DEBUG] Current Lagna: ${this.lagnaHouse}`);
+                console.log(`[DEBUG] North Indian Rashi Number Box clicked - House: ${houseNum}, Rashi: ${rashiName}`);
+                console.log(`[DEBUG] Rashi Number Box displays: ${rashiName}`);
+                console.log(`[DEBUG] Current Lagna House: ${this.lagnaHouseNorth}`);
                 console.log(`[DEBUG] Current First House: ${this.firstHouse}`);
                 console.log(`[DEBUG] Click position: x=${e.evt.clientX}, y=${e.evt.clientY}`);
             });
 
             // Also add click event to text for better coverage
-            rashiText.on('click', (e) => {
+            rashiNumberTextNorth.on('click', (e) => {
                 e.evt.stopPropagation(); // Prevent event bubbling
-                console.log(`[DEBUG] Rashi text clicked - House: ${houseNum}, Rashi: ${rashiName}`);
-                console.log(`[DEBUG] Tiny box number displayed: ${rashiName}`);
-                console.log(`[DEBUG] Current Lagna: ${this.lagnaHouse}`);
+                console.log(`[DEBUG] North Indian Rashi Number Text clicked - House: ${houseNum}, Rashi: ${rashiName}`);
+                console.log(`[DEBUG] Rashi Number Box displays: ${rashiName}`);
+                console.log(`[DEBUG] Current Lagna House: ${this.lagnaHouseNorth}`);
                 console.log(`[DEBUG] Current First House: ${this.firstHouse}`);
                 console.log(`[DEBUG] Click position: x=${e.evt.clientX}, y=${e.evt.clientY}`);
             });
 
-            // Add to tiny box group
-            this.tinyBoxGroup.add(tinyBox);
-            this.tinyBoxGroup.add(rashiText);
+            // Add to rashi number box group
+            this.tinyBoxGroupNorth.add(rashiNumberBoxNorth);
+            this.tinyBoxGroupNorth.add(rashiNumberTextNorth);
         });
 
-        // Add both groups to layer - tiny boxes on top
-        this.layer.add(this.chartGroup);
-        this.layer.add(this.tinyBoxGroup);
+        // Add both groups to layer - rashi number boxes on top
+        this.layer.add(this.chartGroupNorth);
+        this.layer.add(this.tinyBoxGroupNorth);
         
-        // Ensure tiny boxes are on top by moving them to the end of the layer
-        this.tinyBoxGroup.moveToTop();
+        // Ensure rashi number boxes are on top by moving them to the end of the layer
+        this.tinyBoxGroupNorth.moveToTop();
         this.layer.batchDraw();
         
-        console.log('[DEBUG] North Indian chart created with clickable tiny boxes');
+        console.log('[DEBUG] North Indian chart created with clickable Rashi Number Boxes');
 
         // Call renumberHouses to set correct Rashi numbers based on Lagna and First House
         this.renumberHouses();
@@ -478,7 +479,7 @@ class ChartTemplates {
 
         // Add right-click event for context menu
         house.on('contextmenu', (e) => {
-            console.log('[DEBUG] House right-clicked:', houseNumber);
+            console.log('[DEBUG] South Indian Chart House right-clicked:', houseNumber);
             e.evt.preventDefault();
             this.highlightHouse(houseNumber);
             window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
@@ -491,7 +492,7 @@ class ChartTemplates {
             if (this.currentChartType === 'south-indian') {
                 this.houseDataSouth[this.selectedHouse].houseRectSouth.fill('#ffffff');
             } else if (this.currentChartType === 'north-indian') {
-                this.houseData[this.selectedHouse].housePolygon.fill('#ffffff');
+                this.houseDataNorth[this.selectedHouse].housePolygonNorth.fill('#ffffff');
             }
         }
         // Highlight new
@@ -499,7 +500,7 @@ class ChartTemplates {
             if (this.currentChartType === 'south-indian') {
                 this.houseDataSouth[houseNumber].houseRectSouth.fill('#f3f4f6'); // Tailwind gray-100
             } else if (this.currentChartType === 'north-indian') {
-                this.houseData[houseNumber].housePolygon.fill('#f3f4f6'); // Tailwind gray-100
+                this.houseDataNorth[houseNumber].housePolygonNorth.fill('#f3f4f6'); // Tailwind gray-100
             }
             this.selectedHouse = houseNumber;
             this.layer.batchDraw();
@@ -511,7 +512,7 @@ class ChartTemplates {
             if (this.currentChartType === 'south-indian') {
                 this.houseDataSouth[this.selectedHouse].houseRectSouth.fill('#ffffff');
             } else if (this.currentChartType === 'north-indian') {
-                this.houseData[this.selectedHouse].housePolygon.fill('#ffffff');
+                this.houseDataNorth[this.selectedHouse].housePolygonNorth.fill('#ffffff');
             }
             this.selectedHouse = null;
             this.layer.batchDraw();
@@ -569,7 +570,7 @@ class ChartTemplates {
     }
 
     setLagnaHouse(houseNumber) {
-        console.log('[DEBUG] setLagnaHouse called with:', houseNumber);
+        console.log('[DEBUG] setLagnaHouse called with house number:', houseNumber);
         // Remove old Lagna indicator lines if present (South Indian only)
         if (this.currentChartType === 'south-indian' && this.houseDataSouth[this.lagnaHouseSouth] && this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth) {
             this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth.forEach(line => line.destroy());
@@ -611,6 +612,9 @@ class ChartTemplates {
             // Rotate visual order so Lagna is first
             const lagnaIdx = visualOrder.indexOf(this.lagnaHouseSouth);
             houseOrder = visualOrder.slice(lagnaIdx).concat(visualOrder.slice(0, lagnaIdx));
+        } else if (this.currentChartType === 'north-indian') {
+            // For North Indian chart, use the house data keys
+            houseOrder = Object.keys(this.houseDataNorth).map(Number).sort((a, b) => a - b);
         } else if (this.southIndianHouseOrder) {
             houseOrder = this.southIndianHouseOrder;
         } else {
@@ -629,7 +633,7 @@ class ChartTemplates {
             if (this.currentChartType === 'north-indian') {
                 // For North Indian chart, Rashi number is based on the house position relative to Lagna
                 // House 1 (Lagna) = Rashi 1, House 2 = Rashi 2, etc.
-                const rashiIndex = (houseNum - this.lagnaHouseSouth + 12) % 12;
+                const rashiIndex = (houseNum - this.lagnaHouseNorth + 12) % 12;
                 rashiName = rashis[rashiIndex];
             } else {
                 // For South Indian chart, use the original logic
@@ -646,8 +650,8 @@ class ChartTemplates {
             
             // Update North Indian chart Rashi numbers
             if (this.currentChartType === 'north-indian') {
-                // Find the rashi text in the tiny box group
-                const rashiText = this.tinyBoxGroup?.findOne(`RashiText${houseNum}`);
+                            // Find the rashi text in the rashi number box group
+            const rashiText = this.tinyBoxGroupNorth?.findOne(`RashiNumberTextNorth${houseNum}`);
                 if (rashiText) {
                     rashiText.text(rashiName);
                 }
@@ -663,7 +667,16 @@ class ChartTemplates {
             this.chartGroupSouth.destroy();
             this.chartGroupSouth = null;
         }
+        if (this.chartGroupNorth) {
+            this.chartGroupNorth.destroy();
+            this.chartGroupNorth = null;
+        }
+        if (this.tinyBoxGroupNorth) {
+            this.tinyBoxGroupNorth.destroy();
+            this.tinyBoxGroupNorth = null;
+        }
         this.houseDataSouth = {};
+        this.houseDataNorth = {};
         this.currentChartType = null;
         // Do NOT reset this.southIndianHouseOrder here
         // Reset stage scale and position
@@ -695,11 +708,12 @@ class ChartTemplates {
     }
 
     zoomToFit() {
-        if (!this.stage || !this.chartGroupSouth) return;
+        const chartGroup = this.currentChartType === 'south-indian' ? this.chartGroupSouth : this.chartGroupNorth;
+        if (!this.stage || !chartGroup) return;
 
         const stageWidth = this.stage.width();
         const stageHeight = this.stage.height();
-        const chartBounds = this.chartGroupSouth.getClientRect();
+        const chartBounds = chartGroup.getClientRect();
 
         const scaleX = (stageWidth * 0.8) / chartBounds.width;
         const scaleY = (stageHeight * 0.8) / chartBounds.height;
@@ -741,9 +755,9 @@ class ChartTemplates {
     getChartData() {
         return {
             chartType: this.currentChartType,
-            lagnaHouse: this.lagnaHouseSouth,
+            lagnaHouse: this.currentChartType === 'south-indian' ? this.lagnaHouseSouth : this.lagnaHouseNorth,
             firstHouse: this.firstHouse,
-            houseData: this.houseDataSouth
+            houseData: this.currentChartType === 'south-indian' ? this.houseDataSouth : this.houseDataNorth
         };
     }
 
@@ -752,9 +766,14 @@ class ChartTemplates {
         
         try {
             this.currentChartType = data.chartType;
-            this.lagnaHouseSouth = data.lagnaHouse || 1;
+            if (data.chartType === 'south-indian') {
+                this.lagnaHouseSouth = data.lagnaHouse || 1;
+                this.houseDataSouth = data.houseData || {};
+            } else if (data.chartType === 'north-indian') {
+                this.lagnaHouseNorth = data.lagnaHouse || 1;
+                this.houseDataNorth = data.houseData || {};
+            }
             this.firstHouse = data.firstHouse || 1;
-            this.houseDataSouth = data.houseData || {};
             
             // Recreate the chart if we have a chart type
             if (this.currentChartType) {
