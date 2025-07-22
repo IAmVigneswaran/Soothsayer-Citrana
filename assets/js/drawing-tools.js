@@ -58,6 +58,7 @@ class DrawingTools {
             this.addToUndoStack(this.currentShape);
             this.currentShape = null;
         }
+        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
     }
 
     startArrow(pos) {

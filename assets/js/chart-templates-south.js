@@ -262,6 +262,7 @@ class SouthIndianChartTemplate {
         const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
         house.planets.push({ abbr: planetAbbr, label: label || planetAbbr, id: planetId });
         this.updatePlanetsInHouse(houseNumber);
+        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
         console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
     }
 
@@ -272,6 +273,7 @@ class SouthIndianChartTemplate {
         this.updatePlanetsInHouse(houseNumber);
         this.layer.batchDraw();
         this.clearSelectedPlanet();
+        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
     }
 
     renamePlanetInHouseById(houseNumber, planetId, newLabel) {
@@ -436,6 +438,7 @@ class SouthIndianChartTemplate {
             this.houseDataSouth[houseNumber].lagnaLinesSouth = [line];
             this.layer.batchDraw();
         }
+        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
         console.log(`Lagna set to house ${houseNumber}`);
     }
 

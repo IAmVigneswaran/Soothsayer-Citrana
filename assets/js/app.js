@@ -14,7 +14,9 @@ class CitranaApp {
         this.currentTool = 'select';
         this.isDrawing = false;
         this.lastPoint = null;
-        
+        this.undoStack = [];
+        this.redoStack = [];
+        this.maxUndoSteps = 100;
         this.init();
     }
 
@@ -59,16 +61,16 @@ class CitranaApp {
 
     setupEventListeners() {
         // Tool selection
-        document.getElementById('select-tool').addEventListener('click', () => this.setTool('select'));
-        document.getElementById('arrow-tool').addEventListener('click', () => this.setTool('arrow'));
-        document.getElementById('line-tool').addEventListener('click', () => this.setTool('line'));
-        document.getElementById('pen-tool').addEventListener('click', () => this.setTool('pen'));
-        document.getElementById('text-tool').addEventListener('click', () => this.setTool('text'));
-        document.getElementById('hand-tool').addEventListener('click', () => this.setTool('hand'));
+        document.getElementById('select-tool').addEventListener('click', () => { this.setTool('select'); this.pushSnapshot(); });
+        document.getElementById('arrow-tool').addEventListener('click', () => { this.setTool('arrow'); this.pushSnapshot(); });
+        document.getElementById('line-tool').addEventListener('click', () => { this.setTool('line'); this.pushSnapshot(); });
+        document.getElementById('pen-tool').addEventListener('click', () => { this.setTool('pen'); this.pushSnapshot(); });
+        document.getElementById('text-tool').addEventListener('click', () => { this.setTool('text'); this.pushSnapshot(); });
+        document.getElementById('hand-tool').addEventListener('click', () => { this.setTool('hand'); this.pushSnapshot(); });
 
         // Action buttons
-        document.getElementById('undo-btn').addEventListener('click', () => this.drawingTools.undo());
-        document.getElementById('redo-btn').addEventListener('click', () => this.drawingTools.redo());
+        document.getElementById('undo-btn').addEventListener('click', () => this.undo());
+        document.getElementById('redo-btn').addEventListener('click', () => this.redo());
         document.getElementById('export-btn').addEventListener('click', () => this.exportChart());
 
         // Zoom controls
@@ -139,31 +141,37 @@ class CitranaApp {
             if (e.key === 'v' || e.key === 'V') {
                 e.preventDefault();
                 this.setTool('select');
+                this.pushSnapshot();
             } else if (e.key === 'a' || e.key === 'A') {
                 e.preventDefault();
                 this.setTool('arrow');
+                this.pushSnapshot();
             } else if (e.key === 'l' || e.key === 'L') {
                 e.preventDefault();
                 this.setTool('line');
+                this.pushSnapshot();
             } else if (e.key === 'p' || e.key === 'P') {
                 e.preventDefault();
                 this.setTool('pen');
+                this.pushSnapshot();
             } else if (e.key === 't' || e.key === 'T') {
                 e.preventDefault();
                 this.setTool('text');
+                this.pushSnapshot();
             } else if (e.key === 'h' || e.key === 'H') {
                 e.preventDefault();
                 this.setTool('hand');
+                this.pushSnapshot();
             }
 
             // Action shortcuts
             if (e.ctrlKey || e.metaKey) {
                 if (e.key === 'z') {
                     e.preventDefault();
-                    this.drawingTools.undo();
+                    this.undo();
                 } else if (e.key === 'y') {
                     e.preventDefault();
-                    this.drawingTools.redo();
+                    this.redo();
                 }
             }
         });
@@ -276,6 +284,49 @@ class CitranaApp {
         if (window.selectedBhavaSouth) window.selectedBhavaSouth = null;
         this.layer.batchDraw();
         console.log('Chart reset: all planets and annotations cleared');
+    }
+
+    // --- GLOBAL UNDO/REDO ---
+    pushSnapshot() {
+        const chartData = this.chartTemplates.getChartData();
+        const drawingData = this.serializeDrawings();
+        this.undoStack.push({ chartData, drawingData });
+        if (this.undoStack.length > this.maxUndoSteps) this.undoStack.shift();
+        this.redoStack = [];
+    }
+
+    serializeDrawings() {
+        // Only serialize drawing objects (name starts with 'drawing-')
+        return this.layer.getChildren(node => node.name() && node.name().startsWith('drawing-')).map(node => node.toObject());
+    }
+
+    restoreDrawings(drawingData) {
+        // Remove all current drawing objects
+        this.drawingTools.clearAll();
+        // Add from snapshot
+        drawingData.forEach(obj => {
+            const shape = Konva.Node.create(obj);
+            this.layer.add(shape);
+        });
+        this.layer.batchDraw();
+    }
+
+    undo() {
+        if (this.undoStack.length === 0) return;
+        const current = { chartData: this.chartTemplates.getChartData(), drawingData: this.serializeDrawings() };
+        this.redoStack.push(current);
+        const snapshot = this.undoStack.pop();
+        this.chartTemplates.loadChartData(snapshot.chartData);
+        this.restoreDrawings(snapshot.drawingData);
+    }
+
+    redo() {
+        if (this.redoStack.length === 0) return;
+        const current = { chartData: this.chartTemplates.getChartData(), drawingData: this.serializeDrawings() };
+        this.undoStack.push(current);
+        const snapshot = this.redoStack.pop();
+        this.chartTemplates.loadChartData(snapshot.chartData);
+        this.restoreDrawings(snapshot.drawingData);
     }
 }
 
