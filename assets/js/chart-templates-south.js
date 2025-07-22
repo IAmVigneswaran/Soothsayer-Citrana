@@ -292,8 +292,8 @@ class SouthIndianChartTemplate {
         this.chartGroupSouth.getChildren(node => node.name() && node.name().startsWith(`planet-`) && node.name().includes(`-${houseNumber}-`)).forEach(node => node.destroy());
         // Calculate font size based on number of planets
         const n = house.planets.length;
-        const BASE_FONT = 32;
-        const MIN_FONT = 16;
+        const BASE_FONT = 24;
+        const MIN_FONT = 14;
         const STEP = 4;
         const fontSize = Math.max(MIN_FONT, BASE_FONT - (n-1)*STEP);
         // Center all planet texts vertically in the house
@@ -410,6 +410,7 @@ class SouthIndianChartTemplate {
             this.selectedPlanet.planetText.strokeWidth(0);
         }
         this.selectedPlanet = null;
+        this.layer.batchDraw();
     }
 
     setLagnaHouse(houseNumber) {

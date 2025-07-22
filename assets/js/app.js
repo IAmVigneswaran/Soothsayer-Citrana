@@ -79,7 +79,17 @@ class CitranaApp {
         document.getElementById('reset-zoom').addEventListener('click', () => this.chartTemplates.zoomToFit());
 
         // Canvas events
-        this.stage.on('mousedown', (e) => this.handleMouseDown(e));
+        this.stage.on('mousedown', (e) => {
+            // If click is on empty space (not a chart house or planet), clear highlight
+            if (!e.target || (e.target && !e.target.name().startsWith('house-') && !e.target.name().startsWith('planet-') && !e.target.name().startsWith('planet-hit-'))) {
+                if (this.chartTemplates.currentChartType === 'south-indian') {
+                    this.chartTemplates.southIndianTemplate.clearHighlight();
+                } else if (this.chartTemplates.currentChartType === 'north-indian') {
+                    this.chartTemplates.northIndianTemplate.clearHighlight();
+                }
+            }
+            this.handleMouseDown(e);
+        });
         this.stage.on('mousemove', (e) => this.handleMouseMove(e));
         this.stage.on('mouseup', (e) => this.handleMouseUp(e));
         this.stage.on('wheel', (e) => this.handleWheel(e));

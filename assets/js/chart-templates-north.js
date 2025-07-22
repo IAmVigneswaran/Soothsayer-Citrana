@@ -178,7 +178,8 @@ class NorthIndianChartTemplate {
                 closed: true,
                 lineJoin: 'round',
                 lineCap: 'round',
-                name: `house-${houseNumberNorth}`
+                name: `house-${houseNumberNorth}`,
+                listening: true
             });
 
             // Make the polygon selectable by listening to click events
@@ -282,7 +283,8 @@ class NorthIndianChartTemplate {
         this.layer.add(this.chartGroupNorth);
         this.layer.add(this.tinyBoxGroupNorth);
         
-        // Ensure rashi number boxes are on top by moving them to the end of the layer
+        // Ensure house polygons are always on top for hit detection
+        this.chartGroupNorth.moveToTop();
         this.tinyBoxGroupNorth.moveToTop();
         this.layer.batchDraw();
         
@@ -500,8 +502,8 @@ class NorthIndianChartTemplate {
         this.chartGroupNorth.getChildren(node => node.name() && node.name().startsWith(`planet-`) && node.name().includes(`-${houseNumber}-`)).forEach(node => node.destroy());
         // Calculate font size based on number of planets
         const n = house.planets.length;
-        const BASE_FONT = 32;
-        const MIN_FONT = 16;
+        const BASE_FONT = 20;
+        const MIN_FONT = 10;
         const STEP = 4;
         const fontSize = Math.max(MIN_FONT, BASE_FONT - (n-1)*STEP);
         // Center all planet texts vertically in the house (approximate)
@@ -561,20 +563,28 @@ class NorthIndianChartTemplate {
             });
             planetText.on('dragend', (e) => {
                 planetText.opacity(1);
-                // Find which bhava (if any) the drop is over
+                this.layer.batchDraw();
+                // Transform pointer to chart coordinates
                 const pointer = this.stage.getPointerPosition();
                 let targetHouse = null;
-                for (const hNum in this.houseDataNorth) {
-                    const h = this.houseDataNorth[hNum];
-                    // Use bounding box for hit detection (approximate)
-                    if (
-                        pointer.x >= h.x - h.width/2 && pointer.x <= h.x + h.width/2 &&
-                        pointer.y >= h.y - h.height/2 && pointer.y <= h.y + h.height/2
-                    ) {
-                        targetHouse = parseInt(hNum);
-                        break;
+                if (pointer) {
+                    // Adjust for stage scale and position
+                    const scale = this.stage.scaleX();
+                    const stagePos = this.stage.position();
+                    const px = (pointer.x - stagePos.x) / scale;
+                    const py = (pointer.y - stagePos.y) / scale;
+                    for (const hNum in this.houseDataNorth) {
+                        const h = this.houseDataNorth[hNum];
+                        if (NorthIndianChartTemplate.isPointInPolygon(h.points, px, py)) {
+                            targetHouse = parseInt(hNum);
+                            break;
+                        }
                     }
                 }
+                // Restore z-order: move all planet texts and hitRects to top
+                this.chartGroupNorth.getChildren(node => node.name() && (node.name().startsWith('planet-') || node.name().startsWith('planet-hit-'))).forEach(node => node.moveToTop());
+                this.tinyBoxGroupNorth.moveToTop();
+                this.layer.batchDraw();
                 if (targetHouse && targetHouse !== houseNumber) {
                     // Move planet to new bhava by ID
                     this.removePlanetFromHouseById(houseNumber, planetObj.id);
@@ -587,7 +597,6 @@ class NorthIndianChartTemplate {
                     this.updatePlanetsInHouse(houseNumber);
                     console.log(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id})`);
                 }
-                this._dragSource = null;
                 this.layer.batchDraw();
             });
             this.chartGroupNorth.add(hitRect);
@@ -595,6 +604,7 @@ class NorthIndianChartTemplate {
             hitRect.moveToTop();
             planetText.moveToTop();
         });
+        // Do NOT move the house polygon to the top here!
         this.layer.batchDraw();
     }
 
@@ -619,5 +629,19 @@ class NorthIndianChartTemplate {
             this.selectedPlanet.planetText.strokeWidth(0);
         }
         this.selectedPlanet = null;
+        this.layer.batchDraw();
+    }
+
+    // --- Utility: Point-in-Polygon ---
+    static isPointInPolygon(points, px, py) {
+        let inside = false;
+        for (let i = 0, j = points.length / 2 - 1; i < points.length / 2; j = i++) {
+            const xi = points[2 * i], yi = points[2 * i + 1];
+            const xj = points[2 * j], yj = points[2 * j + 1];
+            const intersect = ((yi > py) !== (yj > py)) &&
+                (px < (xj - xi) * (py - yi) / (yj - yi + 0.00001) + xi);
+            if (intersect) inside = !inside;
+        }
+        return inside;
     }
 } 
