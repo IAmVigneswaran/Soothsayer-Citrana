@@ -332,6 +332,9 @@ class NorthIndianChartTemplate {
         this.renumberHouses();
         this.clearHighlight();
         
+        // Reposition all planets based on their stored Rashi numbers
+        this.repositionPlanetsForNewLagna();
+        
         // Get zodiac sign name for the Lagna
         const zodiacSigns = [
             'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
@@ -341,6 +344,7 @@ class NorthIndianChartTemplate {
         
         console.log(`[DEBUG] North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
         console.log('[DEBUG] Chart should now display updated Rashi numbers for the new Lagna');
+        console.log('[DEBUG] All planets have been repositioned to their correct Rashis');
     }
 
     setFirstHouse(houseNumber) {
@@ -352,6 +356,84 @@ class NorthIndianChartTemplate {
     getCurrentRashiNumber(visualPosition) {
         // For now, return empty - will be filled manually
         return '';
+    }
+
+    /**
+     * Get the Rashi number for a given house with the current Lagna
+     * @param {number} houseNumber - The house number (1-12)
+     * @returns {number} The Rashi number (1-12)
+     */
+    getRashiNumberForHouse(houseNumber) {
+        return ((houseNumber + this.lagnaHouseNorth - 2) % 12) + 1;
+    }
+
+    /**
+     * Get the house number for a given Rashi with the current Lagna
+     * @param {number} rashiNumber - The Rashi number (1-12)
+     * @returns {number} The house number (1-12)
+     */
+    getHouseNumberForRashi(rashiNumber) {
+        // Reverse the formula: house = ((rashi - lagna + 1) % 12) + 1
+        let houseNumber = ((rashiNumber - this.lagnaHouseNorth + 1) % 12);
+        if (houseNumber <= 0) houseNumber += 12;
+        return houseNumber;
+    }
+
+    /**
+     * Reposition all planets to their correct houses based on their stored Rashi numbers
+     * This is called when the Lagna changes to ensure planets stay in their Rashis
+     */
+    repositionPlanetsForNewLagna() {
+        console.log('[DEBUG] Repositioning planets for new Lagna...');
+        
+        // Collect all planets with their Rashi numbers
+        const allPlanets = [];
+        for (const houseNum in this.houseDataNorth) {
+            const house = this.houseDataNorth[houseNum];
+            if (house.planets && house.planets.length > 0) {
+                house.planets.forEach(planet => {
+                    if (planet.rashiNumber) {
+                        allPlanets.push({
+                            ...planet,
+                            currentHouse: parseInt(houseNum)
+                        });
+                    }
+                });
+            }
+        }
+        
+        console.log(`[DEBUG] Found ${allPlanets.length} planets to reposition`);
+        
+        // Clear all planets from current positions
+        for (const houseNum in this.houseDataNorth) {
+            this.houseDataNorth[houseNum].planets = [];
+        }
+        
+        // Reposition each planet to its correct house based on Rashi
+        allPlanets.forEach(planet => {
+            const newHouseNumber = this.getHouseNumberForRashi(planet.rashiNumber);
+            console.log(`[DEBUG] Planet ${planet.abbr} (Rashi ${planet.rashiNumber}) moving from house ${planet.currentHouse} to house ${newHouseNumber}`);
+            
+            // Add planet to new house
+            const house = this.houseDataNorth[newHouseNumber];
+            if (house) {
+                if (!house.planets) house.planets = [];
+                house.planets.push({
+                    abbr: planet.abbr,
+                    label: planet.label,
+                    id: planet.id,
+                    rashiNumber: planet.rashiNumber
+                });
+            }
+        });
+        
+        // Update visual representation for all houses
+        for (const houseNum in this.houseDataNorth) {
+            this.updatePlanetsInHouse(parseInt(houseNum));
+        }
+        
+        this.layer.batchDraw();
+        console.log('[DEBUG] Planet repositioning completed');
     }
 
 
@@ -457,6 +539,9 @@ class NorthIndianChartTemplate {
             // Recreate the chart
             this.createNorthIndianChart();
             
+            // Reposition planets if they have Rashi numbers stored
+            this.repositionPlanetsForNewLagna();
+            
             console.log('North Indian chart data loaded successfully');
         } catch (error) {
             console.error('Error loading North Indian chart data:', error);
@@ -473,16 +558,26 @@ class NorthIndianChartTemplate {
     }
 
     // --- Robust Planet Management ---
-    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null) {
+    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, existingRashiNumber = null) {
         const house = this.houseDataNorth[houseNumber];
         if (!house) return;
         if (!house.planets) house.planets = [];
         // Use unique ID for each planet instance
         const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
-        house.planets.push({ abbr: planetAbbr, label: label || planetAbbr, id: planetId });
+        
+        // If this is a planet being moved (has existing Rashi), preserve it
+        // Otherwise, calculate the Rashi number for this house with current Lagna
+        const rashiNumber = existingRashiNumber || this.getRashiNumberForHouse(houseNumber);
+        
+        house.planets.push({ 
+            abbr: planetAbbr, 
+            label: label || planetAbbr, 
+            id: planetId,
+            rashiNumber: rashiNumber // Store the Rashi number when planet is placed
+        });
         this.updatePlanetsInHouse(houseNumber);
         if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
-        console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
+        console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber} in Rashi ${rashiNumber}`);
     }
 
     removePlanetFromHouseById(houseNumber, planetId) {
@@ -554,12 +649,18 @@ class NorthIndianChartTemplate {
             planetText.on('contextmenu', contextHandler);
             // Drag-and-drop between bhavas
             planetText.on('dragstart', (e) => {
-                this._dragSource = { houseNumber, abbr: planetObj.abbr, id: planetObj.id, label: planetObj.label };
+                this._dragSource = { 
+                    houseNumber, 
+                    abbr: planetObj.abbr, 
+                    id: planetObj.id, 
+                    label: planetObj.label,
+                    rashiNumber: planetObj.rashiNumber // Store the Rashi number for the move
+                };
                 planetText.opacity(0.5);
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
-                console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
+                console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber} in Rashi ${planetObj.rashiNumber}`);
             });
             planetText.on('dragend', (e) => {
                 planetText.opacity(1);
@@ -586,12 +687,12 @@ class NorthIndianChartTemplate {
                 this.tinyBoxGroupNorth.moveToTop();
                 this.layer.batchDraw();
                 if (targetHouse && targetHouse !== houseNumber) {
-                    // Move planet to new bhava by ID
+                    // Move planet to new bhava by ID, preserving its Rashi number
                     this.removePlanetFromHouseById(houseNumber, planetObj.id);
-                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id);
+                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.rashiNumber);
                     this.updatePlanetsInHouse(targetHouse);
                     if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
-                    console.log(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}`);
+                    console.log(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}, staying in Rashi ${planetObj.rashiNumber}`);
                 } else {
                     // Snap back to original position
                     this.updatePlanetsInHouse(houseNumber);
