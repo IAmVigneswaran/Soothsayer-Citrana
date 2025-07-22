@@ -111,6 +111,11 @@ class ChartTemplates {
             name: 'north-indian-chart'
         });
 
+        // Create separate group for tiny boxes to ensure they render on top
+        this.tinyBoxGroup = new Konva.Group({
+            name: 'tiny-boxes-group'
+        });
+
         // House definitions based on SVG polygon coordinates
         const houseDefinitions = [
             // House 1 (Lagna) - Center diamond
@@ -187,6 +192,29 @@ class ChartTemplates {
             }
         ];
 
+        // Global offset for tiny boxes - adjust these values to move all tiny boxes
+        const globalOffset = {
+            x: 8,  // Adjust X offset (positive = right, negative = left)
+            y: 8   // Adjust Y offset (positive = down, negative = up)
+        };
+
+        // Exact tiny box positions from reference SVG - treated as individual elements
+        // These positions are fixed and independent of house polygons
+        const tinyBoxPositions = {
+            1: { x: 230.8155 + globalOffset.x, y: 209.75027 + globalOffset.y }, // tanbhav - center diamond
+            2: { x: 111.8155 + globalOffset.x, y: 87.72997 + globalOffset.y },  // dhanbhav - top left triangle
+            3: { x: 90.53612 + globalOffset.x, y: 111.8155 + globalOffset.y },  // anujbhav - top left corner
+            4: { x: 208.55092 + globalOffset.x, y: 230.8155 + globalOffset.y }, // maatabhav - left side
+            5: { x: 252.67113 + globalOffset.x, y: 230.8155 + globalOffset.y }, // santanbhav - right side
+            6: { x: 230.8155 + globalOffset.x, y: 254.56586 + globalOffset.y }, // rogbhav - bottom center
+            7: { x: 90.53612 + globalOffset.x, y: 349.8655 + globalOffset.y },  // dampathyabhav - bottom left
+            8: { x: 111.7655 + globalOffset.x, y: 373.90103 + globalOffset.y }, // aayubhav - bottom left corner
+            9: { x: 349.8655 + globalOffset.x, y: 371.49796 + globalOffset.y }, // bhagyabhav - bottom right
+            10: { x: 371.09488 + globalOffset.x, y: 349.8155 + globalOffset.y }, // karmabhav - bottom right corner
+            11: { x: 371.09488 + globalOffset.x, y: 111.7655 + globalOffset.y }, // laabbhav - top right corner
+            12: { x: 349.8155 + globalOffset.x, y: 90.13304 + globalOffset.y }   // karchbhav - top right
+        };
+
         houseDefinitions.forEach((houseDef) => {
             const houseNumber = houseDef.number;
             
@@ -202,21 +230,28 @@ class ChartTemplates {
                 name: `house-${houseNumber}`
             });
 
-            // Calculate center for house number text
+            // Calculate center for house data
             const centerX = houseDef.points.reduce((sum, val, index) => index % 2 === 0 ? sum + val : sum, 0) / (houseDef.points.length / 2);
             const centerY = houseDef.points.reduce((sum, val, index) => index % 2 === 1 ? sum + val : sum, 0) / (houseDef.points.length / 2);
             
-            // Add house number text
-            const houseText = new Konva.Text({
-                x: centerX - 10,
-                y: centerY - 8,
-                text: houseNumber.toString(),
-                fontSize: 14,
-                fontFamily: 'Arial',
-                fontWeight: 'bold',
-                fill: '#374151',
-                name: `house-text-${houseNumber}`
-            });
+            // Rashi (Zodiac signs) mapping
+            const rashis = [
+                '1', // Aries
+                '2', // Taurus
+                '3', // Gemini
+                '4', // Cancer
+                '5', // Leo
+                '6', // Virgo
+                '7', // Libra
+                '8', // Scorpio
+                '9', // Sagittarius
+                '10', // Capricorn
+                '11', // Aquarius
+                '12'  // Pisces
+            ];
+
+            const rashiIndex = (houseNumber - 1) % 12;
+            const rashiName = rashis[rashiIndex];
 
             // Store house data
             this.houseData[houseNumber] = {
@@ -225,21 +260,69 @@ class ChartTemplates {
                 width: 100, // Approximate for hit detection
                 height: 100, // Approximate for hit detection
                 planets: [],
-                points: houseDef.points
+                points: houseDef.points,
+                housePolygon: housePolygon
             };
 
-            // Add to chart group
+            // Add house polygon to chart group
             this.chartGroup.add(housePolygon);
-            this.chartGroup.add(houseText);
             
             // Add right-click event for context menu
             housePolygon.on('contextmenu', (e) => {
                 e.evt.preventDefault();
+                this.highlightHouse(houseNumber);
                 window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
             });
         });
 
+        // Create tiny boxes as individual elements with exact positions
+        const tinyBoxSize = 17; // Match the reference SVG size (16.95)
+        const rashis = [
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+        ];
+
+        Object.entries(tinyBoxPositions).forEach(([houseNumber, position]) => {
+            const houseNum = parseInt(houseNumber);
+            const rashiIndex = (houseNum - 1) % 12;
+            const rashiName = rashis[rashiIndex];
+
+            // Create tiny black box
+            const tinyBox = new Konva.Rect({
+                x: position.x - tinyBoxSize/2,
+                y: position.y - tinyBoxSize/2,
+                width: tinyBoxSize,
+                height: tinyBoxSize,
+                fill: '#000000',
+                cornerRadius: 4,
+                name: `rashi-box-${houseNum}`,
+                listening: false // Disable mouse events on tiny box
+            });
+
+            // Create Rashi text
+            const rashiText = new Konva.Text({
+                x: position.x - tinyBoxSize/2,
+                y: position.y - tinyBoxSize/2,
+                width: tinyBoxSize,
+                height: tinyBoxSize,
+                text: rashiName,
+                fontSize: 10,
+                fontFamily: 'Arial',
+                fontWeight: 'bold',
+                fill: '#ffffff',
+                align: 'center',
+                verticalAlign: 'middle',
+                name: `rashi-${houseNum}`,
+                listening: false // Disable mouse events on text
+            });
+
+            // Add to tiny box group
+            this.tinyBoxGroup.add(tinyBox);
+            this.tinyBoxGroup.add(rashiText);
+        });
+
+        // Add both groups to layer
         this.layer.add(this.chartGroup);
+        this.layer.add(this.tinyBoxGroup);
         this.layer.batchDraw();
 
         // Zoom to fit
@@ -381,11 +464,19 @@ class ChartTemplates {
     highlightHouse(houseNumber) {
         // Remove highlight from previous
         if (this.selectedHouse && this.houseData[this.selectedHouse]) {
-            this.houseData[this.selectedHouse].houseRect.fill('#ffffff');
+            if (this.currentChartType === 'south-indian') {
+                this.houseData[this.selectedHouse].houseRect.fill('#ffffff');
+            } else if (this.currentChartType === 'north-indian') {
+                this.houseData[this.selectedHouse].housePolygon.fill('#ffffff');
+            }
         }
         // Highlight new
         if (this.houseData[houseNumber]) {
-            this.houseData[houseNumber].houseRect.fill('#f3f4f6'); // Tailwind gray-100
+            if (this.currentChartType === 'south-indian') {
+                this.houseData[houseNumber].houseRect.fill('#f3f4f6'); // Tailwind gray-100
+            } else if (this.currentChartType === 'north-indian') {
+                this.houseData[houseNumber].housePolygon.fill('#f3f4f6'); // Tailwind gray-100
+            }
             this.selectedHouse = houseNumber;
             this.layer.batchDraw();
         }
@@ -393,7 +484,11 @@ class ChartTemplates {
 
     clearHighlight() {
         if (this.selectedHouse && this.houseData[this.selectedHouse]) {
-            this.houseData[this.selectedHouse].houseRect.fill('#ffffff');
+            if (this.currentChartType === 'south-indian') {
+                this.houseData[this.selectedHouse].houseRect.fill('#ffffff');
+            } else if (this.currentChartType === 'north-indian') {
+                this.houseData[this.selectedHouse].housePolygon.fill('#ffffff');
+            }
             this.selectedHouse = null;
             this.layer.batchDraw();
         }
@@ -507,8 +602,19 @@ class ChartTemplates {
             const rashiIndex = (houseNum - 1) % 12;
             const rashiName = rashis[rashiIndex];
             debugBhavas.push({bhavaNum, houseNum, rashiName});
-            if (this.houseData[houseNum] && this.houseData[houseNum].bhavaText) {
+            
+            // Update South Indian chart bhava numbers
+            if (this.currentChartType === 'south-indian' && this.houseData[houseNum] && this.houseData[houseNum].bhavaText) {
                 this.houseData[houseNum].bhavaText.text(bhavaNum.toString());
+            }
+            
+            // Update North Indian chart Rashi numbers
+            if (this.currentChartType === 'north-indian') {
+                // Find the rashi text in the tiny box group
+                const rashiText = this.tinyBoxGroup?.findOne(`rashi-${houseNum}`);
+                if (rashiText) {
+                    rashiText.text(rashiName);
+                }
             }
         }
         this.layer.batchDraw();
