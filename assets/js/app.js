@@ -266,6 +266,17 @@ class CitranaApp {
         this.chartTemplates.clearChart();
         console.log('Chart cleared');
     }
+
+    resetChart() {
+        // Clear all planets from the chart
+        this.chartTemplates.clearAllPlanets();
+        // Clear all annotations/drawings
+        this.drawingTools.clearAll();
+        // Optionally clear selection
+        if (window.selectedBhavaSouth) window.selectedBhavaSouth = null;
+        this.layer.batchDraw();
+        console.log('Chart reset: all planets and annotations cleared');
+    }
 }
 
 // Initialize app when DOM is loaded

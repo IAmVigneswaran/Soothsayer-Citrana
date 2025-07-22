@@ -193,4 +193,12 @@ class ChartCoordinator {
             console.error('Error loading chart data:', error);
         }
     }
+
+    clearAllPlanets() {
+        if (this.currentChartType === 'south-indian') {
+            this.southIndianTemplate.clearAllPlanets();
+        } else if (this.currentChartType === 'north-indian') {
+            this.northIndianTemplate.clearAllPlanets();
+        }
+    }
 } 

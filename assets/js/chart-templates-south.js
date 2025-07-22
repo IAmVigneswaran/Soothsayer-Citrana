@@ -224,6 +224,12 @@ class SouthIndianChartTemplate {
             this.highlightHouse(houseNumber);
             window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
         });
+        // Add click event for selection
+        house.on('click', (e) => {
+            this.highlightHouse(houseNumber);
+            window.selectedBhavaSouth = houseNumber;
+            console.log('[SELECT] South Indian Chart House selected:', houseNumber);
+        });
     }
 
     highlightHouse(houseNumber) {
@@ -247,54 +253,161 @@ class SouthIndianChartTemplate {
         }
     }
 
-    addPlanetToHouse(planetAbbr, houseNumber) {
+    // --- Robust Planet Management ---
+    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null) {
         const house = this.houseDataSouth[houseNumber];
         if (!house) return;
-
-        // Add to house data
-        if (!house.planets) {
-            house.planets = [];
-        }
-        house.planets.push(planetAbbr);
-
-        // Create planet text
-        this.createPlanetText(planetAbbr, houseNumber, house);
-        
-        console.log(`Planet ${planetAbbr} added to house ${houseNumber}`);
+        if (!house.planets) house.planets = [];
+        // Use unique ID for each planet instance
+        const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
+        house.planets.push({ abbr: planetAbbr, label: label || planetAbbr, id: planetId });
+        this.updatePlanetsInHouse(houseNumber);
+        console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
     }
 
-    createPlanetText(planetAbbr, houseNumber, house) {
-        const planet = window.app.planetSystem.getPlanetInfo(planetAbbr);
-        if (!planet) return;
-
-        // Calculate position for planet text
-        const existingPlanets = house.planets.filter(p => p === planetAbbr).length - 1;
-        const offsetY = existingPlanets * 25;
-
-        const planetText = new Konva.Text({
-            x: house.x + house.width / 2 - 15,
-            y: house.y + house.height / 2 - 10 + offsetY,
-            text: planetAbbr,
-            fontSize: 18,
-            fontFamily: 'Arial',
-            fontWeight: 'bold',
-            fill: planet.color,
-            name: `planet-${planetAbbr}-${houseNumber}-${existingPlanets}`,
-            draggable: true
-        });
-
-        // Add drag events
-        planetText.on('dragstart', () => {
-            planetText.opacity(0.5);
-        });
-
-        planetText.on('dragend', () => {
-            planetText.opacity(1);
-            this.layer.batchDraw();
-        });
-
-        this.chartGroupSouth.add(planetText);
+    removePlanetFromHouseById(houseNumber, planetId) {
+        const house = this.houseDataSouth[houseNumber];
+        if (!house || !house.planets) return;
+        house.planets = house.planets.filter((planet) => planet.id !== planetId);
+        this.updatePlanetsInHouse(houseNumber);
         this.layer.batchDraw();
+        this.clearSelectedPlanet();
+    }
+
+    renamePlanetInHouseById(houseNumber, planetId, newLabel) {
+        const house = this.houseDataSouth[houseNumber];
+        if (!house || !house.planets) return;
+        const planet = house.planets.find((p) => p.id === planetId);
+        if (planet) planet.label = newLabel;
+        this.updatePlanetsInHouse(houseNumber);
+        this.layer.batchDraw();
+    }
+
+    updatePlanetsInHouse(houseNumber) {
+        const house = this.houseDataSouth[houseNumber];
+        if (!house) return;
+        // Remove all existing planet texts for this house
+        this.chartGroupSouth.getChildren(node => node.name() && node.name().startsWith(`planet-`) && node.name().includes(`-${houseNumber}-`)).forEach(node => node.destroy());
+        // Calculate font size based on number of planets
+        const n = house.planets.length;
+        const BASE_FONT = 32;
+        const MIN_FONT = 16;
+        const STEP = 4;
+        const fontSize = Math.max(MIN_FONT, BASE_FONT - (n-1)*STEP);
+        // Center all planet texts vertically in the house
+        const totalHeight = n * fontSize + (n-1) * 4;
+        let startY = house.y + house.height/2 - totalHeight/2;
+        house.planets.forEach((planetObj, i) => {
+            const planet = window.app.planetSystem.getPlanetInfo(planetObj.abbr);
+            // Add a transparent rectangle for easier hit area
+            const hitRect = new Konva.Rect({
+                x: house.x + house.width/2 - fontSize,
+                y: startY + i * (fontSize + 4) - fontSize/2,
+                width: fontSize * 2,
+                height: fontSize,
+                fill: 'rgba(0,0,0,0)',
+                name: `planet-hit-${planetObj.id}`,
+                listening: true
+            });
+            // The planet text
+            const planetText = new Konva.Text({
+                x: house.x + house.width/2,
+                y: startY + i * (fontSize + 4),
+                text: planetObj.label,
+                fontSize: fontSize,
+                fontFamily: 'Arial Black, Arial, sans-serif',
+                fontWeight: 'bold',
+                fill: planet ? planet.color : '#000',
+                name: `planet-${planetObj.abbr}-${houseNumber}-${planetObj.id}`,
+                draggable: true,
+                align: 'center',
+                verticalAlign: 'middle',
+                offsetX: fontSize/2,
+                offsetY: fontSize/2,
+            });
+            // Selection logic
+            const selectHandler = (e) => {
+                e.cancelBubble = true;
+                this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
+            };
+            hitRect.on('click', selectHandler);
+            planetText.on('click', selectHandler);
+            // Right-click context menu
+            const contextHandler = (e) => {
+                e.evt.preventDefault();
+                this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
+                window.app.contextMenu.showPlanetMenu(e.evt.clientX, e.evt.clientY, houseNumber, planetObj.abbr, planetObj.id);
+            };
+            hitRect.on('contextmenu', contextHandler);
+            planetText.on('contextmenu', contextHandler);
+            // Drag-and-drop between bhavas
+            planetText.on('dragstart', (e) => {
+                this._dragSource = { houseNumber, abbr: planetObj.abbr, id: planetObj.id, label: planetObj.label };
+                planetText.opacity(0.5);
+                planetText.moveToTop();
+                hitRect.moveToTop();
+                this.layer.batchDraw();
+                console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
+            });
+            planetText.on('dragend', (e) => {
+                planetText.opacity(1);
+                // Find which bhava (if any) the drop is over
+                const pointer = this.stage.getPointerPosition();
+                let targetHouse = null;
+                for (const hNum in this.houseDataSouth) {
+                    const h = this.houseDataSouth[hNum];
+                    if (
+                        pointer.x >= h.x && pointer.x <= h.x + h.width &&
+                        pointer.y >= h.y && pointer.y <= h.y + h.height
+                    ) {
+                        targetHouse = parseInt(hNum);
+                        break;
+                    }
+                }
+                if (targetHouse && targetHouse !== houseNumber) {
+                    // Move planet to new bhava by ID
+                    this.removePlanetFromHouseById(houseNumber, planetObj.id);
+                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id);
+                    this.updatePlanetsInHouse(targetHouse);
+                    console.log(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}`);
+                } else {
+                    // Snap back to original position
+                    this.updatePlanetsInHouse(houseNumber);
+                    console.log(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id})`);
+                }
+                this._dragSource = null;
+                this.layer.batchDraw();
+            });
+            this.chartGroupSouth.add(hitRect);
+            this.chartGroupSouth.add(planetText);
+            hitRect.moveToTop();
+            planetText.moveToTop();
+        });
+        this.layer.batchDraw();
+    }
+
+    // --- Selection and Keyboard Delete ---
+    selectPlanet(planetText, houseNumber, abbr, id) {
+        this.clearSelectedPlanet();
+        this.selectedPlanet = { planetText, houseNumber, abbr, id };
+        planetText.stroke('#f59e42');
+        planetText.strokeWidth(2);
+        this.layer.batchDraw();
+        if (!this._deleteKeyListener) {
+            this._deleteKeyListener = (e) => {
+                if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedPlanet) {
+                    this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
+                }
+            };
+            window.addEventListener('keydown', this._deleteKeyListener);
+        }
+    }
+    clearSelectedPlanet() {
+        if (this.selectedPlanet && this.selectedPlanet.planetText) {
+            this.selectedPlanet.planetText.strokeEnabled(false);
+            this.selectedPlanet.planetText.strokeWidth(0);
+        }
+        this.selectedPlanet = null;
     }
 
     setLagnaHouse(houseNumber) {
@@ -444,5 +557,14 @@ class SouthIndianChartTemplate {
         } catch (error) {
             console.error('Error loading South Indian chart data:', error);
         }
+    }
+
+    clearAllPlanets() {
+        for (const houseNum in this.houseDataSouth) {
+            this.houseDataSouth[houseNum].planets = [];
+            this.updatePlanetsInHouse(houseNum);
+        }
+        this.layer.batchDraw();
+        console.log('All planets cleared from South Indian chart');
     }
 } 

@@ -68,7 +68,7 @@ class DrawingTools {
             fill: '#374151',
             pointerLength: 10,
             pointerWidth: 8,
-            name: 'arrow'
+            name: 'drawing-arrow'
         });
 
         this.currentShape = arrow;
@@ -91,7 +91,7 @@ class DrawingTools {
             points: [pos.x, pos.y, pos.x, pos.y],
             stroke: '#374151',
             strokeWidth: 2,
-            name: 'line'
+            name: 'drawing-line'
         });
 
         this.currentShape = line;
@@ -116,7 +116,7 @@ class DrawingTools {
             strokeWidth: 2,
             lineCap: 'round',
             lineJoin: 'round',
-            name: 'pen'
+            name: 'drawing-pen'
         });
 
         this.currentShape = line;
@@ -142,7 +142,7 @@ class DrawingTools {
             fontFamily: 'Arial',
             fill: '#374151',
             draggable: true,
-            name: 'text'
+            name: 'drawing-text'
         });
 
         this.currentShape = text;
@@ -263,7 +263,7 @@ class DrawingTools {
 
     clearAll() {
         // Remove all drawing objects (not chart objects)
-        const drawingObjects = window.app.layer.find('arrow, line, pen, text');
+        const drawingObjects = window.app.layer.find(node => node.name() && node.name().startsWith('drawing-'));
         drawingObjects.forEach(obj => obj.destroy());
         window.app.layer.batchDraw();
         

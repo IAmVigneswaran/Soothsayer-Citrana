@@ -459,4 +459,13 @@ class NorthIndianChartTemplate {
             console.error('Error loading North Indian chart data:', error);
         }
     }
+
+    clearAllPlanets() {
+        for (const houseNum in this.houseDataNorth) {
+            this.houseDataNorth[houseNum].planets = [];
+            this.updatePlanetsInHouse(houseNum);
+        }
+        this.layer.batchDraw();
+        console.log('All planets cleared from North Indian chart');
+    }
 } 

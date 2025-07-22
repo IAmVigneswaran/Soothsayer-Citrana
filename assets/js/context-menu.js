@@ -118,9 +118,10 @@ class ContextMenu {
             <div class="context-menu-separator"></div>
             `;
         }
-        // Always add 'Clear Chart' as the last item
+        // Add 'Reset Chart' and 'Clear Canvas' (renamed from 'Clear Chart')
         menuHtml += `
-            <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Chart</div>
+            <div class="context-menu-item" data-action="reset-chart"><i data-lucide="refresh-ccw"></i> Reset Chart</div>
+            <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>
         `;
         this.menu.innerHTML = menuHtml;
         lucide.createIcons();
@@ -157,7 +158,8 @@ class ContextMenu {
             `<div class="context-menu-separator"></div>` +
             `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}"><i data-lucide="eraser"></i> Clear House</div>` +
             `<div class="context-menu-separator"></div>` +
-            `<div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Chart</div>`;
+            `<div class="context-menu-item" data-action="reset-chart"><i data-lucide="refresh-ccw"></i> Reset Chart</div>` +
+            `<div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>`;
         console.log('[DEBUG] Menu HTML:', menuHtml);
         this.menu.innerHTML = menuHtml;
         lucide.createIcons();
@@ -179,6 +181,26 @@ class ContextMenu {
         }
         this.show(x, y);
         this.setupMenuEventListeners();
+    }
+
+    showPlanetMenu(x, y, houseNumber, planetAbbr, planetId) {
+        // Custom context menu for planet text
+        const menuHtml = `
+            <div class="context-menu-header">Planet Options</div>
+            <div class="context-menu-separator"></div>
+            <div class="context-menu-item has-submenu" data-action="edit-planet-parent"><i data-lucide="edit"></i> Edit
+                <div class="context-submenu context-menu">
+                    <div class="context-menu-item" data-action="rename-planet" data-house="${houseNumber}" data-abbr="${planetAbbr}" data-planetid="${planetId}"><i data-lucide="type"></i> Rename</div>
+                    <div class="context-menu-item danger" data-action="delete-planet" data-house="${houseNumber}" data-abbr="${planetAbbr}" data-planetid="${planetId}"><i data-lucide="trash-2"></i> Delete</div>
+                </div>
+            </div>
+        `;
+        this.menu.innerHTML = menuHtml;
+        lucide.createIcons();
+        this.show(x, y);
+        this.setupMenuEventListeners();
+        this.setupSubmenuHover();
+        this.menu.style.zIndex = '9999';
     }
 
     setupMenuEventListeners() {
@@ -211,6 +233,9 @@ class ContextMenu {
             case 'clear-chart':
                 window.app.clearChart();
                 break;
+            case 'reset-chart':
+                window.app.resetChart();
+                break;
                 
             case 'set-lagna':
                 // Set the right-clicked house as Lagna directly
@@ -237,6 +262,22 @@ class ContextMenu {
                     console.log(`Clear house ${houseNumber}`);
                 }
                 break;
+
+            // Add planet actions
+            if (action === 'rename-planet') {
+                const abbr = this.menu.querySelector('[data-action="rename-planet"]').dataset.abbr;
+                const planetId = this.menu.querySelector('[data-action="rename-planet"]').dataset.planetid;
+                const newLabel = prompt('Enter new label for this planet:');
+                if (newLabel && window.app.chartTemplates.currentChartType === 'south-indian') {
+                    window.app.chartTemplates.southIndianTemplate.renamePlanetInHouseById(parseInt(houseNumber), planetId, newLabel);
+                }
+            } else if (action === 'delete-planet') {
+                const abbr = this.menu.querySelector('[data-action="delete-planet"]').dataset.abbr;
+                const planetId = this.menu.querySelector('[data-action="delete-planet"]').dataset.planetid;
+                if (window.app.chartTemplates.currentChartType === 'south-indian') {
+                    window.app.chartTemplates.southIndianTemplate.removePlanetFromHouseById(parseInt(houseNumber), planetId);
+                }
+            }
         }
     }
 

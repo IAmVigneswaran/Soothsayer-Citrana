@@ -149,22 +149,26 @@ class PlanetSystem {
     handleDrop(e) {
         e.preventDefault();
         if (!this.draggedPlanet) return;
-        const stage = window.app?.chartTemplates?.getStage();
-        if (!stage) {
-            console.error('Stage not available for drop');
-            return;
+        // Check for selected bhava (South Indian)
+        let targetHouse = window.selectedBhavaSouth;
+        if (!targetHouse) {
+            const stage = window.app?.chartTemplates?.getStage();
+            if (!stage) {
+                console.error('Stage not available for drop');
+                return;
+            }
+            // Get drop position relative to stage
+            const pointer = stage.getPointerPosition();
+            if (!pointer) {
+                console.error('Could not get pointer position');
+                return;
+            }
+            // Fallback: Find the closest house to drop position
+            targetHouse = this.findClosestHouse(pointer);
         }
-        // Get drop position relative to stage
-        const pointer = stage.getPointerPosition();
-        if (!pointer) {
-            console.error('Could not get pointer position');
-            return;
-        }
-        // Find the closest house to drop position
-        const closestHouse = this.findClosestHouse(pointer);
-        if (closestHouse) {
-            this.placePlanetInHouse(this.draggedPlanet, closestHouse);
-            console.log(`Planet ${this.draggedPlanet} placed in house ${closestHouse}`);
+        if (targetHouse) {
+            this.placePlanetInHouse(this.draggedPlanet, targetHouse);
+            console.log(`Planet ${this.draggedPlanet} placed in house ${targetHouse}`);
         } else {
             console.log('No suitable house found for planet placement');
         }
