@@ -6,10 +6,10 @@ class ChartTemplates {
     constructor(stage, layer) {
         this.stage = stage;
         this.layer = layer;
-        this.chartGroup = null;
+        this.chartGroupSouth = null;
         this.currentChartType = null;
-        this.houseData = {};
-        this.lagnaHouse = 1;
+        this.houseDataSouth = {};
+        this.lagnaHouseSouth = 1;
         this.firstHouse = 1;
         this.selectedHouse = null; // Track selected house for highlight
         
@@ -27,15 +27,15 @@ class ChartTemplates {
     }
 
     getChartGroup() {
-        return this.chartGroup;
+        return this.chartGroupSouth;
     }
 
     getHouseData() {
-        return this.houseData;
+        return this.houseDataSouth;
     }
 
     getDropZones() {
-        return Object.keys(this.houseData);
+        return Object.keys(this.houseDataSouth);
     }
 
     createSouthIndianChart() {
@@ -48,10 +48,10 @@ class ChartTemplates {
         this.currentChartType = 'south-indian';
 
         // Set Aries (house 1) as default Lagna
-        this.lagnaHouse = 1;
+        this.lagnaHouseSouth = 1;
 
         // Create chart group
-        this.chartGroup = new Konva.Group({
+        this.chartGroupSouth = new Konva.Group({
             name: 'south-indian-chart'
         });
 
@@ -88,7 +88,7 @@ class ChartTemplates {
             this.createHouse(pos.x, pos.y, houseSize, houseSize, pos.house);
         });
 
-        this.layer.add(this.chartGroup);
+        this.layer.add(this.chartGroupSouth);
         this.layer.batchDraw();
 
         // Zoom to fit
@@ -389,18 +389,18 @@ class ChartTemplates {
 
         // Create small rounded black box for Rashi
         const rashiBoxSize = 20;
-        const rashiBox = new Konva.Rect({
+        const rashiNumberSouthBox = new Konva.Rect({
             x: x + width - rashiBoxSize - 5,
             y: y + 5,
             width: rashiBoxSize,
             height: rashiBoxSize,
             fill: '#000000',
             cornerRadius: 4,
-            name: `rashi-box-${houseNumber}`
+            name: `rashiNumberSouthBox-${houseNumber}`
         });
 
         // Create Rashi text (white text on black background)
-        const rashiText = new Konva.Text({
+        const rashiNumberSouthText = new Konva.Text({
             x: x + width - rashiBoxSize - 5,
             y: y + 5,
             width: rashiBoxSize,
@@ -412,38 +412,38 @@ class ChartTemplates {
             fill: '#ffffff',
             align: 'center',
             verticalAlign: 'middle',
-            name: `rashi-${houseNumber}`
+            name: `rashiNumberSouthText-${houseNumber}`
         });
 
         // Store house data
-        this.houseData[houseNumber] = {
+        this.houseDataSouth[houseNumber] = {
             x: x,
             y: y,
             width: width,
             height: height,
             planets: [],
-            houseRect: house,
-            bhavaBox: null, // Initialize bhavaBox to null
-            bhavaText: null, // Initialize bhavaText to null
-            lagnaLines: null // Store Lagna indicator lines
+            houseRectSouth: house,
+            bhavaNumberSouthBox: null, // Initialize bhavaNumberSouthBox to null
+            bhavaNumberSouthText: null, // Initialize bhavaNumberSouthText to null
+            lagnaLinesSouth: null // Store Lagna indicator lines
         };
 
         // Add to chart group
-        this.chartGroup.add(house);
-        this.chartGroup.add(rashiBox);
-        this.chartGroup.add(rashiText);
+        this.chartGroupSouth.add(house);
+        this.chartGroupSouth.add(rashiNumberSouthBox);
+        this.chartGroupSouth.add(rashiNumberSouthText);
 
         // Add duplicate Bhava number at bottom left
-        const bhavaBoxBottomLeft = new Konva.Rect({
+        const bhavaNumberSouthBox = new Konva.Rect({
             x: x + 5,
             y: y + height - rashiBoxSize - 5,
             width: rashiBoxSize,
             height: rashiBoxSize,
             fill: '#145A32', // dark green
             cornerRadius: 4,
-            name: `bhava-box-bottomleft-${houseNumber}`
+            name: `bhavaNumberSouthBox-${houseNumber}`
         });
-        const bhavaTextBottomLeft = new Konva.Text({
+        const bhavaNumberSouthText = new Konva.Text({
             x: x + 5,
             y: y + height - rashiBoxSize - 5,
             width: rashiBoxSize,
@@ -455,16 +455,16 @@ class ChartTemplates {
             fill: '#ffffff', // white text for bhava
             align: 'center',
             verticalAlign: 'middle',
-            name: `bhava-bottomleft-${houseNumber}`
+            name: `bhavaNumberSouthText-${houseNumber}`
         });
-        this.chartGroup.add(bhavaBoxBottomLeft);
-        this.chartGroup.add(bhavaTextBottomLeft);
+        this.chartGroupSouth.add(bhavaNumberSouthBox);
+        this.chartGroupSouth.add(bhavaNumberSouthText);
         // Store references for later updates
-        this.houseData[houseNumber].bhavaBox = bhavaBoxBottomLeft;
-        this.houseData[houseNumber].bhavaText = bhavaTextBottomLeft;
+        this.houseDataSouth[houseNumber].bhavaNumberSouthBox = bhavaNumberSouthBox;
+        this.houseDataSouth[houseNumber].bhavaNumberSouthText = bhavaNumberSouthText;
 
         // Draw Lagna indicator lines if this is the Lagna house and South Indian chart
-        if (this.currentChartType === 'south-indian' && houseNumber === this.lagnaHouse) {
+        if (this.currentChartType === 'south-indian' && houseNumber === this.lagnaHouseSouth) {
             // Single diagonal line from top-left to a point near top and left sides
             const line = new Konva.Line({
                 points: [x, y + 0, x + 0, y + height * 0.18, x + width * 0.18, y],
@@ -472,8 +472,8 @@ class ChartTemplates {
                 strokeWidth: 2,
                 name: `lagna-line-${houseNumber}`
             });
-            this.chartGroup.add(line);
-            this.houseData[houseNumber].lagnaLines = [line];
+            this.chartGroupSouth.add(line);
+            this.houseDataSouth[houseNumber].lagnaLinesSouth = [line];
         }
 
         // Add right-click event for context menu
@@ -487,17 +487,17 @@ class ChartTemplates {
 
     highlightHouse(houseNumber) {
         // Remove highlight from previous
-        if (this.selectedHouse && this.houseData[this.selectedHouse]) {
+        if (this.selectedHouse && this.houseDataSouth[this.selectedHouse]) {
             if (this.currentChartType === 'south-indian') {
-                this.houseData[this.selectedHouse].houseRect.fill('#ffffff');
+                this.houseDataSouth[this.selectedHouse].houseRectSouth.fill('#ffffff');
             } else if (this.currentChartType === 'north-indian') {
                 this.houseData[this.selectedHouse].housePolygon.fill('#ffffff');
             }
         }
         // Highlight new
-        if (this.houseData[houseNumber]) {
+        if (this.houseDataSouth[houseNumber]) {
             if (this.currentChartType === 'south-indian') {
-                this.houseData[houseNumber].houseRect.fill('#f3f4f6'); // Tailwind gray-100
+                this.houseDataSouth[houseNumber].houseRectSouth.fill('#f3f4f6'); // Tailwind gray-100
             } else if (this.currentChartType === 'north-indian') {
                 this.houseData[houseNumber].housePolygon.fill('#f3f4f6'); // Tailwind gray-100
             }
@@ -507,9 +507,9 @@ class ChartTemplates {
     }
 
     clearHighlight() {
-        if (this.selectedHouse && this.houseData[this.selectedHouse]) {
+        if (this.selectedHouse && this.houseDataSouth[this.selectedHouse]) {
             if (this.currentChartType === 'south-indian') {
-                this.houseData[this.selectedHouse].houseRect.fill('#ffffff');
+                this.houseDataSouth[this.selectedHouse].houseRectSouth.fill('#ffffff');
             } else if (this.currentChartType === 'north-indian') {
                 this.houseData[this.selectedHouse].housePolygon.fill('#ffffff');
             }
@@ -519,7 +519,7 @@ class ChartTemplates {
     }
 
     addPlanetToHouse(planetAbbr, houseNumber) {
-        const house = this.houseData[houseNumber];
+        const house = this.houseDataSouth[houseNumber];
         if (!house) return;
 
         // Add to house data
@@ -564,34 +564,34 @@ class ChartTemplates {
             this.layer.batchDraw();
         });
 
-        this.chartGroup.add(planetText);
+        this.chartGroupSouth.add(planetText);
         this.layer.batchDraw();
     }
 
     setLagnaHouse(houseNumber) {
         console.log('[DEBUG] setLagnaHouse called with:', houseNumber);
         // Remove old Lagna indicator lines if present (South Indian only)
-        if (this.currentChartType === 'south-indian' && this.houseData[this.lagnaHouse] && this.houseData[this.lagnaHouse].lagnaLines) {
-            this.houseData[this.lagnaHouse].lagnaLines.forEach(line => line.destroy());
-            this.houseData[this.lagnaHouse].lagnaLines = null;
+        if (this.currentChartType === 'south-indian' && this.houseDataSouth[this.lagnaHouseSouth] && this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth) {
+            this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth.forEach(line => line.destroy());
+            this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth = null;
         }
-        this.lagnaHouse = houseNumber;
+        this.lagnaHouseSouth = houseNumber;
         this.renumberHouses();
         this.clearHighlight();
         // Add new Lagna indicator line
-        if (this.currentChartType === 'south-indian' && this.houseData[houseNumber]) {
-            const x = this.houseData[houseNumber].x;
-            const y = this.houseData[houseNumber].y;
-            const width = this.houseData[houseNumber].width;
-            const height = this.houseData[houseNumber].height;
+        if (this.currentChartType === 'south-indian' && this.houseDataSouth[houseNumber]) {
+            const x = this.houseDataSouth[houseNumber].x;
+            const y = this.houseDataSouth[houseNumber].y;
+            const width = this.houseDataSouth[houseNumber].width;
+            const height = this.houseDataSouth[houseNumber].height;
             const line = new Konva.Line({
                 points: [x, y + 0, x + 0, y + height * 0.18, x + width * 0.18, y],
                 stroke: '#374151', // Match grid color
                 strokeWidth: 2,
                 name: `lagna-line-${houseNumber}`
             });
-            this.chartGroup.add(line);
-            this.houseData[houseNumber].lagnaLines = [line];
+            this.chartGroupSouth.add(line);
+            this.houseDataSouth[houseNumber].lagnaLinesSouth = [line];
             this.layer.batchDraw();
         }
         console.log(`Lagna set to house ${houseNumber}`);
@@ -609,12 +609,12 @@ class ChartTemplates {
         let houseOrder;
         if (this.currentChartType === 'south-indian') {
             // Rotate visual order so Lagna is first
-            const lagnaIdx = visualOrder.indexOf(this.lagnaHouse);
+            const lagnaIdx = visualOrder.indexOf(this.lagnaHouseSouth);
             houseOrder = visualOrder.slice(lagnaIdx).concat(visualOrder.slice(0, lagnaIdx));
         } else if (this.southIndianHouseOrder) {
             houseOrder = this.southIndianHouseOrder;
         } else {
-            houseOrder = Object.keys(this.houseData).map(Number).sort((a, b) => a - b);
+            houseOrder = Object.keys(this.houseDataSouth).map(Number).sort((a, b) => a - b);
         }
         const rashis = [
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
@@ -629,7 +629,7 @@ class ChartTemplates {
             if (this.currentChartType === 'north-indian') {
                 // For North Indian chart, Rashi number is based on the house position relative to Lagna
                 // House 1 (Lagna) = Rashi 1, House 2 = Rashi 2, etc.
-                const rashiIndex = (houseNum - this.lagnaHouse + 12) % 12;
+                const rashiIndex = (houseNum - this.lagnaHouseSouth + 12) % 12;
                 rashiName = rashis[rashiIndex];
             } else {
                 // For South Indian chart, use the original logic
@@ -640,8 +640,8 @@ class ChartTemplates {
             debugBhavas.push({bhavaNum, houseNum, rashiName});
             
             // Update South Indian chart bhava numbers
-            if (this.currentChartType === 'south-indian' && this.houseData[houseNum] && this.houseData[houseNum].bhavaText) {
-                this.houseData[houseNum].bhavaText.text(bhavaNum.toString());
+            if (this.currentChartType === 'south-indian' && this.houseDataSouth[houseNum] && this.houseDataSouth[houseNum].bhavaNumberSouthText) {
+                this.houseDataSouth[houseNum].bhavaNumberSouthText.text(bhavaNum.toString());
             }
             
             // Update North Indian chart Rashi numbers
@@ -659,11 +659,11 @@ class ChartTemplates {
     }
 
     clearChart() {
-        if (this.chartGroup) {
-            this.chartGroup.destroy();
-            this.chartGroup = null;
+        if (this.chartGroupSouth) {
+            this.chartGroupSouth.destroy();
+            this.chartGroupSouth = null;
         }
-        this.houseData = {};
+        this.houseDataSouth = {};
         this.currentChartType = null;
         // Do NOT reset this.southIndianHouseOrder here
         // Reset stage scale and position
@@ -695,11 +695,11 @@ class ChartTemplates {
     }
 
     zoomToFit() {
-        if (!this.stage || !this.chartGroup) return;
+        if (!this.stage || !this.chartGroupSouth) return;
 
         const stageWidth = this.stage.width();
         const stageHeight = this.stage.height();
-        const chartBounds = this.chartGroup.getClientRect();
+        const chartBounds = this.chartGroupSouth.getClientRect();
 
         const scaleX = (stageWidth * 0.8) / chartBounds.width;
         const scaleY = (stageHeight * 0.8) / chartBounds.height;
@@ -741,9 +741,9 @@ class ChartTemplates {
     getChartData() {
         return {
             chartType: this.currentChartType,
-            lagnaHouse: this.lagnaHouse,
+            lagnaHouse: this.lagnaHouseSouth,
             firstHouse: this.firstHouse,
-            houseData: this.houseData
+            houseData: this.houseDataSouth
         };
     }
 
@@ -752,9 +752,9 @@ class ChartTemplates {
         
         try {
             this.currentChartType = data.chartType;
-            this.lagnaHouse = data.lagnaHouse || 1;
+            this.lagnaHouseSouth = data.lagnaHouse || 1;
             this.firstHouse = data.firstHouse || 1;
-            this.houseData = data.houseData || {};
+            this.houseDataSouth = data.houseData || {};
             
             // Recreate the chart if we have a chart type
             if (this.currentChartType) {
