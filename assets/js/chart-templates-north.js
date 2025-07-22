@@ -2,6 +2,7 @@
  * North Indian Chart Template Class
  * Handles North Indian chart layout and functionality
  */
+
 class NorthIndianChartTemplate {
     constructor(stage, layer) {
         this.stage = stage;
@@ -155,6 +156,16 @@ class NorthIndianChartTemplate {
             12: { x: 349.8155 + globalOffsetNorth.x, y: 90.13304 + globalOffsetNorth.y }   // karchbhav - top right
         };
 
+        // Save the original positions
+        const originalTinyBoxPositionsNorth = { ...tinyBoxPositionsNorth };
+
+        tinyBoxPositionsNorth[5] = originalTinyBoxPositionsNorth[7];
+        tinyBoxPositionsNorth[6] = originalTinyBoxPositionsNorth[8];
+        tinyBoxPositionsNorth[7] = originalTinyBoxPositionsNorth[6];
+        tinyBoxPositionsNorth[8] = originalTinyBoxPositionsNorth[9];
+        tinyBoxPositionsNorth[9] = originalTinyBoxPositionsNorth[10];
+        tinyBoxPositionsNorth[10] = originalTinyBoxPositionsNorth[5];
+
         houseDefinitionsNorth.forEach((houseDefNorth) => {
             const houseNumberNorth = houseDefNorth.number;
             
@@ -206,19 +217,15 @@ class NorthIndianChartTemplate {
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
         ];
 
-        // Calculate correct Rashi numbers based on Lagna and First House
+        // For now, just use empty Rashi numbers - will be filled manually
         const calculateRashiNumberNorth = (houseNumberNorth) => {
-            // For North Indian chart, the house order is different from standard 1-12
-            // Based on the North Indian layout, the correct house order is:
-            // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] but with different Rashi mapping
-            // For now, let's use the simple mapping: House N = Rashi N
-            // This will be corrected by the renumberHouses() function later
-            return houseNumberNorth.toString();
+            return ''; // Empty for now
         };
 
         Object.entries(tinyBoxPositionsNorth).forEach(([houseNumberNorth, positionNorth]) => {
             const houseNumNorth = parseInt(houseNumberNorth);
             const rashiNameNorth = calculateRashiNumberNorth(houseNumNorth);
+            const uniqueId = `${houseNumNorth}NRB`;
 
             // Create rashi number box
             const rashiNumberBoxNorth = new Konva.Rect({
@@ -228,7 +235,8 @@ class NorthIndianChartTemplate {
                 height: rashiNumberBoxSizeNorth,
                 fill: '#000000',
                 cornerRadius: 4,
-                name: `RashiNumberBoxNorth${houseNumNorth}`
+                name: `RashiNumberBoxNorth${houseNumNorth}`,
+                id: uniqueId // Assign unique ID
             });
 
             // Create Rashi text
@@ -244,27 +252,24 @@ class NorthIndianChartTemplate {
                 fill: '#ffffff',
                 align: 'center',
                 verticalAlign: 'middle',
-                name: `RashiNumberTextNorth${houseNumNorth}`
+                name: `RashiNumberTextNorth${houseNumNorth}`,
+                id: uniqueId // Assign unique ID
             });
+            
+            console.log(`[DEBUG] Created Rashi text element with name: RashiNumberTextNorth${houseNumNorth}`);
 
             // Add click event to rashi number box for debug
             rashiNumberBoxNorth.on('click', (e) => {
                 e.evt.stopPropagation(); // Prevent event bubbling
-                console.log(`[DEBUG] North Indian Rashi Number Box clicked - House: ${houseNumNorth}, Rashi: ${rashiNameNorth}`);
-                console.log(`[DEBUG] Rashi Number Box displays: ${rashiNameNorth}`);
-                console.log(`[DEBUG] Current Lagna House: ${this.lagnaHouseNorth}`);
-                console.log(`[DEBUG] Current First House: ${this.firstHouseNorth}`);
-                console.log(`[DEBUG] Click position: x=${e.evt.clientX}, y=${e.evt.clientY}`);
+                const currentRashiNumber = this.getCurrentRashiNumber(houseNumNorth);
+                console.log(`[DEBUG] Clicked Rashi Box ID: ${uniqueId}, Rashi: ${currentRashiNumber}, Lagna: ${this.lagnaHouseNorth}`);
             });
 
             // Also add click event to text for better coverage
             rashiNumberTextNorth.on('click', (e) => {
                 e.evt.stopPropagation(); // Prevent event bubbling
-                console.log(`[DEBUG] North Indian Rashi Number Text clicked - House: ${houseNumNorth}, Rashi: ${rashiNameNorth}`);
-                console.log(`[DEBUG] Rashi Number Box displays: ${rashiNameNorth}`);
-                console.log(`[DEBUG] Current Lagna House: ${this.lagnaHouseNorth}`);
-                console.log(`[DEBUG] Current First House: ${this.firstHouseNorth}`);
-                console.log(`[DEBUG] Click position: x=${e.evt.clientX}, y=${e.evt.clientY}`);
+                const currentRashiNumber = this.getCurrentRashiNumber(houseNumNorth);
+                console.log(`[DEBUG] Clicked Rashi Box ID: ${uniqueId}, Rashi: ${currentRashiNumber}, Lagna: ${this.lagnaHouseNorth}`);
             });
 
             // Add to rashi number box group
@@ -313,11 +318,26 @@ class NorthIndianChartTemplate {
     }
 
     setLagnaHouse(houseNumber) {
-        console.log('[DEBUG] setLagnaHouse called with house number:', houseNumber);
+        console.log('[DEBUG] North Indian Chart - setLagnaHouse called with house number:', houseNumber);
+        console.log('[DEBUG] Previous Lagna House:', this.lagnaHouseNorth);
+        
         this.lagnaHouseNorth = houseNumber;
+        
+        console.log('[DEBUG] New Lagna House set to:', this.lagnaHouseNorth);
+        console.log('[DEBUG] Calling renumberHouses() to update Rashi numbers...');
+        
         this.renumberHouses();
         this.clearHighlight();
-        console.log(`Lagna set to house ${houseNumber}`);
+        
+        // Get zodiac sign name for the Lagna
+        const zodiacSigns = [
+            'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+            'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+        ];
+        const lagnaSignName = zodiacSigns[houseNumber - 1] || 'Unknown';
+        
+        console.log(`[DEBUG] North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
+        console.log('[DEBUG] Chart should now display updated Rashi numbers for the new Lagna');
     }
 
     setFirstHouse(houseNumber) {
@@ -326,53 +346,37 @@ class NorthIndianChartTemplate {
         console.log(`First house set to house ${houseNumber}`);
     }
 
+    getCurrentRashiNumber(visualPosition) {
+        // For now, return empty - will be filled manually
+        return '';
+    }
+
+
+
+    /**
+     * Updates the Rashi numbers in the North Indian chart for any Lagna.
+     * Uses the universal formula:
+     *   Rashi = ((house + lagna - 2) % 12) + 1
+     * Where:
+     *   - house: the logical house number (1-12, matches the visual box after swapping)
+     *   - lagna: the current Lagna (1-12)
+     * This formula works for all 12 Lagnas and ensures correct Rashi numbering in every box.
+     */
     renumberHouses() {
-        // Initialize debug array at the beginning
-        const debugBhavas = [];
-        
-        // The tinyBoxPositions keys are actually the Rashi numbers, not house numbers
-        // Based on debug output, we need to map Rashi numbers to house numbers
-        // Let's create the correct mapping from Rashi number to house number
-        const rashiToHouseMappingNorth = {
-            1: 1,   // Rashi 1 = House 1 (Center diamond - Aries Lagna)
-            2: 2,   // Rashi 2 = House 2 (Top triangle - Taurus)
-            3: 3,   // Rashi 3 = House 3 (Top left corner - Gemini)
-            4: 4,   // Rashi 4 = House 4 (Left side - Cancer)
-            5: 10,  // Rashi 5 = House 10 (Bottom right corner - Leo) - debug shows Rashi 5
-            6: 7,   // Rashi 6 = House 7 (Bottom left - Virgo) - debug shows Rashi 6
-            7: 5,   // Rashi 7 = House 5 (Right side - Libra) - debug shows Rashi 7
-            8: 6,   // Rashi 8 = House 6 (Bottom center - Scorpio) - debug shows Rashi 8
-            9: 8,   // Rashi 9 = House 8 (Bottom left corner - Sagittarius) - debug shows Rashi 9
-            10: 9,  // Rashi 10 = House 9 (Bottom right - Capricorn) - debug shows Rashi 10
-            11: 11, // Rashi 11 = House 11 (Top right corner - Aquarius)
-            12: 12  // Rashi 12 = House 12 (Top right - Pisces)
-        };
-        
-        // Apply the mapping with Lagna adjustment
-        for (let rashiNumberNorth = 1; rashiNumberNorth <= 12; rashiNumberNorth++) {
-            // Get the actual house number for this Rashi number
-            const houseNumNorth = rashiToHouseMappingNorth[rashiNumberNorth];
-            
-            // For Aries Lagna (house 1), the Rashi numbers should follow natural zodiac order
-            // starting from the Lagna position. Since house 1 is Lagna, it should be Rashi 1
-            const baseRashiNorth = rashiNumberNorth; // The Rashi number corresponds to the natural zodiac order
-            
-            // Adjust for Lagna: (base rashi - lagna rashi + 12) % 12 + 1
-            const lagnaRashiNorth = rashiToHouseMappingNorth[this.lagnaHouseNorth];
-            const adjustedRashiNorth = ((baseRashiNorth - lagnaRashiNorth + 12) % 12) + 1;
-            const rashiNameNorth = adjustedRashiNorth.toString();
-            
-            // Update North Indian chart Rashi numbers using the Rashi number
-            const rashiTextNorth = this.tinyBoxGroupNorth?.findOne(`RashiNumberTextNorth${rashiNumberNorth}`);
-            if (rashiTextNorth) {
-                rashiTextNorth.text(rashiNameNorth);
+        for (let house = 1; house <= 12; house++) {
+            const rashiNumber = ((house + this.lagnaHouseNorth - 2) % 12) + 1;
+            console.log(`[DEBUG] renumberHouses: house=${house}, lagna=${this.lagnaHouseNorth}, rashi=${rashiNumber}`);
+            const rashiText = this.tinyBoxGroupNorth?.findOne(`[name="RashiNumberTextNorth${house}"]`);
+            if (rashiText) {
+                rashiText.text(rashiNumber.toString());
+            } else {
+                const foundElement = this.tinyBoxGroupNorth?.children.find(child => child.name() === `RashiNumberTextNorth${house}`);
+                if (foundElement) {
+                    foundElement.text(rashiNumber.toString());
+                }
             }
-            debugBhavas.push({rashiNumberNorth, houseNumNorth, rashiNameNorth, baseRashiNorth, lagnaRashiNorth});
         }
-        
         this.layer.batchDraw();
-        console.log('Bhava mapping:', debugBhavas);
-        console.log('Houses renumbered');
     }
 
     clearChart() {

@@ -90,10 +90,17 @@ class ChartCoordinator {
     }
 
     setLagnaHouse(houseNumber) {
+        console.log('[DEBUG] ChartCoordinator - setLagnaHouse called with house number:', houseNumber);
+        console.log('[DEBUG] Current chart type:', this.currentChartType);
+        
         if (this.currentChartType === 'south-indian') {
+            console.log('[DEBUG] Delegating to South Indian template');
             this.southIndianTemplate.setLagnaHouse(houseNumber);
         } else if (this.currentChartType === 'north-indian') {
+            console.log('[DEBUG] Delegating to North Indian template');
             this.northIndianTemplate.setLagnaHouse(houseNumber);
+        } else {
+            console.log('[DEBUG] ERROR: Unknown chart type:', this.currentChartType);
         }
     }
 

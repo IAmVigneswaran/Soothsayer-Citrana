@@ -214,8 +214,14 @@ class ContextMenu {
                 
             case 'set-lagna':
                 // Set the right-clicked house as Lagna directly
+                console.log('[DEBUG] Context Menu - set-lagna action triggered');
+                console.log('[DEBUG] House number from menu:', houseNumber);
+                console.log('[DEBUG] Parsed house number:', parseInt(houseNumber));
                 if (window.app && window.app.chartTemplates && houseNumber) {
+                    console.log('[DEBUG] Calling chartTemplates.setLagnaHouse with:', parseInt(houseNumber));
                     window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber));
+                } else {
+                    console.log('[DEBUG] ERROR: Cannot set Lagna - missing app, chartTemplates, or houseNumber');
                 }
                 break;
                 
