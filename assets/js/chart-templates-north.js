@@ -601,25 +601,27 @@ class NorthIndianChartTemplate {
         const MIN_FONT = 10;
         const STEP = 4;
         const fontSize = Math.max(MIN_FONT, BASE_FONT - (n-1)*STEP);
-        // Center all planet texts vertically in the house (approximate)
+        // Perfectly center all planet texts both horizontally and vertically in the house
         const totalHeight = n * fontSize + (n-1) * 4;
-        let startY = house.y - totalHeight/2;
+        const startY = house.y - totalHeight/2;
         house.planets.forEach((planetObj, i) => {
             const planet = window.app.planetSystem.getPlanetInfo(planetObj.abbr);
+            const planetY = startY + i * (fontSize + 4);
+            
             // Add a transparent rectangle for easier hit area
             const hitRect = new Konva.Rect({
                 x: house.x - fontSize,
-                y: startY + i * (fontSize + 4) - fontSize/2,
+                y: planetY - fontSize/2,
                 width: fontSize * 2,
                 height: fontSize,
                 fill: 'rgba(0,0,0,0)',
                 name: `planet-hit-${planetObj.id}`,
                 listening: true
             });
-            // The planet text
+            // The planet text - perfectly centered
             const planetText = new Konva.Text({
                 x: house.x,
-                y: startY + i * (fontSize + 4),
+                y: planetY,
                 text: planetObj.label,
                 fontSize: fontSize,
                 fontFamily: 'Arial Black, Arial, sans-serif',
