@@ -107,7 +107,7 @@ class SouthIndianChartTemplate {
             width: houseSize * 2,
             height: houseSize,
             text: 'Rashi Chart 1\nD1',
-            fontSize: 24,
+            fontSize: 18,
             fontFamily: 'Arial Black, Arial, sans-serif',
             fontWeight: 'bold',
             fill: '#000000',
@@ -181,6 +181,15 @@ class SouthIndianChartTemplate {
                     finishEditing();
                 }
             });
+            // Center the textarea in the viewport
+            const textareaWidth = 400;
+            const textareaHeight = Math.max(28, centerText.height() - 6);
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            textarea.style.width = textareaWidth + 'px';
+            textarea.style.height = textareaHeight + 'px';
+            textarea.style.left = ((viewportWidth - textareaWidth) / 2) + 'px';
+            textarea.style.top = ((viewportHeight - textareaHeight) / 2) + 'px';
         });
         this.chartGroupSouth.add(centerText);
 

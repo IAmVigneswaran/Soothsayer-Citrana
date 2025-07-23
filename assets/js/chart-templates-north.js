@@ -297,6 +297,99 @@ class NorthIndianChartTemplate {
         this.zoomToFit();
         
         console.log('North Indian chart created');
+
+        // Add editable label above the chart (not in the center) - ensure it's on top
+        // Recalculate chart bounds after zoomToFit
+        const chartBoundsAfterZoom = this.chartGroupNorth.getClientRect();
+        const chartWidth = chartBoundsAfterZoom.width;
+        const labelWidth = 400; // Fixed label width
+        const fontSize = 18;
+        const labelHeight = fontSize * 4; // Allow up to 4 lines
+        const labelY = -labelHeight - -5; // 12px margin above chart group
+        // Fine-tune label offset for each browser
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        let labelOffset = -95; // Default for Chrome/Brave
+        if (isSafari) {
+            labelOffset = -117; // Adjust as needed for Safari
+        }
+        const labelX = (chartWidth - labelWidth) / 2 + labelOffset;
+        const centerLabel = new Konva.Text({
+            x: labelX,
+            y: labelY,
+            width: labelWidth,
+            height: labelHeight,
+            text: 'Rashi Chart 1\nD1',
+            fontSize: fontSize,
+            fontFamily: 'Arial Black, Arial, sans-serif',
+            fontWeight: 'bold',
+            fill: '#000000',
+            align: 'center',
+            verticalAlign: 'middle',
+            draggable: false,
+            name: 'north-label-text',
+            listening: true
+        });
+        this.chartGroupNorth.add(centerLabel);
+        centerLabel.moveToTop();
+        // In-place editing on double-click (centered in viewport)
+        centerLabel.on('dblclick dbltap', () => {
+            const textarea = document.createElement('textarea');
+            textarea.className = 'konva-textarea';
+            document.body.appendChild(textarea);
+            textarea.value = centerLabel.text();
+            textarea.maxLength = 200;
+            // Restrict to max 4 lines
+            textarea.addEventListener('input', (e) => {
+                const lines = textarea.value.split('\n');
+                if (lines.length > 4) {
+                    textarea.value = lines.slice(0, 4).join('\n');
+                }
+            });
+            // Center the textarea in the viewport
+            const textareaWidth = 400;
+            const textareaHeight = Math.max(28, centerLabel.height() - 6);
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            textarea.style.width = textareaWidth + 'px';
+            textarea.style.height = textareaHeight + 'px';
+            textarea.style.left = ((viewportWidth - textareaWidth) / 2) + 'px';
+            textarea.style.top = ((viewportHeight - textareaHeight) / 2) + 'px';
+            textarea.style.position = 'absolute';
+            textarea.style.fontSize = centerLabel.fontSize() + 'px';
+            textarea.style.lineHeight = centerLabel.fontSize() + 'px';
+            textarea.style.fontFamily = centerLabel.fontFamily();
+            textarea.style.color = centerLabel.fill();
+            textarea.style.fontWeight = 'bold';
+            textarea.style.textAlign = 'center';
+            textarea.style.border = '1.5px solid #374151';
+            textarea.style.background = 'white';
+            textarea.style.outline = 'none';
+            textarea.style.resize = 'none';
+            textarea.style.zIndex = '10000';
+            textarea.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            textarea.style.padding = '0';
+            textarea.style.margin = '0';
+            textarea.style.overflow = 'hidden';
+            textarea.focus();
+            textarea.select();
+            // Save on blur or Enter
+            const finishEditing = () => {
+                centerLabel.text(textarea.value);
+                textarea.remove();
+                this.layer.batchDraw();
+            };
+            textarea.addEventListener('blur', finishEditing);
+            textarea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    finishEditing();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    textarea.value = centerLabel.text();
+                    finishEditing();
+                }
+            });
+        });
     }
 
     highlightHouse(houseNumber) {
@@ -494,28 +587,26 @@ class NorthIndianChartTemplate {
         const stageHeight = this.stage.height();
         const chartBounds = this.chartGroupNorth.getClientRect();
 
-        const scaleX = (stageWidth * 0.8) / chartBounds.width;
-        const scaleY = (stageHeight * 0.8) / chartBounds.height;
+        const scaleX = (stageWidth * 0.7) / chartBounds.width;
+        const scaleY = (stageHeight * 0.7) / chartBounds.height;
         const scale = Math.min(scaleX, scaleY, 2); // Max scale of 2
 
         this.stage.scale({ x: scale, y: scale });
 
-        // Center the chart
+        // Center the chart, but add extra top margin for the label
+        const extraTopMargin = -50; // px, adjust as needed
         const chartCenter = {
             x: chartBounds.x + chartBounds.width / 2,
             y: chartBounds.y + chartBounds.height / 2
         };
-
         const stageCenter = {
             x: stageWidth / 2,
-            y: stageHeight / 2
+            y: (stageHeight / 2) + (extraTopMargin / 2)
         };
-
         const newPos = {
             x: stageCenter.x - chartCenter.x * scale,
-            y: stageCenter.y - chartCenter.y * scale
+            y: stageCenter.y - chartCenter.y * scale - extraTopMargin
         };
-
         this.stage.position(newPos);
         this.stage.batchDraw();
     }
