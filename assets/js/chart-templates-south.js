@@ -87,6 +87,19 @@ class SouthIndianChartTemplate {
             this.createHouse(pos.x, pos.y, houseSize, houseSize, pos.house);
         });
 
+        // Fill the center 4 boxes with a single white rectangle with black border
+        const centerRect = new Konva.Rect({
+            x: startX + houseSize,
+            y: startY + houseSize,
+            width: houseSize * 2,
+            height: houseSize * 2,
+            fill: '#ffffff',
+            stroke: '#374151',
+            strokeWidth: 2,
+            listening: false
+        });
+        this.chartGroupSouth.add(centerRect);
+
         this.layer.add(this.chartGroupSouth);
         this.layer.batchDraw();
 
