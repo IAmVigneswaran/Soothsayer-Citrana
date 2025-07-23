@@ -3,20 +3,6 @@
  * Konva.js Implementation
  */
 
-// Planet definitions with colors
-const PLANETS = {
-    'Su': { name: 'Sun', color: '#FF6B35' },
-    'Mo': { name: 'Moon', color: '#4ECDC4' },
-    'Ma': { name: 'Mars', color: '#FF3838' },
-    'Me': { name: 'Mercury', color: '#45B7D1' },
-    'Ju': { name: 'Jupiter', color: '#96CEB4' },
-    'Ve': { name: 'Venus', color: '#FFEAA7' },
-    'Sa': { name: 'Saturn', color: '#DDA0DD' },
-    'Ra': { name: 'Rahu', color: '#2C3E50' },
-    'Ke': { name: 'Ketu', color: '#8B4513' },
-    'Md': { name: 'Maandi', color: '#FF69B4' }
-};
-
 /**
  * Utility class for common operations
  */
@@ -34,36 +20,6 @@ class Utils {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
-    }
-
-    /**
-     * Get planet color
-     */
-    static getPlanetColor(planetAbbr) {
-        const planet = PLANETS[planetAbbr];
-        return planet ? planet.color : '#000000';
-    }
-
-    /**
-     * Get planet name
-     */
-    static getPlanetName(planetAbbr) {
-        const planet = PLANETS[planetAbbr];
-        return planet ? planet.name : planetAbbr;
-    }
-
-    /**
-     * Get all planet abbreviations
-     */
-    static getPlanetAbbreviations() {
-        return Object.keys(PLANETS);
-    }
-
-    /**
-     * Get planet info
-     */
-    static getPlanetInfo(planetAbbr) {
-        return PLANETS[planetAbbr] || null;
     }
 
     /**
@@ -381,5 +337,4 @@ class Utils {
 }
 
 // Export for use in other modules
-window.Utils = Utils;
-window.PLANETS = PLANETS; 
+window.Utils = Utils; 

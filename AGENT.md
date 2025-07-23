@@ -154,13 +154,13 @@ Soothsayer-Citrana/
 ## Customization
 
 ### Adding New Planets
-Edit the PLANETS constant in assets/js/utils.js:
+Edit the `planets` object in `assets/js/planet-system.js`:
 
 ```javascript
-const PLANETS = {
-    'Su': { name: 'Sun', color: '#FF6B35' },
+this.planets = {
+    'Su': { name: 'Sun', fullName: 'Sun', color: '#000000' },
     // Add your new planet here
-    'New': { name: 'New Planet', color: '#FF0000' }
+    'New': { name: 'New Planet', fullName: 'New Planet', color: '#FF0000' }
 };
 ```
 

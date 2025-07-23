@@ -152,11 +152,12 @@ Open `demo.html` for a guided tour with pre-loaded example data.
 ## 🔧 Customization Options
 
 ### Adding New Planets
-Edit the `PLANETS` constant in `assets/js/utils.js`:
+Edit the `planets` object in `assets/js/planet-system.js`:
 ```javascript
-const PLANETS = {
-    'Su': { name: 'Sun', symbol: '☉', color: '#FF6B35' },
-    'New': { name: 'New Planet', symbol: '★', color: '#FF0000' }
+this.planets = {
+    'Su': { name: 'Sun', fullName: 'Sun', color: '#000000' },
+    // Add your new planet here
+    'New': { name: 'New Planet', fullName: 'New Planet', color: '#FF0000' }
 };
 ```
 

@@ -53,20 +53,15 @@ Create a modern, web-based whiteboard application specifically designed for Veda
 ### 2. Planet Management System
 
 #### Planet Library
-The application includes a dedicated panel with all major Grahas:
+The application includes a dedicated panel with all major Grahas. To add or modify planets, edit the `planets` object in `assets/js/planet-system.js`:
 
-| Planet Name | Abbreviation |
-|-------------|--------------|
-| Sun | Su |
-| Moon | Mo |
-| Mercury | Me |
-| Venus | Ve |
-| Mars | Ma |
-| Jupiter | Ju |
-| Saturn | Sa |
-| Rahu | Ra |
-| Ketu | Ke |
-| Maandi | Md |
+```javascript
+this.planets = {
+    'Su': { name: 'Sun', fullName: 'Sun', color: '#000000' },
+    // Add your new planet here
+    'New': { name: 'New Planet', fullName: 'New Planet', color: '#FF0000' }
+};
+```
 
 #### Drag and Drop Functionality
 - **Source**: Planet library panel with visual planet representations
