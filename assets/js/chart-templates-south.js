@@ -100,6 +100,90 @@ class SouthIndianChartTemplate {
         });
         this.chartGroupSouth.add(centerRect);
 
+        // Add editable center text
+        const centerText = new Konva.Text({
+            x: startX + houseSize,
+            y: startY + houseSize + houseSize / 2,
+            width: houseSize * 2,
+            height: houseSize,
+            text: 'Rashi Chart 1\nD1',
+            fontSize: 24,
+            fontFamily: 'Arial Black, Arial, sans-serif',
+            fontWeight: 'bold',
+            fill: '#000000',
+            align: 'center',
+            verticalAlign: 'middle',
+            draggable: false,
+            name: 'center-label-text',
+            listening: true
+        });
+        // In-place editing on double-click
+        centerText.on('dblclick dbltap', () => {
+            const stage = this.stage;
+            const textRect = centerText.getClientRect({ relativeTo: stage });
+            const stageBox = stage.container().getBoundingClientRect();
+            // Calculate position relative to viewport
+            const areaPosition = {
+                x: stageBox.left + textRect.x,
+                y: stageBox.top + textRect.y
+            };
+            // Create textarea
+            const textarea = document.createElement('textarea');
+            textarea.className = 'konva-textarea';
+            document.body.appendChild(textarea);
+            textarea.value = centerText.text();
+            // Style textarea to match the text bounding box
+            textarea.style.position = 'absolute';
+            textarea.style.top = areaPosition.y + 'px';
+            textarea.style.left = areaPosition.x + 'px';
+            textarea.style.width = textRect.width + 'px';
+            textarea.style.height = Math.max(28, textRect.height - 8) + 'px';
+            textarea.style.fontSize = centerText.fontSize() + 'px';
+            textarea.style.lineHeight = centerText.fontSize() + 'px';
+            textarea.style.fontFamily = centerText.fontFamily();
+            textarea.style.color = centerText.fill();
+            textarea.style.fontWeight = 'bold';
+            textarea.style.textAlign = 'center';
+            textarea.style.border = '1.5px solid #374151';
+            textarea.style.background = 'white';
+            textarea.style.outline = 'none';
+            textarea.style.resize = 'none';
+            textarea.style.zIndex = '10000';
+            textarea.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            textarea.style.padding = '0';
+            textarea.style.margin = '0';
+            textarea.style.overflow = 'hidden';
+            textarea.focus();
+            textarea.select();
+            textarea.maxLength = 200;
+            // Restrict to max 4 lines
+            textarea.addEventListener('input', (e) => {
+                const lines = textarea.value.split('\n');
+                if (lines.length > 4) {
+                    // Remove extra lines
+                    textarea.value = lines.slice(0, 4).join('\n');
+                }
+            });
+            // Save on blur or Enter
+            const finishEditing = () => {
+                centerText.text(textarea.value);
+                textarea.remove();
+                this.layer.batchDraw();
+            };
+            textarea.addEventListener('blur', finishEditing);
+            textarea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    finishEditing();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    textarea.value = centerText.text();
+                    finishEditing();
+                }
+            });
+        });
+        this.chartGroupSouth.add(centerText);
+
         this.layer.add(this.chartGroupSouth);
         this.layer.batchDraw();
 

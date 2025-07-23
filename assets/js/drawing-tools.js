@@ -372,28 +372,30 @@ class DrawingTools {
         textarea.value = text.text() === 'Double-click to edit' ? '' : text.text();
         
         // Style the textarea
-            textarea.style.position = 'absolute';
-            textarea.style.top = areaPosition.y + 'px';
-            textarea.style.left = areaPosition.x + 'px';
+        textarea.style.position = 'absolute';
+        textarea.style.top = areaPosition.y + 'px';
+        textarea.style.left = areaPosition.x + 'px';
         textarea.style.width = Math.max(100, text.width()) + 'px';
-        textarea.style.height = Math.max(20, text.height()) + 'px';
-            textarea.style.fontSize = text.fontSize() + 'px';
+        // Apply canvas scale to font size and height for editing precision
+        const scale = this.stage.scaleX();
+        const scaledFontSize = text.fontSize() * scale;
+        textarea.style.fontSize = scaledFontSize + 'px';
+        textarea.style.lineHeight = scaledFontSize + 'px';
+        textarea.style.height = (scaledFontSize + 4) + 'px';
         textarea.style.fontFamily = text.fontFamily();
         textarea.style.color = text.fill();
-            textarea.style.border = 'none';
+        textarea.style.border = 'none';
         textarea.style.borderRadius = '0px';
-            textarea.style.padding = '0px';
-            textarea.style.margin = '0px';
+        textarea.style.padding = '0px';
+        textarea.style.margin = '0px';
         textarea.style.background = 'transparent';
-            textarea.style.outline = 'none';
-            textarea.style.resize = 'none';
+        textarea.style.outline = 'none';
+        textarea.style.resize = 'none';
         textarea.style.zIndex = '10000';
         textarea.style.boxShadow = 'none';
-
-        // Apply stage scale
-        const scale = this.stage.scaleX();
-            textarea.style.transform = `scale(${scale})`;
-        textarea.style.transformOrigin = 'left top';
+        // Remove transform scaling for caret precision
+        textarea.style.transform = '';
+        textarea.style.transformOrigin = '';
 
         // Focus and select all text
             textarea.focus();
