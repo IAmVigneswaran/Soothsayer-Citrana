@@ -662,12 +662,17 @@ class DrawingTools {
         const textEditColor = document.getElementById('text-edit-color');
         const saveButton = document.getElementById('text-edit-save');
         const cancelButton = document.getElementById('text-edit-cancel');
+        const deleteButton = document.getElementById('text-edit-delete');
         
         if (!textEditControls || !textEditInput || !textEditColor || !saveButton || !cancelButton) {
             console.error('Text edit UI elements not found');
             this.isEditingPlanet = false;
             this.currentlyEditingPlanet = null;
             return;
+        }
+        // Always show the Delete button for planet text
+        if (deleteButton) {
+            deleteButton.style.display = 'inline-flex';
         }
         
         // Clear any existing value and set initial value
@@ -730,6 +735,9 @@ class DrawingTools {
             textEditInput.removeEventListener('input', handleInput);
             textEditColor.removeEventListener('change', handleColorChange);
             textEditColor.removeEventListener('input', handleColorChange);
+            if (deleteButton) {
+                deleteButton.removeEventListener('click', handleDelete);
+            }
         };
         
         const handleSave = () => {
@@ -738,6 +746,22 @@ class DrawingTools {
         
         const handleCancel = () => {
             finishEditing(false);
+        };
+
+        const handleDelete = () => {
+            finishEditing(false); // Treat delete as cancel
+            // Remove the planet from its house
+            if (typeof editingPlanetText._planetHouseNumber !== 'undefined' && typeof editingPlanetText._planetId !== 'undefined') {
+                // Try to remove from South or North chart
+                if (window.app && window.app.chartTemplates) {
+                    const chartType = window.app.chartTemplates.currentChartType;
+                    if (chartType === 'south-indian' && window.app.chartTemplates.southIndianTemplate) {
+                        window.app.chartTemplates.southIndianTemplate.removePlanetFromHouseById(editingPlanetText._planetHouseNumber, editingPlanetText._planetId);
+                    } else if (chartType === 'north-indian' && window.app.chartTemplates.northIndianTemplate) {
+                        window.app.chartTemplates.northIndianTemplate.removePlanetFromHouseById(editingPlanetText._planetHouseNumber, editingPlanetText._planetId);
+                    }
+                }
+            }
         };
         
         const handleKeyDown = (e) => {
@@ -782,6 +806,9 @@ class DrawingTools {
         textEditInput.addEventListener('input', handleInput);
         textEditColor.addEventListener('change', handleColorChange);
         textEditColor.addEventListener('input', handleColorChange);
+        if (deleteButton) {
+            deleteButton.addEventListener('click', handleDelete);
+        }
         
         // Ensure the input field is properly initialized
         textEditInput.removeAttribute('placeholder');
@@ -824,6 +851,11 @@ class DrawingTools {
         
         // Hide any existing Edit UI first
         this.editUI.hide();
+        
+        // Set up delete callback
+        this.editUI.setDeleteCallback(() => {
+            this.deleteSelectedShape();
+        });
         
         // Show Edit UI for the clicked element
         this.editUI.show(element, tool);

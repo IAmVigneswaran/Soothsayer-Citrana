@@ -352,7 +352,9 @@ class SouthIndianChartTemplate {
                 offsetX: fontSize/2,
                 offsetY: fontSize/2,
             });
-
+            planetText._planetHouseNumber = houseNumber;
+            planetText._planetId = planetObj.id;
+            
             // Safari-specific: Ensure draggable is properly set
             setTimeout(() => {
                 planetText.draggable(true);
@@ -468,13 +470,13 @@ class SouthIndianChartTemplate {
                             y: planetPos.y
                         };
                     }
-
+                    
                     // --- NEW: Always transform pointer to stage coordinates ---
                     const scale = this.stage.scaleX();
                     const stagePos = this.stage.position();
                     const px = (pointer.x - stagePos.x) / scale;
                     const py = (pointer.y - stagePos.y) / scale;
-
+                    
                     // Find which bhava the drop is over
                     for (const hNum in this.houseDataSouth) {
                         const h = this.houseDataSouth[hNum];

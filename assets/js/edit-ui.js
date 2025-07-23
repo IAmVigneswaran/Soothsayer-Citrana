@@ -7,6 +7,7 @@ class EditUI {
         this.currentElement = null;
         this.currentTool = null;
         this.isVisible = false;
+        this.onDelete = null; // Callback for delete action
         
         // Initialize the Edit UI container
         this.initEditUIContainer();
@@ -177,6 +178,15 @@ class EditUI {
         controlsDiv.appendChild(widthValue);
         controlsDiv.appendChild(increaseWidth);
         controlsDiv.appendChild(colorInput);
+        // --- Add Delete button ---
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
+        deleteBtn.className = 'edit-btn danger';
+        deleteBtn.title = 'Delete';
+        deleteBtn.addEventListener('click', () => {
+            if (this.onDelete) this.onDelete();
+        });
+        controlsDiv.appendChild(deleteBtn);
         container.appendChild(controlsDiv);
         
         // Initialize Lucide icons
@@ -245,6 +255,15 @@ class EditUI {
         controlsDiv.appendChild(widthValue);
         controlsDiv.appendChild(increaseWidth);
         controlsDiv.appendChild(colorInput);
+        // --- Add Delete button ---
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
+        deleteBtn.className = 'edit-btn danger';
+        deleteBtn.title = 'Delete';
+        deleteBtn.addEventListener('click', () => {
+            if (this.onDelete) this.onDelete();
+        });
+        controlsDiv.appendChild(deleteBtn);
         container.appendChild(controlsDiv);
         
         // Initialize Lucide icons
@@ -420,6 +439,15 @@ class EditUI {
         controlsDiv.appendChild(boldBtn);
         controlsDiv.appendChild(italicBtn);
         controlsDiv.appendChild(colorInput);
+        // --- Add Delete button ---
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
+        deleteBtn.className = 'edit-btn danger';
+        deleteBtn.title = 'Delete';
+        deleteBtn.addEventListener('click', () => {
+            if (this.onDelete) this.onDelete();
+        });
+        controlsDiv.appendChild(deleteBtn);
         container.appendChild(controlsDiv);
         
         // Initialize Lucide icons
@@ -541,6 +569,10 @@ class EditUI {
      */
     getCurrentTool() {
         return this.currentTool;
+    }
+
+    setDeleteCallback(callback) {
+        this.onDelete = callback;
     }
 
 

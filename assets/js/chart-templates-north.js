@@ -640,6 +640,8 @@ class NorthIndianChartTemplate {
                 offsetX: fontSize/2,
                 offsetY: fontSize/2,
             });
+            planetText._planetHouseNumber = houseNumber;
+            planetText._planetId = planetObj.id;
 
             // Make planet text editable with live preview
             if (window.app && window.app.drawingTools) {
