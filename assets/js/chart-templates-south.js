@@ -318,8 +318,24 @@ class SouthIndianChartTemplate {
                 height: fontSize,
                 fill: 'rgba(0,0,0,0)',
                 name: `planet-hit-${planetObj.id}`,
-                listening: true
+                listening: true,
+                draggable: true // Make hit rect draggable too for Safari
             });
+            
+            // Safari-specific: Add touch event handling to hit rect
+            hitRect.on('touchstart', (e) => {
+                e.evt.preventDefault();
+                console.log(`[DEBUG] Touch start for hit rect of planet ${planetObj.abbr} from house ${houseNumber}`);
+            });
+            
+            hitRect.on('touchmove', (e) => {
+                e.evt.preventDefault();
+            });
+            
+            hitRect.on('touchend', (e) => {
+                e.evt.preventDefault();
+            });
+
             // The planet text - perfectly centered
             const planetText = new Konva.Text({
                 x: house.x + house.width/2,
@@ -335,6 +351,25 @@ class SouthIndianChartTemplate {
                 verticalAlign: 'middle',
                 offsetX: fontSize/2,
                 offsetY: fontSize/2,
+            });
+
+            // Safari-specific: Ensure draggable is properly set
+            setTimeout(() => {
+                planetText.draggable(true);
+            }, 10);
+            
+            // Safari-specific: Add touch event handling
+            planetText.on('touchstart', (e) => {
+                e.evt.preventDefault();
+                console.log(`[DEBUG] Touch start for planet ${planetObj.abbr} from house ${houseNumber}`);
+            });
+            
+            planetText.on('touchmove', (e) => {
+                e.evt.preventDefault();
+            });
+            
+            planetText.on('touchend', (e) => {
+                e.evt.preventDefault();
             });
 
             // Make planet text editable with live preview
@@ -372,8 +407,11 @@ class SouthIndianChartTemplate {
             };
             hitRect.on('contextmenu', contextHandler);
             planetText.on('contextmenu', contextHandler);
-            // Drag-and-drop between bhavas
-            planetText.on('dragstart', (e) => {
+            
+            // Safari-compatible drag handlers for both hit rect and planet text
+            const dragStartHandler = (e) => {
+                console.log(`[DEBUG] Drag start for planet ${planetObj.abbr} from house ${houseNumber}`);
+                
                 this._dragSource = { 
                     houseNumber, 
                     abbr: planetObj.abbr, 
@@ -382,26 +420,95 @@ class SouthIndianChartTemplate {
                     color: planetObj.color
                 };
                 planetText.opacity(0.5);
+                hitRect.opacity(0.5);
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
                 console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
-            });
-            planetText.on('dragend', (e) => {
+            };
+            
+            const dragEndHandler = (e) => {
                 planetText.opacity(1);
-                // Find which bhava (if any) the drop is over
-                const pointer = this.stage.getPointerPosition();
+                hitRect.opacity(1);
+                
+                // Safari-compatible drop detection
                 let targetHouse = null;
-                for (const hNum in this.houseDataSouth) {
-                    const h = this.houseDataSouth[hNum];
-                    if (
-                        pointer.x >= h.x && pointer.x <= h.x + h.width &&
-                        pointer.y >= h.y && pointer.y <= h.y + h.height
-                    ) {
-                        targetHouse = parseInt(hNum);
-                        break;
+                let pointer = null;
+                
+                // Try multiple methods to get pointer position for Safari compatibility
+                try {
+                    // Method 1: Use stage pointer position
+                    pointer = this.stage.getPointerPosition();
+                    
+                    // Method 2: If stage pointer fails, try event position
+                    if (!pointer && e.evt) {
+                        const stageBox = this.stage.container().getBoundingClientRect();
+                        const scale = this.stage.scaleX();
+                        const stagePos = this.stage.position();
+                        
+                        pointer = {
+                            x: (e.evt.clientX - stageBox.left - stagePos.x) / scale,
+                            y: (e.evt.clientY - stageBox.top - stagePos.y) / scale
+                        };
                     }
+                    
+                    // Method 3: If still no pointer, use the planet's current position
+                    if (!pointer) {
+                        pointer = {
+                            x: planetText.x(),
+                            y: planetText.y()
+                        };
+                    }
+                    
+                    // Method 4: Safari fallback - use the planet's final position after drag
+                    if (!pointer) {
+                        const planetPos = planetText.position();
+                        pointer = {
+                            x: planetPos.x,
+                            y: planetPos.y
+                        };
+                    }
+                    
+                    console.log('[DEBUG] Drop detection - Pointer position:', pointer);
+                    
+                    // Find which bhava the drop is over
+                    for (const hNum in this.houseDataSouth) {
+                        const h = this.houseDataSouth[hNum];
+                        if (
+                            pointer.x >= h.x && pointer.x <= h.x + h.width &&
+                            pointer.y >= h.y && pointer.y <= h.y + h.height
+                        ) {
+                            targetHouse = parseInt(hNum);
+                            console.log(`[DEBUG] Drop detected over house ${targetHouse}`);
+                            break;
+                        }
+                    }
+                    
+                    // Method 5: If still no target house found, try a broader search
+                    if (!targetHouse) {
+                        console.log('[DEBUG] No target house found, trying broader search...');
+                        for (const hNum in this.houseDataSouth) {
+                            const h = this.houseDataSouth[hNum];
+                            const centerX = h.x + h.width / 2;
+                            const centerY = h.y + h.height / 2;
+                            const distance = Math.sqrt(
+                                Math.pow(pointer.x - centerX, 2) + 
+                                Math.pow(pointer.y - centerY, 2)
+                            );
+                            
+                            // If planet is within reasonable distance of house center
+                            if (distance < Math.max(h.width, h.height) / 2) {
+                                targetHouse = parseInt(hNum);
+                                console.log(`[DEBUG] Drop detected over house ${targetHouse} using distance method`);
+                                break;
+                            }
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('[DEBUG] Error in drop detection:', error);
                 }
+                
                 if (targetHouse && targetHouse !== houseNumber) {
                     // Move planet to new bhava by ID
                     this.removePlanetFromHouseById(houseNumber, planetObj.id);
@@ -419,11 +526,17 @@ class SouthIndianChartTemplate {
                 } else {
                     // Snap back to original position
                     this.updatePlanetsInHouse(houseNumber);
-                    console.log(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id})`);
+                    console.log(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id}) - Target house: ${targetHouse}, Original house: ${houseNumber}`);
                 }
                 this._dragSource = null;
                 this.layer.batchDraw();
-            });
+            };
+            
+            // Add drag handlers to both hit rect and planet text
+            hitRect.on('dragstart', dragStartHandler);
+            planetText.on('dragstart', dragStartHandler);
+            hitRect.on('dragend', dragEndHandler);
+            planetText.on('dragend', dragEndHandler);
             this.chartGroupSouth.add(hitRect);
             this.chartGroupSouth.add(planetText);
             hitRect.moveToTop();

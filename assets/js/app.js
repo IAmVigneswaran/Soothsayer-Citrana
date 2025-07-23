@@ -40,6 +40,15 @@ class CitranaApp {
             height: container.offsetHeight
         });
         
+        // Safari-specific configuration for better drag and drop
+        this.stage.draggable(false); // Disable stage dragging by default
+        this.stage.on('dragstart', (e) => {
+            // Prevent stage dragging when dragging planets
+            if (e.target && e.target.name() && e.target.name().startsWith('planet-')) {
+                e.evt.preventDefault();
+            }
+        });
+        
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
         
@@ -243,6 +252,7 @@ class CitranaApp {
         const pos = this.drawingTools.getPrecisePositionFromKonva(e);
         
         if (this.currentTool === 'hand') {
+            // Safari-specific: Ensure stage is draggable for hand tool
             this.stage.draggable(true);
             document.getElementById('canvas-container').style.cursor = 'grabbing';
         } else if (this.currentTool === 'select') {
@@ -267,6 +277,7 @@ class CitranaApp {
 
     handleMouseUp(e) {
         if (this.currentTool === 'hand') {
+            // Safari-specific: Disable stage dragging when hand tool is released
             this.stage.draggable(false);
             document.getElementById('canvas-container').style.cursor = 'grab';
         } else if (this.currentTool === 'select') {
