@@ -250,6 +250,69 @@ body {
     height: 16px;
 }
 
+/* Floating Text Edit Controls */
+.floating-text-edit-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #000000;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    border-radius: 8px;
+}
+
+.text-edit-input {
+    width: 120px;
+    height: 32px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 0 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    outline: none;
+    transition: border-color 0.2s ease;
+    text-align: center;
+}
+
+.text-edit-input:focus {
+    border-color: #000000;
+}
+
+.floating-text-edit-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.floating-text-edit-controls button:hover {
+    background: #000000;
+    color: white;
+}
+
+.floating-text-edit-controls button:active {
+    transform: scale(0.95);
+}
+
+.floating-text-edit-controls button i {
+    width: 16px;
+    height: 16px;
+}
+
 /* Context Menu */
 .context-menu {
     position: absolute;

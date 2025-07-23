@@ -632,6 +632,24 @@ class NorthIndianChartTemplate {
                 offsetX: fontSize/2,
                 offsetY: fontSize/2,
             });
+
+            // Make planet text editable with live preview
+            if (window.app && window.app.drawingTools) {
+                window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel) => {
+                    // Update the planet label in the house data
+                    const planetIndex = house.planets.findIndex(p => p.id === planetObj.id);
+                    if (planetIndex !== -1) {
+                        house.planets[planetIndex].label = newLabel;
+                        // Update the planet text
+                        planetText.text(newLabel);
+                        this.layer.batchDraw();
+                        // Trigger snapshot for undo/redo
+                        if (window.app && window.app.pushSnapshot) {
+                            window.app.pushSnapshot();
+                        }
+                    }
+                });
+            }
             // Selection logic
             const selectHandler = (e) => {
                 e.cancelBubble = true;
@@ -717,9 +735,9 @@ class NorthIndianChartTemplate {
         this.layer.batchDraw();
         if (!this._deleteKeyListener) {
             this._deleteKeyListener = (e) => {
-                if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedPlanet) {
-                    this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
-                }
+                            if (e.key === 'Delete' && this.selectedPlanet) {
+                this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
+            }
             };
             window.addEventListener('keydown', this._deleteKeyListener);
         }

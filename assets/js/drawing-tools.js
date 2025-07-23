@@ -328,53 +328,53 @@ class DrawingTools {
         }
 
         // Get the absolute position of the text
-        const textPosition = text.absolutePosition();
+            const textPosition = text.absolutePosition();
         const stageBox = this.stage.container().getBoundingClientRect();
-        
+            
         // Calculate position relative to viewport
-        const areaPosition = {
-            x: stageBox.left + textPosition.x,
-            y: stageBox.top + textPosition.y
-        };
+            const areaPosition = {
+                x: stageBox.left + textPosition.x,
+                y: stageBox.top + textPosition.y
+            };
 
         // Create textarea
-        const textarea = document.createElement('textarea');
+            const textarea = document.createElement('textarea');
         textarea.className = 'konva-textarea';
-        document.body.appendChild(textarea);
+            document.body.appendChild(textarea);
 
         // Set initial value
         textarea.value = text.text() === 'Double-click to edit' ? '' : text.text();
         
         // Style the textarea
-        textarea.style.position = 'absolute';
-        textarea.style.top = areaPosition.y + 'px';
-        textarea.style.left = areaPosition.x + 'px';
+            textarea.style.position = 'absolute';
+            textarea.style.top = areaPosition.y + 'px';
+            textarea.style.left = areaPosition.x + 'px';
         textarea.style.width = Math.max(100, text.width()) + 'px';
         textarea.style.height = Math.max(20, text.height()) + 'px';
-        textarea.style.fontSize = text.fontSize() + 'px';
+            textarea.style.fontSize = text.fontSize() + 'px';
         textarea.style.fontFamily = text.fontFamily();
         textarea.style.color = text.fill();
-        textarea.style.border = 'none';
+            textarea.style.border = 'none';
         textarea.style.borderRadius = '0px';
-        textarea.style.padding = '0px';
-        textarea.style.margin = '0px';
+            textarea.style.padding = '0px';
+            textarea.style.margin = '0px';
         textarea.style.background = 'transparent';
-        textarea.style.outline = 'none';
-        textarea.style.resize = 'none';
+            textarea.style.outline = 'none';
+            textarea.style.resize = 'none';
         textarea.style.zIndex = '10000';
         textarea.style.boxShadow = 'none';
 
         // Apply stage scale
         const scale = this.stage.scaleX();
-        textarea.style.transform = `scale(${scale})`;
+            textarea.style.transform = `scale(${scale})`;
         textarea.style.transformOrigin = 'left top';
 
         // Focus and select all text
-        textarea.focus();
+            textarea.focus();
         textarea.select();
 
         // Disable dragging while editing and hide the original text
-        text.setAttrs({ 
+                text.setAttrs({
             draggable: false,
             visible: false // Hide the original text while editing
         });
@@ -407,11 +407,11 @@ class DrawingTools {
                 e.preventDefault();
                 textarea.value = text.text();
                 finishEditing();
-            }
+                }
         };
 
-        const handleOutsideClick = (e) => {
-            if (e.target !== textarea) {
+            const handleOutsideClick = (e) => {
+                if (e.target !== textarea) {
                 finishEditing();
             }
         };
@@ -421,8 +421,8 @@ class DrawingTools {
         document.addEventListener('keydown', handleKeyDown);
         
         // Delay outside click handler to prevent immediate closure
-        setTimeout(() => {
-            document.addEventListener('click', handleOutsideClick);
+            setTimeout(() => {
+                document.addEventListener('click', handleOutsideClick);
         }, 100);
     }
 
@@ -589,5 +589,131 @@ class DrawingTools {
             this.layer.batchDraw();
             console.log('Selected shape deleted');
         }
+    }
+
+    /**
+     * Make planet text editable with live preview
+     * @param {KonvaText} planetText - The planet text object
+     * @param {Function} onUpdate - Callback function to update the planet label
+     */
+    makePlanetTextEditable(planetText, onUpdate) {
+        // Double-click to edit planet text
+        planetText.on('dblclick', () => {
+            this.editPlanetText(planetText, onUpdate);
+        });
+    }
+
+    /**
+     * Edit planet text using the floating UI
+     * @param {KonvaText} planetText - The planet text object
+     * @param {Function} onUpdate - Callback function to update the planet label
+     */
+    editPlanetText(planetText, onUpdate) {
+        const currentText = planetText.text();
+        
+        // Get the text edit UI elements
+        const textEditControls = document.getElementById('text-edit-controls');
+        const textEditInput = document.getElementById('text-edit-input');
+        const saveButton = document.getElementById('text-edit-save');
+        const cancelButton = document.getElementById('text-edit-cancel');
+        
+        if (!textEditControls || !textEditInput || !saveButton || !cancelButton) {
+            console.error('Text edit UI elements not found');
+            return;
+        }
+        
+        // Clear any existing value and set initial value
+        textEditInput.value = '';
+        textEditInput.value = currentText;
+        
+        // Show the text edit UI
+        textEditControls.style.display = 'flex';
+        
+        // Focus the input and place cursor at the end (after a small delay to ensure UI is ready)
+        setTimeout(() => {
+            textEditInput.focus();
+            // Double-check the value is set correctly
+            if (textEditInput.value !== currentText) {
+                textEditInput.value = currentText;
+            }
+            // Set cursor at the end
+            const length = textEditInput.value.length;
+            textEditInput.setSelectionRange(length, length);
+        }, 100);
+        
+        // Disable dragging while editing
+        planetText.draggable(false);
+        
+        const finishEditing = (save = false) => {
+            // Hide the text edit UI
+            textEditControls.style.display = 'none';
+            
+            if (save) {
+                const newText = textEditInput.value.trim();
+                if (newText && newText.length <= 6) {
+                    // Update the planet label through callback
+                    if (onUpdate) {
+                        onUpdate(newText);
+                    }
+                } else {
+                    // Restore original text if invalid
+                    planetText.text(currentText);
+                }
+            } else {
+                // Restore original text if cancelled
+                planetText.text(currentText);
+            }
+            
+            // Re-enable dragging
+            planetText.draggable(true);
+            
+            // Remove event listeners
+            saveButton.removeEventListener('click', handleSave);
+            cancelButton.removeEventListener('click', handleCancel);
+            textEditInput.removeEventListener('keydown', handleKeyDown);
+        };
+        
+        const handleSave = () => {
+            finishEditing(true);
+        };
+        
+        const handleCancel = () => {
+            finishEditing(false);
+        };
+        
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finishEditing(true);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                finishEditing(false);
+            }
+            // Allow backspace to work normally in the input field
+        };
+        
+        // Add event listeners
+        saveButton.addEventListener('click', handleSave);
+        cancelButton.addEventListener('click', handleCancel);
+        textEditInput.addEventListener('keydown', handleKeyDown);
+        
+        // Add live preview with character limit enforcement
+        textEditInput.addEventListener('input', () => {
+            let newText = textEditInput.value;
+            
+            // Enforce 6 character limit
+            if (newText.length > 6) {
+                newText = newText.substring(0, 6);
+                textEditInput.value = newText;
+            }
+            
+            // Update planet text in real-time
+            planetText.text(newText);
+            this.layer.batchDraw();
+        });
+        
+        // Ensure the input field is properly initialized
+        textEditInput.removeAttribute('placeholder');
+        textEditInput.value = currentText;
     }
 } 

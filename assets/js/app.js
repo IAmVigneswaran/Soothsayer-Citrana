@@ -147,15 +147,17 @@ class CitranaApp {
 
     setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
-            // Check if we're in text editing mode
-            const textarea = document.querySelector('.konva-textarea');
-            if (textarea && document.activeElement === textarea) {
-                // Only allow Enter and Escape in text editing mode
-                if (e.key === 'Enter' || e.key === 'Escape') {
-                    return; // Let the textarea handle these
-                }
-                return; // Ignore all other keyboard shortcuts during text editing
+                    // Check if we're in text editing mode
+        const textarea = document.querySelector('.konva-textarea');
+        const textEditInput = document.getElementById('text-edit-input');
+        if ((textarea && document.activeElement === textarea) || 
+            (textEditInput && document.activeElement === textEditInput)) {
+            // Only allow Enter and Escape in text editing mode
+            if (e.key === 'Enter' || e.key === 'Escape') {
+                return; // Let the textarea handle these
             }
+            return; // Ignore all other keyboard shortcuts during text editing
+        }
 
             // Tool shortcuts
             if (e.key === 'v' || e.key === 'V') {
@@ -195,8 +197,8 @@ class CitranaApp {
                 }
             }
             
-            // Delete selected shape
-            if (e.key === 'Delete' || e.key === 'Backspace') {
+            // Delete selected shape (only with Delete key, not Backspace)
+            if (e.key === 'Delete') {
                 if (this.currentTool === 'select') {
                     e.preventDefault();
                     this.drawingTools.deleteSelectedShape();
@@ -247,8 +249,8 @@ class CitranaApp {
         if (this.currentTool === 'select') {
             this.drawingTools.handleSelectMouseMove(pos);
         } else if (this.isDrawing && pos) {
-            this.drawingTools.draw(pos, this.currentTool);
-            this.lastPoint = pos;
+        this.drawingTools.draw(pos, this.currentTool);
+        this.lastPoint = pos;
         }
     }
 
