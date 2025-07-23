@@ -1,0 +1,547 @@
+/**
+ * Edit UI Class
+ * Provides context-sensitive editing controls for different drawing tools and elements
+ */
+class EditUI {
+    constructor() {
+        this.currentElement = null;
+        this.currentTool = null;
+        this.isVisible = false;
+        
+        // Initialize the Edit UI container
+        this.initEditUIContainer();
+        
+        // Default properties for different tools
+        this.defaultProperties = {
+            pen: { strokeWidth: 2, strokeColor: '#FF0000' },
+            line: { strokeWidth: 2, strokeColor: '#FF0000' },
+            arrow: { strokeWidth: 2, strokeColor: '#FF0000' },
+            text: { fontSize: 16, fontWeight: 400, fontStyle: 'normal', fill: '#000000' }
+        };
+    }
+
+    /**
+     * Initialize the Edit UI container in the DOM
+     */
+    initEditUIContainer() {
+        // Create the main Edit UI container
+        const editUIContainer = document.createElement('div');
+        editUIContainer.id = 'edit-ui-container';
+        editUIContainer.className = 'floating-edit-ui';
+        editUIContainer.style.display = 'none';
+        
+        // Create the content area
+        const contentArea = document.createElement('div');
+        contentArea.id = 'edit-ui-content';
+        contentArea.className = 'edit-ui-content';
+        
+        editUIContainer.appendChild(contentArea);
+        
+        // Add to the body
+        document.body.appendChild(editUIContainer);
+    }
+
+    /**
+     * Show Edit UI for a specific element and tool
+     * @param {Object} element - The element to edit (Konva shape)
+     * @param {string} tool - The tool type ('pen', 'line', 'arrow', 'text')
+     */
+    show(element, tool) {
+        console.log(`[EDIT UI] show() called with tool: ${tool}, element:`, element);
+        
+        this.currentElement = element;
+        this.currentTool = tool;
+        this.isVisible = true;
+        
+        // Note: Text properties will be handled safely in the click handlers
+        
+        // Clear previous content
+        this.clearContent();
+        
+        // Create tool-specific controls
+        this.createToolControls(tool);
+        
+        // Show the container
+        const container = document.getElementById('edit-ui-container');
+        if (container) {
+            container.style.display = 'flex';
+            console.log(`[EDIT UI] Container displayed`);
+        } else {
+            console.error(`[EDIT UI] Container not found!`);
+        }
+        
+        // Position the Edit UI
+        this.positionEditUI();
+    }
+
+    /**
+     * Hide the Edit UI
+     */
+    hide() {
+        this.isVisible = false;
+        this.currentElement = null;
+        this.currentTool = null;
+        
+        const container = document.getElementById('edit-ui-container');
+        container.style.display = 'none';
+    }
+
+    /**
+     * Clear the content area
+     */
+    clearContent() {
+        const content = document.getElementById('edit-ui-content');
+        content.innerHTML = '';
+    }
+
+    /**
+     * Create tool-specific controls
+     * @param {string} tool - The tool type
+     */
+    createToolControls(tool) {
+        const content = document.getElementById('edit-ui-content');
+        
+        switch (tool) {
+            case 'pen':
+            case 'line':
+                this.createStrokeControls(content);
+                break;
+            case 'arrow':
+                this.createArrowControls(content);
+                break;
+            case 'text':
+                this.createTextControls(content);
+                break;
+        }
+    }
+
+    /**
+     * Create stroke controls for pen and line tools
+     * @param {HTMLElement} container - The container to add controls to
+     */
+    createStrokeControls(container) {
+        // Get current values from the element with proper fallbacks
+        const currentStrokeWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : this.defaultProperties.pen.strokeWidth;
+        const currentStrokeColor = this.currentElement.stroke ? this.currentElement.stroke() : this.defaultProperties.pen.strokeColor;
+        
+        // Create controls container
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'edit-controls-group';
+        
+        // Stroke Width Control
+        const decreaseWidth = document.createElement('button');
+        decreaseWidth.innerHTML = '<i data-lucide="minus"></i>';
+        decreaseWidth.className = 'edit-btn';
+        decreaseWidth.title = 'Decrease thickness';
+        
+        const widthValue = document.createElement('span');
+        widthValue.textContent = currentStrokeWidth;
+        widthValue.className = 'edit-value';
+        
+        const increaseWidth = document.createElement('button');
+        increaseWidth.innerHTML = '<i data-lucide="plus"></i>';
+        increaseWidth.className = 'edit-btn';
+        increaseWidth.title = 'Increase thickness';
+        
+        // Width event listeners
+        decreaseWidth.addEventListener('click', () => {
+            const newWidth = Math.max(1, currentStrokeWidth - 1);
+            this.updateStrokeWidth(newWidth);
+            widthValue.textContent = newWidth;
+        });
+        
+        increaseWidth.addEventListener('click', () => {
+            const newWidth = Math.min(20, currentStrokeWidth + 1);
+            this.updateStrokeWidth(newWidth);
+            widthValue.textContent = newWidth;
+        });
+        
+        // Stroke Color Control
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.value = currentStrokeColor;
+        colorInput.className = 'edit-color-input';
+        colorInput.title = 'Line color';
+        
+        colorInput.addEventListener('change', (e) => {
+            this.updateStrokeColor(e.target.value);
+        });
+        
+        // Also listen for input event for better Chrome compatibility
+        colorInput.addEventListener('input', (e) => {
+            this.updateStrokeColor(e.target.value);
+        });
+        
+        // Add all controls to container
+        controlsDiv.appendChild(decreaseWidth);
+        controlsDiv.appendChild(widthValue);
+        controlsDiv.appendChild(increaseWidth);
+        controlsDiv.appendChild(colorInput);
+        container.appendChild(controlsDiv);
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+    }
+
+    /**
+     * Create arrow controls
+     * @param {HTMLElement} container - The container to add controls to
+     */
+    createArrowControls(container) {
+        // Get current values from the element with proper fallbacks
+        const currentStrokeWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 2);
+        const currentStrokeColor = this.currentElement.stroke ? this.currentElement.stroke() : this.defaultProperties.arrow.strokeColor;
+        
+        // Create controls container
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'edit-controls-group';
+        
+        // Arrow Thickness Control
+        const decreaseWidth = document.createElement('button');
+        decreaseWidth.innerHTML = '<i data-lucide="minus"></i>';
+        decreaseWidth.className = 'edit-btn';
+        decreaseWidth.title = 'Decrease thickness';
+        
+        const widthValue = document.createElement('span');
+        widthValue.textContent = currentStrokeWidth;
+        widthValue.className = 'edit-value';
+        
+        const increaseWidth = document.createElement('button');
+        increaseWidth.innerHTML = '<i data-lucide="plus"></i>';
+        increaseWidth.className = 'edit-btn';
+        increaseWidth.title = 'Increase thickness';
+        
+        // Width event listeners
+        decreaseWidth.addEventListener('click', () => {
+            const newWidth = Math.max(1, currentStrokeWidth - 1);
+            this.updateStrokeWidth(newWidth);
+            widthValue.textContent = newWidth;
+        });
+        
+        increaseWidth.addEventListener('click', () => {
+            const newWidth = Math.min(20, currentStrokeWidth + 1);
+            this.updateStrokeWidth(newWidth);
+            widthValue.textContent = newWidth;
+        });
+        
+        // Arrow Color Control
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.value = currentStrokeColor;
+        colorInput.className = 'edit-color-input';
+        colorInput.title = 'Arrow color';
+        
+        colorInput.addEventListener('change', (e) => {
+            this.updateStrokeColor(e.target.value);
+        });
+        
+        // Also listen for input event for better Chrome compatibility
+        colorInput.addEventListener('input', (e) => {
+            this.updateStrokeColor(e.target.value);
+        });
+        
+        // Add all controls to container
+        controlsDiv.appendChild(decreaseWidth);
+        controlsDiv.appendChild(widthValue);
+        controlsDiv.appendChild(increaseWidth);
+        controlsDiv.appendChild(colorInput);
+        container.appendChild(controlsDiv);
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+    }
+
+    /**
+     * Create text controls
+     * @param {HTMLElement} container - The container to add controls to
+     */
+    createTextControls(container) {
+        console.log('[EDIT UI] Creating text controls for element:', this.currentElement);
+        console.log('[EDIT UI] Element properties:', {
+            fontSize: this.currentElement.fontSize,
+            fontWeight: this.currentElement.fontWeight,
+            fontStyle: this.currentElement.fontStyle,
+            fill: this.currentElement.fill
+        });
+        
+        // Get current values from the element with proper fallbacks
+        const currentFontSize = this.currentElement.fontSize ? this.currentElement.fontSize() : this.defaultProperties.text.fontSize;
+        const currentFontWeight = this.currentElement.fontWeight ? this.currentElement.fontWeight() : this.defaultProperties.text.fontWeight;
+        const currentFontStyle = this.currentElement.fontStyle ? this.currentElement.fontStyle() : this.defaultProperties.text.fontStyle;
+        const currentFill = this.currentElement.fill ? this.currentElement.fill() : this.defaultProperties.text.fill;
+        
+        // Create controls container
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'edit-controls-group';
+        
+        // Font Size Control
+        const decreaseSize = document.createElement('button');
+        decreaseSize.innerHTML = '<i data-lucide="minus"></i>';
+        decreaseSize.className = 'edit-btn';
+        decreaseSize.title = 'Decrease font size';
+        
+        const sizeValue = document.createElement('span');
+        sizeValue.textContent = currentFontSize;
+        sizeValue.className = 'edit-value';
+        
+        const increaseSize = document.createElement('button');
+        increaseSize.innerHTML = '<i data-lucide="plus"></i>';
+        increaseSize.className = 'edit-btn';
+        increaseSize.title = 'Increase font size';
+        
+        // Size event listeners
+        decreaseSize.addEventListener('click', () => {
+            // Get current font size from element
+            const currentSize = this.currentElement.fontSize ? this.currentElement.fontSize() : this.defaultProperties.text.fontSize;
+            const newSize = Math.max(8, currentSize - 2);
+            
+            // Set font size safely
+            if (typeof this.currentElement.fontSize === 'function') {
+                this.currentElement.fontSize(newSize);
+            } else {
+                this.currentElement.attrs.fontSize = newSize;
+            }
+            
+            this.currentElement.getLayer().batchDraw();
+            sizeValue.textContent = newSize;
+        });
+        
+        increaseSize.addEventListener('click', () => {
+            // Get current font size from element
+            const currentSize = this.currentElement.fontSize ? this.currentElement.fontSize() : this.defaultProperties.text.fontSize;
+            const newSize = Math.min(72, currentSize + 2);
+            
+            // Set font size safely
+            if (typeof this.currentElement.fontSize === 'function') {
+                this.currentElement.fontSize(newSize);
+            } else {
+                this.currentElement.attrs.fontSize = newSize;
+            }
+            
+            this.currentElement.getLayer().batchDraw();
+            sizeValue.textContent = newSize;
+        });
+        
+        // Font Style Controls
+        const boldBtn = document.createElement('button');
+        boldBtn.innerHTML = '<i data-lucide="bold"></i>';
+        boldBtn.className = `edit-btn ${currentFontWeight === 'bold' ? 'active' : ''}`;
+        boldBtn.title = 'Bold';
+        
+        const italicBtn = document.createElement('button');
+        italicBtn.innerHTML = '<i data-lucide="italic"></i>';
+        italicBtn.className = `edit-btn ${currentFontStyle === 'italic' ? 'active' : ''}`;
+        italicBtn.title = 'Italic';
+        
+        // Style event listeners
+        boldBtn.addEventListener('click', () => {
+            // Get current font weight from the element with safe fallback
+            let currentWeight = 400; // Default to normal
+            if (this.currentElement.fontWeight && typeof this.currentElement.fontWeight === 'function') {
+                currentWeight = this.currentElement.fontWeight();
+            }
+            
+            const isBold = currentWeight === 'bold' || currentWeight === 700 || currentWeight === '700';
+            const newWeight = isBold ? 'normal' : 'bold';
+            console.log('[EDIT UI] Bold button clicked - currentWeight:', currentWeight, 'isBold:', isBold, 'newWeight:', newWeight);
+            
+            // Set font weight and ensure it works
+            if (newWeight === 'bold') {
+                // For bold, try setting both font family and weight
+                this.currentElement.fontFamily('Arial Black, Arial, sans-serif');
+                if (typeof this.currentElement.fontWeight === 'function') {
+                    this.currentElement.fontWeight('bold');
+                } else {
+                    this.currentElement.attrs.fontWeight = 'bold';
+                }
+                console.log('[EDIT UI] Set to bold with Arial Black');
+            } else {
+                // For normal, reset to regular font family
+                this.currentElement.fontFamily('Arial, sans-serif');
+                if (typeof this.currentElement.fontWeight === 'function') {
+                    this.currentElement.fontWeight('normal');
+                } else {
+                    this.currentElement.attrs.fontWeight = 'normal';
+                }
+                console.log('[EDIT UI] Set to normal with Arial');
+            }
+            
+            // Force a redraw to ensure the change is applied
+            this.currentElement.getLayer().batchDraw();
+            
+            this.currentElement.getLayer().batchDraw();
+            boldBtn.classList.toggle('active');
+        });
+        
+        italicBtn.addEventListener('click', () => {
+            // Get current font style from the element with safe fallback
+            let currentStyle = 'normal'; // Default to normal
+            if (this.currentElement.fontStyle && typeof this.currentElement.fontStyle === 'function') {
+                currentStyle = this.currentElement.fontStyle();
+            }
+            
+            const newStyle = currentStyle === 'italic' ? 'normal' : 'italic';
+            console.log('[EDIT UI] Italic button clicked - currentStyle:', currentStyle, 'newStyle:', newStyle);
+            
+            // Set font style safely
+            if (typeof this.currentElement.fontStyle === 'function') {
+                this.currentElement.fontStyle(newStyle);
+                console.log('[EDIT UI] Set fontStyle to', newStyle);
+            } else {
+                // If fontStyle function doesn't exist, try setting it as a property
+                this.currentElement.attrs.fontStyle = newStyle;
+                console.log('[EDIT UI] Set fontStyle as property to', newStyle);
+            }
+            
+            this.currentElement.getLayer().batchDraw();
+            italicBtn.classList.toggle('active');
+        });
+        
+        // Text Color Control
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.value = currentFill;
+        colorInput.className = 'edit-color-input';
+        colorInput.title = 'Text color';
+        
+        colorInput.addEventListener('change', (e) => {
+            this.updateTextColor(e.target.value);
+        });
+        
+        // Also listen for input event for better Chrome compatibility
+        colorInput.addEventListener('input', (e) => {
+            this.updateTextColor(e.target.value);
+        });
+        
+        // Add all controls to container
+        controlsDiv.appendChild(decreaseSize);
+        controlsDiv.appendChild(sizeValue);
+        controlsDiv.appendChild(increaseSize);
+        controlsDiv.appendChild(boldBtn);
+        controlsDiv.appendChild(italicBtn);
+        controlsDiv.appendChild(colorInput);
+        container.appendChild(controlsDiv);
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+    }
+
+    /**
+     * Position the Edit UI on screen
+     */
+    positionEditUI() {
+        const container = document.getElementById('edit-ui-container');
+        
+        // Position at bottom center, same as planet text edit UI
+        container.style.bottom = '20px';
+        container.style.left = '50%';
+        container.style.transform = 'translateX(-50%)';
+    }
+
+    /**
+     * Update stroke width for the current element
+     * @param {number} width - New stroke width
+     */
+    updateStrokeWidth(width) {
+        if (this.currentElement) {
+            this.currentElement.strokeWidth(width);
+            this.currentElement.getLayer().batchDraw();
+        }
+    }
+
+    /**
+     * Update stroke color for the current element
+     * @param {string} color - New stroke color
+     */
+    updateStrokeColor(color) {
+        if (this.currentElement) {
+            this.currentElement.stroke(color);
+            
+            // For arrows, also update the fill color (arrowhead)
+            if (this.currentElement instanceof Konva.Arrow) {
+                this.currentElement.fill(color);
+            }
+            
+            this.currentElement.getLayer().batchDraw();
+        }
+    }
+
+    /**
+     * Update font size for the current element
+     * @param {number} size - New font size
+     */
+    updateFontSize(size) {
+        console.log('[EDIT UI] updateFontSize called with:', size);
+        if (this.currentElement) {
+            console.log('[EDIT UI] Before update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
+            this.currentElement.fontSize(size);
+            console.log('[EDIT UI] After update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
+            this.currentElement.getLayer().batchDraw();
+        }
+    }
+
+    /**
+     * Update font weight for the current element
+     * @param {string} weight - New font weight
+     */
+    updateFontWeight(weight) {
+        console.log('[EDIT UI] updateFontWeight called with:', weight);
+        if (this.currentElement) {
+            console.log('[EDIT UI] Before update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
+            this.currentElement.fontWeight(weight);
+            console.log('[EDIT UI] After update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
+            this.currentElement.getLayer().batchDraw();
+        }
+    }
+
+    /**
+     * Update font style for the current element
+     * @param {string} style - New font style
+     */
+    updateFontStyle(style) {
+        console.log('[EDIT UI] updateFontStyle called with:', style);
+        if (this.currentElement) {
+            console.log('[EDIT UI] Before update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
+            this.currentElement.fontStyle(style);
+            console.log('[EDIT UI] After update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
+            this.currentElement.getLayer().batchDraw();
+        }
+    }
+
+    /**
+     * Update text color for the current element
+     * @param {string} color - New text color
+     */
+    updateTextColor(color) {
+        if (this.currentElement) {
+            this.currentElement.fill(color);
+            this.currentElement.getLayer().batchDraw();
+        }
+    }
+
+    /**
+     * Check if Edit UI is currently visible
+     * @returns {boolean} True if visible
+     */
+    isEditUIVisible() {
+        return this.isVisible;
+    }
+
+    /**
+     * Get the current element being edited
+     * @returns {Object|null} Current element or null
+     */
+    getCurrentElement() {
+        return this.currentElement;
+    }
+
+    /**
+     * Get the current tool type
+     * @returns {string|null} Current tool type or null
+     */
+    getCurrentTool() {
+        return this.currentTool;
+    }
+
+
+} 

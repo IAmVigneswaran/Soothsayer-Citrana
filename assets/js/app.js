@@ -88,6 +88,12 @@ class CitranaApp {
                     this.chartTemplates.northIndianTemplate.clearHighlight();
                 }
             }
+            
+            // Hide Edit UI if clicking outside of it
+            if (this.drawingTools.editUI && this.drawingTools.editUI.isEditUIVisible()) {
+                this.drawingTools.editUI.hide();
+            }
+            
             this.handleMouseDown(e);
         });
         this.stage.on('mousemove', (e) => this.handleMouseMove(e));

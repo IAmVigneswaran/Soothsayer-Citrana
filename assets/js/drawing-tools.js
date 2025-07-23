@@ -18,6 +18,9 @@ class DrawingTools {
         this.selectedShape = null;
         this.isDragging = false;
         
+        // Initialize Edit UI
+        this.editUI = new EditUI();
+        
         // Setup touch events for mobile precision
         this.setupTouchEvents();
     }
@@ -196,15 +199,20 @@ class DrawingTools {
     startArrow(pos) {
         const arrow = new Konva.Arrow({
             points: [pos.x, pos.y, pos.x, pos.y],
-            stroke: '#374151',
+            stroke: '#FF0000',
             strokeWidth: 2,
-            fill: '#374151',
+            fill: '#FF0000',
             pointerLength: 10,
             pointerWidth: 8,
             name: 'drawing-arrow',
             perfectDrawEnabled: true,
             listening: true,
             draggable: false // Will be enabled when select tool is active
+        });
+
+        // Add click handler for Edit UI
+        arrow.on('click', () => {
+            this.showEditUI(arrow, 'arrow');
         });
 
         this.currentShape = arrow;
@@ -225,12 +233,17 @@ class DrawingTools {
     startLine(pos) {
         const line = new Konva.Line({
             points: [pos.x, pos.y, pos.x, pos.y],
-            stroke: '#374151',
+            stroke: '#FF0000',
             strokeWidth: 2,
             name: 'drawing-line',
             perfectDrawEnabled: true,
             listening: true,
             draggable: false // Will be enabled when select tool is active
+        });
+
+        // Add click handler for Edit UI
+        line.on('click', () => {
+            this.showEditUI(line, 'line');
         });
 
         this.currentShape = line;
@@ -251,7 +264,7 @@ class DrawingTools {
     startPen(pos) {
         const line = new Konva.Line({
             points: [pos.x, pos.y],
-            stroke: '#374151',
+            stroke: '#FF0000',
             strokeWidth: 2,
             lineCap: 'round',
             lineJoin: 'round',
@@ -260,6 +273,12 @@ class DrawingTools {
             listening: true,
             draggable: false, // Will be enabled when select tool is active
             tension: 0.1 // Smooth curves
+        });
+
+        // Add click handler for Edit UI
+        line.on('click', (e) => {
+            e.cancelBubble = true;
+            this.showEditUI(line, 'pen');
         });
 
         this.currentShape = line;
@@ -282,7 +301,9 @@ class DrawingTools {
             y: pos.y,
             text: 'Double-click to edit',
             fontSize: 16,
-            fontFamily: 'Arial',
+            fontFamily: 'Arial, sans-serif',
+            fontWeight: 400,
+            fontStyle: 'normal',
             fill: '#374151',
             draggable: true,
             name: 'drawing-text',
@@ -297,12 +318,13 @@ class DrawingTools {
         // Make text editable immediately and on double-click
         this.makeTextEditable(text);
         
-        // Also make it editable on single click for better UX
-        text.on('click', () => {
-            // Only edit if we're not in select mode
-            if (this.currentTool !== 'select') {
-                this.editText(text);
-            }
+        // Add click handler for Edit UI
+        text.on('click', (e) => {
+            // Prevent event bubbling
+            e.cancelBubble = true;
+            
+            // Show Edit UI (always show Edit UI on click)
+            this.showEditUI(text, 'text');
         });
         
         // Auto-switch to select tool after creating text
@@ -715,5 +737,20 @@ class DrawingTools {
         // Ensure the input field is properly initialized
         textEditInput.removeAttribute('placeholder');
         textEditInput.value = currentText;
+    }
+
+    /**
+     * Show Edit UI for a specific element
+     * @param {Object} element - The Konva element to edit
+     * @param {string} tool - The tool type
+     */
+    showEditUI(element, tool) {
+        console.log(`[EDIT UI] Showing Edit UI for ${tool} tool, element:`, element);
+        
+        // Hide any existing Edit UI first
+        this.editUI.hide();
+        
+        // Show Edit UI for the clicked element
+        this.editUI.show(element, tool);
     }
 } 

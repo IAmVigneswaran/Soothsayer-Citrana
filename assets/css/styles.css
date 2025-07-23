@@ -471,4 +471,105 @@ body {
   font-weight: normal;
   line-height: 1;
   vertical-align: middle;
+}
+
+/* Floating Edit UI */
+.floating-edit-ui {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #000000;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    border-radius: 8px;
+}
+
+.edit-ui-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-controls-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-control-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.edit-btn:hover {
+    background: #000000;
+    color: white;
+}
+
+.edit-btn:active {
+    transform: scale(0.95);
+}
+
+.edit-btn.active {
+    background: #000000;
+    color: white;
+}
+
+.edit-btn i {
+    width: 16px;
+    height: 16px;
+}
+
+.edit-value {
+    font-size: 12px;
+    font-weight: 500;
+    color: #000000;
+    min-width: 20px;
+    text-align: center;
+    padding: 0 8px;
+}
+
+.edit-color-input {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    background: none;
+}
+
+.edit-color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.edit-color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
 } 
