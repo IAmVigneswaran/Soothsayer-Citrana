@@ -607,3 +607,38 @@ body {
     border: none;
     border-radius: 3px;
 } 
+
+@media (max-width: 768px) {
+  .floating-edit-ui {
+    top: 72px;
+    bottom: auto;
+    flex-wrap: nowrap;
+    max-width: 100vw;
+    overflow-x: auto;
+    gap: 4px;
+    padding: 4px;
+    height: 40px;
+  }
+  .edit-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .edit-ui-content,
+  .edit-controls-group {
+    flex-wrap: nowrap;
+  }
+  .floating-text-edit-controls {
+    top: 72px;
+    bottom: auto;
+    flex-wrap: nowrap;
+    max-width: 100vw;
+    overflow-x: auto;
+    gap: 4px;
+    padding: 4px;
+    height: 40px;
+  }
+  .floating-text-edit-controls button {
+    width: 28px;
+    height: 28px;
+  }
+} 
