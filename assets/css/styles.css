@@ -285,6 +285,25 @@ body {
     border-color: #000000;
 }
 
+.text-edit-color-input {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+}
+
+.text-edit-color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.text-edit-color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+}
+
 .floating-text-edit-controls button {
     display: flex;
     align-items: center;

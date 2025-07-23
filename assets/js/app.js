@@ -94,6 +94,11 @@ class CitranaApp {
                 this.drawingTools.editUI.hide();
             }
             
+            // Cancel planet editing if clicking outside of editing areas
+            if (this.drawingTools.isEditingPlanet) {
+                this.drawingTools.cancelPlanetEditing();
+            }
+            
             this.handleMouseDown(e);
         });
         this.stage.on('mousemove', (e) => this.handleMouseMove(e));

@@ -18,6 +18,10 @@ class DrawingTools {
         this.selectedShape = null;
         this.isDragging = false;
         
+        // Track editing state to prevent conflicts
+        this.isEditingPlanet = false;
+        this.currentlyEditingPlanet = null;
+        
         // Initialize Edit UI
         this.editUI = new EditUI();
         
@@ -621,6 +625,11 @@ class DrawingTools {
     makePlanetTextEditable(planetText, onUpdate) {
         // Double-click to edit planet text
         planetText.on('dblclick', () => {
+            // Prevent multiple editing sessions
+            if (this.isEditingPlanet) {
+                console.log('[DEBUG] Already editing a planet, ignoring double-click');
+                return;
+            }
             this.editPlanetText(planetText, onUpdate);
         });
     }
@@ -631,22 +640,40 @@ class DrawingTools {
      * @param {Function} onUpdate - Callback function to update the planet label
      */
     editPlanetText(planetText, onUpdate) {
+        // Check if text edit controls are already visible
+        const textEditControls = document.getElementById('text-edit-controls');
+        if (textEditControls && textEditControls.style.display === 'flex') {
+            console.log('[DEBUG] Text edit controls already visible, ignoring edit request');
+            return;
+        }
+        
+        // Set editing state
+        this.isEditingPlanet = true;
+        this.currentlyEditingPlanet = planetText;
+        
         const currentText = planetText.text();
+        const currentColor = planetText.fill() || '#000000';
+        
+        // Store reference to the specific planet being edited
+        const editingPlanetText = planetText;
         
         // Get the text edit UI elements
-        const textEditControls = document.getElementById('text-edit-controls');
         const textEditInput = document.getElementById('text-edit-input');
+        const textEditColor = document.getElementById('text-edit-color');
         const saveButton = document.getElementById('text-edit-save');
         const cancelButton = document.getElementById('text-edit-cancel');
         
-        if (!textEditControls || !textEditInput || !saveButton || !cancelButton) {
+        if (!textEditControls || !textEditInput || !textEditColor || !saveButton || !cancelButton) {
             console.error('Text edit UI elements not found');
+            this.isEditingPlanet = false;
+            this.currentlyEditingPlanet = null;
             return;
         }
         
         // Clear any existing value and set initial value
         textEditInput.value = '';
         textEditInput.value = currentText;
+        textEditColor.value = currentColor;
         
         // Show the text edit UI
         textEditControls.style.display = 'flex';
@@ -664,35 +691,45 @@ class DrawingTools {
         }, 100);
         
         // Disable dragging while editing
-        planetText.draggable(false);
+        editingPlanetText.draggable(false);
         
         const finishEditing = (save = false) => {
+            // Clear editing state
+            this.isEditingPlanet = false;
+            this.currentlyEditingPlanet = null;
+            
             // Hide the text edit UI
             textEditControls.style.display = 'none';
             
             if (save) {
                 const newText = textEditInput.value.trim();
+                const newColor = textEditColor.value;
                 if (newText && newText.length <= 6) {
                     // Update the planet label through callback
                     if (onUpdate) {
-                        onUpdate(newText);
+                        onUpdate(newText, newColor);
                     }
                 } else {
-                    // Restore original text if invalid
-                    planetText.text(currentText);
+                    // Restore original text and color if invalid
+                    editingPlanetText.text(currentText);
+                    editingPlanetText.fill(currentColor);
                 }
             } else {
-                // Restore original text if cancelled
-                planetText.text(currentText);
+                // Restore original text and color if cancelled
+                editingPlanetText.text(currentText);
+                editingPlanetText.fill(currentColor);
             }
             
             // Re-enable dragging
-            planetText.draggable(true);
+            editingPlanetText.draggable(true);
             
             // Remove event listeners
             saveButton.removeEventListener('click', handleSave);
             cancelButton.removeEventListener('click', handleCancel);
             textEditInput.removeEventListener('keydown', handleKeyDown);
+            textEditInput.removeEventListener('input', handleInput);
+            textEditColor.removeEventListener('change', handleColorChange);
+            textEditColor.removeEventListener('input', handleColorChange);
         };
         
         const handleSave = () => {
@@ -714,13 +751,7 @@ class DrawingTools {
             // Allow backspace to work normally in the input field
         };
         
-        // Add event listeners
-        saveButton.addEventListener('click', handleSave);
-        cancelButton.addEventListener('click', handleCancel);
-        textEditInput.addEventListener('keydown', handleKeyDown);
-        
-        // Add live preview with character limit enforcement
-        textEditInput.addEventListener('input', () => {
+        const handleInput = () => {
             let newText = textEditInput.value;
             
             // Enforce 6 character limit
@@ -729,14 +760,55 @@ class DrawingTools {
                 textEditInput.value = newText;
             }
             
-            // Update planet text in real-time
-            planetText.text(newText);
+            // Update ONLY the specific planet text being edited
+            editingPlanetText.text(newText);
             this.layer.batchDraw();
-        });
+        };
+        
+        const handleColorChange = (e) => {
+            const newColor = e.target.value;
+            
+            console.log(`[DEBUG] Color changed to: ${newColor} for planet text`);
+            
+            // Update ONLY the specific planet text being edited
+            editingPlanetText.fill(newColor);
+            this.layer.batchDraw();
+        };
+        
+        // Add event listeners
+        saveButton.addEventListener('click', handleSave);
+        cancelButton.addEventListener('click', handleCancel);
+        textEditInput.addEventListener('keydown', handleKeyDown);
+        textEditInput.addEventListener('input', handleInput);
+        textEditColor.addEventListener('change', handleColorChange);
+        textEditColor.addEventListener('input', handleColorChange);
         
         // Ensure the input field is properly initialized
         textEditInput.removeAttribute('placeholder');
         textEditInput.value = currentText;
+        textEditColor.value = currentColor;
+    }
+
+    /**
+     * Cancel any existing planet editing session
+     */
+    cancelPlanetEditing() {
+        if (this.isEditingPlanet && this.currentlyEditingPlanet) {
+            // Hide the text edit UI
+            const textEditControls = document.getElementById('text-edit-controls');
+            if (textEditControls) {
+                textEditControls.style.display = 'none';
+            }
+            
+            // Re-enable dragging
+            this.currentlyEditingPlanet.draggable(true);
+            
+            // Clear editing state
+            this.isEditingPlanet = false;
+            this.currentlyEditingPlanet = null;
+            
+            console.log('[DEBUG] Cancelled existing planet editing session');
+        }
     }
 
     /**
@@ -746,6 +818,9 @@ class DrawingTools {
      */
     showEditUI(element, tool) {
         console.log(`[EDIT UI] Showing Edit UI for ${tool} tool, element:`, element);
+        
+        // Cancel any existing planet editing
+        this.cancelPlanetEditing();
         
         // Hide any existing Edit UI first
         this.editUI.hide();

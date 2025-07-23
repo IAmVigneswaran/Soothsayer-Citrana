@@ -422,7 +422,8 @@ class NorthIndianChartTemplate {
                     abbr: planet.abbr,
                     label: planet.label,
                     id: planet.id,
-                    rashiNumber: planet.rashiNumber
+                    rashiNumber: planet.rashiNumber,
+                    color: planet.color
                 });
             }
         });
@@ -569,11 +570,16 @@ class NorthIndianChartTemplate {
         // Otherwise, calculate the Rashi number for this house with current Lagna
         const rashiNumber = existingRashiNumber || this.getRashiNumberForHouse(houseNumber);
         
+        // Get planet color
+        const planet = window.app.planetSystem.getPlanetInfo(planetAbbr);
+        const planetColor = planet ? planet.color : '#000000';
+        
         house.planets.push({ 
             abbr: planetAbbr, 
             label: label || planetAbbr, 
             id: planetId,
-            rashiNumber: rashiNumber // Store the Rashi number when planet is placed
+            rashiNumber: rashiNumber, // Store the Rashi number when planet is placed
+            color: planetColor
         });
         this.updatePlanetsInHouse(houseNumber);
         if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
@@ -626,7 +632,7 @@ class NorthIndianChartTemplate {
                 fontSize: fontSize,
                 fontFamily: 'Arial Black, Arial, sans-serif',
                 fontWeight: 'bold',
-                fill: planet ? planet.color : '#000',
+                fill: planetObj.color || (planet ? planet.color : '#000'),
                 name: `planet-${planetObj.abbr}-${houseNumber}-${planetObj.id}`,
                 draggable: true,
                 align: 'center',
@@ -637,14 +643,17 @@ class NorthIndianChartTemplate {
 
             // Make planet text editable with live preview
             if (window.app && window.app.drawingTools) {
-                window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel) => {
+                window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel, newColor) => {
                     // Update the planet label in the house data
                     const planetIndex = house.planets.findIndex(p => p.id === planetObj.id);
                     if (planetIndex !== -1) {
                         house.planets[planetIndex].label = newLabel;
-                        // Update the planet text
+                        house.planets[planetIndex].color = newColor;
+                        // Update the planet text and color
                         planetText.text(newLabel);
+                        planetText.fill(newColor);
                         this.layer.batchDraw();
+                        console.log(`[DEBUG] Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
                         // Trigger snapshot for undo/redo
                         if (window.app && window.app.pushSnapshot) {
                             window.app.pushSnapshot();
@@ -674,7 +683,8 @@ class NorthIndianChartTemplate {
                     abbr: planetObj.abbr, 
                     id: planetObj.id, 
                     label: planetObj.label,
-                    rashiNumber: planetObj.rashiNumber // Store the Rashi number for the move
+                    rashiNumber: planetObj.rashiNumber, // Store the Rashi number for the move
+                    color: planetObj.color
                 };
                 planetText.opacity(0.5);
                 planetText.moveToTop();
@@ -707,9 +717,17 @@ class NorthIndianChartTemplate {
                 this.tinyBoxGroupNorth.moveToTop();
                 this.layer.batchDraw();
                 if (targetHouse && targetHouse !== houseNumber) {
-                    // Move planet to new bhava by ID, preserving its Rashi number
+                    // Move planet to new bhava by ID, preserving its Rashi number and color
                     this.removePlanetFromHouseById(houseNumber, planetObj.id);
                     this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.rashiNumber);
+                    // Update the color of the moved planet
+                    const targetHouseData = this.houseDataNorth[targetHouse];
+                    if (targetHouseData && targetHouseData.planets) {
+                        const movedPlanet = targetHouseData.planets.find(p => p.id === planetObj.id);
+                        if (movedPlanet) {
+                            movedPlanet.color = planetObj.color;
+                        }
+                    }
                     this.updatePlanetsInHouse(targetHouse);
                     if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
                     console.log(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}, staying in Rashi ${planetObj.rashiNumber}`);
