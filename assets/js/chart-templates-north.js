@@ -308,9 +308,14 @@ class NorthIndianChartTemplate {
         const labelY = -labelHeight - -5; // 12px margin above chart group
         // Fine-tune label offset for each browser
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        let labelOffset = -95; // Default for Chrome/Brave
-        if (isSafari) {
-            labelOffset = -117; // Adjust as needed for Safari
+        const isMobile = window.innerWidth <= 600;
+        let labelOffset;
+        if (isMobile) {
+            // Fine-tune these values for mobile Safari and mobile Chrome/Brave
+            labelOffset = isSafari ? -33 : 2;
+        } else {
+            // Desktop values
+            labelOffset = isSafari ? -117 : -95;
         }
         const labelX = (chartWidth - labelWidth) / 2 + labelOffset;
         const centerLabel = new Konva.Text({
@@ -587,14 +592,18 @@ class NorthIndianChartTemplate {
         const stageHeight = this.stage.height();
         const chartBounds = this.chartGroupNorth.getClientRect();
 
-        const scaleX = (stageWidth * 0.7) / chartBounds.width;
-        const scaleY = (stageHeight * 0.7) / chartBounds.height;
+        // Detect mobile vs desktop
+        const isMobile = window.innerWidth <= 600;
+        const scaleFactor = isMobile ? 0.95 : 0.7;
+        const extraTopMargin = isMobile ? 20 : -50;
+
+        const scaleX = (stageWidth * scaleFactor) / chartBounds.width;
+        const scaleY = (stageHeight * scaleFactor) / chartBounds.height;
         const scale = Math.min(scaleX, scaleY, 2); // Max scale of 2
 
         this.stage.scale({ x: scale, y: scale });
 
         // Center the chart, but add extra top margin for the label
-        const extraTopMargin = -50; // px, adjust as needed
         const chartCenter = {
             x: chartBounds.x + chartBounds.width / 2,
             y: chartBounds.y + chartBounds.height / 2

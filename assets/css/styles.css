@@ -460,6 +460,21 @@ body {
     }
 }
 
+@media (max-width: 600px) {
+  .floating-zoom-controls {
+    left: 0 !important;
+    right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    bottom: 20px !important;
+    width: 240px !important;
+    max-width: 240px !important;
+    z-index: 1000;
+  }
+}
+
 /* Tool states */
 .tool-active {
     background: #000000 !important;

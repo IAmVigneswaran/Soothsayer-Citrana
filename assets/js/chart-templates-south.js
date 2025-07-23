@@ -780,28 +780,30 @@ class SouthIndianChartTemplate {
         const stageHeight = this.stage.height();
         const chartBounds = this.chartGroupSouth.getClientRect();
 
-        const scaleX = (stageWidth * 0.8) / chartBounds.width;
-        const scaleY = (stageHeight * 0.8) / chartBounds.height;
+        // Detect mobile vs desktop (Zoom to fit)
+        const isMobile = window.innerWidth <= 600;
+        const scaleFactor = isMobile ? 0.95 : 0.7;
+        const extraTopMargin = isMobile ? 20 : 20;
+
+        const scaleX = (stageWidth * scaleFactor) / chartBounds.width;
+        const scaleY = (stageHeight * scaleFactor) / chartBounds.height;
         const scale = Math.min(scaleX, scaleY, 2); // Max scale of 2
 
         this.stage.scale({ x: scale, y: scale });
 
-        // Center the chart
+        // Center the chart, but add extra top margin for the label
         const chartCenter = {
             x: chartBounds.x + chartBounds.width / 2,
             y: chartBounds.y + chartBounds.height / 2
         };
-
         const stageCenter = {
             x: stageWidth / 2,
-            y: stageHeight / 2
+            y: (stageHeight / 2) + (extraTopMargin / 2)
         };
-
         const newPos = {
             x: stageCenter.x - chartCenter.x * scale,
-            y: stageCenter.y - chartCenter.y * scale
+            y: stageCenter.y - chartCenter.y * scale - extraTopMargin
         };
-
         this.stage.position(newPos);
         this.stage.batchDraw();
     }
