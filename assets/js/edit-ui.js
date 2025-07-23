@@ -439,6 +439,52 @@ class EditUI {
         controlsDiv.appendChild(boldBtn);
         controlsDiv.appendChild(italicBtn);
         controlsDiv.appendChild(colorInput);
+        // --- Add text alignment buttons ---
+        const alignLeftBtn = document.createElement('button');
+        alignLeftBtn.innerHTML = '<i data-lucide="align-left"></i>';
+        alignLeftBtn.className = 'edit-btn';
+        alignLeftBtn.title = 'Align Left';
+        const alignCenterBtn = document.createElement('button');
+        alignCenterBtn.innerHTML = '<i data-lucide="align-center"></i>';
+        alignCenterBtn.className = 'edit-btn';
+        alignCenterBtn.title = 'Align Center';
+        const alignRightBtn = document.createElement('button');
+        alignRightBtn.innerHTML = '<i data-lucide="align-right"></i>';
+        alignRightBtn.className = 'edit-btn';
+        alignRightBtn.title = 'Align Right';
+        // Set initial active state
+        const currentAlign = this.currentElement.align ? this.currentElement.align() : 'center';
+        if (currentAlign === 'left') alignLeftBtn.classList.add('active');
+        else if (currentAlign === 'right') alignRightBtn.classList.add('active');
+        else alignCenterBtn.classList.add('active');
+        // Alignment event listeners
+        alignLeftBtn.addEventListener('click', () => {
+            this.currentElement.align('left');
+            this.currentElement.offsetX(0);
+            this.currentElement.getLayer().batchDraw();
+            alignLeftBtn.classList.add('active');
+            alignCenterBtn.classList.remove('active');
+            alignRightBtn.classList.remove('active');
+        });
+        alignCenterBtn.addEventListener('click', () => {
+            this.currentElement.align('center');
+            this.currentElement.offsetX(this.currentElement.width() / 2);
+            this.currentElement.getLayer().batchDraw();
+            alignLeftBtn.classList.remove('active');
+            alignCenterBtn.classList.add('active');
+            alignRightBtn.classList.remove('active');
+        });
+        alignRightBtn.addEventListener('click', () => {
+            this.currentElement.align('right');
+            this.currentElement.offsetX(this.currentElement.width());
+            this.currentElement.getLayer().batchDraw();
+            alignLeftBtn.classList.remove('active');
+            alignCenterBtn.classList.remove('active');
+            alignRightBtn.classList.add('active');
+        });
+        controlsDiv.appendChild(alignLeftBtn);
+        controlsDiv.appendChild(alignCenterBtn);
+        controlsDiv.appendChild(alignRightBtn);
         // --- Add Delete button ---
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
