@@ -468,15 +468,19 @@ class SouthIndianChartTemplate {
                             y: planetPos.y
                         };
                     }
-                    
-                    console.log('[DEBUG] Drop detection - Pointer position:', pointer);
-                    
+
+                    // --- NEW: Always transform pointer to stage coordinates ---
+                    const scale = this.stage.scaleX();
+                    const stagePos = this.stage.position();
+                    const px = (pointer.x - stagePos.x) / scale;
+                    const py = (pointer.y - stagePos.y) / scale;
+
                     // Find which bhava the drop is over
                     for (const hNum in this.houseDataSouth) {
                         const h = this.houseDataSouth[hNum];
                         if (
-                            pointer.x >= h.x && pointer.x <= h.x + h.width &&
-                            pointer.y >= h.y && pointer.y <= h.y + h.height
+                            px >= h.x && px <= h.x + h.width &&
+                            py >= h.y && py <= h.y + h.height
                         ) {
                             targetHouse = parseInt(hNum);
                             console.log(`[DEBUG] Drop detected over house ${targetHouse}`);
@@ -492,8 +496,8 @@ class SouthIndianChartTemplate {
                             const centerX = h.x + h.width / 2;
                             const centerY = h.y + h.height / 2;
                             const distance = Math.sqrt(
-                                Math.pow(pointer.x - centerX, 2) + 
-                                Math.pow(pointer.y - centerY, 2)
+                                Math.pow(px - centerX, 2) + 
+                                Math.pow(py - centerY, 2)
                             );
                             
                             // If planet is within reasonable distance of house center
