@@ -527,6 +527,40 @@ body {
     width: 240px !important;
     max-width: 240px !important;
     z-index: 1000;
+    /* Safari-specific fixes */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Ensure visibility on Safari */
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Force hardware acceleration */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Safari-specific zoom controls fix */
+@supports (-webkit-touch-callout: none) {
+  .floating-zoom-controls {
+    /* Additional Safari-specific properties */
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    /* Ensure proper stacking context */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* Force display */
+    display: flex !important;
+    visibility: visible !important;
+    /* Safari positioning fixes */
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateZ(0) !important;
+    -webkit-transform: translateX(-50%) translateZ(0) !important;
+    /* Ensure it's above other elements */
+    z-index: 9999 !important;
   }
 }
 
