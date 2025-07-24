@@ -786,13 +786,14 @@ class NorthIndianChartTemplate {
                 listening: true
             });
             // The planet text - perfectly centered
+            const isMobile = /Mobile|Android|iP(ad|hone|od)/.test(navigator.userAgent);
             const planetText = new Konva.Text({
                 x: house.x,
                 y: planetY,
                 text: planetObj.label,
                 fontSize: fontSize,
                 fontFamily: 'Arial Black, Arial, sans-serif',
-                fontWeight: 'bold',
+                fontWeight: isMobile ? 700 : 'bold',
                 fill: planetObj.color || (planet ? planet.color : '#000'),
                 name: `planet-${planetObj.abbr}-${houseNumber}-${planetObj.id}`,
                 draggable: true,
