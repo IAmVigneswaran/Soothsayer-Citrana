@@ -119,10 +119,53 @@ class CitranaApp {
         this.stage.on('touchmove', (e) => this.handleTouchMove(e));
         this.stage.on('touchend', (e) => this.handleTouchEnd(e));
 
+        // Safari-specific fix for toolbar visibility
+        this.setupSafariToolbarFix();
+
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
 
         console.log('Event listeners setup complete');
+    }
+    
+    /**
+     * Setup Safari-specific fix to ensure toolbar remains visible
+     */
+    setupSafariToolbarFix() {
+        // Only apply Safari-specific fixes
+        if (!this.isTouchDevice()) return;
+        
+        const toolbar = document.querySelector('.floating-top-toolbar');
+        if (!toolbar) return;
+        
+        // Fix toolbar visibility after focus events (keyboard dismissal)
+        const fixToolbarVisibility = () => {
+            setTimeout(() => {
+                if (toolbar) {
+                    toolbar.style.visibility = 'visible';
+                    toolbar.style.opacity = '1';
+                    toolbar.style.display = 'flex';
+                    console.log('[SAFARI] Toolbar visibility restored');
+                }
+            }, 100);
+        };
+        
+        // Listen for focus events that might indicate keyboard dismissal
+        document.addEventListener('focusin', fixToolbarVisibility);
+        document.addEventListener('focusout', fixToolbarVisibility);
+        
+        // Listen for window resize events (Safari sometimes triggers these)
+        window.addEventListener('resize', fixToolbarVisibility);
+        
+        // Listen for scroll events (Safari sometimes hides elements during scroll)
+        window.addEventListener('scroll', fixToolbarVisibility);
+        
+        // Periodic check to ensure toolbar is visible
+        setInterval(() => {
+            if (toolbar && (toolbar.style.visibility === 'hidden' || toolbar.style.display === 'none')) {
+                fixToolbarVisibility();
+            }
+        }, 2000);
     }
 
     loadSavedData() {
