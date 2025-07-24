@@ -453,11 +453,21 @@ class SouthIndianChartTemplate {
                 fill: planetObj.color || (planet ? planet.color : '#000'),
                 name: `planet-${planetObj.abbr}-${houseNumber}-${planetObj.id}`,
                 draggable: true,
-                align: 'center',
-                verticalAlign: 'middle',
-                offsetX: fontSize/2,
-                offsetY: fontSize/2,
+                align: 'left',
+                verticalAlign: 'top',
+                offsetX: 0,
+                offsetY: 0,
             });
+            
+            // Calculate exact center position
+            setTimeout(() => {
+                const textWidth = planetText.width();
+                const textHeight = planetText.height();
+                planetText.x(house.x + house.width/2 - textWidth/2);
+                planetText.y(planetY - textHeight/2);
+                this.layer.batchDraw();
+            }, 10);
+            
             planetText._planetHouseNumber = houseNumber;
             planetText._planetId = planetObj.id;
             
@@ -491,6 +501,16 @@ class SouthIndianChartTemplate {
                         // Update the planet text and color
                         planetText.text(newLabel);
                         planetText.fill(newColor);
+                        
+                        // Re-center the text after editing
+                        setTimeout(() => {
+                            const textWidth = planetText.width();
+                            const textHeight = planetText.height();
+                            planetText.x(house.x + house.width/2 - textWidth/2);
+                            planetText.y(planetY - textHeight/2);
+                            this.layer.batchDraw();
+                        }, 10);
+                        
                         this.layer.batchDraw();
                         console.log(`[DEBUG] Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
                         // Trigger snapshot for undo/redo
