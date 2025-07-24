@@ -217,6 +217,18 @@ class CitranaApp {
                 }
             }
             
+            // Zoom shortcuts
+            if (e.key === '+' || e.key === '=') {
+                e.preventDefault();
+                this.zoomIn();
+            } else if (e.key === '-') {
+                e.preventDefault();
+                this.zoomOut();
+            } else if (e.key === '0') {
+                e.preventDefault();
+                this.chartTemplates.zoomToFit();
+            }
+            
             // Delete selected shape (only with Delete key, not Backspace)
             if (e.key === 'Delete') {
                 if (this.currentTool === 'select') {
@@ -381,12 +393,79 @@ class CitranaApp {
     }
 
     redo() {
-        if (this.redoStack.length === 0) return;
-        const current = { chartData: this.chartTemplates.getChartData(), drawingData: this.serializeDrawings() };
-        this.undoStack.push(current);
-        const snapshot = this.redoStack.pop();
-        this.chartTemplates.loadChartData(snapshot.chartData);
-        this.restoreDrawings(snapshot.drawingData);
+        if (this.redoStack.length > 0) {
+            const drawingData = this.redoStack.pop();
+            this.undoStack.push(this.serializeDrawings());
+            this.restoreDrawings(drawingData);
+            console.log('Redo performed');
+        }
+    }
+
+    zoomIn() {
+        const scaleBy = 1.2;
+        const oldScale = this.stage.scaleX();
+        const newScale = oldScale * scaleBy;
+        
+        if (newScale <= 5) { // Max zoom limit
+            // Get the center of the stage
+            const stageCenter = {
+                x: this.stage.width() / 2,
+                y: this.stage.height() / 2
+            };
+            
+            const mousePointTo = {
+                x: (stageCenter.x - this.stage.x()) / oldScale,
+                y: (stageCenter.y - this.stage.y()) / oldScale
+            };
+            
+            this.stage.scale({ x: newScale, y: newScale });
+            
+            const newPos = {
+                x: stageCenter.x - mousePointTo.x * newScale,
+                y: stageCenter.y - mousePointTo.y * newScale
+            };
+            this.stage.position(newPos);
+            this.stage.batchDraw();
+            
+            this.updateZoomLevel();
+        }
+    }
+
+    zoomOut() {
+        const scaleBy = 0.8;
+        const oldScale = this.stage.scaleX();
+        const newScale = oldScale * scaleBy;
+        
+        if (newScale >= 0.1) { // Min zoom limit
+            // Get the center of the stage
+            const stageCenter = {
+                x: this.stage.width() / 2,
+                y: this.stage.height() / 2
+            };
+            
+            const mousePointTo = {
+                x: (stageCenter.x - this.stage.x()) / oldScale,
+                y: (stageCenter.y - this.stage.y()) / oldScale
+            };
+            
+            this.stage.scale({ x: newScale, y: newScale });
+            
+            const newPos = {
+                x: stageCenter.x - mousePointTo.x * newScale,
+                y: stageCenter.y - mousePointTo.y * newScale
+            };
+            this.stage.position(newPos);
+            this.stage.batchDraw();
+            
+            this.updateZoomLevel();
+        }
+    }
+
+    resetZoom() {
+        this.stage.scale({ x: 1, y: 1 });
+        this.stage.position({ x: 0, y: 0 });
+        this.stage.batchDraw();
+        this.updateZoomLevel();
     }
 }
 

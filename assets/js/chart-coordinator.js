@@ -128,26 +128,84 @@ class ChartCoordinator {
     zoomIn() {
         if (!this.stage) return;
         
-        const newScale = this.stage.scaleX() * 1.2;
-        this.stage.scale({ x: newScale, y: newScale });
-        this.stage.batchDraw();
-        this.updateZoomLevel();
+        const scaleBy = 1.2;
+        const oldScale = this.stage.scaleX();
+        const newScale = oldScale * scaleBy;
+        
+        if (newScale <= 5) { // Max zoom limit
+            // Get the center of the stage
+            const stageCenter = {
+                x: this.stage.width() / 2,
+                y: this.stage.height() / 2
+            };
+            
+            const mousePointTo = {
+                x: (stageCenter.x - this.stage.x()) / oldScale,
+                y: (stageCenter.y - this.stage.y()) / oldScale
+            };
+            
+            this.stage.scale({ x: newScale, y: newScale });
+            
+            const newPos = {
+                x: stageCenter.x - mousePointTo.x * newScale,
+                y: stageCenter.y - mousePointTo.y * newScale
+            };
+            this.stage.position(newPos);
+            this.stage.batchDraw();
+            this.updateZoomLevel();
+        }
     }
 
     zoomOut() {
         if (!this.stage) return;
         
-        const newScale = this.stage.scaleX() / 1.2;
-        this.stage.scale({ x: newScale, y: newScale });
-        this.stage.batchDraw();
-        this.updateZoomLevel();
+        const scaleBy = 0.8;
+        const oldScale = this.stage.scaleX();
+        const newScale = oldScale * scaleBy;
+        
+        if (newScale >= 0.1) { // Min zoom limit
+            // Get the center of the stage
+            const stageCenter = {
+                x: this.stage.width() / 2,
+                y: this.stage.height() / 2
+            };
+            
+            const mousePointTo = {
+                x: (stageCenter.x - this.stage.x()) / oldScale,
+                y: (stageCenter.y - this.stage.y()) / oldScale
+            };
+            
+            this.stage.scale({ x: newScale, y: newScale });
+            
+            const newPos = {
+                x: stageCenter.x - mousePointTo.x * newScale,
+                y: stageCenter.y - mousePointTo.y * newScale
+            };
+            this.stage.position(newPos);
+            this.stage.batchDraw();
+            this.updateZoomLevel();
+        }
     }
 
     zoomToFit() {
-        if (this.currentChartType === 'south-indian') {
+        console.log('[DEBUG] zoomToFit called, currentChartType:', this.currentChartType);
+        
+        // Check if chart groups exist to determine chart type
+        if (this.southIndianTemplate && this.southIndianTemplate.chartGroupSouth) {
+            console.log('[DEBUG] Using South Indian zoomToFit');
             this.southIndianTemplate.zoomToFit();
-        } else if (this.currentChartType === 'north-indian') {
+        } else if (this.northIndianTemplate && this.northIndianTemplate.chartGroupNorth) {
+            console.log('[DEBUG] Using North Indian zoomToFit');
             this.northIndianTemplate.zoomToFit();
+        } else {
+            console.log('[DEBUG] No chart groups found, using simple reset');
+            // Fallback to simple reset
+            if (this.stage) {
+                this.stage.scale({ x: 1, y: 1 });
+                this.stage.position({ x: 0, y: 0 });
+                this.stage.batchDraw();
+                this.updateZoomLevel();
+            }
         }
     }
 

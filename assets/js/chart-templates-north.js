@@ -590,34 +590,48 @@ class NorthIndianChartTemplate {
 
         const stageWidth = this.stage.width();
         const stageHeight = this.stage.height();
+        
+        // Get the chart bounds in local coordinates (not screen coordinates)
         const chartBounds = this.chartGroupNorth.getClientRect();
+        
+        // Convert screen bounds to local bounds
+        const scale = this.stage.scaleX();
+        const stagePos = this.stage.position();
+        const localBounds = {
+            x: (chartBounds.x - stagePos.x) / scale,
+            y: (chartBounds.y - stagePos.y) / scale,
+            width: chartBounds.width / scale,
+            height: chartBounds.height / scale
+        };
 
         // Detect mobile vs desktop
         const isMobile = window.innerWidth <= 600;
         const scaleFactor = isMobile ? 0.95 : 0.7;
         const extraTopMargin = isMobile ? 20 : -50;
 
-        const scaleX = (stageWidth * scaleFactor) / chartBounds.width;
-        const scaleY = (stageHeight * scaleFactor) / chartBounds.height;
-        const scale = Math.min(scaleX, scaleY, 2); // Max scale of 2
+        const scaleX = (stageWidth * scaleFactor) / localBounds.width;
+        const scaleY = (stageHeight * scaleFactor) / localBounds.height;
+        const newScale = Math.min(scaleX, scaleY, 2); // Max scale of 2
 
-        this.stage.scale({ x: scale, y: scale });
+        this.stage.scale({ x: newScale, y: newScale });
 
         // Center the chart, but add extra top margin for the label
         const chartCenter = {
-            x: chartBounds.x + chartBounds.width / 2,
-            y: chartBounds.y + chartBounds.height / 2
+            x: localBounds.x + localBounds.width / 2,
+            y: localBounds.y + localBounds.height / 2
         };
         const stageCenter = {
             x: stageWidth / 2,
             y: (stageHeight / 2) + (extraTopMargin / 2)
         };
         const newPos = {
-            x: stageCenter.x - chartCenter.x * scale,
-            y: stageCenter.y - chartCenter.y * scale - extraTopMargin
+            x: stageCenter.x - chartCenter.x * newScale,
+            y: stageCenter.y - chartCenter.y * newScale - extraTopMargin
         };
         this.stage.position(newPos);
         this.stage.batchDraw();
+        
+        console.log('[DEBUG] North Indian zoomToFit - scale:', newScale, 'position:', newPos, 'extraTopMargin:', extraTopMargin);
     }
 
     getChartData() {
