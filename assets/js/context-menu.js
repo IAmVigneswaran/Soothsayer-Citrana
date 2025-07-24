@@ -6,7 +6,6 @@ class ContextMenu {
     constructor() {
         this.menu = null;
         this.isVisible = false;
-        this.isInteractingWithMenuItem = false; // Track menu item interactions
     }
 
     init() {
@@ -100,30 +99,19 @@ class ContextMenu {
             }
         });
         
-        // Hide menu when touching outside (mobile) - but not immediately after long press
+        // Hide menu when touching outside (mobile)
         document.addEventListener('touchend', (e) => {
-            console.log('[CONTEXT MENU] Document touchend, target:', e.target);
-            
-            // Don't hide if currently interacting with a menu item
-            if (this.isInteractingWithMenuItem) {
-                console.log('[CONTEXT MENU] Not hiding - currently interacting with menu item');
-                return;
-            }
-            
-            // Add a longer delay to prevent immediate hiding after long press
+            // Add a delay to prevent immediate hiding after long press
             setTimeout(() => {
                 if (this.menu && !this.menu.contains(e.target)) {
-                    console.log('[CONTEXT MENU] Hiding menu - touched outside');
                     this.hide();
                 }
-            }, 300); // Increased delay
+            }, 200);
         });
         
         // Prevent immediate hiding when touching inside the menu
         document.addEventListener('touchstart', (e) => {
-            console.log('[CONTEXT MENU] Document touchstart, target:', e.target);
             if (this.menu && this.menu.contains(e.target)) {
-                console.log('[CONTEXT MENU] Touching inside menu, preventing propagation');
                 // Prevent the touchstart from triggering the hide logic
                 e.stopPropagation();
             }
@@ -289,72 +277,29 @@ class ContextMenu {
         this.menu.onclick = null;
         this.menu.onclick = (e) => {
             const item = e.target.closest('.context-menu-item');
-            console.log('[DEBUG] Click event target:', e.target);
-            console.log('[DEBUG] Closest .context-menu-item:', item);
             if (!item) return;
             e.preventDefault();
             const action = item.dataset.action;
             const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
-            console.log('[DEBUG] Menu item clicked:', action, houseNumber);
             this.handleAction(action, houseNumber);
             this.hide();
         };
         
-        // More robust touch handling for mobile
-        let touchStartTime = 0;
-        let touchStartTarget = null;
-        
-        this.menu.addEventListener('touchstart', (e) => {
-            console.log('[CONTEXT MENU] touchstart on menu, target:', e.target);
-            touchStartTime = Date.now();
-            touchStartTarget = e.target;
-            
-            // Check if touching a menu item
+        // Simple and direct touch handling for mobile
+        this.menu.addEventListener('touchend', (e) => {
             const item = e.target.closest('.context-menu-item');
             if (item) {
-                this.isInteractingWithMenuItem = true;
-                console.log('[CONTEXT MENU] Started interacting with menu item:', item.dataset.action);
+                e.preventDefault();
+                e.stopPropagation();
+                const action = item.dataset.action;
+                const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
+                this.handleAction(action, houseNumber);
+                this.hide();
             }
-            
-            // Don't prevent default or stop propagation here
-        }, { passive: true });
-        
-        this.menu.addEventListener('touchend', (e) => {
-            console.log('[CONTEXT MENU] touchend on menu, target:', e.target);
-            const touchDuration = Date.now() - touchStartTime;
-            
-            // Only handle if it's a short touch (not a long press)
-            if (touchDuration < 300 && touchStartTarget === e.target) {
-                const item = e.target.closest('.context-menu-item');
-                if (item) {
-                    console.log('[CONTEXT MENU] Menu item found:', item.dataset.action);
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const action = item.dataset.action;
-                    const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
-                    console.log('[DEBUG] Menu item touched:', action, houseNumber);
-                    this.handleAction(action, houseNumber);
-                    this.hide();
-                } else {
-                    console.log('[CONTEXT MENU] No menu item found');
-                }
-            }
-            
-            // Reset interaction flag after a delay
-            setTimeout(() => {
-                this.isInteractingWithMenuItem = false;
-                console.log('[CONTEXT MENU] Reset interaction flag');
-            }, 500);
-            
-            // Reset touch tracking
-            touchStartTime = 0;
-            touchStartTarget = null;
         }, { passive: false });
         
-        // Also handle mousedown for better cross-device support
+        // Prevent text selection on menu items
         this.menu.addEventListener('mousedown', (e) => {
-            console.log('[CONTEXT MENU] mousedown on menu, target:', e.target);
-            // Prevent default to avoid text selection
             e.preventDefault();
         }, { passive: false });
     }
