@@ -122,28 +122,24 @@ class PlanetSystem {
     handleLibraryTouchEnd() {
         if (this.isDraggingLibrary) {
             this.isDraggingLibrary = false;
-            this.grahaLibrary.style.transition = '';
             
-            // Keep the height locked for a moment to prevent the "snap back" effect
-            setTimeout(() => {
-                // Unlock the height constraints
-                this.grahaLibrary.style.height = '';
-                this.grahaLibrary.style.minHeight = '';
-                this.grahaLibrary.style.maxHeight = '';
-                
-                // Restore grid overflow
-                const planetGrid = this.grahaLibrary.querySelector('.planet-grid');
-                if (planetGrid) {
-                    planetGrid.style.maxHeight = '';
-                    planetGrid.style.overflow = '';
-                }
-            }, 100); // Small delay to prevent immediate height change
+            // Keep the exact same height permanently to prevent any changes
+            this.grahaLibrary.style.height = this.initialHeight + 'px';
+            this.grahaLibrary.style.minHeight = this.initialHeight + 'px';
+            this.grahaLibrary.style.maxHeight = this.initialHeight + 'px';
             
             // Re-enable transitions on planet items
             const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
             planetItems.forEach(item => {
                 item.style.transition = '';
             });
+            
+            // Keep grid height locked
+            const planetGrid = this.grahaLibrary.querySelector('.planet-grid');
+            if (planetGrid) {
+                planetGrid.style.maxHeight = planetGrid.offsetHeight + 'px';
+                planetGrid.style.overflow = 'hidden';
+            }
             
             // Remove visual feedback
             this.grahaLibrary.style.boxShadow = '';
