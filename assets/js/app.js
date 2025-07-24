@@ -113,6 +113,11 @@ class CitranaApp {
         this.stage.on('mousemove', (e) => this.handleMouseMove(e));
         this.stage.on('mouseup', (e) => this.handleMouseUp(e));
         this.stage.on('wheel', (e) => this.handleWheel(e));
+        
+        // Touch events for mobile
+        this.stage.on('touchstart', (e) => this.handleTouchStart(e));
+        this.stage.on('touchmove', (e) => this.handleTouchMove(e));
+        this.stage.on('touchend', (e) => this.handleTouchEnd(e));
 
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
@@ -247,14 +252,19 @@ class CitranaApp {
         document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(`${tool}-tool`).classList.add('active');
         
-        // Update cursor
+        // Update cursor and touch behavior
         const container = document.getElementById('canvas-container');
         if (tool === 'hand') {
             container.style.cursor = 'grab';
+            // Don't enable draggable here - only enable it during touch/mouse down
         } else if (tool === 'select') {
             container.style.cursor = 'default';
+            // Ensure stage is not draggable when switching to select tool
+            this.stage.draggable(false);
         } else {
             container.style.cursor = 'crosshair';
+            // Ensure stage is not draggable for drawing tools
+            this.stage.draggable(false);
         }
         
         console.log(`Tool set to: ${tool}`);
@@ -294,6 +304,73 @@ class CitranaApp {
             document.getElementById('canvas-container').style.cursor = 'grab';
         } else if (this.currentTool === 'select') {
             this.drawingTools.handleSelectMouseUp();
+        } else {
+            this.isDrawing = false;
+            this.drawingTools.stopDrawing();
+        }
+    }
+    
+    /**
+     * Handle touch start events for mobile
+     * @param {KonvaEvent} e - Konva touch event
+     */
+    handleTouchStart(e) {
+        // Prevent default to avoid browser gestures
+        e.evt.preventDefault();
+        
+        if (this.currentTool === 'hand') {
+            // Enable stage dragging for hand tool
+            this.stage.draggable(true);
+            document.getElementById('canvas-container').style.cursor = 'grabbing';
+        } else if (this.currentTool === 'select') {
+            const pos = this.drawingTools.getPrecisePositionFromKonva(e);
+            this.drawingTools.handleSelectTouchDown(pos, e);
+        } else {
+            // For drawing tools, use the existing touch handling
+            const pos = this.drawingTools.getPrecisePositionFromKonva(e);
+            if (pos) {
+                this.isDrawing = true;
+                this.lastPoint = pos;
+                this.drawingTools.startDrawing(pos, this.currentTool);
+            }
+        }
+    }
+    
+    /**
+     * Handle touch move events for mobile
+     * @param {KonvaEvent} e - Konva touch event
+     */
+    handleTouchMove(e) {
+        // Prevent default to avoid browser gestures
+        e.evt.preventDefault();
+        
+        if (this.currentTool === 'select') {
+            const pos = this.drawingTools.getPrecisePositionFromKonva(e);
+            this.drawingTools.handleSelectMouseMove(pos);
+        } else if (this.isDrawing) {
+            const pos = this.drawingTools.getPrecisePositionFromKonva(e);
+            if (pos) {
+                this.drawingTools.draw(pos, this.currentTool);
+                this.lastPoint = pos;
+            }
+        }
+        // Hand tool panning is handled automatically by Konva's draggable
+    }
+    
+    /**
+     * Handle touch end events for mobile
+     * @param {KonvaEvent} e - Konva touch event
+     */
+    handleTouchEnd(e) {
+        // Prevent default to avoid browser gestures
+        e.evt.preventDefault();
+        
+        if (this.currentTool === 'hand') {
+            // Disable stage dragging when hand tool is released
+            this.stage.draggable(false);
+            document.getElementById('canvas-container').style.cursor = 'grab';
+        } else if (this.currentTool === 'select') {
+            this.drawingTools.handleSelectTouchUp();
         } else {
             this.isDrawing = false;
             this.drawingTools.stopDrawing();
