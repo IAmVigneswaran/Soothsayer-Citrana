@@ -778,7 +778,7 @@ class DrawingTools {
      * @param {Function} onUpdate - Callback function to update the planet label
      */
     makePlanetTextEditable(planetText, onUpdate) {
-        // Double-click to edit planet text
+        // Double-click to edit planet text (desktop)
         planetText.on('dblclick', () => {
             // Prevent multiple editing sessions
             if (this.isEditingPlanet) {
@@ -786,6 +786,43 @@ class DrawingTools {
                 return;
             }
             this.editPlanetText(planetText, onUpdate);
+        });
+        
+        // Double-tap to edit planet text (mobile)
+        let lastTap = 0;
+        let tapCount = 0;
+        let tapTimer = null;
+        
+        planetText.on('tap', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 500 && tapLength > 0) {
+                // Double tap detected
+                tapCount++;
+                if (tapCount === 2) {
+                    clearTimeout(tapTimer);
+                    tapCount = 0;
+                    
+                    // Prevent multiple editing sessions
+                    if (this.isEditingPlanet) {
+                        console.log('[DEBUG] Already editing a planet, ignoring double-tap');
+                        return;
+                    }
+                    
+                    this.editPlanetText(planetText, onUpdate);
+                }
+            } else {
+                tapCount = 1;
+            }
+            
+            lastTap = currentTime;
+            
+            // Reset tap count after a delay
+            if (tapTimer) clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => {
+                tapCount = 0;
+            }, 500);
         });
     }
 
