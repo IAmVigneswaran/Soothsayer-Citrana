@@ -1200,7 +1200,106 @@ class DrawingTools {
     }
 
     editHeading(heading) {
-        // Show Edit UI, preset to 2 lines max
-        this.showEditUI(heading, 'heading');
+        // Prevent multiple textareas
+        const existingTextarea = document.querySelector('.konva-textarea');
+        if (existingTextarea) {
+            existingTextarea.remove();
+        }
+        // Get the absolute position of the heading
+        const textPosition = heading.absolutePosition();
+        const stageBox = this.stage.container().getBoundingClientRect();
+        // Calculate position relative to viewport
+        const areaPosition = {
+            x: stageBox.left + textPosition.x,
+            y: stageBox.top + textPosition.y
+        };
+        // Create textarea
+        const textarea = document.createElement('textarea');
+        textarea.className = 'konva-textarea';
+        document.body.appendChild(textarea);
+        // Set initial value
+        textarea.value = heading.text();
+        // Style the textarea
+        textarea.style.position = 'absolute';
+        textarea.style.top = areaPosition.y + 'px';
+        textarea.style.left = areaPosition.x + 'px';
+        textarea.style.width = Math.max(150, heading.width()) + 'px';
+        // Apply canvas scale to font size and height for editing precision
+        const scale = this.stage.scaleX();
+        const scaledFontSize = heading.fontSize() * scale;
+        textarea.style.fontSize = '16px'; // Prevent mobile zoom
+        textarea.style.lineHeight = scaledFontSize + 'px';
+        textarea.style.height = (scaledFontSize * 2 + 8) + 'px'; // 2 lines
+        textarea.style.fontFamily = heading.fontFamily();
+        textarea.style.color = heading.fill();
+        textarea.style.fontWeight = 'bold';
+        textarea.style.textAlign = heading.align();
+        textarea.style.border = 'none';
+        textarea.style.borderRadius = '0px';
+        textarea.style.padding = '0px';
+        textarea.style.margin = '0px';
+        textarea.style.background = 'transparent';
+        textarea.style.outline = 'none';
+        textarea.style.resize = 'none';
+        textarea.style.zIndex = '10000';
+        textarea.style.boxShadow = 'none';
+        textarea.style.transform = '';
+        textarea.style.transformOrigin = '';
+        textarea.style.touchAction = 'manipulation';
+        textarea.style.WebkitTouchAction = 'manipulation';
+        textarea.rows = 2;
+        textarea.maxLength = 200;
+        // Enforce 2-line limit
+        textarea.addEventListener('input', function() {
+            const lines = textarea.value.split('\n');
+            if (lines.length > 2) {
+                textarea.value = lines.slice(0, 2).join('\n');
+            }
+        });
+        // Focus and select all text
+        textarea.focus();
+        textarea.select();
+        // Disable dragging while editing and hide the original heading
+        heading.setAttrs({
+            draggable: false,
+            visible: false
+        });
+        const finishEditing = () => {
+            const newText = textarea.value.trim();
+            heading.text(newText);
+            textarea.remove();
+            heading.setAttrs({
+                draggable: true,
+                visible: true
+            });
+            this.layer.batchDraw();
+            document.removeEventListener('click', handleOutsideClick);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                finishEditing();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                textarea.value = heading.text();
+                finishEditing();
+            }
+        };
+        const handleOutsideClick = (e) => {
+            if (e.target !== textarea) {
+                finishEditing();
+            }
+        };
+        textarea.addEventListener('blur', finishEditing);
+        document.addEventListener('keydown', handleKeyDown);
+        setTimeout(() => {
+            document.addEventListener('click', handleOutsideClick);
+        }, 100);
+        // Live update preview
+        textarea.addEventListener('input', () => {
+            heading.text(textarea.value);
+            this.layer.batchDraw();
+        });
     }
 } 
