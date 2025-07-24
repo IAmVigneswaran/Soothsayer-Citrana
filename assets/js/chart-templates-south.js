@@ -377,6 +377,13 @@ class SouthIndianChartTemplate {
             window.selectedBhavaSouth = houseNumber;
             console.log('[SELECT] South Indian Chart House selected:', houseNumber);
         });
+        
+        // Add touch event for mobile selection
+        house.on('tap', (e) => {
+            this.highlightHouse(houseNumber);
+            window.selectedBhavaSouth = houseNumber;
+            console.log('[SELECT] South Indian Chart House selected via touch:', houseNumber);
+        });
     }
 
     highlightHouse(houseNumber) {

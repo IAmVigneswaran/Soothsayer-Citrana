@@ -50,9 +50,52 @@ class PlanetSystem {
     setupLibraryEventListeners() {
         // Drag functionality for floating library
         const header = this.grahaLibrary.querySelector('.planet-library-header');
+        
+        // Desktop mouse events
         header.addEventListener('mousedown', (e) => this.handleLibraryDragStart(e));
         document.addEventListener('mousemove', (e) => this.handleLibraryDragMove(e));
         document.addEventListener('mouseup', () => this.handleLibraryDragEnd());
+        
+        // Mobile touch events
+        header.addEventListener('touchstart', (e) => this.handleLibraryTouchStart(e));
+        document.addEventListener('touchmove', (e) => this.handleLibraryTouchMove(e));
+        document.addEventListener('touchend', () => this.handleLibraryTouchEnd());
+    }
+    
+    handleLibraryTouchStart(e) {
+        e.preventDefault();
+        this.isDraggingLibrary = true;
+        const touch = e.touches[0];
+        this.dragStartX = touch.clientX;
+        this.dragStartY = touch.clientY;
+        const rect = this.grahaLibrary.getBoundingClientRect();
+        this.initialX = rect.left;
+        this.initialY = rect.top;
+        this.grahaLibrary.style.transition = 'none';
+    }
+    
+    handleLibraryTouchMove(e) {
+        if (!this.isDraggingLibrary) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - this.dragStartX;
+        const deltaY = touch.clientY - this.dragStartY;
+        const newX = this.initialX + deltaX;
+        const newY = this.initialY + deltaY;
+        // Keep within viewport bounds
+        const maxX = window.innerWidth - this.grahaLibrary.offsetWidth;
+        const maxY = window.innerHeight - this.grahaLibrary.offsetHeight;
+        const clampedX = Math.max(0, Math.min(newX, maxX));
+        const clampedY = Math.max(0, Math.min(newY, maxY));
+        this.grahaLibrary.style.left = clampedX + 'px';
+        this.grahaLibrary.style.top = clampedY + 'px';
+    }
+    
+    handleLibraryTouchEnd() {
+        if (this.isDraggingLibrary) {
+            this.isDraggingLibrary = false;
+            this.grahaLibrary.style.transition = '';
+        }
     }
     handleLibraryDragStart(e) {
         this.isDraggingLibrary = true;
