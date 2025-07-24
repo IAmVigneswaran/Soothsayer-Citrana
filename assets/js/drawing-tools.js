@@ -1090,40 +1090,71 @@ class DrawingTools {
     addDoubleTapSupport(shape, tool) {
         if (!this.isTouchDevice) return;
 
-        console.log(`[DEBUG] Adding double-tap support for ${tool} tool`);
+        let lastTouchEnd = 0;
+        let touchCount = 0;
+        let touchTimer = null;
 
-        let lastTap = 0;
-        let tapCount = 0;
-        let tapTimer = null;
+        // Use touchstart and touchend for more reliable double-tap detection
+        shape.on('touchstart', (e) => {
+            // Prevent default to avoid conflicts
+            e.evt.preventDefault();
+        });
 
-        const handleTap = (e) => {
-            console.log(`[DEBUG] Tap detected for ${tool} tool, tapCount: ${tapCount}`);
+        shape.on('touchend', (e) => {
+            // Prevent default to avoid conflicts
+            e.evt.preventDefault();
+            e.evt.stopPropagation();
+            
             const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
+            const touchLength = currentTime - lastTouchEnd;
 
-            if (tapLength < 500 && tapLength > 0) {
+            if (touchLength < 500 && touchLength > 0) {
                 // Double tap detected
-                tapCount++;
-                if (tapCount === 2) {
-                    clearTimeout(tapTimer);
-                    tapCount = 0;
-                    console.log(`[DEBUG] Double-tap detected for ${tool} tool`);
+                touchCount++;
+                if (touchCount === 2) {
+                    clearTimeout(touchTimer);
+                    touchCount = 0;
                     this.showEditUI(shape, tool);
                 }
             } else {
-                tapCount = 1;
+                touchCount = 1;
             }
 
-            lastTap = currentTime;
+            lastTouchEnd = currentTime;
 
-            // Reset tap count after a delay
-            if (tapTimer) clearTimeout(tapTimer);
-            tapTimer = setTimeout(() => {
-                tapCount = 0;
+            // Reset touch count after a delay
+            if (touchTimer) clearTimeout(touchTimer);
+            touchTimer = setTimeout(() => {
+                touchCount = 0;
+            }, 500);
+        });
+
+        // Store handlers for cleanup
+        shape._touchStartHandler = (e) => e.evt.preventDefault();
+        shape._touchEndHandler = (e) => {
+            e.evt.preventDefault();
+            e.evt.stopPropagation();
+            
+            const currentTime = new Date().getTime();
+            const touchLength = currentTime - lastTouchEnd;
+
+            if (touchLength < 500 && touchLength > 0) {
+                touchCount++;
+                if (touchCount === 2) {
+                    clearTimeout(touchTimer);
+                    touchCount = 0;
+                    this.showEditUI(shape, tool);
+                }
+            } else {
+                touchCount = 1;
+            }
+
+            lastTouchEnd = currentTime;
+
+            if (touchTimer) clearTimeout(touchTimer);
+            touchTimer = setTimeout(() => {
+                touchCount = 0;
             }, 500);
         };
-
-        shape.on('tap', handleTap);
-        shape._tapHandler = handleTap; // Store handler for cleanup
     }
 } 
