@@ -25,44 +25,11 @@ class DrawingTools {
         // Initialize Edit UI
         this.editUI = new EditUI();
         
-        // Setup touch events for mobile precision
-        this.setupTouchEvents();
+        // Do NOT call setupTouchEvents(); let app.js handle all mobile touch events
     }
 
     detectTouchDevice() {
         return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    }
-
-    setupTouchEvents() {
-        if (!this.isTouchDevice) return;
-
-        // Add touch event listeners to stage
-        this.stage.on('touchstart', (e) => {
-            e.evt.preventDefault();
-            const touch = e.evt.touches[0];
-            const pos = this.getPrecisePosition(touch);
-            
-            // Use appropriate handler based on current tool
-            if (this.currentTool === 'select') {
-                this.handleSelectTouchDown(pos, e);
-            } else {
-                this.startDrawing(pos, this.currentTool);
-            }
-        });
-
-        this.stage.on('touchmove', (e) => {
-            e.evt.preventDefault();
-            if (!this.isDrawing) return;
-            const touch = e.evt.touches[0];
-            const pos = this.getPrecisePosition(touch);
-            this.draw(pos, this.currentTool);
-        });
-
-        this.stage.on('touchend', (e) => {
-            e.evt.preventDefault();
-            this.stopDrawing();
-            this.handleSelectTouchUp();
-        });
     }
 
     /**
