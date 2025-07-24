@@ -906,3 +906,53 @@ body {
     touch-action: manipulation;
     -webkit-touch-action: manipulation;
 } 
+
+/* Prevent zooming on input focus in mobile browsers */
+.text-edit-input,
+.edit-ui-content input[type="text"],
+.edit-ui-content input[type="number"],
+.edit-ui-content input[type="color"] {
+    /* Prevent zoom on focus in mobile browsers */
+    font-size: 16px !important; /* Minimum font size to prevent zoom */
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Prevent zoom on focus */
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    /* Ensure proper touch behavior */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+}
+
+/* Additional mobile-specific input fixes */
+@media (max-width: 768px) {
+    .text-edit-input,
+    .edit-ui-content input[type="text"],
+    .edit-ui-content input[type="number"],
+    .edit-ui-content input[type="color"] {
+        /* Force minimum font size to prevent zoom */
+        font-size: 16px !important;
+        /* Prevent any scaling */
+        -webkit-transform: scale(1) !important;
+        transform: scale(1) !important;
+        /* Ensure proper input behavior */
+        -webkit-appearance: none;
+        border-radius: 4px;
+        /* Prevent zoom on focus */
+        -webkit-text-size-adjust: 100% !important;
+        text-size-adjust: 100% !important;
+    }
+    
+    /* Prevent zoom on color inputs specifically */
+    input[type="color"] {
+        /* Force minimum size to prevent zoom */
+        min-width: 32px !important;
+        min-height: 32px !important;
+        /* Prevent zoom behavior */
+        -webkit-transform: scale(1) !important;
+        transform: scale(1) !important;
+    }
+} 

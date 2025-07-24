@@ -122,6 +122,9 @@ class CitranaApp {
         // Safari-specific fix for toolbar visibility
         this.setupSafariToolbarFix();
 
+        // Prevent zooming on input focus in mobile browsers
+        this.setupMobileInputZoomPrevention();
+
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
 
@@ -220,6 +223,60 @@ class CitranaApp {
                 fixUIElementsVisibility();
             }
         }, 2000);
+    }
+    
+    /**
+     * Setup mobile input zoom prevention
+     */
+    setupMobileInputZoomPrevention() {
+        // Only apply on mobile devices
+        if (!this.isTouchDevice()) return;
+        
+        // Prevent zoom on input focus
+        const preventZoomOnFocus = (e) => {
+            const target = e.target;
+            
+            // Check if it's an input field
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                // Force minimum font size to prevent zoom
+                target.style.fontSize = '16px';
+                
+                // Prevent zoom by ensuring proper viewport
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    // Temporarily set viewport to prevent zoom
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=no');
+                    
+                    // Restore viewport after a short delay
+                    setTimeout(() => {
+                        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0, minimum-scale=0.1, viewport-fit=cover');
+                    }, 100);
+                }
+                
+                console.log('[MOBILE] Prevented zoom on input focus');
+            }
+        };
+        
+        // Listen for focus events on input fields
+        document.addEventListener('focusin', preventZoomOnFocus);
+        
+        // Also prevent zoom on touch events for inputs
+        const preventZoomOnTouch = (e) => {
+            const target = e.target;
+            
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                // Prevent default zoom behavior
+                e.preventDefault();
+                
+                // Force focus without zoom
+                target.focus();
+                
+                console.log('[MOBILE] Prevented zoom on input touch');
+            }
+        };
+        
+        // Listen for touch events on input fields
+        document.addEventListener('touchstart', preventZoomOnTouch, { passive: false });
     }
 
     loadSavedData() {
