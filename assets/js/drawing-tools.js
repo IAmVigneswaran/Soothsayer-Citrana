@@ -428,7 +428,7 @@ class DrawingTools {
         // Apply canvas scale to font size and height for editing precision
         const scale = this.stage.scaleX();
         const scaledFontSize = text.fontSize() * scale;
-        textarea.style.fontSize = scaledFontSize + 'px';
+        textarea.style.fontSize = '16px'; // Prevent mobile zoom
         textarea.style.lineHeight = scaledFontSize + 'px';
         textarea.style.height = (scaledFontSize + 4) + 'px';
         textarea.style.fontFamily = text.fontFamily();
@@ -445,6 +445,8 @@ class DrawingTools {
         // Remove transform scaling for caret precision
         textarea.style.transform = '';
         textarea.style.transformOrigin = '';
+        textarea.style.touchAction = 'manipulation';
+        textarea.style.WebkitTouchAction = 'manipulation';
 
         // Focus and select all text
             textarea.focus();
