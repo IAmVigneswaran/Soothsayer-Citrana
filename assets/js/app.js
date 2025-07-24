@@ -142,27 +142,27 @@ class CitranaApp {
         // Fix UI elements visibility after focus events (keyboard dismissal)
         const fixUIElementsVisibility = () => {
             setTimeout(() => {
-                // Fix top toolbar
+                // Fix top toolbar - always visible
                 if (toolbar) {
                     toolbar.style.visibility = 'visible';
                     toolbar.style.opacity = '1';
-                    toolbar.style.display = 'flex';
+                    // Don't force display - let existing CSS control it
                     console.log('[SAFARI] Top toolbar visibility restored');
                 }
                 
-                // Fix floating edit UI
-                if (editUI) {
+                // Fix floating edit UI - only if it should be visible
+                if (editUI && editUI.style.display !== 'none') {
                     editUI.style.visibility = 'visible';
                     editUI.style.opacity = '1';
-                    editUI.style.display = 'flex';
+                    // Don't force display - let JavaScript control it
                     console.log('[SAFARI] Floating Edit UI visibility restored');
                 }
                 
-                // Fix floating text edit controls
-                if (textEditControls) {
+                // Fix floating text edit controls - only if it should be visible
+                if (textEditControls && textEditControls.style.display !== 'none') {
                     textEditControls.style.visibility = 'visible';
                     textEditControls.style.opacity = '1';
-                    textEditControls.style.display = 'flex';
+                    // Don't force display - let JavaScript control it
                     console.log('[SAFARI] Text Edit Controls visibility restored');
                     
                     // Fix individual planet text edit input elements
@@ -173,19 +173,19 @@ class CitranaApp {
                     if (textEditInput) {
                         textEditInput.style.visibility = 'visible';
                         textEditInput.style.opacity = '1';
-                        textEditInput.style.display = 'block';
+                        // Don't force display - let existing CSS control it
                     }
                     
                     if (textEditColor) {
                         textEditColor.style.visibility = 'visible';
                         textEditColor.style.opacity = '1';
-                        textEditColor.style.display = 'block';
+                        // Don't force display - let existing CSS control it
                     }
                     
                     textEditButtons.forEach(button => {
                         button.style.visibility = 'visible';
                         button.style.opacity = '1';
-                        button.style.display = 'inline-flex';
+                        // Don't force display - let existing CSS control it
                     });
                     
                     console.log('[SAFARI] Planet text edit input elements restored');
@@ -205,18 +205,18 @@ class CitranaApp {
         
         // Periodic check to ensure UI elements are visible
         setInterval(() => {
-            // Check top toolbar
+            // Check top toolbar - always should be visible
             if (toolbar && (toolbar.style.visibility === 'hidden' || toolbar.style.display === 'none')) {
                 fixUIElementsVisibility();
             }
             
-            // Check floating edit UI
-            if (editUI && (editUI.style.visibility === 'hidden' || editUI.style.display === 'none')) {
+            // Check floating edit UI - only if it should be visible
+            if (editUI && editUI.style.display !== 'none' && (editUI.style.visibility === 'hidden' || editUI.style.opacity === '0')) {
                 fixUIElementsVisibility();
             }
             
-            // Check floating text edit controls
-            if (textEditControls && (textEditControls.style.visibility === 'hidden' || textEditControls.style.display === 'none')) {
+            // Check floating text edit controls - only if it should be visible
+            if (textEditControls && textEditControls.style.display !== 'none' && (textEditControls.style.visibility === 'hidden' || textEditControls.style.opacity === '0')) {
                 fixUIElementsVisibility();
             }
         }, 2000);

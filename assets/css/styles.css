@@ -588,10 +588,10 @@ body {
   
   /* Safari-specific floating edit UI fix */
   .floating-edit-ui {
-    /* Force visibility and positioning */
+    /* Force visibility and positioning - but only when already displayed */
     visibility: visible !important;
     opacity: 1 !important;
-    display: flex !important;
+    /* Don't force display - let JavaScript control initial visibility */
     /* Ensure proper stacking context */
     -webkit-transform: translateX(-50%) translateZ(0);
     transform: translateX(-50%) translateZ(0);
@@ -612,10 +612,10 @@ body {
   
   /* Safari-specific floating text edit controls fix */
   .floating-text-edit-controls {
-    /* Force visibility and positioning */
+    /* Force visibility and positioning - but only when already displayed */
     visibility: visible !important;
     opacity: 1 !important;
-    display: flex !important;
+    /* Don't force display - let JavaScript control initial visibility */
     /* Ensure proper stacking context */
     -webkit-transform: translateX(-50%) translateZ(0);
     transform: translateX(-50%) translateZ(0);
