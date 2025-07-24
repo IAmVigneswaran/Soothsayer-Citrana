@@ -1090,11 +1090,14 @@ class DrawingTools {
     addDoubleTapSupport(shape, tool) {
         if (!this.isTouchDevice) return;
 
+        console.log(`[DEBUG] Adding double-tap support for ${tool} tool`);
+
         let lastTap = 0;
         let tapCount = 0;
         let tapTimer = null;
 
         const handleTap = (e) => {
+            console.log(`[DEBUG] Tap detected for ${tool} tool, tapCount: ${tapCount}`);
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
 
@@ -1104,7 +1107,8 @@ class DrawingTools {
                 if (tapCount === 2) {
                     clearTimeout(tapTimer);
                     tapCount = 0;
-                    this.showEditUIForShape(shape);
+                    console.log(`[DEBUG] Double-tap detected for ${tool} tool`);
+                    this.showEditUI(shape, tool);
                 }
             } else {
                 tapCount = 1;
