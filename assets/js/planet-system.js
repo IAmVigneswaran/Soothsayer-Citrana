@@ -100,7 +100,7 @@ class PlanetSystem {
 
     // --- Planet Library and Drag-and-Drop ---
     createPlanetLibrary() {
-        const library = this.planetGrid;
+        const library = document.getElementById('planet-library');
         if (!library) {
             console.error('Planet library container not found');
             return;
@@ -112,9 +112,16 @@ class PlanetSystem {
             planetItem.textContent = planet.fullName;
             planetItem.draggable = true;
             planetItem.dataset.planet = abbr;
-            // Add drag event listeners
+            
+            // Add drag event listeners for desktop
             planetItem.addEventListener('dragstart', (e) => this.handleDragStart(e, abbr));
             planetItem.addEventListener('dragend', (e) => this.handleDragEnd(e));
+            
+            // Add touch event listeners for mobile
+            planetItem.addEventListener('touchstart', (e) => this.handleTouchStart(e, abbr));
+            planetItem.addEventListener('touchmove', (e) => this.handleTouchMove(e, abbr));
+            planetItem.addEventListener('touchend', (e) => this.handleTouchEnd(e, abbr));
+            
             library.appendChild(planetItem);
         });
     }
@@ -145,6 +152,158 @@ class PlanetSystem {
         e.target.style.opacity = '1';
         e.target.style.transform = 'scale(1)';
         console.log('Drag ended');
+    }
+    
+    // Mobile touch handlers
+    handleTouchStart(e, planetAbbr) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        this.draggedPlanet = planetAbbr;
+        this.touchStartX = e.touches[0].clientX;
+        this.touchStartY = e.touches[0].clientY;
+        this.isDragging = false;
+        
+        // Create visual drag preview immediately for Safari
+        this.createDragPreview(planetAbbr, e.touches[0].clientX, e.touches[0].clientY);
+        
+        // Add touch move listener to document for better Safari support
+        document.addEventListener('touchmove', this.boundTouchMove = (e) => this.handleTouchMove(e, planetAbbr), { passive: false });
+        document.addEventListener('touchend', this.boundTouchEnd = (e) => this.handleTouchEnd(e, planetAbbr), { passive: false });
+        
+        console.log(`Touch started for planet: ${planetAbbr}`);
+    }
+    
+    handleTouchMove(e, planetAbbr) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!this.draggedPlanet || this.draggedPlanet !== planetAbbr) return;
+        
+        const touch = e.touches[0];
+        const deltaX = Math.abs(touch.clientX - this.touchStartX);
+        const deltaY = Math.abs(touch.clientY - this.touchStartY);
+        
+        // Start dragging after a small movement threshold
+        if (!this.isDragging && (deltaX > 5 || deltaY > 5)) {
+            this.isDragging = true;
+            console.log('Started mobile drag');
+        }
+        
+        if (this.dragPreview) {
+            // Update drag preview position
+            this.dragPreview.style.left = (touch.clientX - 25) + 'px';
+            this.dragPreview.style.top = (touch.clientY - 25) + 'px';
+        }
+    }
+    
+    handleTouchEnd(e, planetAbbr) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!this.draggedPlanet || this.draggedPlanet !== planetAbbr) return;
+        
+        if (this.isDragging) {
+            // Handle drop
+            const touch = e.changedTouches[0];
+            this.handleMobileDrop(touch.clientX, touch.clientY);
+        }
+        
+        // Clean up
+        this.draggedPlanet = null;
+        this.isDragging = false;
+        this.removeDragPreview();
+        
+        // Remove document event listeners
+        if (this.boundTouchMove) {
+            document.removeEventListener('touchmove', this.boundTouchMove);
+            this.boundTouchMove = null;
+        }
+        if (this.boundTouchEnd) {
+            document.removeEventListener('touchend', this.boundTouchEnd);
+            this.boundTouchEnd = null;
+        }
+        
+        console.log('Touch ended');
+    }
+    
+    createDragPreview(planetAbbr, x, y) {
+        // Remove existing preview
+        this.removeDragPreview();
+        
+        // Create new preview
+        this.dragPreview = document.createElement('div');
+        this.dragPreview.className = 'planet-drag-preview';
+        this.dragPreview.textContent = this.planets[planetAbbr].fullName;
+        this.dragPreview.style.cssText = `
+            position: fixed;
+            left: ${x - 25}px;
+            top: ${y - 25}px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 2px solid #000000;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #000000;
+            z-index: 10000;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0.9;
+        `;
+        
+        document.body.appendChild(this.dragPreview);
+    }
+    
+    removeDragPreview() {
+        if (this.dragPreview) {
+            this.dragPreview.remove();
+            this.dragPreview = null;
+        }
+    }
+    
+    handleMobileDrop(x, y) {
+        // Check for selected bhava first
+        let targetHouse = null;
+        const chartType = window.app?.chartTemplates?.currentChartType;
+        if (chartType === 'south-indian') {
+            targetHouse = window.selectedBhavaSouth;
+        } else if (chartType === 'north-indian') {
+            targetHouse = window.selectedBhavaNorth;
+        }
+        
+        if (!targetHouse) {
+            // Find house based on touch position
+            targetHouse = this.findHouseAtPosition(x, y);
+        }
+        
+        if (targetHouse && this.draggedPlanet) {
+            this.placePlanetInHouse(this.draggedPlanet, targetHouse);
+            console.log(`Mobile drop: Planet ${this.draggedPlanet} placed in house ${targetHouse}`);
+        }
+    }
+    
+    findHouseAtPosition(x, y) {
+        // This is a simplified implementation
+        // In a real implementation, you'd need to convert screen coordinates to chart coordinates
+        // and check which house polygon contains the point
+        
+        const chartType = window.app?.chartTemplates?.currentChartType;
+        if (chartType === 'south-indian') {
+            // For South Indian chart, you'd check the 3x4 grid
+            // This is a placeholder - you'd need to implement proper coordinate conversion
+            return 1; // Default to house 1
+        } else if (chartType === 'north-indian') {
+            // For North Indian chart, you'd check the polygon shapes
+            // This is a placeholder - you'd need to implement proper coordinate conversion
+            return 1; // Default to house 1
+        }
+        
+        return null;
     }
     handleDrop(e) {
         e.preventDefault();

@@ -697,3 +697,41 @@ body {
     height: 28px;
   }
 } 
+
+/* Mobile drag preview */
+.planet-drag-preview {
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border: 2px solid #000000;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: #000000;
+    z-index: 10000;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    opacity: 0.9;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    -webkit-touch-action: none;
+}
+
+/* Prevent text selection during drag on mobile */
+.planet-item {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+} 
