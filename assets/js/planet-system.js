@@ -72,6 +72,10 @@ class PlanetSystem {
         this.initialX = rect.left;
         this.initialY = rect.top;
         this.grahaLibrary.style.transition = 'none';
+        
+        // Add subtle visual feedback for mobile dragging (no size change)
+        this.grahaLibrary.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
+        this.grahaLibrary.style.zIndex = '1001';
     }
     
     handleLibraryTouchMove(e) {
@@ -95,6 +99,10 @@ class PlanetSystem {
         if (this.isDraggingLibrary) {
             this.isDraggingLibrary = false;
             this.grahaLibrary.style.transition = '';
+            
+            // Remove visual feedback
+            this.grahaLibrary.style.boxShadow = '';
+            this.grahaLibrary.style.zIndex = '';
         }
     }
     handleLibraryDragStart(e) {

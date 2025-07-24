@@ -41,7 +41,13 @@ class DrawingTools {
             e.evt.preventDefault();
             const touch = e.evt.touches[0];
             const pos = this.getPrecisePosition(touch);
-            this.startDrawing(pos, this.currentTool);
+            
+            // Use appropriate handler based on current tool
+            if (this.currentTool === 'select') {
+                this.handleSelectTouchDown(pos, e);
+            } else {
+                this.startDrawing(pos, this.currentTool);
+            }
         });
 
         this.stage.on('touchmove', (e) => {
@@ -55,6 +61,7 @@ class DrawingTools {
         this.stage.on('touchend', (e) => {
             e.evt.preventDefault();
             this.stopDrawing();
+            this.handleSelectTouchUp();
         });
     }
 
@@ -340,9 +347,39 @@ class DrawingTools {
     }
 
     makeTextEditable(text) {
-        // Double-click to edit (always works regardless of tool)
+        // Double-click to edit (desktop)
         text.on('dblclick', () => {
             this.editText(text);
+        });
+        
+        // Double-tap to edit (mobile)
+        let lastTap = 0;
+        let tapCount = 0;
+        let tapTimer = null;
+        
+        text.on('tap', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 500 && tapLength > 0) {
+                // Double tap detected
+                tapCount++;
+                if (tapCount === 2) {
+                    clearTimeout(tapTimer);
+                    tapCount = 0;
+                    this.editText(text);
+                }
+            } else {
+                tapCount = 1;
+            }
+            
+            lastTap = currentTime;
+            
+            // Reset tap count after a delay
+            if (tapTimer) clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => {
+                tapCount = 0;
+            }, 500);
         });
     }
 
@@ -589,6 +626,110 @@ class DrawingTools {
             // Clicked on empty space, clear selection
             this.clearSelection();
         }
+    }
+    
+    /**
+     * Handle touch down for select tool (mobile)
+     * @param {Object} pos - Touch position
+     * @param {KonvaEvent} e - Konva event
+     */
+    handleSelectTouchDown(pos, e) {
+        if (!pos) return;
+
+        const clickedShape = e.target;
+        
+        // Check if clicked on a drawing object
+        if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
+            this.selectShape(clickedShape);
+            this.isDragging = true;
+            
+            // Add double-tap detection for Edit UI
+            this.setupDoubleTapForEditUI(clickedShape);
+        } else {
+            // Clicked on empty space, clear selection
+            this.clearSelection();
+        }
+    }
+    
+    /**
+     * Handle touch up for select tool
+     */
+    handleSelectTouchUp() {
+        this.isDragging = false;
+    }
+    
+    /**
+     * Setup double-tap detection for showing Edit UI
+     * @param {KonvaObject} shape - The shape to monitor
+     */
+    setupDoubleTapForEditUI(shape) {
+        let lastTap = 0;
+        let tapCount = 0;
+        let tapTimer = null;
+        
+        const handleTap = (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 500 && tapLength > 0) {
+                // Double tap detected
+                tapCount++;
+                if (tapCount === 2) {
+                    clearTimeout(tapTimer);
+                    tapCount = 0;
+                    this.showEditUIForShape(shape);
+                }
+            } else {
+                tapCount = 1;
+            }
+            
+            lastTap = currentTime;
+            
+            // Reset tap count after a delay
+            if (tapTimer) clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => {
+                tapCount = 0;
+            }, 500);
+        };
+        
+        // Add tap event listener
+        shape.on('tap', handleTap);
+        
+        // Store the handler for cleanup
+        shape._tapHandler = handleTap;
+    }
+    
+    /**
+     * Show Edit UI for a specific shape
+     * @param {KonvaObject} shape - The shape to show Edit UI for
+     */
+    showEditUIForShape(shape) {
+        if (!shape || !shape.name()) return;
+        
+        // Determine tool type from shape name
+        let toolType = 'text'; // default
+        if (shape.name().includes('drawing-arrow')) {
+            toolType = 'arrow';
+        } else if (shape.name().includes('drawing-line')) {
+            toolType = 'line';
+        } else if (shape.name().includes('drawing-pen')) {
+            toolType = 'pen';
+        } else if (shape.name().includes('drawing-text')) {
+            toolType = 'text';
+        }
+        
+        // Show Edit UI
+        if (this.editUI) {
+            this.editUI.show(shape, toolType);
+        }
+    }
+    
+    /**
+     * Get the EditUI instance
+     * @returns {EditUI} The EditUI instance
+     */
+    getEditUI() {
+        return this.editUI;
     }
 
     /**

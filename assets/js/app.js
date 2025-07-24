@@ -301,6 +301,12 @@ class CitranaApp {
     }
 
     handleWheel(e) {
+        // Allow pinch-to-zoom on mobile devices
+        if (this.isTouchDevice()) {
+            // Don't prevent default on mobile to allow browser pinch-to-zoom
+            return;
+        }
+        
         e.evt.preventDefault();
         
         const scaleBy = 1.1;
@@ -325,6 +331,10 @@ class CitranaApp {
         this.stage.batchDraw();
         
         this.updateZoomLevel();
+    }
+    
+    isTouchDevice() {
+        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     }
 
     handleResize() {
