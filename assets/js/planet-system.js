@@ -71,6 +71,9 @@ class PlanetSystem {
         const rect = this.grahaLibrary.getBoundingClientRect();
         this.initialX = rect.left;
         this.initialY = rect.top;
+        
+        // Remove the transform that centers the library on mobile
+        this.grahaLibrary.style.transform = 'none';
         this.grahaLibrary.style.transition = 'none';
         
         // Add subtle visual feedback for mobile dragging (no size change)
@@ -103,6 +106,8 @@ class PlanetSystem {
             // Remove visual feedback
             this.grahaLibrary.style.boxShadow = '';
             this.grahaLibrary.style.zIndex = '';
+            
+            // Don't restore transform - keep the library where user dragged it
         }
     }
     handleLibraryDragStart(e) {
