@@ -585,6 +585,102 @@ body {
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
   }
+  
+  /* Safari-specific floating edit UI fix */
+  .floating-edit-ui {
+    /* Force visibility and positioning */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+    /* Ensure proper stacking context */
+    -webkit-transform: translateX(-50%) translateZ(0);
+    transform: translateX(-50%) translateZ(0);
+    /* Force hardware acceleration */
+    -webkit-transform: translate3d(-50%, 0, 0);
+    transform: translate3d(-50%, 0, 0);
+    /* Ensure it stays on top */
+    z-index: 10001 !important;
+    /* Safari-specific positioning */
+    position: fixed !important;
+    top: 72px !important;
+    left: 50% !important;
+    bottom: auto !important;
+    /* Prevent Safari from hiding it */
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Safari-specific floating text edit controls fix */
+  .floating-text-edit-controls {
+    /* Force visibility and positioning */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+    /* Ensure proper stacking context */
+    -webkit-transform: translateX(-50%) translateZ(0);
+    transform: translateX(-50%) translateZ(0);
+    /* Force hardware acceleration */
+    -webkit-transform: translate3d(-50%, 0, 0);
+    transform: translate3d(-50%, 0, 0);
+    /* Ensure it stays on top */
+    z-index: 10001 !important;
+    /* Safari-specific positioning */
+    position: fixed !important;
+    top: 72px !important;
+    left: 50% !important;
+    bottom: auto !important;
+    /* Prevent Safari from hiding it */
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Safari-specific planet text edit input fixes */
+  .floating-text-edit-controls .text-edit-input {
+    /* Ensure input is visible and functional */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    /* Safari-specific input properties */
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    /* Force proper rendering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* Ensure proper focus behavior */
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  
+  /* Safari-specific planet text edit color input fixes */
+  .floating-text-edit-controls .text-edit-color-input {
+    /* Ensure color input is visible and functional */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    /* Safari-specific color input properties */
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    /* Force proper rendering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  /* Safari-specific planet text edit button fixes */
+  .floating-text-edit-controls button {
+    /* Ensure buttons are visible and functional */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: inline-flex !important;
+    /* Safari-specific button properties */
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    /* Force proper rendering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* Ensure proper touch behavior */
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 /* Tool states */

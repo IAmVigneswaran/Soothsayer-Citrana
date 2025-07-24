@@ -136,34 +136,88 @@ class CitranaApp {
         if (!this.isTouchDevice()) return;
         
         const toolbar = document.querySelector('.floating-top-toolbar');
-        if (!toolbar) return;
+        const editUI = document.querySelector('.floating-edit-ui');
+        const textEditControls = document.querySelector('.floating-text-edit-controls');
         
-        // Fix toolbar visibility after focus events (keyboard dismissal)
-        const fixToolbarVisibility = () => {
+        // Fix UI elements visibility after focus events (keyboard dismissal)
+        const fixUIElementsVisibility = () => {
             setTimeout(() => {
+                // Fix top toolbar
                 if (toolbar) {
                     toolbar.style.visibility = 'visible';
                     toolbar.style.opacity = '1';
                     toolbar.style.display = 'flex';
-                    console.log('[SAFARI] Toolbar visibility restored');
+                    console.log('[SAFARI] Top toolbar visibility restored');
+                }
+                
+                // Fix floating edit UI
+                if (editUI) {
+                    editUI.style.visibility = 'visible';
+                    editUI.style.opacity = '1';
+                    editUI.style.display = 'flex';
+                    console.log('[SAFARI] Floating Edit UI visibility restored');
+                }
+                
+                // Fix floating text edit controls
+                if (textEditControls) {
+                    textEditControls.style.visibility = 'visible';
+                    textEditControls.style.opacity = '1';
+                    textEditControls.style.display = 'flex';
+                    console.log('[SAFARI] Text Edit Controls visibility restored');
+                    
+                    // Fix individual planet text edit input elements
+                    const textEditInput = document.getElementById('text-edit-input');
+                    const textEditColor = document.getElementById('text-edit-color');
+                    const textEditButtons = textEditControls.querySelectorAll('button');
+                    
+                    if (textEditInput) {
+                        textEditInput.style.visibility = 'visible';
+                        textEditInput.style.opacity = '1';
+                        textEditInput.style.display = 'block';
+                    }
+                    
+                    if (textEditColor) {
+                        textEditColor.style.visibility = 'visible';
+                        textEditColor.style.opacity = '1';
+                        textEditColor.style.display = 'block';
+                    }
+                    
+                    textEditButtons.forEach(button => {
+                        button.style.visibility = 'visible';
+                        button.style.opacity = '1';
+                        button.style.display = 'inline-flex';
+                    });
+                    
+                    console.log('[SAFARI] Planet text edit input elements restored');
                 }
             }, 100);
         };
         
         // Listen for focus events that might indicate keyboard dismissal
-        document.addEventListener('focusin', fixToolbarVisibility);
-        document.addEventListener('focusout', fixToolbarVisibility);
+        document.addEventListener('focusin', fixUIElementsVisibility);
+        document.addEventListener('focusout', fixUIElementsVisibility);
         
         // Listen for window resize events (Safari sometimes triggers these)
-        window.addEventListener('resize', fixToolbarVisibility);
+        window.addEventListener('resize', fixUIElementsVisibility);
         
         // Listen for scroll events (Safari sometimes hides elements during scroll)
-        window.addEventListener('scroll', fixToolbarVisibility);
+        window.addEventListener('scroll', fixUIElementsVisibility);
         
-        // Periodic check to ensure toolbar is visible
+        // Periodic check to ensure UI elements are visible
         setInterval(() => {
+            // Check top toolbar
             if (toolbar && (toolbar.style.visibility === 'hidden' || toolbar.style.display === 'none')) {
-                fixToolbarVisibility();
+                fixUIElementsVisibility();
+            }
+            
+            // Check floating edit UI
+            if (editUI && (editUI.style.visibility === 'hidden' || editUI.style.display === 'none')) {
+                fixUIElementsVisibility();
+            }
+            
+            // Check floating text edit controls
+            if (textEditControls && (textEditControls.style.visibility === 'hidden' || textEditControls.style.display === 'none')) {
+                fixUIElementsVisibility();
             }
         }, 2000);
     }
