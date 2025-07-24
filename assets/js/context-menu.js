@@ -169,9 +169,24 @@ class ContextMenu {
         // Add different menu structure for North Indian chart based on device
         if (chartType === 'north-indian') {
             if (isMobile) {
-                // Mobile: Simple "Set as Lagna" menu item
+                // Mobile: "Set as Lagna" header followed by list of rashis as regular menu items
+                const rashis = [
+                    { name: 'Aries', symbol: '\u2648' },
+                    { name: 'Taurus', symbol: '\u2649' },
+                    { name: 'Gemini', symbol: '\u264A' },
+                    { name: 'Cancer', symbol: '\u264B' },
+                    { name: 'Leo', symbol: '\u264C' },
+                    { name: 'Virgo', symbol: '\u264D' },
+                    { name: 'Libra', symbol: '\u264E' },
+                    { name: 'Scorpio', symbol: '\u264F' },
+                    { name: 'Sagittarius', symbol: '\u2650' },
+                    { name: 'Capricorn', symbol: '\u2651' },
+                    { name: 'Aquarius', symbol: '\u2652' },
+                    { name: 'Pisces', symbol: '\u2653' }
+                ];
                 menuHtml += `
                 <div class="context-menu-item" data-action="set-lagna"><i data-lucide="target"></i> Set as Lagna</div>
+                ${rashis.map((rashi, i) => `<div class='context-menu-item' data-action='set-lagna' data-house='${i+1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`).join('')}
                 <div class="context-menu-separator"></div>
                 `;
             } else {
