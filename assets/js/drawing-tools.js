@@ -790,7 +790,13 @@ class DrawingTools {
         };
 
         const handleDelete = () => {
-            finishEditing(false); // Treat delete as cancel
+            // Clear editing state
+            this.isEditingPlanet = false;
+            this.currentlyEditingPlanet = null;
+            
+            // Hide the text edit UI
+            textEditControls.style.display = 'none';
+            
             // Remove the planet from its house
             if (typeof editingPlanetText._planetHouseNumber !== 'undefined' && typeof editingPlanetText._planetId !== 'undefined') {
                 // Try to remove from South or North chart
@@ -802,6 +808,23 @@ class DrawingTools {
                         window.app.chartTemplates.northIndianTemplate.removePlanetFromHouseById(editingPlanetText._planetHouseNumber, editingPlanetText._planetId);
                     }
                 }
+            }
+            
+            // Re-enable dragging
+            editingPlanetText.draggable(true);
+            
+            // Remove event listeners
+            saveButton.removeEventListener('click', handleSave);
+            cancelButton.removeEventListener('click', handleCancel);
+            textEditInput.removeEventListener('keydown', handleKeyDown);
+            textEditInput.removeEventListener('input', handleInput);
+            textEditColor.removeEventListener('change', handleColorChange);
+            textEditColor.removeEventListener('input', handleColorChange);
+            if (deleteButton) {
+                deleteButton.removeEventListener('click', handleDelete);
+            }
+            if (retrogradeButton) {
+                retrogradeButton.removeEventListener('click', handleRetrograde);
             }
         };
         
