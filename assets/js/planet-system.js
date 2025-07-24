@@ -72,15 +72,30 @@ class PlanetSystem {
         this.initialX = rect.left;
         this.initialY = rect.top;
         
+        // Store the current height to lock it during dragging
+        this.initialHeight = this.grahaLibrary.offsetHeight;
+        
         // Remove the transform that centers the library on mobile
         this.grahaLibrary.style.transform = 'none';
         this.grahaLibrary.style.transition = 'none';
+        
+        // Lock the height to prevent any changes
+        this.grahaLibrary.style.height = this.initialHeight + 'px';
+        this.grahaLibrary.style.minHeight = this.initialHeight + 'px';
+        this.grahaLibrary.style.maxHeight = this.initialHeight + 'px';
         
         // Disable transitions on all planet items to prevent height changes
         const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
         planetItems.forEach(item => {
             item.style.transition = 'none';
         });
+        
+        // Also lock the grid height
+        const planetGrid = this.grahaLibrary.querySelector('.planet-grid');
+        if (planetGrid) {
+            planetGrid.style.maxHeight = planetGrid.offsetHeight + 'px';
+            planetGrid.style.overflow = 'hidden';
+        }
         
         // Add subtle visual feedback for mobile dragging (no size change)
         this.grahaLibrary.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
@@ -109,11 +124,23 @@ class PlanetSystem {
             this.isDraggingLibrary = false;
             this.grahaLibrary.style.transition = '';
             
+            // Unlock the height constraints
+            this.grahaLibrary.style.height = '';
+            this.grahaLibrary.style.minHeight = '';
+            this.grahaLibrary.style.maxHeight = '';
+            
             // Re-enable transitions on planet items
             const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
             planetItems.forEach(item => {
                 item.style.transition = '';
             });
+            
+            // Restore grid overflow
+            const planetGrid = this.grahaLibrary.querySelector('.planet-grid');
+            if (planetGrid) {
+                planetGrid.style.maxHeight = '';
+                planetGrid.style.overflow = '';
+            }
             
             // Remove visual feedback
             this.grahaLibrary.style.boxShadow = '';
