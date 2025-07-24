@@ -33,9 +33,48 @@ class ContextMenu {
         const canvas = document.getElementById('canvas-container');
         
         if (canvas) {
+            // Desktop: Right-click context menu
             canvas.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 this.showChartMenu(e.clientX, e.clientY);
+            });
+            
+            // Mobile: Long press for context menu
+            let longPressTimer = null;
+            let longPressThreshold = 500; // 500ms for long press
+            
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) { // Single touch only
+                    longPressTimer = setTimeout(() => {
+                        const touch = e.touches[0];
+                        e.preventDefault();
+                        this.showChartMenu(touch.clientX, touch.clientY);
+                    }, longPressThreshold);
+                }
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                // Cancel long press if user moves finger
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            });
+            
+            canvas.addEventListener('touchend', (e) => {
+                // Cancel long press if user lifts finger before threshold
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            });
+            
+            canvas.addEventListener('touchcancel', (e) => {
+                // Cancel long press if touch is cancelled
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
             });
         } else {
             console.error('Canvas container not found for context menu');
@@ -43,6 +82,13 @@ class ContextMenu {
 
         // Hide menu when clicking outside
         document.addEventListener('click', (e) => {
+            if (this.menu && !this.menu.contains(e.target)) {
+                this.hide();
+            }
+        });
+        
+        // Hide menu when touching outside (mobile)
+        document.addEventListener('touchend', (e) => {
             if (this.menu && !this.menu.contains(e.target)) {
                 this.hide();
             }

@@ -481,32 +481,32 @@ body {
         transform: translateX(-50%);
         top: auto;
         right: auto;
-        max-width: 450px;
-        min-width: 400px;
-        width: 450px;
+        max-width: 320px;
+        min-width: 280px;
+        width: 320px;
     }
     
     .planet-library-header {
-        padding: 8px 12px;
-        min-height: 2rem;
+        padding: 6px 8px;
+        min-height: 1.5rem;
     }
     
     .planet-library-title {
-        font-size: 12px;
+        font-size: 10px;
     }
     
     .planet-grid {
-        padding: 12px;
-        gap: 10px;
-        max-height: 200px;
+        padding: 6px;
+        gap: 4px;
+        max-height: 120px;
         grid-template-columns: repeat(6, 1fr);
     }
     
     .planet-item {
-        width: 60px;
-        height: 32px;
-        font-size: 9px;
-        padding: 4px;
+        width: 45px;
+        height: 24px;
+        font-size: 8px;
+        padding: 2px;
     }
     
     .floating-zoom-controls {

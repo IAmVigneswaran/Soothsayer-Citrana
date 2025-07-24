@@ -195,6 +195,33 @@ class NorthIndianChartTemplate {
                 this.highlightHouse(houseNumberNorth);
                 window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumberNorth);
             });
+            
+            // Add touch support for mobile context menu
+            let longPressTimer = null;
+            housePolygonNorth.on('touchstart', (e) => {
+                if (e.evt.touches.length === 1) {
+                    longPressTimer = setTimeout(() => {
+                        const touch = e.evt.touches[0];
+                        e.evt.preventDefault();
+                        this.highlightHouse(houseNumberNorth);
+                        window.app.contextMenu.showHouseMenu(touch.clientX, touch.clientY, houseNumberNorth);
+                    }, 500);
+                }
+            });
+            
+            housePolygonNorth.on('touchmove', (e) => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            });
+            
+            housePolygonNorth.on('touchend', (e) => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            });
 
             // Store house data
             const centerXNorth = houseDefNorth.points.reduce((sum, val, index) => index % 2 === 0 ? sum + val : sum, 0) / (houseDefNorth.points.length / 2);
@@ -812,6 +839,40 @@ class NorthIndianChartTemplate {
             };
             hitRect.on('contextmenu', contextHandler);
             planetText.on('contextmenu', contextHandler);
+            
+            // Touch support for mobile context menu
+            let planetLongPressTimer = null;
+            const touchContextHandler = (e) => {
+                if (e.evt.touches.length === 1) {
+                    planetLongPressTimer = setTimeout(() => {
+                        const touch = e.evt.touches[0];
+                        e.evt.preventDefault();
+                        this.selectPlanet && this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
+                        window.app.contextMenu.showPlanetMenu(touch.clientX, touch.clientY, houseNumber, planetObj.abbr, planetObj.id);
+                    }, 500);
+                }
+            };
+            
+            const touchMoveHandler = (e) => {
+                if (planetLongPressTimer) {
+                    clearTimeout(planetLongPressTimer);
+                    planetLongPressTimer = null;
+                }
+            };
+            
+            const touchEndHandler = (e) => {
+                if (planetLongPressTimer) {
+                    clearTimeout(planetLongPressTimer);
+                    planetLongPressTimer = null;
+                }
+            };
+            
+            hitRect.on('touchstart', touchContextHandler);
+            planetText.on('touchstart', touchContextHandler);
+            hitRect.on('touchmove', touchMoveHandler);
+            planetText.on('touchmove', touchMoveHandler);
+            hitRect.on('touchend', touchEndHandler);
+            planetText.on('touchend', touchEndHandler);
             // Drag-and-drop between bhavas
             planetText.on('dragstart', (e) => {
                 this._dragSource = { 
