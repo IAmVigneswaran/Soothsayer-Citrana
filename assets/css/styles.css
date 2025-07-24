@@ -250,6 +250,21 @@ body {
     height: 16px;
 }
 
+.floating-zoom-controls button.active {
+  background: #000000;
+  color: white;
+}
+
+.zoom-divider {
+  width: 1px;
+  height: 24px;
+  background: #000;
+  opacity: 0.15;
+  margin: 0 8px;
+  display: inline-block;
+  align-self: center;
+}
+
 /* Floating Text Edit Controls */
 .floating-text-edit-controls {
     position: absolute;
