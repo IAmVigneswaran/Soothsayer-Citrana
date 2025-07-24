@@ -99,19 +99,21 @@ class ContextMenu {
             }
         });
         
-        // Hide menu when touching outside (mobile)
+        // Hide menu when touching outside (mobile) - but not immediately after long press
         document.addEventListener('touchend', (e) => {
-            // Add a delay to prevent immediate hiding after long press
+            // Add a small delay to prevent immediate hiding after long press
             setTimeout(() => {
                 if (this.menu && !this.menu.contains(e.target)) {
                     this.hide();
                 }
-            }, 200);
+            }, 150);
         });
         
         // Prevent immediate hiding when touching inside the menu
         document.addEventListener('touchstart', (e) => {
+            console.log('[CONTEXT MENU] Document touchstart, target:', e.target);
             if (this.menu && this.menu.contains(e.target)) {
+                console.log('[CONTEXT MENU] Touching inside menu, preventing propagation');
                 // Prevent the touchstart from triggering the hide logic
                 e.stopPropagation();
             }
@@ -151,41 +153,52 @@ class ContextMenu {
 
     showExistingChartMenu(x, y, chartType) {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        
         let menuHtml = `
             <div class="context-menu-header">${chartName} Chart</div>
             <div class="context-menu-separator"></div>
         `;
-        // Add 'Set as Lagna' menu item only for South Indian chart
+        // Add 'Set as Lagna' menu item for both South Indian and North Indian charts
         if (chartType === 'south-indian') {
             menuHtml += `
             <div class="context-menu-item" data-action="set-lagna"><i data-lucide="target"></i> Set as Lagna</div>
             <div class="context-menu-separator"></div>
             `;
         }
-        // Add 'Set Lagna as ...' with 12 sub-menu items for North Indian chart
+        // Add different menu structure for North Indian chart based on device
         if (chartType === 'north-indian') {
-            const rashis = [
-                { name: 'Aries', symbol: '\u2648' },
-                { name: 'Taurus', symbol: '\u2649' },
-                { name: 'Gemini', symbol: '\u264A' },
-                { name: 'Cancer', symbol: '\u264B' },
-                { name: 'Leo', symbol: '\u264C' },
-                { name: 'Virgo', symbol: '\u264D' },
-                { name: 'Libra', symbol: '\u264E' },
-                { name: 'Scorpio', symbol: '\u264F' },
-                { name: 'Sagittarius', symbol: '\u2650' },
-                { name: 'Capricorn', symbol: '\u2651' },
-                { name: 'Aquarius', symbol: '\u2652' },
-                { name: 'Pisces', symbol: '\u2653' }
-            ];
-            menuHtml += `
-            <div class="context-menu-item has-submenu" data-action="set-lagna-parent"><i data-lucide="target"></i> Set Lagna as ...
-                <div class="context-submenu context-menu">
-                    ${rashis.map((rashi, i) => `<div class='context-menu-item' data-action='set-lagna' data-house='${i+1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`).join('')}
+            if (isMobile) {
+                // Mobile: Simple "Set as Lagna" menu item
+                menuHtml += `
+                <div class="context-menu-item" data-action="set-lagna"><i data-lucide="target"></i> Set as Lagna</div>
+                <div class="context-menu-separator"></div>
+                `;
+            } else {
+                // Desktop: Submenu with all 12 rashis
+                const rashis = [
+                    { name: 'Aries', symbol: '\u2648' },
+                    { name: 'Taurus', symbol: '\u2649' },
+                    { name: 'Gemini', symbol: '\u264A' },
+                    { name: 'Cancer', symbol: '\u264B' },
+                    { name: 'Leo', symbol: '\u264C' },
+                    { name: 'Virgo', symbol: '\u264D' },
+                    { name: 'Libra', symbol: '\u264E' },
+                    { name: 'Scorpio', symbol: '\u264F' },
+                    { name: 'Sagittarius', symbol: '\u2650' },
+                    { name: 'Capricorn', symbol: '\u2651' },
+                    { name: 'Aquarius', symbol: '\u2652' },
+                    { name: 'Pisces', symbol: '\u2653' }
+                ];
+                menuHtml += `
+                <div class="context-menu-item has-submenu" data-action="set-lagna-parent"><i data-lucide="target"></i> Set Lagna as ...
+                    <div class="context-submenu context-menu">
+                        ${rashis.map((rashi, i) => `<div class='context-menu-item' data-action='set-lagna' data-house='${i+1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`).join('')}
+                    </div>
                 </div>
-            </div>
-            <div class="context-menu-separator"></div>
-            `;
+                <div class="context-menu-separator"></div>
+                `;
+            }
         }
         // Add 'Reset Chart' and 'Clear Canvas' (renamed from 'Clear Chart')
         menuHtml += `
@@ -196,8 +209,11 @@ class ContextMenu {
         lucide.createIcons();
         this.show(x, y);
         this.setupMenuEventListeners();
-        // Setup submenu hover logic
-        this.setupSubmenuHover();
+        
+        // Setup submenu hover logic only for desktop
+        if (!isMobile) {
+            this.setupSubmenuHover();
+        }
     }
 
     setupSubmenuHover() {
@@ -277,30 +293,39 @@ class ContextMenu {
         this.menu.onclick = null;
         this.menu.onclick = (e) => {
             const item = e.target.closest('.context-menu-item');
+            console.log('[DEBUG] Click event target:', e.target);
+            console.log('[DEBUG] Closest .context-menu-item:', item);
             if (!item) return;
             e.preventDefault();
             const action = item.dataset.action;
             const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
+            console.log('[DEBUG] Menu item clicked:', action, houseNumber);
             this.handleAction(action, houseNumber);
             this.hide();
         };
         
-        // Simple and direct touch handling for mobile
+        // Add touch event handling for mobile
+        this.menu.addEventListener('touchstart', (e) => {
+            console.log('[CONTEXT MENU] touchstart on menu, target:', e.target);
+            // Prevent touch events from bubbling up to document
+            e.stopPropagation();
+        }, { passive: false });
+        
         this.menu.addEventListener('touchend', (e) => {
+            console.log('[CONTEXT MENU] touchend on menu, target:', e.target);
             const item = e.target.closest('.context-menu-item');
             if (item) {
+                console.log('[CONTEXT MENU] Menu item found:', item.dataset.action);
                 e.preventDefault();
                 e.stopPropagation();
                 const action = item.dataset.action;
                 const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
+                console.log('[DEBUG] Menu item touched:', action, houseNumber);
                 this.handleAction(action, houseNumber);
                 this.hide();
+            } else {
+                console.log('[CONTEXT MENU] No menu item found');
             }
-        }, { passive: false });
-        
-        // Prevent text selection on menu items
-        this.menu.addEventListener('mousedown', (e) => {
-            e.preventDefault();
         }, { passive: false });
     }
 
@@ -326,11 +351,21 @@ class ContextMenu {
                 console.log('[DEBUG] Context Menu - set-lagna action triggered');
                 console.log('[DEBUG] House number from menu:', houseNumber);
                 console.log('[DEBUG] Parsed house number:', parseInt(houseNumber));
-                if (window.app && window.app.chartTemplates && houseNumber) {
-                    console.log('[DEBUG] Calling chartTemplates.setLagnaHouse with:', parseInt(houseNumber));
-                    window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber));
+                
+                if (window.app && window.app.chartTemplates) {
+                    if (houseNumber) {
+                        // If house number is provided (from house-specific menu), set that house as Lagna
+                        console.log('[DEBUG] Calling chartTemplates.setLagnaHouse with:', parseInt(houseNumber));
+                        window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber));
+                    } else {
+                        // If no house number (from chart context menu), show a prompt or use default
+                        console.log('[DEBUG] No house number provided, using default behavior');
+                        // For North Indian chart, you might want to set a default house or show a prompt
+                        // For now, let's set house 1 as default
+                        window.app.chartTemplates.setLagnaHouse(1);
+                    }
                 } else {
-                    console.log('[DEBUG] ERROR: Cannot set Lagna - missing app, chartTemplates, or houseNumber');
+                    console.log('[DEBUG] ERROR: Cannot set Lagna - missing app or chartTemplates');
                 }
                 break;
                 
