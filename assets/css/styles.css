@@ -956,14 +956,3 @@ body {
         transform: scale(1) !important;
     }
 } 
-
-/* Safari-specific Graha Library fix */
-.floating-planet-library {
-  position: fixed !important;
-  bottom: 110px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  z-index: 9998 !important;
-  top: auto !important;
-  right: auto !important;
-} 
