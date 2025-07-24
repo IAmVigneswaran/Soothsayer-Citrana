@@ -343,11 +343,11 @@ class NorthIndianChartTemplate {
             document.body.appendChild(textarea);
             textarea.value = centerLabel.text();
             textarea.maxLength = 200;
-            // Restrict to max 4 lines
+            // Restrict to max 2 lines
             textarea.addEventListener('input', (e) => {
                 const lines = textarea.value.split('\n');
-                if (lines.length > 4) {
-                    textarea.value = lines.slice(0, 4).join('\n');
+                if (lines.length > 2) {
+                    textarea.value = lines.slice(0, 2).join('\n');
                 }
             });
             // Center the textarea in the viewport

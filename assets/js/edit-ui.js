@@ -485,6 +485,48 @@ class EditUI {
         controlsDiv.appendChild(alignLeftBtn);
         controlsDiv.appendChild(alignCenterBtn);
         controlsDiv.appendChild(alignRightBtn);
+        
+        // --- Add Retrograde button (only for planet text) ---
+        const retrogradeBtn = document.createElement('button');
+        retrogradeBtn.innerHTML = '<i data-lucide="rotate-ccw"></i>';
+        retrogradeBtn.className = 'edit-btn';
+        retrogradeBtn.title = 'Toggle Retrograde';
+        
+        // Check if this is planet text (has _planetHouseNumber property)
+        const isPlanetText = this.currentElement._planetHouseNumber !== undefined;
+        const currentText = this.currentElement.text ? this.currentElement.text() : '';
+        const isRetrograde = currentText.includes('R');
+        
+        // Set initial active state
+        if (isRetrograde) {
+            retrogradeBtn.classList.add('active');
+        }
+        
+        // Only show retrograde button for planet text
+        if (isPlanetText) {
+            retrogradeBtn.addEventListener('click', () => {
+                const currentText = this.currentElement.text();
+                let newText;
+                
+                if (isRetrograde) {
+                    // Remove retrograde "R" - find and remove the R subscript
+                    newText = currentText.replace(/R/g, '');
+                } else {
+                    // Add retrograde "R" - add R as subscript
+                    newText = currentText + 'R';
+                }
+                
+                // Update the text
+                this.currentElement.text(newText);
+                this.currentElement.getLayer().batchDraw();
+                
+                // Toggle active state
+                retrogradeBtn.classList.toggle('active');
+            });
+            
+            controlsDiv.appendChild(retrogradeBtn);
+        }
+        
         // --- Add Delete button ---
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';

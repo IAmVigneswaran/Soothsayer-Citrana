@@ -332,6 +332,34 @@ body {
     height: 16px;
 }
 
+#text-edit-retrograde {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+#text-edit-retrograde:hover {
+    background: #000000;
+    color: white;
+}
+
+#text-edit-retrograde:active {
+    transform: scale(0.95);
+}
+
+#text-edit-retrograde.active {
+    background: #000000;
+    color: white;
+}
+
 /* Context Menu */
 .context-menu {
     position: absolute;

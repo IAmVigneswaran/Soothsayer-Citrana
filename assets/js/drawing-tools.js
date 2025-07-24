@@ -665,6 +665,7 @@ class DrawingTools {
         const saveButton = document.getElementById('text-edit-save');
         const cancelButton = document.getElementById('text-edit-cancel');
         const deleteButton = document.getElementById('text-edit-delete');
+        const retrogradeButton = document.getElementById('text-edit-retrograde');
         
         if (!textEditControls || !textEditInput || !textEditColor || !saveButton || !cancelButton) {
             console.error('Text edit UI elements not found');
@@ -672,6 +673,40 @@ class DrawingTools {
             this.currentlyEditingPlanet = null;
             return;
         }
+        
+        // Set up retrograde button
+        const isRetrograde = currentText.includes('ᵣ'); // Unicode subscript R
+        if (retrogradeButton) {
+            // Set initial state
+            if (isRetrograde) {
+                retrogradeButton.classList.add('active');
+            } else {
+                retrogradeButton.classList.remove('active');
+            }
+            
+            // Add click event listener
+            const handleRetrograde = () => {
+                const currentInputText = textEditInput.value;
+                let newText;
+                
+                if (currentInputText.includes('ᵣ')) {
+                    // Remove retrograde "R" subscript
+                    newText = currentInputText.replace(/ᵣ/g, '');
+                    retrogradeButton.classList.remove('active');
+                } else {
+                    // Add retrograde "R" subscript
+                    newText = currentInputText + 'ᵣ';
+                    retrogradeButton.classList.add('active');
+                }
+                
+                textEditInput.value = newText;
+                // Trigger input event to update any live preview
+                textEditInput.dispatchEvent(new Event('input'));
+            };
+            
+            retrogradeButton.addEventListener('click', handleRetrograde);
+        }
+        
         // Always show the Delete button for planet text
         if (deleteButton) {
             deleteButton.style.display = 'inline-flex';
@@ -711,7 +746,8 @@ class DrawingTools {
             if (save) {
                 const newText = textEditInput.value.trim();
                 const newColor = textEditColor.value;
-                if (newText && newText.length <= 6) {
+                const baseText = newText.replace(/ᵣ/g, ''); // Remove R subscript for length check
+                if (newText && baseText.length <= 6) {
                     // Update the planet label through callback
                     if (onUpdate) {
                         onUpdate(newText, newColor);
@@ -739,6 +775,9 @@ class DrawingTools {
             textEditColor.removeEventListener('input', handleColorChange);
             if (deleteButton) {
                 deleteButton.removeEventListener('click', handleDelete);
+            }
+            if (retrogradeButton) {
+                retrogradeButton.removeEventListener('click', handleRetrograde);
             }
         };
         
@@ -780,9 +819,13 @@ class DrawingTools {
         const handleInput = () => {
             let newText = textEditInput.value;
             
-            // Enforce 6 character limit
-            if (newText.length > 6) {
-                newText = newText.substring(0, 6);
+            // Enforce 6 character limit, but allow "ᵣ" to be added beyond it
+            const baseText = newText.replace(/ᵣ/g, ''); // Remove R subscript for length check
+            if (baseText.length > 6) {
+                // If base text is too long, truncate it but preserve R subscript if it was there
+                const truncatedBase = baseText.substring(0, 6);
+                const hasR = newText.includes('ᵣ');
+                newText = hasR ? truncatedBase + 'ᵣ' : truncatedBase;
                 textEditInput.value = newText;
             }
             
