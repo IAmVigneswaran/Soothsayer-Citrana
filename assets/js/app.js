@@ -121,22 +121,6 @@ class CitranaApp {
         this.stage.on('touchmove', (e) => this.handleTouchMove(e));
         this.stage.on('touchend', (e) => this.handleTouchEnd(e));
 
-        // Tap-outside-to-deselect for mobile
-        this.stage.on('tap', (e) => {
-            if (!e.target || (
-                e.target &&
-                !e.target.name().startsWith('house-') &&
-                !e.target.name().startsWith('planet-') &&
-                !e.target.name().startsWith('planet-hit-')
-            )) {
-                if (this.chartTemplates.currentChartType === 'south-indian') {
-                    this.chartTemplates.southIndianTemplate.clearHighlight();
-                } else if (this.chartTemplates.currentChartType === 'north-indian') {
-                    this.chartTemplates.northIndianTemplate.clearHighlight();
-                }
-            }
-        });
-
         // Safari-specific fix for toolbar visibility
         this.setupSafariToolbarFix();
 
