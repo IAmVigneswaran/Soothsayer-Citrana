@@ -108,6 +108,14 @@ class ContextMenu {
                 }
             }, 150);
         });
+        
+        // Prevent immediate hiding when touching inside the menu
+        document.addEventListener('touchstart', (e) => {
+            if (this.menu && this.menu.contains(e.target)) {
+                // Prevent the touchstart from triggering the hide logic
+                e.stopPropagation();
+            }
+        }, { passive: false });
 
         // Hide menu on escape key
         document.addEventListener('keydown', (e) => {
@@ -279,6 +287,25 @@ class ContextMenu {
             this.handleAction(action, houseNumber);
             this.hide();
         };
+        
+        // Add touch event handling for mobile
+        this.menu.addEventListener('touchstart', (e) => {
+            // Prevent touch events from bubbling up to document
+            e.stopPropagation();
+        }, { passive: false });
+        
+        this.menu.addEventListener('touchend', (e) => {
+            const item = e.target.closest('.context-menu-item');
+            if (item) {
+                e.preventDefault();
+                e.stopPropagation();
+                const action = item.dataset.action;
+                const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
+                console.log('[DEBUG] Menu item touched:', action, houseNumber);
+                this.handleAction(action, houseNumber);
+                this.hide();
+            }
+        }, { passive: false });
     }
 
     handleAction(action, houseNumber) {
