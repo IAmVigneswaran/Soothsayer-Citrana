@@ -111,7 +111,9 @@ class ContextMenu {
         
         // Prevent immediate hiding when touching inside the menu
         document.addEventListener('touchstart', (e) => {
+            console.log('[CONTEXT MENU] Document touchstart, target:', e.target);
             if (this.menu && this.menu.contains(e.target)) {
+                console.log('[CONTEXT MENU] Touching inside menu, preventing propagation');
                 // Prevent the touchstart from triggering the hide logic
                 e.stopPropagation();
             }
@@ -290,13 +292,16 @@ class ContextMenu {
         
         // Add touch event handling for mobile
         this.menu.addEventListener('touchstart', (e) => {
+            console.log('[CONTEXT MENU] touchstart on menu, target:', e.target);
             // Prevent touch events from bubbling up to document
             e.stopPropagation();
         }, { passive: false });
         
         this.menu.addEventListener('touchend', (e) => {
+            console.log('[CONTEXT MENU] touchend on menu, target:', e.target);
             const item = e.target.closest('.context-menu-item');
             if (item) {
+                console.log('[CONTEXT MENU] Menu item found:', item.dataset.action);
                 e.preventDefault();
                 e.stopPropagation();
                 const action = item.dataset.action;
@@ -304,6 +309,8 @@ class ContextMenu {
                 console.log('[DEBUG] Menu item touched:', action, houseNumber);
                 this.handleAction(action, houseNumber);
                 this.hide();
+            } else {
+                console.log('[CONTEXT MENU] No menu item found');
             }
         }, { passive: false });
     }

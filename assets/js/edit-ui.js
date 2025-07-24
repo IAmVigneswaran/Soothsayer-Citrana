@@ -107,10 +107,25 @@ class EditUI {
         // Create new touch outside handler
         this.touchOutsideHandler = (e) => {
             const container = document.getElementById('edit-ui-container');
-            if (container && !container.contains(e.target)) {
-                // Touch was outside the Edit UI, hide it
-                this.hide();
+            const contextMenu = document.getElementById('context-menu');
+            
+            // Don't hide if touching inside Edit UI
+            if (container && container.contains(e.target)) {
+                return;
             }
+            
+            // Don't hide if touching inside context menu
+            if (contextMenu && contextMenu.contains(e.target)) {
+                return;
+            }
+            
+            // Don't hide if touching on context menu items
+            if (e.target.closest('.context-menu-item')) {
+                return;
+            }
+            
+            // Touch was outside both Edit UI and context menu, hide Edit UI
+            this.hide();
         };
         
         // Add touch listener with a small delay to prevent immediate dismissal
