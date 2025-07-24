@@ -476,10 +476,37 @@ body {
     }
     
     .floating-planet-library {
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        max-width: none;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        top: auto;
+        right: auto;
+        max-width: 450px;
+        min-width: 400px;
+        width: 450px;
+    }
+    
+    .planet-library-header {
+        padding: 8px 12px;
+        min-height: 2rem;
+    }
+    
+    .planet-library-title {
+        font-size: 12px;
+    }
+    
+    .planet-grid {
+        padding: 12px;
+        gap: 10px;
+        max-height: 200px;
+        grid-template-columns: repeat(6, 1fr);
+    }
+    
+    .planet-item {
+        width: 60px;
+        height: 32px;
+        font-size: 9px;
+        padding: 4px;
     }
     
     .floating-zoom-controls {
