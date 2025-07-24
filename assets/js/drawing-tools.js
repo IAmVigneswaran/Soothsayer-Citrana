@@ -225,6 +225,9 @@ class DrawingTools {
         arrow.on('click', () => {
             this.showEditUI(arrow, 'arrow');
         });
+        
+        // Add double-tap support for mobile
+        this.addDoubleTapSupport(arrow, 'arrow');
 
         this.currentShape = arrow;
         this.layer.add(arrow);
@@ -256,6 +259,9 @@ class DrawingTools {
         line.on('click', () => {
             this.showEditUI(line, 'line');
         });
+        
+        // Add double-tap support for mobile
+        this.addDoubleTapSupport(line, 'line');
 
         this.currentShape = line;
         this.layer.add(line);
@@ -291,6 +297,9 @@ class DrawingTools {
             e.cancelBubble = true;
             this.showEditUI(line, 'pen');
         });
+        
+        // Add double-tap support for mobile
+        this.addDoubleTapSupport(line, 'pen');
 
         this.currentShape = line;
         this.layer.add(line);
@@ -337,6 +346,9 @@ class DrawingTools {
             // Show Edit UI (always show Edit UI on click)
             this.showEditUI(text, 'text');
         });
+        
+        // Add double-tap support for mobile Edit UI
+        this.addDoubleTapSupport(text, 'text');
         
         // Auto-switch to select tool after creating text
         setTimeout(() => {
@@ -1068,5 +1080,46 @@ class DrawingTools {
         
         // Show Edit UI for the clicked element
         this.editUI.show(element, tool);
+    }
+
+    /**
+     * Add double-tap support for Konva shapes
+     * @param {KonvaShape} shape - The Konva shape to add double-tap support to
+     * @param {string} tool - The tool type (e.g., 'arrow', 'line', 'pen')
+     */
+    addDoubleTapSupport(shape, tool) {
+        if (!this.isTouchDevice) return;
+
+        let lastTap = 0;
+        let tapCount = 0;
+        let tapTimer = null;
+
+        const handleTap = (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+
+            if (tapLength < 500 && tapLength > 0) {
+                // Double tap detected
+                tapCount++;
+                if (tapCount === 2) {
+                    clearTimeout(tapTimer);
+                    tapCount = 0;
+                    this.showEditUIForShape(shape);
+                }
+            } else {
+                tapCount = 1;
+            }
+
+            lastTap = currentTime;
+
+            // Reset tap count after a delay
+            if (tapTimer) clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => {
+                tapCount = 0;
+            }, 500);
+        };
+
+        shape.on('tap', handleTap);
+        shape._tapHandler = handleTap; // Store handler for cleanup
     }
 } 
