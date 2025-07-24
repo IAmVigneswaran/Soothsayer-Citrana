@@ -76,6 +76,7 @@ class CitranaApp {
         document.getElementById('pen-tool').addEventListener('click', () => { this.setTool('pen'); this.pushSnapshot(); });
         document.getElementById('text-tool').addEventListener('click', () => { this.setTool('text'); this.pushSnapshot(); });
         document.getElementById('hand-tool').addEventListener('click', () => { this.setTool('hand'); this.pushSnapshot(); });
+        document.getElementById('heading-tool').addEventListener('click', () => { this.setTool('heading'); this.pushSnapshot(); });
         // Add for zoom controls bar
         document.getElementById('zoom-hand-tool').addEventListener('click', () => { this.setTool('hand'); this.pushSnapshot(); });
 

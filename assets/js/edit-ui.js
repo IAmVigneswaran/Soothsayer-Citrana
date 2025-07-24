@@ -178,6 +178,9 @@ class EditUI {
             case 'text':
                 this.createTextControls(content);
                 break;
+            case 'heading':
+                this.createTextControls(content, 2); // 2-line limit
+                break;
         }
     }
 
@@ -360,7 +363,7 @@ class EditUI {
      * Create text controls
      * @param {HTMLElement} container - The container to add controls to
      */
-    createTextControls(container) {
+    createTextControls(container, maxLines) {
         console.log('[EDIT UI] Creating text controls for element:', this.currentElement);
         console.log('[EDIT UI] Element properties:', {
             fontSize: this.currentElement.fontSize,
@@ -641,6 +644,17 @@ class EditUI {
         
         // Initialize Lucide icons
         lucide.createIcons();
+
+        // Find the input element (textarea or input)
+        const input = container.querySelector('.text-edit-input') || container.querySelector('input[type="text"]');
+        if (input && maxLines) {
+            input.addEventListener('input', function enforceLineLimit(e) {
+                const lines = input.value.split('\n');
+                if (lines.length > maxLines) {
+                    input.value = lines.slice(0, maxLines).join('\n');
+                }
+            });
+        }
     }
 
     /**

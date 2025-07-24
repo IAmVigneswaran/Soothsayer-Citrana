@@ -117,6 +117,9 @@ class DrawingTools {
             case 'text':
                 this.startText(pos);
                 break;
+            case 'heading':
+                this.startHeading(pos);
+                break;
         }
     }
 
@@ -1085,7 +1088,12 @@ class DrawingTools {
         });
         
         // Show Edit UI for the clicked element
-        this.editUI.show(element, tool);
+        if (tool === 'heading') {
+            // Show Edit UI with 2-line limit
+            this.editUI.show(element, 'heading');
+        } else {
+            this.editUI.show(element, tool);
+        }
     }
 
     /**
@@ -1127,5 +1135,72 @@ class DrawingTools {
 
         shape.on('tap', handleTap);
         shape._tapHandler = handleTap; // Store handler for cleanup
+    }
+
+    startHeading(pos) {
+        const heading = new Konva.Text({
+            x: pos.x,
+            y: pos.y,
+            text: 'Rashi Chart 1\nD1',
+            fontSize: 18,
+            fontFamily: 'Arial Black, Arial, sans-serif',
+            fontWeight: 'bold',
+            fill: '#000000',
+            draggable: true,
+            name: 'drawing-heading',
+            align: 'center',
+            verticalAlign: 'middle',
+            listening: true,
+            padding: 4
+        });
+        this.currentShape = heading;
+        this.layer.add(heading);
+        this.layer.batchDraw();
+        // Make heading editable on click/double-tap
+        this.makeHeadingEditable(heading);
+        // Auto-switch to select tool after creating heading
+        setTimeout(() => {
+            if (window.app) {
+                window.app.setTool('select');
+            }
+        }, 100);
+    }
+
+    makeHeadingEditable(heading) {
+        // Double-click to edit (desktop)
+        heading.on('dblclick', () => {
+            this.editHeading(heading);
+        });
+        // Double-tap to edit (mobile)
+        let lastTap = 0;
+        let tapCount = 0;
+        let tapTimer = null;
+        heading.on('tap', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 500 && tapLength > 0) {
+                tapCount++;
+                if (tapCount === 2) {
+                    clearTimeout(tapTimer);
+                    tapCount = 0;
+                    this.editHeading(heading);
+                }
+            } else {
+                tapCount = 1;
+            }
+            lastTap = currentTime;
+            if (tapTimer) clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => { tapCount = 0; }, 500);
+        });
+        // Show Edit UI on click (desktop)
+        heading.on('click', (e) => {
+            e.cancelBubble = true;
+            this.showEditUI(heading, 'heading');
+        });
+    }
+
+    editHeading(heading) {
+        // Show Edit UI, preset to 2 lines max
+        this.showEditUI(heading, 'heading');
     }
 } 
