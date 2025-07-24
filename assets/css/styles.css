@@ -956,3 +956,40 @@ body {
         transform: scale(1) !important;
     }
 } 
+
+@media (max-width: 600px) {
+  .context-menu {
+    min-width: 110px;
+    padding: 2px 0;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .context-menu-header, .context-menu-create-header {
+    font-size: 13px;
+    padding: 0.25rem 0.5rem;
+  }
+  .context-menu-item {
+    padding: 0 0.5rem;
+    height: 1.8rem;
+    font-size: 13px;
+    gap: 0.4rem;
+  }
+  .context-menu-item:hover,
+  .context-submenu .context-menu-item:hover {
+    height: 1.8rem;
+  }
+  .context-menu-separator {
+    margin: 2px 0;
+  }
+  .context-submenu {
+    min-width: 120px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    padding: 2px 0;
+  }
+  .context-submenu .context-menu-item {
+    padding-left: 18px;
+    padding-right: 8px;
+    font-size: 13px;
+  }
+} 
