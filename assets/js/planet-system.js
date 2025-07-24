@@ -76,6 +76,12 @@ class PlanetSystem {
         this.grahaLibrary.style.transform = 'none';
         this.grahaLibrary.style.transition = 'none';
         
+        // Disable transitions on all planet items to prevent height changes
+        const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
+        planetItems.forEach(item => {
+            item.style.transition = 'none';
+        });
+        
         // Add subtle visual feedback for mobile dragging (no size change)
         this.grahaLibrary.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
         this.grahaLibrary.style.zIndex = '1001';
@@ -102,6 +108,12 @@ class PlanetSystem {
         if (this.isDraggingLibrary) {
             this.isDraggingLibrary = false;
             this.grahaLibrary.style.transition = '';
+            
+            // Re-enable transitions on planet items
+            const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
+            planetItems.forEach(item => {
+                item.style.transition = '';
+            });
             
             // Remove visual feedback
             this.grahaLibrary.style.boxShadow = '';
