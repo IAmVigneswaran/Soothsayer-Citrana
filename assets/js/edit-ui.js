@@ -73,6 +73,50 @@ class EditUI {
         
         // Position the Edit UI
         this.positionEditUI();
+        
+        // Add touch outside to dismiss for mobile
+        this.setupTouchOutsideToDismiss();
+    }
+    
+    /**
+     * Add touch support to a button for better mobile experience
+     * @param {HTMLElement} button - The button element
+     * @param {Function} handler - The click handler function
+     */
+    addTouchSupport(button, handler) {
+        // Add click listener
+        button.addEventListener('click', handler);
+        
+        // Add touch listener for mobile
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handler();
+        });
+    }
+    
+    /**
+     * Setup touch outside to dismiss functionality for mobile
+     */
+    setupTouchOutsideToDismiss() {
+        // Remove any existing listeners
+        if (this.touchOutsideHandler) {
+            document.removeEventListener('touchstart', this.touchOutsideHandler);
+        }
+        
+        // Create new touch outside handler
+        this.touchOutsideHandler = (e) => {
+            const container = document.getElementById('edit-ui-container');
+            if (container && !container.contains(e.target)) {
+                // Touch was outside the Edit UI, hide it
+                this.hide();
+            }
+        };
+        
+        // Add touch listener with a small delay to prevent immediate dismissal
+        setTimeout(() => {
+            document.addEventListener('touchstart', this.touchOutsideHandler, { passive: true });
+        }, 100);
     }
 
     /**
@@ -82,6 +126,12 @@ class EditUI {
         this.isVisible = false;
         this.currentElement = null;
         this.currentTool = null;
+        
+        // Remove touch outside listener
+        if (this.touchOutsideHandler) {
+            document.removeEventListener('touchstart', this.touchOutsideHandler);
+            this.touchOutsideHandler = null;
+        }
         
         const container = document.getElementById('edit-ui-container');
         container.style.display = 'none';
@@ -260,9 +310,30 @@ class EditUI {
         deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
         deleteBtn.className = 'edit-btn danger';
         deleteBtn.title = 'Delete';
-        deleteBtn.addEventListener('click', () => {
-            if (this.onDelete) this.onDelete();
+        
+        // Enhanced delete functionality that works with both click and touch
+        const handleDelete = () => {
+            console.log('[EDIT UI] Delete button pressed');
+            
+            // Delete the element
+            if (this.currentElement) {
+                this.currentElement.destroy();
+                this.currentElement.getLayer().batchDraw();
+                console.log('[EDIT UI] Element deleted');
+            }
+            
+            // Hide the Edit UI
+            this.hide();
+        };
+        
+        // Add both click and touch listeners for better mobile support
+        deleteBtn.addEventListener('click', handleDelete);
+        deleteBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDelete();
         });
+        
         controlsDiv.appendChild(deleteBtn);
         container.appendChild(controlsDiv);
         
@@ -309,7 +380,7 @@ class EditUI {
         increaseSize.title = 'Increase font size';
         
         // Size event listeners
-        decreaseSize.addEventListener('click', () => {
+        this.addTouchSupport(decreaseSize, () => {
             // Get current font size from element
             const currentSize = this.currentElement.fontSize ? this.currentElement.fontSize() : this.defaultProperties.text.fontSize;
             const newSize = Math.max(8, currentSize - 2);
@@ -325,7 +396,7 @@ class EditUI {
             sizeValue.textContent = newSize;
         });
         
-        increaseSize.addEventListener('click', () => {
+        this.addTouchSupport(increaseSize, () => {
             // Get current font size from element
             const currentSize = this.currentElement.fontSize ? this.currentElement.fontSize() : this.defaultProperties.text.fontSize;
             const newSize = Math.min(72, currentSize + 2);
@@ -532,9 +603,24 @@ class EditUI {
         deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
         deleteBtn.className = 'edit-btn danger';
         deleteBtn.title = 'Delete';
-        deleteBtn.addEventListener('click', () => {
-            if (this.onDelete) this.onDelete();
-        });
+        
+        // Enhanced delete functionality that works with both click and touch
+        const handleDelete = () => {
+            console.log('[EDIT UI] Delete button pressed');
+            
+            // Delete the element
+            if (this.currentElement) {
+                this.currentElement.destroy();
+                this.currentElement.getLayer().batchDraw();
+                console.log('[EDIT UI] Element deleted');
+            }
+            
+            // Hide the Edit UI
+            this.hide();
+        };
+        
+        this.addTouchSupport(deleteBtn, handleDelete);
+        
         controlsDiv.appendChild(deleteBtn);
         container.appendChild(controlsDiv);
         

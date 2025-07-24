@@ -677,6 +677,15 @@ body {
   .edit-btn {
     width: 28px;
     height: 28px;
+    /* Touch-friendly improvements */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
   .edit-ui-content,
   .edit-controls-group {
@@ -695,6 +704,15 @@ body {
   .floating-text-edit-controls button {
     width: 28px;
     height: 28px;
+    /* Touch-friendly improvements */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 } 
 
