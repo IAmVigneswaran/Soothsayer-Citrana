@@ -41,15 +41,17 @@ class ContextMenu {
             
             // Mobile: Long press for context menu
             let longPressTimer = null;
-            let longPressThreshold = 500; // 500ms for long press
+            let longPressTriggered = false;
             
             canvas.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 1) { // Single touch only
+                    longPressTriggered = false;
                     longPressTimer = setTimeout(() => {
                         const touch = e.touches[0];
                         e.preventDefault();
+                        longPressTriggered = true;
                         this.showChartMenu(touch.clientX, touch.clientY);
-                    }, longPressThreshold);
+                    }, 500);
                 }
             });
             
@@ -66,6 +68,16 @@ class ContextMenu {
                 if (longPressTimer) {
                     clearTimeout(longPressTimer);
                     longPressTimer = null;
+                }
+                
+                // If long press was triggered, prevent the menu from being hidden
+                if (longPressTriggered) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Reset the flag after a short delay to allow normal touch behavior
+                    setTimeout(() => {
+                        longPressTriggered = false;
+                    }, 100);
                 }
             });
             
@@ -87,11 +99,14 @@ class ContextMenu {
             }
         });
         
-        // Hide menu when touching outside (mobile)
+        // Hide menu when touching outside (mobile) - but not immediately after long press
         document.addEventListener('touchend', (e) => {
-            if (this.menu && !this.menu.contains(e.target)) {
-                this.hide();
-            }
+            // Add a small delay to prevent immediate hiding after long press
+            setTimeout(() => {
+                if (this.menu && !this.menu.contains(e.target)) {
+                    this.hide();
+                }
+            }, 150);
         });
 
         // Hide menu on escape key

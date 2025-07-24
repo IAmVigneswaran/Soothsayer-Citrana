@@ -198,11 +198,14 @@ class NorthIndianChartTemplate {
             
             // Add touch support for mobile context menu
             let longPressTimer = null;
+            let longPressTriggered = false;
             housePolygonNorth.on('touchstart', (e) => {
                 if (e.evt.touches.length === 1) {
+                    longPressTriggered = false;
                     longPressTimer = setTimeout(() => {
                         const touch = e.evt.touches[0];
                         e.evt.preventDefault();
+                        longPressTriggered = true;
                         this.highlightHouse(houseNumberNorth);
                         window.app.contextMenu.showHouseMenu(touch.clientX, touch.clientY, houseNumberNorth);
                     }, 500);
@@ -220,6 +223,16 @@ class NorthIndianChartTemplate {
                 if (longPressTimer) {
                     clearTimeout(longPressTimer);
                     longPressTimer = null;
+                }
+                
+                // If long press was triggered, prevent the menu from being hidden
+                if (longPressTriggered) {
+                    e.evt.preventDefault();
+                    e.evt.stopPropagation();
+                    // Reset the flag after a short delay
+                    setTimeout(() => {
+                        longPressTriggered = false;
+                    }, 100);
                 }
             });
 
@@ -842,11 +855,14 @@ class NorthIndianChartTemplate {
             
             // Touch support for mobile context menu
             let planetLongPressTimer = null;
+            let planetLongPressTriggered = false;
             const touchContextHandler = (e) => {
                 if (e.evt.touches.length === 1) {
+                    planetLongPressTriggered = false;
                     planetLongPressTimer = setTimeout(() => {
                         const touch = e.evt.touches[0];
                         e.evt.preventDefault();
+                        planetLongPressTriggered = true;
                         this.selectPlanet && this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
                         window.app.contextMenu.showPlanetMenu(touch.clientX, touch.clientY, houseNumber, planetObj.abbr, planetObj.id);
                     }, 500);
@@ -864,6 +880,16 @@ class NorthIndianChartTemplate {
                 if (planetLongPressTimer) {
                     clearTimeout(planetLongPressTimer);
                     planetLongPressTimer = null;
+                }
+                
+                // If long press was triggered, prevent the menu from being hidden
+                if (planetLongPressTriggered) {
+                    e.evt.preventDefault();
+                    e.evt.stopPropagation();
+                    // Reset the flag after a short delay
+                    setTimeout(() => {
+                        planetLongPressTriggered = false;
+                    }, 100);
                 }
             };
             
