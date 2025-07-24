@@ -6,6 +6,7 @@ class ContextMenu {
     constructor() {
         this.menu = null;
         this.isVisible = false;
+        this.isInteractingWithMenuItem = false; // Track menu item interactions
     }
 
     init() {
@@ -101,12 +102,21 @@ class ContextMenu {
         
         // Hide menu when touching outside (mobile) - but not immediately after long press
         document.addEventListener('touchend', (e) => {
-            // Add a small delay to prevent immediate hiding after long press
+            console.log('[CONTEXT MENU] Document touchend, target:', e.target);
+            
+            // Don't hide if currently interacting with a menu item
+            if (this.isInteractingWithMenuItem) {
+                console.log('[CONTEXT MENU] Not hiding - currently interacting with menu item');
+                return;
+            }
+            
+            // Add a longer delay to prevent immediate hiding after long press
             setTimeout(() => {
                 if (this.menu && !this.menu.contains(e.target)) {
+                    console.log('[CONTEXT MENU] Hiding menu - touched outside');
                     this.hide();
                 }
-            }, 150);
+            }, 300); // Increased delay
         });
         
         // Prevent immediate hiding when touching inside the menu
@@ -290,28 +300,62 @@ class ContextMenu {
             this.hide();
         };
         
-        // Add touch event handling for mobile
+        // More robust touch handling for mobile
+        let touchStartTime = 0;
+        let touchStartTarget = null;
+        
         this.menu.addEventListener('touchstart', (e) => {
             console.log('[CONTEXT MENU] touchstart on menu, target:', e.target);
-            // Prevent touch events from bubbling up to document
-            e.stopPropagation();
-        }, { passive: false });
+            touchStartTime = Date.now();
+            touchStartTarget = e.target;
+            
+            // Check if touching a menu item
+            const item = e.target.closest('.context-menu-item');
+            if (item) {
+                this.isInteractingWithMenuItem = true;
+                console.log('[CONTEXT MENU] Started interacting with menu item:', item.dataset.action);
+            }
+            
+            // Don't prevent default or stop propagation here
+        }, { passive: true });
         
         this.menu.addEventListener('touchend', (e) => {
             console.log('[CONTEXT MENU] touchend on menu, target:', e.target);
-            const item = e.target.closest('.context-menu-item');
-            if (item) {
-                console.log('[CONTEXT MENU] Menu item found:', item.dataset.action);
-                e.preventDefault();
-                e.stopPropagation();
-                const action = item.dataset.action;
-                const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
-                console.log('[DEBUG] Menu item touched:', action, houseNumber);
-                this.handleAction(action, houseNumber);
-                this.hide();
-            } else {
-                console.log('[CONTEXT MENU] No menu item found');
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // Only handle if it's a short touch (not a long press)
+            if (touchDuration < 300 && touchStartTarget === e.target) {
+                const item = e.target.closest('.context-menu-item');
+                if (item) {
+                    console.log('[CONTEXT MENU] Menu item found:', item.dataset.action);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const action = item.dataset.action;
+                    const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
+                    console.log('[DEBUG] Menu item touched:', action, houseNumber);
+                    this.handleAction(action, houseNumber);
+                    this.hide();
+                } else {
+                    console.log('[CONTEXT MENU] No menu item found');
+                }
             }
+            
+            // Reset interaction flag after a delay
+            setTimeout(() => {
+                this.isInteractingWithMenuItem = false;
+                console.log('[CONTEXT MENU] Reset interaction flag');
+            }, 500);
+            
+            // Reset touch tracking
+            touchStartTime = 0;
+            touchStartTarget = null;
+        }, { passive: false });
+        
+        // Also handle mousedown for better cross-device support
+        this.menu.addEventListener('mousedown', (e) => {
+            console.log('[CONTEXT MENU] mousedown on menu, target:', e.target);
+            // Prevent default to avoid text selection
+            e.preventDefault();
         }, { passive: false });
     }
 
