@@ -124,23 +124,26 @@ class PlanetSystem {
             this.isDraggingLibrary = false;
             this.grahaLibrary.style.transition = '';
             
-            // Unlock the height constraints
-            this.grahaLibrary.style.height = '';
-            this.grahaLibrary.style.minHeight = '';
-            this.grahaLibrary.style.maxHeight = '';
+            // Keep the height locked for a moment to prevent the "snap back" effect
+            setTimeout(() => {
+                // Unlock the height constraints
+                this.grahaLibrary.style.height = '';
+                this.grahaLibrary.style.minHeight = '';
+                this.grahaLibrary.style.maxHeight = '';
+                
+                // Restore grid overflow
+                const planetGrid = this.grahaLibrary.querySelector('.planet-grid');
+                if (planetGrid) {
+                    planetGrid.style.maxHeight = '';
+                    planetGrid.style.overflow = '';
+                }
+            }, 100); // Small delay to prevent immediate height change
             
             // Re-enable transitions on planet items
             const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
             planetItems.forEach(item => {
                 item.style.transition = '';
             });
-            
-            // Restore grid overflow
-            const planetGrid = this.grahaLibrary.querySelector('.planet-grid');
-            if (planetGrid) {
-                planetGrid.style.maxHeight = '';
-                planetGrid.style.overflow = '';
-            }
             
             // Remove visual feedback
             this.grahaLibrary.style.boxShadow = '';
