@@ -7,6 +7,19 @@ Citrana is a whiteboard web application that allows students, gurus, and Vedanga
 
 Perfect for educational purposes, research documentation, and professional chart analysis, Citrana offers a seamless experience for anyone studying or practising Vedanga Jyotisha (Vedic astrology). Whether you're a student learning the fundamentals, a guru teaching traditional methods, or a researcher documenting complex planetary configurations to decode Karma, Citrana provides the tools you need to create accurate, professional-quality astrological charts for online classes, presentations, and personal reference.
 
+## Definition of Citrana
+
+### Sanskrit (संस्कृतम्)
+**Citraṇā** (चित्रणा): The act of painting, drawing, illustration, or portrayal. Derived from the Sanskrit root *citrayati* with the suffix *-anā*.
+
+### Tamil (தமிழ்)
+**சித்திரம்** (Cittiram): Artistic representation, drawing, illustration, or systematic arrangement.
+
+### Hindi (हिंदी)
+**Citraṇa** (चित्रण): Portrayal, delineation, painting, illustration, or drawing.
+
+---
+
 This codebase is developed using AI agents.
 
 ## Core Features
