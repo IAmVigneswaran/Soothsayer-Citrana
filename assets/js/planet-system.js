@@ -8,7 +8,7 @@ class PlanetSystem {
         this.stage = stage;
         this.layer = layer;
         this.chartTemplates = chartTemplates;
-        
+
         // Graha Library UI state
         this.grahaLibrary = null;
         this.planetGrid = null;
@@ -329,13 +329,13 @@ class PlanetSystem {
             console.error('Planet library container not found');
             return;
         }
-        
+
         // Clear existing content
         library.innerHTML = '';
-        
+
         // Get current page planets
         const currentPlanets = this.currentPage === 1 ? this.planetsPage1 : this.planetsPage2;
-        
+
         // Create planet items for current page
         Object.entries(currentPlanets).forEach(([abbr, planet]) => {
             const planetItem = document.createElement('div');
@@ -355,10 +355,10 @@ class PlanetSystem {
 
             library.appendChild(planetItem);
         });
-        
+
         // Create page dots for desktop
         this.createPageDots();
-        
+
         // Add swipe event listeners for mobile
         this.setupSwipeEvents();
     }
@@ -606,10 +606,13 @@ class PlanetSystem {
         // Check both pages for planet info
         return this.planetsPage1[abbr] || this.planetsPage2[abbr] || null;
     }
-    
+
     getAllPlanets() {
         // Return all planets from both pages
-        return { ...this.planetsPage1, ...this.planetsPage2 };
+        return {
+            ...this.planetsPage1,
+            ...this.planetsPage2
+        };
     }
 
     // Paging methods
@@ -631,7 +634,7 @@ class PlanetSystem {
         for (let i = 1; i <= this.totalPages; i++) {
             const dot = document.createElement('div');
             dot.className = `page-dot ${i === this.currentPage ? 'active' : ''}`;
-            
+
             dot.addEventListener('click', () => this.goToPage(i));
             dotsContainer.appendChild(dot);
         }
@@ -657,10 +660,10 @@ class PlanetSystem {
 
         this.handleSwipeMove = (e) => {
             if (!this.swipeStartX) return;
-            
+
             const deltaX = e.touches[0].clientX - this.swipeStartX;
             const deltaY = e.touches[0].clientY - this.swipeStartY;
-            
+
             // Check if it's a horizontal swipe
             if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
                 this.isSwiping = true;
@@ -670,10 +673,10 @@ class PlanetSystem {
 
         this.handleSwipeEnd = (e) => {
             if (!this.isSwiping || !this.swipeStartX) return;
-            
+
             const deltaX = e.changedTouches[0].clientX - this.swipeStartX;
             const threshold = 100; // Minimum swipe distance
-            
+
             if (Math.abs(deltaX) > threshold) {
                 if (deltaX > 0 && this.currentPage > 1) {
                     // Swipe right - go to previous page
@@ -683,22 +686,28 @@ class PlanetSystem {
                     this.goToPage(this.currentPage + 1);
                 }
             }
-            
+
             this.swipeStartX = 0;
             this.swipeStartY = 0;
             this.isSwiping = false;
         };
 
-        library.addEventListener('touchstart', this.handleSwipeStart, { passive: false });
-        library.addEventListener('touchmove', this.handleSwipeMove, { passive: false });
-        library.addEventListener('touchend', this.handleSwipeEnd, { passive: false });
+        library.addEventListener('touchstart', this.handleSwipeStart, {
+            passive: false
+        });
+        library.addEventListener('touchmove', this.handleSwipeMove, {
+            passive: false
+        });
+        library.addEventListener('touchend', this.handleSwipeEnd, {
+            passive: false
+        });
     }
 
     goToPage(pageNumber) {
         if (pageNumber < 1 || pageNumber > this.totalPages || pageNumber === this.currentPage) {
             return;
         }
-        
+
         this.currentPage = pageNumber;
         this.createPlanetLibrary();
         console.log(`Switched to page ${pageNumber}`);
