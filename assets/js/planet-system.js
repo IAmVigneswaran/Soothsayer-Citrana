@@ -16,15 +16,15 @@ class PlanetSystem {
         // Planet data
         this.planets = {
             'Lg': { name: 'Lagna', fullName: 'Lagna', color: '#000000' },
-            'Su': { name: 'Sun', fullName: 'Sun', color: '#000000' },
-            'Mo': { name: 'Moon', fullName: 'Moon', color: '#000000' },
-            'Me': { name: 'Mercury', fullName: 'Mercury', color: '#000000' },
-            'Ve': { name: 'Venus', fullName: 'Venus', color: '#000000' },
-            'Ma': { name: 'Mars', fullName: 'Mars', color: '#000000' },
-            'Ju': { name: 'Jupiter', fullName: 'Jupiter', color: '#000000' },
-            'Sa': { name: 'Saturn', fullName: 'Saturn', color: '#000000' },
-            'Ra': { name: 'Rahu', fullName: 'Rahu', color: '#000000' },
-            'Ke': { name: 'Ketu', fullName: 'Ketu', color: '#000000' },
+            'Su': { name: 'Sun', fullName: 'Sun', color: '#e2792e' },
+            'Mo': { name: 'Moon', fullName: 'Moon', color: '#868484' },
+            'Me': { name: 'Mercury', fullName: 'Mercury', color: '#08b130' },
+            'Ve': { name: 'Venus', fullName: 'Venus', color: '#eb539f' },
+            'Ma': { name: 'Mars', fullName: 'Mars', color: '#da3b26' },
+            'Ju': { name: 'Jupiter', fullName: 'Jupiter', color: '#ffa200' },
+            'Sa': { name: 'Saturn', fullName: 'Saturn', color: '#3274b5' },
+            'Ra': { name: 'Rahu', fullName: 'Rahu', color: '#4c4b4b' },
+            'Ke': { name: 'Ketu', fullName: 'Ketu', color: '#4c4b4b' },
             'Md': { name: 'Maandi', fullName: 'Maandi', color: '#000000' },
             'Cu': { name: 'Custom', fullName: 'Custom', color: '#000000' }
         };
