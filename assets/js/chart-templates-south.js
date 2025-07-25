@@ -286,7 +286,7 @@ class SouthIndianChartTemplate {
             y: y + height - rashiNumberBoxSizeSouth - 5,
             width: rashiNumberBoxSizeSouth,
             height: rashiNumberBoxSizeSouth,
-            fill: '#145A32', // dark green
+            fill: '#ffc600', // bright yellow
             cornerRadius: 4,
             name: `bhavaNumberSouthBox-${houseNumber}`
         });
@@ -299,7 +299,7 @@ class SouthIndianChartTemplate {
             fontSize: 10,
             fontFamily: 'Arial',
             fontWeight: 'bold',
-            fill: '#ffffff', // white text for bhava
+            fill: '#000000', // black text for bhava
             align: 'center',
             verticalAlign: 'middle',
             name: `bhavaNumberSouthText-${houseNumber}`
