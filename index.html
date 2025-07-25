@@ -275,6 +275,28 @@
         </div>
     </div>
 
+    <!-- Confirmation Dialog Modal -->
+    <div id="confirmation-modal" class="confirmation-modal">
+        <div class="confirmation-modal-content">
+            <div class="confirmation-modal-header">
+                <h2 class="confirmation-modal-title">Confirm Action</h2>
+                <button class="confirmation-modal-close" id="confirmation-modal-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="confirmation-modal-body">
+                <p id="confirmation-message">Are you sure you want to proceed? This action cannot be undone.</p>
+                <p class="confirmation-warning"><strong>Warning:</strong> Be sure to save your image before proceeding.</p>
+            </div>
+            
+            <div class="confirmation-modal-actions">
+                <button class="confirmation-btn confirmation-btn-yes" id="confirmation-yes">Yes</button>
+                <button class="confirmation-btn confirmation-btn-no" id="confirmation-no">No</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="assets/js/utils.js"></script>

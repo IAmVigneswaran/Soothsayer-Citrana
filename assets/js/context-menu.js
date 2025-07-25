@@ -355,10 +355,16 @@ class ContextMenu {
                 break;
                 
             case 'clear-chart':
-                window.app.clearChart();
+                window.app.showConfirmationDialog(
+                    'This will completely clear the entire chart, including all planets, drawings, and chart structure. This action cannot be undone.',
+                    () => window.app.clearChart()
+                );
                 break;
             case 'reset-chart':
-                window.app.resetChart();
+                window.app.showConfirmationDialog(
+                    'This will reset the chart by removing all planets and drawings, but keep the chart structure intact. This action cannot be undone.',
+                    () => window.app.resetChart()
+                );
                 break;
                 
             case 'set-lagna':

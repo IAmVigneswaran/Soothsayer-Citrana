@@ -179,7 +179,8 @@ class CitranaApp {
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
 
-        console.log('Event listeners setup complete');
+        // Confirmation Dialog
+        this.setupConfirmationDialog();
     }
     
     /**
@@ -328,6 +329,52 @@ class CitranaApp {
         
         // Listen for touch events on input fields
         document.addEventListener('touchstart', preventZoomOnTouch, { passive: false });
+    }
+
+    setupConfirmationDialog() {
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const confirmationClose = document.getElementById('confirmation-modal-close');
+        const confirmationYes = document.getElementById('confirmation-yes');
+        const confirmationNo = document.getElementById('confirmation-no');
+        
+        if (confirmationModal && confirmationClose && confirmationYes && confirmationNo) {
+            // Close button
+            confirmationClose.addEventListener('click', () => {
+                confirmationModal.classList.remove('active');
+            });
+            
+            // No button - close modal
+            confirmationNo.addEventListener('click', () => {
+                confirmationModal.classList.remove('active');
+            });
+            
+            // Yes button - execute the callback
+            confirmationYes.addEventListener('click', () => {
+                if (this.pendingConfirmationCallback) {
+                    this.pendingConfirmationCallback();
+                    this.pendingConfirmationCallback = null;
+                }
+                confirmationModal.classList.remove('active');
+            });
+            
+            // Close when clicking outside
+            confirmationModal.addEventListener('click', (e) => {
+                if (e.target === confirmationModal) {
+                    confirmationModal.classList.remove('active');
+                }
+            });
+        }
+    }
+
+    showConfirmationDialog(message, callback) {
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        
+        if (confirmationModal && confirmationMessage) {
+            confirmationMessage.textContent = message;
+            this.pendingConfirmationCallback = callback;
+            confirmationModal.classList.add('active');
+        }
     }
 
     loadSavedData() {
