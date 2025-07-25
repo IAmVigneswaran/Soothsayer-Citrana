@@ -1274,6 +1274,9 @@ class DrawingTools {
         let tapCount = 0;
         let tapTimer = null;
         let isProcessingTap = false;
+        let holdTimer = null;
+        let isDragging = false;
+        let startPos = null;
 
         const handleTap = (e) => {
             // Prevent event bubbling and default behavior
@@ -1292,6 +1295,7 @@ class DrawingTools {
                 tapCount++;
                 if (tapCount === 2) {
                     clearTimeout(tapTimer);
+                    clearTimeout(holdTimer);
                     tapCount = 0;
                     isProcessingTap = true;
                     
@@ -1315,9 +1319,96 @@ class DrawingTools {
             }, 500);
         };
 
+        // Add tap-hold-to-drag functionality
+        const handleTouchStart = (e) => {
+            e.cancelBubble = true;
+            e.evt.preventDefault();
+            
+            const pos = this.stage.getPointerPosition();
+            startPos = pos;
+            
+            // Start hold timer for drag activation
+            holdTimer = setTimeout(() => {
+                if (!isDragging && startPos) {
+                    isDragging = true;
+                    
+                    // Switch to select tool if not already active
+                    if (window.app && window.app.currentTool !== 'select') {
+                        window.app.setTool('select');
+                    }
+                    
+                    // Enable dragging on the shape
+                    shape.draggable(true);
+                    
+                    // Select the shape
+                    this.selectShape(shape);
+                    
+                    console.log('[MOBILE] Started tap-hold drag for shape');
+                }
+            }, 300); // 300ms hold to start dragging
+        };
+
+        const handleTouchMove = (e) => {
+            e.cancelBubble = true;
+            e.evt.preventDefault();
+            
+            if (isDragging && shape.draggable()) {
+                // Let Konva handle the dragging
+                return;
+            }
+            
+            // Cancel hold if moved too much
+            if (startPos) {
+                const currentPos = this.stage.getPointerPosition();
+                const distance = Math.sqrt(
+                    Math.pow(currentPos.x - startPos.x, 2) + 
+                    Math.pow(currentPos.y - startPos.y, 2)
+                );
+                
+                if (distance > 10) { // 10px threshold
+                    if (holdTimer) {
+                        clearTimeout(holdTimer);
+                        holdTimer = null;
+                    }
+                }
+            }
+        };
+
+        const handleTouchEnd = (e) => {
+            e.cancelBubble = true;
+            e.evt.preventDefault();
+            
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+            
+            if (isDragging) {
+                isDragging = false;
+                
+                // Disable dragging after a short delay
+                setTimeout(() => {
+                    shape.draggable(false);
+                    console.log('[MOBILE] Finished tap-hold drag for shape');
+                }, 100);
+            }
+            
+            startPos = null;
+        };
+
         // Add tap event listener with higher priority
         shape.on('tap', handleTap);
         shape._tapHandler = handleTap; // Store handler for cleanup
+        
+        // Add touch events for tap-hold-to-drag
+        shape.on('touchstart', handleTouchStart);
+        shape.on('touchmove', handleTouchMove);
+        shape.on('touchend', handleTouchEnd);
+        
+        // Store touch handlers for cleanup
+        shape._touchStartHandler = handleTouchStart;
+        shape._touchMoveHandler = handleTouchMove;
+        shape._touchEndHandler = handleTouchEnd;
         
         // Also add click handler for desktop compatibility
         shape.on('click', (e) => {
@@ -1533,6 +1624,99 @@ class DrawingTools {
                 shape._tapHandler(e);
             }
         });
+
+        // Add tap-hold-to-drag functionality to bounding box for mobile
+        if (this.isTouchDevice) {
+            let holdTimer = null;
+            let isDragging = false;
+            let startPos = null;
+
+            const handleTouchStart = (e) => {
+                e.cancelBubble = true;
+                e.evt.preventDefault();
+                
+                const pos = this.stage.getPointerPosition();
+                startPos = pos;
+                
+                // Start hold timer for drag activation
+                holdTimer = setTimeout(() => {
+                    if (!isDragging && startPos) {
+                        isDragging = true;
+                        
+                        // Switch to select tool if not already active
+                        if (window.app && window.app.currentTool !== 'select') {
+                            window.app.setTool('select');
+                        }
+                        
+                        // Enable dragging on the shape
+                        shape.draggable(true);
+                        
+                        // Select the shape
+                        this.selectShape(shape);
+                        
+                        console.log('[MOBILE] Started tap-hold drag via bounding box');
+                    }
+                }, 300); // 300ms hold to start dragging
+            };
+
+            const handleTouchMove = (e) => {
+                e.cancelBubble = true;
+                e.evt.preventDefault();
+                
+                if (isDragging && shape.draggable()) {
+                    // Let Konva handle the dragging
+                    return;
+                }
+                
+                // Cancel hold if moved too much
+                if (startPos) {
+                    const currentPos = this.stage.getPointerPosition();
+                    const distance = Math.sqrt(
+                        Math.pow(currentPos.x - startPos.x, 2) + 
+                        Math.pow(currentPos.y - startPos.y, 2)
+                    );
+                    
+                    if (distance > 10) { // 10px threshold
+                        if (holdTimer) {
+                            clearTimeout(holdTimer);
+                            holdTimer = null;
+                        }
+                    }
+                }
+            };
+
+            const handleTouchEnd = (e) => {
+                e.cancelBubble = true;
+                e.evt.preventDefault();
+                
+                if (holdTimer) {
+                    clearTimeout(holdTimer);
+                    holdTimer = null;
+                }
+                
+                if (isDragging) {
+                    isDragging = false;
+                    
+                    // Disable dragging after a short delay
+                    setTimeout(() => {
+                        shape.draggable(false);
+                        console.log('[MOBILE] Finished tap-hold drag via bounding box');
+                    }, 100);
+                }
+                
+                startPos = null;
+            };
+
+            // Add touch events for tap-hold-to-drag
+            boundingBox.on('touchstart', handleTouchStart);
+            boundingBox.on('touchmove', handleTouchMove);
+            boundingBox.on('touchend', handleTouchEnd);
+            
+            // Store touch handlers for cleanup
+            boundingBox._touchStartHandler = handleTouchStart;
+            boundingBox._touchMoveHandler = handleTouchMove;
+            boundingBox._touchEndHandler = handleTouchEnd;
+        }
 
         // Update bounding box position when shape moves
         shape.on('dragmove', () => {
