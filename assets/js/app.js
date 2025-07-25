@@ -29,7 +29,6 @@ class CitranaApp {
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
         this.loadSavedData();
-        this.detectIOSSafari();
         
         console.log('App initialization complete');
     }
@@ -824,24 +823,6 @@ class CitranaApp {
         this.stage.position({ x: 0, y: 0 });
         this.stage.batchDraw();
         this.updateZoomLevel();
-    }
-
-    detectIOSSafari() {
-        const ua = navigator.userAgent;
-        const isIOS = /iPad|iPhone|iPod/.test(ua);
-        // Only true Safari: has 'Safari' but not 'CriOS', 'FxiOS', 'EdgiOS', or 'OPiOS'
-        const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-
-        const grahaLib = document.querySelector('.floating-planet-library');
-        if (grahaLib) {
-            if (isIOS && isSafari) {
-                grahaLib.style.bottom = '180px';
-                console.log('iOS Safari detected. Graha Library offset set to 180px.');
-            } else {
-                grahaLib.style.bottom = '80px';
-                console.log('Not iOS Safari. Graha Library offset set to 80px.');
-            }
-        }
     }
 }
 
