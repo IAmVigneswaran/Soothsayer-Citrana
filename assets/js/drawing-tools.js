@@ -1501,8 +1501,11 @@ class DrawingTools {
      * @returns {KonvaRect} The invisible bounding box
      */
     createBoundingBox(shape, toolType) {
-        // Get the shape's bounding box with some padding
-        const padding = 15; // 15px padding around the shape
+        // Use larger padding for mobile devices for easier double-tap/selection
+        let padding = 15;
+        if (window.Utils && window.Utils.isMobile && window.Utils.isMobile()) {
+            padding = 40; // Much larger for mobile
+        }
         const bounds = shape.getClientRect();
         
         const boundingBox = new Konva.Rect({
@@ -1545,7 +1548,11 @@ class DrawingTools {
      * @param {KonvaShape} shape - The shape being moved
      */
     updateBoundingBox(boundingBox, shape) {
-        const padding = 15;
+        // Use same padding logic as createBoundingBox
+        let padding = 15;
+        if (window.Utils && window.Utils.isMobile && window.Utils.isMobile()) {
+            padding = 40;
+        }
         const bounds = shape.getClientRect();
         
         boundingBox.setAttrs({
