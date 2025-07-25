@@ -80,7 +80,7 @@ class Utils {
      */
     static saveChartData(data) {
         try {
-            localStorage.setItem('vedicChartData', JSON.stringify(data));
+            localStorage.setItem('citranaChartData', JSON.stringify(data));
             console.log('Chart data saved');
         } catch (error) {
             console.error('Failed to save chart data:', error);
@@ -92,11 +92,10 @@ class Utils {
      */
     static loadChartData() {
         try {
-            const data = localStorage.getItem('vedicChartData');
+            const data = localStorage.getItem('citranaChartData');
             return data ? JSON.parse(data) : null;
         } catch (error) {
             console.error('Failed to load chart data:', error);
-            return null;
         }
     }
 
@@ -105,7 +104,7 @@ class Utils {
      */
     static clearChartData() {
         try {
-            localStorage.removeItem('vedicChartData');
+            localStorage.removeItem('citranaChartData');
             console.log('Chart data cleared');
         } catch (error) {
             console.error('Failed to clear chart data:', error);

@@ -3,7 +3,12 @@
  * Manages planet library, floating Graha Library UI, and drag-and-drop functionality
  */
 class PlanetSystem {
-    constructor() {
+    constructor(stage, layer, chartTemplates) {
+        // Store references to dependencies
+        this.stage = stage;
+        this.layer = layer;
+        this.chartTemplates = chartTemplates;
+        
         // Graha Library UI state
         this.grahaLibrary = null;
         this.planetGrid = null;
@@ -278,9 +283,11 @@ class PlanetSystem {
             canvas.addEventListener('drop', (e) => this.handleDrop(e));
         }
     }
-    setupDropZones(chartTemplates) {
-        this.dropZones = chartTemplates.getDropZones();
-        console.log('Drop zones setup complete');
+    setupDropZones() {
+        if (this.chartTemplates) {
+            this.dropZones = this.chartTemplates.getDropZones();
+            console.log('Drop zones setup complete');
+        }
     }
     handleDragStart(e, planetAbbr) {
         this.draggedPlanet = planetAbbr;
@@ -418,7 +425,7 @@ class PlanetSystem {
     handleMobileDrop(x, y) {
         // Check for selected bhava first
         let targetHouse = null;
-        const chartType = window.app?.chartTemplates?.currentChartType;
+        const chartType = this.chartTemplates?.currentChartType;
         if (chartType === 'south-indian') {
             targetHouse = window.selectedBhavaSouth;
         } else if (chartType === 'north-indian') {
@@ -441,7 +448,7 @@ class PlanetSystem {
         // In a real implementation, you'd need to convert screen coordinates to chart coordinates
         // and check which house polygon contains the point
 
-        const chartType = window.app?.chartTemplates?.currentChartType;
+        const chartType = this.chartTemplates?.currentChartType;
         if (chartType === 'south-indian') {
             // For South Indian chart, you'd check the 3x4 grid
             // This is a placeholder - you'd need to implement proper coordinate conversion
@@ -459,14 +466,14 @@ class PlanetSystem {
         if (!this.draggedPlanet) return;
         // Check for selected bhava (South or North Indian)
         let targetHouse = null;
-        const chartType = window.app?.chartTemplates?.currentChartType;
+        const chartType = this.chartTemplates?.currentChartType;
         if (chartType === 'south-indian') {
             targetHouse = window.selectedBhavaSouth;
         } else if (chartType === 'north-indian') {
             targetHouse = window.selectedBhavaNorth;
         }
         if (!targetHouse) {
-            const stage = window.app?.chartTemplates?.getStage();
+            const stage = this.chartTemplates?.getStage();
             if (!stage) {
                 console.error('Stage not available for drop');
                 return;
@@ -494,13 +501,12 @@ class PlanetSystem {
         return 1; // Place in first house by default
     }
     placePlanetInHouse(planetAbbr, houseIndex, label = null, id = null) {
-        const chartTemplates = window.app?.chartTemplates;
-        if (!chartTemplates) {
+        if (!this.chartTemplates) {
             console.error('Chart templates not available');
             return;
         }
         // Add planet to the specified house
-        chartTemplates.addPlanetToHouse(planetAbbr, houseIndex, label, id);
+        this.chartTemplates.addPlanetToHouse(planetAbbr, houseIndex, label, id);
     }
     getPlanetInfo(abbr) {
         return this.planets[abbr] || null;
