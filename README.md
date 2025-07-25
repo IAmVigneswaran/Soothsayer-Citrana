@@ -28,6 +28,7 @@ This codebase is developed using AI agents.
 - Professional Export: High-resolution PNG exports (300 DPI) with auto-save functionality
 - Context Menus: Right-click and long-press support for quick chart management
 - Keyboard Shortcuts: Power user features for efficient workflow
+- Privacy focused: No data collection, no tracking, no server-side storage
 
 ## Table of Contents
 
@@ -50,7 +51,7 @@ This codebase is developed using AI agents.
 
 ### Prerequisites
 - Modern web browser (Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)
-- No server setup required - runs entirely in the browser
+- No setup required - runs entirely in the browser
 
 ## Usage Guide
 
@@ -60,7 +61,7 @@ This codebase is developed using AI agents.
 2. **Set Lagna**: Right-click any house and select "Set as Lagna (Ascendant)"
 3. **Add Planets**: Drag planets from the sidebar to chart houses
 4. **Add Annotations**: Use drawing tools to add notes and aspects
-5. **Export**: Click "Export PNG" to save your chart
+5. **Export**: Click "Export" to save your chart in `.png`
 
 ### Browser Compatibility
 
