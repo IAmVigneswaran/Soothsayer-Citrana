@@ -209,7 +209,7 @@ class DrawingTools {
         const arrow = new Konva.Arrow({
             points: [pos.x, pos.y, pos.x, pos.y],
             stroke: '#FF0000',
-            strokeWidth: 2,
+            strokeWidth: 5,
             fill: '#FF0000',
             pointerLength: 10,
             pointerWidth: 8,
@@ -260,7 +260,7 @@ class DrawingTools {
         const line = new Konva.Line({
             points: [pos.x, pos.y, pos.x, pos.y],
             stroke: '#FF0000',
-            strokeWidth: 2,
+            strokeWidth: 5,
             name: 'drawing-line',
             perfectDrawEnabled: true,
             listening: true,
@@ -308,7 +308,7 @@ class DrawingTools {
         const line = new Konva.Line({
             points: [pos.x, pos.y],
             stroke: '#FF0000',
-            strokeWidth: 2,
+            strokeWidth: 5,
             lineCap: 'round',
             lineJoin: 'round',
             name: 'drawing-pen',

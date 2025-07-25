@@ -14,9 +14,9 @@ class EditUI {
         
         // Default properties for different tools
         this.defaultProperties = {
-            pen: { strokeWidth: 2, strokeColor: '#FF0000' },
-            line: { strokeWidth: 2, strokeColor: '#FF0000' },
-            arrow: { strokeWidth: 2, strokeColor: '#FF0000' },
+            pen: { strokeWidth: 5, strokeColor: '#FF0000' },
+            line: { strokeWidth: 5, strokeColor: '#FF0000' },
+            arrow: { strokeWidth: 5, strokeColor: '#FF0000' },
             text: { fontSize: 16, fontWeight: 400, fontStyle: 'normal', fill: '#000000' }
         };
     }
@@ -214,13 +214,15 @@ class EditUI {
         
         // Width event listeners
         decreaseWidth.addEventListener('click', () => {
-            const newWidth = Math.max(1, currentStrokeWidth - 1);
+            const currentWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : this.defaultProperties.pen.strokeWidth;
+            const newWidth = Math.max(1, currentWidth - 1);
             this.updateStrokeWidth(newWidth);
             widthValue.textContent = newWidth;
         });
         
         increaseWidth.addEventListener('click', () => {
-            const newWidth = Math.min(20, currentStrokeWidth + 1);
+            const currentWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : this.defaultProperties.pen.strokeWidth;
+            const newWidth = Math.min(10, currentWidth + 1);
             this.updateStrokeWidth(newWidth);
             widthValue.textContent = newWidth;
         });
@@ -267,7 +269,7 @@ class EditUI {
      */
     createArrowControls(container) {
         // Get current values from the element with proper fallbacks
-        const currentStrokeWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 2);
+        const currentStrokeWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5);
         const currentStrokeColor = this.currentElement.stroke ? this.currentElement.stroke() : this.defaultProperties.arrow.strokeColor;
         
         // Create controls container
@@ -291,13 +293,15 @@ class EditUI {
         
         // Width event listeners
         decreaseWidth.addEventListener('click', () => {
-            const newWidth = Math.max(1, currentStrokeWidth - 1);
+            const currentWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5);
+            const newWidth = Math.max(1, currentWidth - 1);
             this.updateStrokeWidth(newWidth);
             widthValue.textContent = newWidth;
         });
         
         increaseWidth.addEventListener('click', () => {
-            const newWidth = Math.min(20, currentStrokeWidth + 1);
+            const currentWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5);
+            const newWidth = Math.min(10, currentWidth + 1);
             this.updateStrokeWidth(newWidth);
             widthValue.textContent = newWidth;
         });
