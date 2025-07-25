@@ -18,6 +18,7 @@ class CitranaApp {
         this.redoStack = [];
         this.maxUndoSteps = 100;
         this.exportWithWhiteBg = true; // Default: white background
+        this.isExporting = false; // Prevent multiple concurrent exports
         this.init();
     }
 
@@ -405,96 +406,320 @@ class CitranaApp {
     }
 
     exportChart() {
-        try {
-            // 1. Get the current stage size (do not resize or move content)
-            const width = this.stage.width();
-            const height = this.stage.height();
+        // Prevent multiple concurrent exports
+        if (this.isExporting) {
+            console.log('Export already in progress, ignoring duplicate request');
+            return;
+        }
 
-            let bgRect = null;
-            // 2. Add a white background rectangle at the bottom of the Konva layer if transparency is OFF
-            if (this.exportWithWhiteBg) {
-                bgRect = new Konva.Rect({
-                    x: 0,
-                    y: 0,
-                    width: width,
-                    height: height,
-                    fill: 'white',
-                    listening: false,
-                    name: 'export-bg-rect'
-                });
-                this.layer.add(bgRect);
-                bgRect.moveToBottom();
-                this.layer.batchDraw();
-            }
+        console.log('=== Starting export process ===');
+        this.isExporting = true;
+        this.showExportProgress();
 
-            // 3. Export the PNG from Konva (with or without white background)
-            const dataURL = this.stage.toDataURL({
-                pixelRatio: 2,
-                mimeType: 'image/png'
-            });
+        // Use requestAnimationFrame to ensure the canvas is fully rendered
+        const performExport = () => {
+            try {
+                // Step 1: Prepare chart and generate PNG (50%)
+                this.updateExportProgress(50, 'Generating high-resolution image...');
+                
+                const width = this.stage.width();
+                const height = this.stage.height();
 
-            // 4. Remove the temporary white background rectangle from the layer
-            if (bgRect) {
-                this.layer.batchDraw();
-                bgRect.destroy();
-                this.layer.batchDraw();
-            }
-
-            // 5. Add 100px white padding to all sides using an offscreen canvas
-            //    This does NOT affect the app or Konva stage—only the exported file
-            const img = new window.Image();
-            img.onload = () => {
-                // Calculate new dimensions with 100px padding on each side
-                const paddedWidth = img.width + 200;
-                const paddedHeight = img.height + 200;
-                // Create an offscreen canvas
-                const offscreen = document.createElement('canvas');
-                offscreen.width = paddedWidth;
-                offscreen.height = paddedHeight;
-                const ctx = offscreen.getContext('2d');
-
-                // Fill the entire offscreen canvas with white if exportWithWhiteBg, else transparent
+                let bgRect = null;
                 if (this.exportWithWhiteBg) {
-                    ctx.fillStyle = 'white';
-                    ctx.fillRect(0, 0, paddedWidth, paddedHeight);
-                } else {
-                    ctx.clearRect(0, 0, paddedWidth, paddedHeight);
+                    bgRect = new Konva.Rect({
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height,
+                        fill: 'white',
+                        listening: false,
+                        name: 'export-bg-rect'
+                    });
+                    this.layer.add(bgRect);
+                    bgRect.moveToBottom();
+                    this.layer.batchDraw();
+                }
+                
+                // Force a complete render cycle
+                this.stage.batchDraw();
+                
+                // Take the screenshot immediately (optimized)
+                const dataURL = this.stage.toDataURL({
+                    pixelRatio: 2,
+                    mimeType: 'image/png'
+                });
+                
+                // Step 3: Clean up background rectangle
+                if (bgRect) {
+                    bgRect.destroy();
+                    this.layer.batchDraw();
                 }
 
-                // Draw the exported PNG at (100, 100) to center it with padding
-                ctx.drawImage(img, 100, 100);
+                // Step 2: Process image with padding and watermark (80%)
+                this.updateExportProgress(80, 'Adding padding and watermark...');
+                
+                // Optimized processing: Get dimensions directly from dataURL
+                console.log('Processing dataURL directly...');
+                try {
+                    // Step 3: Create final image (90%)
+                    this.updateExportProgress(90, 'Creating final image...');
+                    
+                    // Get dimensions from the original dataURL without loading image
+                    const img = new window.Image();
+                    img.onload = () => {
+                        const width = img.width;
+                        const height = img.height;
+                        
+                        // Create the padded canvas directly
+                        const paddedWidth = width + 200;
+                        const paddedHeight = height + 200;
+                        const offscreen = document.createElement('canvas');
+                        offscreen.width = paddedWidth;
+                        offscreen.height = paddedHeight;
+                        const ctx = offscreen.getContext('2d');
 
-                // 5b. Add watermark text at the bottom center
-                ctx.font = '24px sans-serif';
-                ctx.fillStyle = '#888'; // subtle gray
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                const watermark = 'Generated by Citrana - https://citrana.soothsayer.life/';
-                ctx.fillText(watermark, paddedWidth / 2, paddedHeight - 30);
+                        // Fill background
+                        if (this.exportWithWhiteBg) {
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(0, 0, paddedWidth, paddedHeight);
+                        } else {
+                            ctx.clearRect(0, 0, paddedWidth, paddedHeight);
+                        }
 
-                // 6. Download the padded image as PNG
-                const paddedDataURL = offscreen.toDataURL('image/png');
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                const seconds = String(now.getSeconds()).padStart(2, '0');
-                const timestamp = `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
-                const filename = `citrana-chart-${timestamp}.png`;
+                        // Draw the chart
+                        ctx.drawImage(img, 100, 100);
 
+                        // Add watermark
+                        ctx.font = '24px sans-serif';
+                        ctx.fillStyle = '#888';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        const watermark = 'Generated by Citrana - https://citrana.soothsayer.life/';
+                        ctx.fillText(watermark, paddedWidth / 2, paddedHeight - 30);
+
+                        // Step 4: Download file (95%)
+                        this.updateExportProgress(95, 'Preparing download...');
+                        
+                        const paddedDataURL = offscreen.toDataURL('image/png');
+                        const now = new Date();
+                        const year = now.getFullYear();
+                        const month = String(now.getMonth() + 1).padStart(2, '0');
+                        const day = String(now.getDate()).padStart(2, '0');
+                        const hours = String(now.getHours()).padStart(2, '0');
+                        const minutes = String(now.getMinutes()).padStart(2, '0');
+                        const seconds = String(now.getSeconds()).padStart(2, '0');
+                        const timestamp = `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
+                        const filename = `citrana-chart-${timestamp}.png`;
+
+                        // Use a more reliable download method
+                        console.log('Calling downloadFile with filename:', filename);
+                        this.downloadFile(paddedDataURL, filename);
+                        
+                        // Step 7: Complete (100%)
+                        this.updateExportProgress(100, 'Export completed successfully!');
+                        
+                        // Reduced delay for completion
+                        setTimeout(() => {
+                            this.hideExportProgress();
+                            this.isExporting = false;
+                            this._lastDownloadedFile = null; // Reset download tracking
+                            console.log(`Chart exported successfully as: ${filename}`);
+                        }, 300); // Reduced from 1000ms to 300ms
+                    };
+                    
+                    img.onerror = () => {
+                        console.error('Error loading image for dimensions');
+                        this.updateExportProgress(0, 'Export failed. Please try again.');
+                        setTimeout(() => {
+                            this.hideExportProgress();
+                            this.isExporting = false;
+                            this._lastDownloadedFile = null;
+                        }, 1000); // Reduced from 2000ms to 1000ms
+                    };
+                    
+                    // Load the image to get dimensions
+                    img.src = dataURL;
+                    
+                } catch (error) {
+                    console.error('Error processing export:', error);
+                    this.updateExportProgress(0, 'Export failed. Please try again.');
+                    setTimeout(() => {
+                        this.hideExportProgress();
+                        this.isExporting = false;
+                        this._lastDownloadedFile = null; // Reset download tracking
+                    }, 1000); // Reduced from 2000ms to 1000ms
+                }
+                
+            } catch (error) {
+                console.error('Error exporting chart:', error);
+                this.updateExportProgress(0, 'Export failed. Please try again.');
+                setTimeout(() => {
+                    this.hideExportProgress();
+                    this.isExporting = false;
+                    this._lastDownloadedFile = null; // Reset download tracking
+                }, 2000);
+            }
+        };
+
+        // Start the export process on the next frame
+        requestAnimationFrame(performExport);
+    }
+
+    showExportProgress() {
+        const modal = document.getElementById('export-progress-modal');
+        const progressFill = document.getElementById('export-progress-fill');
+        const progressText = document.getElementById('export-progress-text');
+        
+        if (modal && progressFill && progressText) {
+            progressFill.style.width = '0%';
+            progressText.textContent = 'Preparing chart for export...';
+            modal.style.display = 'block';
+        }
+    }
+
+    updateExportProgress(percentage, message) {
+        const progressFill = document.getElementById('export-progress-fill');
+        const progressText = document.getElementById('export-progress-text');
+        
+        if (progressFill && progressText) {
+            progressFill.style.width = `${percentage}%`;
+            progressText.textContent = message;
+        }
+    }
+
+    hideExportProgress() {
+        const modal = document.getElementById('export-progress-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    downloadFile(dataURL, filename) {
+        // Chrome-specific fix: Use a more robust download method
+        console.log('Starting download for:', filename);
+        
+        // Prevent multiple downloads of the same file
+        if (this._lastDownloadedFile === filename) {
+            console.log('File already downloaded, skipping duplicate:', filename);
+            return;
+        }
+        this._lastDownloadedFile = filename;
+        
+        // Detect Chrome/Brave
+        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        const isBrave = navigator.brave && navigator.brave.isBrave();
+        
+        if (isChrome || isBrave) {
+            // Chrome/Brave specific method: Use blob with proper cleanup
+            console.log('Using Chrome/Brave specific download method');
+            
+            // Convert dataURL to blob
+            const byteString = atob(dataURL.split(',')[1]);
+            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            
+            const blob = new Blob([ab], { type: mimeString });
+            const url = window.URL.createObjectURL(blob);
+            
+            // Chrome/Brave specific: Use a more robust approach
+            // Create download link with unique ID to prevent conflicts
+            const linkId = 'download-link-' + Date.now();
+            const link = document.createElement('a');
+            link.id = linkId;
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            link.style.position = 'absolute';
+            link.style.left = '-9999px';
+            link.style.top = '-9999px';
+            link.style.zIndex = '-9999';
+            
+            // Add to DOM
+            document.body.appendChild(link);
+            
+            // Chrome/Brave specific: Use a more reliable click method
+            const triggerDownload = () => {
+                try {
+                    // Try the standard click method first
+                    link.click();
+                    console.log('Standard click triggered for Chrome/Brave');
+                } catch (clickError) {
+                    console.error('Standard click failed, trying alternative:', clickError);
+                    
+                    // Alternative: Create a mouse event
+                    const clickEvent = new MouseEvent('click', {
+                        view: window,
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    link.dispatchEvent(clickEvent);
+                    console.log('Mouse event triggered for Chrome/Brave');
+                }
+                
+                // Cleanup after a shorter delay for Chrome/Brave
+                setTimeout(() => {
+                    const linkElement = document.getElementById(linkId);
+                    if (linkElement) {
+                        document.body.removeChild(linkElement);
+                    }
+                    window.URL.revokeObjectURL(url);
+                    console.log('Chrome/Brave download completed for:', filename);
+                }, 200); // Reduced from 500ms to 200ms
+            };
+            
+            // Use a shorter delay for Chrome/Brave to ensure DOM is ready
+            setTimeout(triggerDownload, 10); // Reduced from 50ms to 10ms
+            
+        } else {
+            // Standard method for other browsers
+            console.log('Using standard download method');
+            
+            try {
                 const link = document.createElement('a');
                 link.download = filename;
-                link.href = paddedDataURL;
+                link.href = dataURL;
+                link.style.display = 'none';
+                
+                document.body.appendChild(link);
                 link.click();
-
-                console.log(`Chart exported successfully as: ${filename}`);
-            };
-            // Start loading the exported PNG into the offscreen canvas
-            img.src = dataURL;
-        } catch (error) {
-            console.error('Error exporting chart:', error);
+                document.body.removeChild(link);
+                
+                console.log('Standard download completed for:', filename);
+                
+            } catch (error) {
+                console.error('Standard download failed, trying blob method:', error);
+                
+                // Fallback to blob method
+                try {
+                    const response = fetch(dataURL);
+                    response.then(res => res.blob()).then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = filename;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                        console.log('Blob download completed for:', filename);
+                    });
+                } catch (blobError) {
+                    console.error('All download methods failed:', blobError);
+                    
+                    // Last resort: Open in new window
+                    const newWindow = window.open(dataURL, '_blank');
+                    if (newWindow) {
+                        console.log('Opened image in new window as last resort');
+                    }
+                }
+            }
         }
     }
 
@@ -915,7 +1140,5 @@ class CitranaApp {
     }
 }
 
-// Initialize app when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.app = new CitranaApp();
-}); 
+// App initialization is handled in index.html
+// This prevents duplicate initialization 
