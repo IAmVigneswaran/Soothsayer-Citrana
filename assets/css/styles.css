@@ -1009,3 +1009,174 @@ body {
     font-size: 13px;
   }
 } 
+
+/* Help Button (Desktop Only) */
+.help-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #000000;
+    background: white;
+    color: #000000;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.help-btn:hover {
+    background: #000000;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.help-btn:active {
+    transform: translateY(0);
+}
+
+.help-btn i {
+    width: 20px;
+    height: 20px;
+}
+
+/* Help Modal */
+.help-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.help-modal.active {
+    display: flex;
+}
+
+.help-modal-content {
+    background: white;
+    border: 1px solid #000000;
+    border-radius: 8px;
+    padding: 32px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.help-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #000000;
+}
+
+.help-modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0;
+}
+
+.help-modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #000000;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.help-modal-close:hover {
+    background: #000000;
+    color: white;
+}
+
+.help-modal-close i {
+    width: 16px;
+    height: 16px;
+}
+
+.help-section {
+    margin-bottom: 24px;
+}
+
+.help-section:last-child {
+    margin-bottom: 0;
+}
+
+.help-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 12px 0;
+}
+
+.help-shortcuts {
+    display: grid;
+    gap: 8px;
+}
+
+.help-shortcut {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+}
+
+.help-shortcut-key {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #000000;
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.help-shortcut-desc {
+    color: #495057;
+    font-size: 14px;
+}
+
+.help-instructions {
+    line-height: 1.6;
+    color: #495057;
+}
+
+.help-instructions p {
+    margin: 0 0 12px 0;
+}
+
+.help-instructions p:last-child {
+    margin-bottom: 0;
+}
+
+/* Mobile: Hide help button */
+@media (max-width: 768px) {
+    .help-btn {
+        display: none;
+    }
+} 

@@ -95,6 +95,28 @@ class CitranaApp {
             });
         }
 
+        // Help Button
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const helpModalClose = document.getElementById('help-modal-close');
+        
+        if (helpBtn && helpModal && helpModalClose) {
+            helpBtn.addEventListener('click', () => {
+                helpModal.classList.add('active');
+            });
+            
+            helpModalClose.addEventListener('click', () => {
+                helpModal.classList.remove('active');
+            });
+            
+            // Close modal when clicking outside
+            helpModal.addEventListener('click', (e) => {
+                if (e.target === helpModal) {
+                    helpModal.classList.remove('active');
+                }
+            });
+        }
+
         // Zoom controls
         document.getElementById('zoom-in').addEventListener('click', () => this.chartTemplates.zoomIn());
         document.getElementById('zoom-out').addEventListener('click', () => this.chartTemplates.zoomOut());
@@ -498,6 +520,15 @@ class CitranaApp {
                 if (this.currentTool === 'select') {
                     e.preventDefault();
                     this.drawingTools.deleteSelectedShape();
+                }
+            }
+
+            // Help modal shortcut
+            if (e.key === '?' || e.key === '/') {
+                e.preventDefault();
+                const helpModal = document.getElementById('help-modal');
+                if (helpModal) {
+                    helpModal.classList.add('active');
                 }
             }
         });
