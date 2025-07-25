@@ -144,15 +144,15 @@ class ChartCoordinator {
                 y: (stageCenter.y - this.stage.y()) / oldScale
             };
             
-            this.stage.scale({ x: newScale, y: newScale });
+        this.stage.scale({ x: newScale, y: newScale });
             
             const newPos = {
                 x: stageCenter.x - mousePointTo.x * newScale,
                 y: stageCenter.y - mousePointTo.y * newScale
             };
             this.stage.position(newPos);
-            this.stage.batchDraw();
-            this.updateZoomLevel();
+        this.stage.batchDraw();
+        this.updateZoomLevel();
         }
     }
 
@@ -175,15 +175,15 @@ class ChartCoordinator {
                 y: (stageCenter.y - this.stage.y()) / oldScale
             };
             
-            this.stage.scale({ x: newScale, y: newScale });
+        this.stage.scale({ x: newScale, y: newScale });
             
             const newPos = {
                 x: stageCenter.x - mousePointTo.x * newScale,
                 y: stageCenter.y - mousePointTo.y * newScale
             };
             this.stage.position(newPos);
-            this.stage.batchDraw();
-            this.updateZoomLevel();
+        this.stage.batchDraw();
+        this.updateZoomLevel();
         }
     }
 

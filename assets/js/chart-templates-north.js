@@ -188,7 +188,7 @@ class NorthIndianChartTemplate {
                 window.selectedBhavaNorth = houseNumberNorth;
                 console.log('[SELECT] North Indian Chart House selected:', houseNumberNorth);
             });
-            
+
             // Add touch support for mobile selection
             housePolygonNorth.on('tap', (e) => {
                 this.highlightHouse(houseNumberNorth);

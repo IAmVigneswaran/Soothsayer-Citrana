@@ -1092,7 +1092,7 @@ class DrawingTools {
             // Show Edit UI with 2-line limit
             this.editUI.show(element, 'heading');
         } else {
-            this.editUI.show(element, tool);
+        this.editUI.show(element, tool);
         }
     }
 
