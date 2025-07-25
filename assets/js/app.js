@@ -827,9 +827,10 @@ class CitranaApp {
     }
 
     detectIOSSafari() {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-
+        const ua = navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(ua);
+        // Only true Safari: has 'Safari' but not 'CriOS', 'FxiOS', 'EdgiOS', or 'OPiOS'
+        const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
         if (isIOS && isSafari) {
             document.body.classList.add('ios-safari');
             console.log('iOS Safari detected. Applying iOS Safari specific fixes.');
