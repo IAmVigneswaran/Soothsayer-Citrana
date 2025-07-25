@@ -154,26 +154,29 @@ Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 - `isPointInPolygon()`: Hit detection for polygon houses
 - `getRashiNumberForHouse()`: Rashi calculation
 
-### Planet System (assets/js/planet-system.js - 456 lines)
-Manages the floating planet library and drag-and-drop functionality.
+### Planet System (assets/js/planet-system.js - 715 lines)
+Manages the floating planet library and drag-and-drop functionality with paging system.
 
 **Key Responsibilities:**
-- Creates and manages floating planet library UI
+- Creates and manages floating planet library UI with paging
 - Implements drag-and-drop for planet placement
 - Handles touch and mouse interactions
 - Manages planet data and visual representations
 - Provides drop zone detection and validation
 - Implements mobile-friendly drag preview
+- Manages paging navigation for desktop and mobile
 
 **Key Features:**
-- Floating, draggable planet library
-- 12 planets including Lagna and Custom
+- Floating, draggable planet library with paging
+- 24 planets across two pages (12 per page)
+- Desktop navigation with clickable page dots
+- Mobile swipe navigation (left/right)
 - Drag preview with visual feedback
 - Touch and mouse support
 - Drop zone validation
 - Mobile-optimized interactions
 
-**Planet Library:**
+**Planet Library - Page 1 (Traditional Grahas):**
 - Lg: Lagna (Ascendant)
 - Su: Sun
 - Mo: Moon
@@ -187,13 +190,31 @@ Manages the floating planet library and drag-and-drop functionality.
 - Md: Maandi
 - Cu: Custom
 
+**Planet Library - Page 2 (Additional Grahas):**
+- AK: Atmakaraka
+- AmK: Amatyakaraka
+- BK: Bhratrikaraka
+- MK: Matrikaraka
+- PK: Pitrikaraka
+- GK: Gnatikaraka
+- DK: Dara Karaka
+- AL: Arudha Lagna
+- UL: Upapada Lagna
+- KL: Karakamsa Lagna
+- IL: Indu Lagna
+- SL: Sree Lagna
+
 **Key Methods:**
 - `init()`: Initialize planet library
-- `createPlanetLibrary()`: Build UI elements
+- `createPlanetLibrary()`: Build UI elements with paging
+- `createPageDots()`: Create desktop navigation dots
+- `setupSwipeEvents()`: Configure mobile swipe navigation
+- `goToPage()`: Navigate between pages
 - `setupDragAndDrop()`: Configure drag functionality
 - `handleDragStart/Move/End()`: Drag interaction handling
 - `handleTouchStart/Move/End()`: Touch interaction handling
 - `findHouseAtPosition()`: Drop zone detection
+- `getPlanetInfo()`: Retrieve planet data from paged structure
 
 ### Drawing Tools (assets/js/drawing-tools.js - 1567 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
@@ -325,7 +346,8 @@ Provides utility functions for common operations across the application.
 - Dynamic House Numbering: Automatic renumbering based on Lagna position
 
 ### Planet Management
-- 12 Major Grahas: Including Lagna, Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu, Maandi, and Custom
+- 24 Major Grahas: 12 traditional Grahas on Page 1 and 12 additional Grahas on Page 2
+- Paging System: Two-page navigation with desktop dots and mobile swipe
 - Text-based Display: Uses abbreviations instead of symbols for better compatibility
 - Drag & Drop: Intuitive planet placement from floating library to chart houses
 - Multiple Instances: Same planet can be placed multiple times
@@ -394,10 +416,10 @@ Provides utility functions for common operations across the application.
 ## Customization Guidelines
 
 ### Adding New Planets
-Edit the planets object in assets/js/planet-system.js:
+Edit the planets objects in assets/js/planet-system.js:
 ```javascript
-// Planet data
-        this.planets = {
+// Planet data - Page 1 (Traditional Grahas)
+        this.planetsPage1 = {
             'Lg': {
                 name: 'Lagna',
                 fullName: 'Lagna',
@@ -459,6 +481,74 @@ Edit the planets object in assets/js/planet-system.js:
                 color: '#000000'
             }
         };
+
+        // Planet data - Page 2 (Additional Grahas)
+        this.planetsPage2 = {
+            'AK': {
+                name: 'AK',
+                fullName: 'Atmakaraka',
+                color: '#000000'
+            },
+            'AmK': {
+                name: 'AmK',
+                fullName: 'Amatyakaraka',
+                color: '#000000'
+            },
+            'BK': {
+                name: 'BK',
+                fullName: 'Bhratrikaraka',
+                color: '#000000'
+            },
+            'MK': {
+                name: 'MK',
+                fullName: 'Matrikaraka',
+                color: '#000000'
+            },
+            'PK': {
+                name: 'PK',
+                fullName: 'Pitrikaraka',
+                color: '#000000'
+            },
+            'GK': {
+                name: 'GK',
+                fullName: 'Gnatikaraka',
+                color: '#000000'
+            },
+            'DK': {
+                name: 'DK',
+                fullName: 'Dara Karaka',
+                color: '#000000'
+            },
+            'AL': {
+                name: 'AL',
+                fullName: 'Arudha Lagna',
+                color: '#000000'
+            },
+            'UL': {
+                name: 'UL',
+                fullName: 'Upapada Lagna',
+                color: '#000000'
+            },
+            'KL': {
+                name: 'KL',
+                fullName: 'Karakamsa Lagna',
+                color: '#000000'
+            },
+            'IL': {
+                name: 'IL',
+                fullName: 'Indu Lagna',
+                color: '#000000'
+            },
+            'SL': {
+                name: 'SL',
+                fullName: 'Sree Lagna',
+                color: '#000000'
+            }
+        };
+        
+        // Paging state
+        this.currentPage = 1;
+        this.totalPages = 2;
         this.draggedPlanet = null;
         this.dropZones = [];
     }
