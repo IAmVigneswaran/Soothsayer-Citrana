@@ -29,6 +29,7 @@ class CitranaApp {
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
         this.loadSavedData();
+        this.detectIOSSafari();
         
         console.log('App initialization complete');
     }
@@ -823,6 +824,18 @@ class CitranaApp {
         this.stage.position({ x: 0, y: 0 });
         this.stage.batchDraw();
         this.updateZoomLevel();
+    }
+
+    detectIOSSafari() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+
+        if (isIOS && isSafari) {
+            document.body.classList.add('ios-safari');
+            console.log('iOS Safari detected. Applying iOS Safari specific fixes.');
+        } else {
+            document.body.classList.remove('ios-safari');
+        }
     }
 }
 
