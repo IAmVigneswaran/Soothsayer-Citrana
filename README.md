@@ -3,17 +3,18 @@
 </p>
 
 
-Citrana is a whiteboard web application inspired by Excalidraw that allows students, gurus, and Vedanga Jyotisha researchers and practitioners to create Janma Kundali (Vedic charts) for study and reference. Built with pure HTML5, CSS3, and JavaScript, this modern, interactive tool provides an intuitive interface for creating both South Indian and North Indian astrological charts with drag-and-drop planet placement and comprehensive drawing tools.
+Citrana is a whiteboard web application that allows students, gurus, and Vedanga Jyotisha practitioners and researchers to create Janma Kundali (Vedic charts) for study and reference. Built with pure HTML5, CSS3, and JavaScript, this modern, interactive tool provides an intuitive interface for creating both South Indian and North Indian astrological charts with drag-and-drop planet placement and comprehensive drawing tools.
 
-Perfect for educational purposes, research documentation, and professional chart analysis, Citrana offers a seamless experience for anyone studying or practising Vedanga Jyotisha (Vedic astrology). Whether you're a student learning the fundamentals, a guru teaching traditional methods, or a researcher documenting complex planetary configurations, Citrana provides the tools you need to create accurate, professional-quality astrological charts for online classes, presentations, and personal reference.
+Perfect for educational purposes, research documentation, and professional chart analysis, Citrana offers a seamless experience for anyone studying or practising Vedanga Jyotisha (Vedic astrology). Whether you're a student learning the fundamentals, a guru teaching traditional methods, or a researcher documenting complex planetary configurations to decode Karma, Citrana provides the tools you need to create accurate, professional-quality astrological charts for online classes, presentations, and personal reference.
+
+This codebase is developed using AI agents.
 
 ## Core Features
 
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic house numbering
-- Drag & Drop Planets: 12 major grahas with intuitive placement and multiple instances support
+- Drag & Drop Planets: Navagrahas with intuitive placement and multiple instances support
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools with undo/redo
 - Professional Export: High-resolution PNG exports (300 DPI) with auto-save functionality
-- Mobile Optimised: Touch-friendly interface with responsive design for all devices
 - Context Menus: Right-click and long-press support for quick chart management
 - Keyboard Shortcuts: Power user features for efficient workflow
 
