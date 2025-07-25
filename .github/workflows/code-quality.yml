@@ -4,37 +4,9 @@ on:
   push:
     paths:
       - 'assets/js/**/*.js'
-    paths-ignore:
-      - 'Docs/**'
-      - '**/*.md'
-      - '**/LICENSE'
-      - '**/.gitignore'
-      - '**/assets/images/**'
-      - '**/assets/images/*'
-      - '**/assets/images/**/*'
-      - '**/assets/svgs/**'
-      - '**/assets/svgs/*'
-      - '**/assets/svgs/**/*'
-      - '**/assets/favicon/**'
-      - '**/assets/favicon/*'
-      - '**/assets/favicon/**/*'
   pull_request:
     paths:
       - 'assets/js/**/*.js'
-    paths-ignore:
-      - 'Docs/**'
-      - '**/*.md'
-      - '**/LICENSE'
-      - '**/.gitignore'
-      - '**/assets/images/**'
-      - '**/assets/images/*'
-      - '**/assets/images/**/*'
-      - '**/assets/svgs/**'
-      - '**/assets/svgs/*'
-      - '**/assets/svgs/**/*'
-      - '**/assets/favicon/**'
-      - '**/assets/favicon/*'
-      - '**/assets/favicon/**/*'
 
 jobs:
   eslint:
