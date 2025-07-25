@@ -474,10 +474,17 @@ class PlanetSystem {
         // Remove existing preview
         this.removeDragPreview();
 
+        // Get planet info from current page or both pages
+        const planetInfo = this.getPlanetInfo(planetAbbr);
+        if (!planetInfo) {
+            console.error(`Planet info not found for: ${planetAbbr}`);
+            return;
+        }
+
         // Create new preview
         this.dragPreview = document.createElement('div');
         this.dragPreview.className = 'planet-drag-preview';
-        this.dragPreview.textContent = this.planets[planetAbbr].fullName;
+        this.dragPreview.textContent = planetInfo.fullName;
         this.dragPreview.style.cssText = `
             position: fixed;
             left: ${x - 25}px;
