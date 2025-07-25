@@ -1074,6 +1074,29 @@ body {
     overflow-y: auto;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     position: relative;
+    /* Fix scrollbar issue - ensure padding accounts for scrollbar */
+    padding-right: 40px; /* Extra padding for scrollbar */
+    margin-right: 8px; /* Margin to prevent scrollbar from touching edge */
+}
+
+/* Custom scrollbar styling for help modal */
+.help-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.help-modal-content::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+}
+
+.help-modal-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+    border: 1px solid #a8a8a8;
+}
+
+.help-modal-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 .help-modal-header {
