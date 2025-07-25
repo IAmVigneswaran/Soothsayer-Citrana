@@ -1,249 +1,475 @@
-# Citrana
+# Citrana - Vedic Astrology Chart Builder
 
-A modern, interactive web application for creating Vedic astrology charts, inspired by Excalidraw. Built with pure HTML5, CSS3, and JavaScript, this tool provides an intuitive interface for educators and students of Vedanga Jyotisha.
+A modern, interactive web application for creating Vedic astrology charts with drag-and-drop planet placement and comprehensive drawing tools. Built with pure HTML5, CSS3, and JavaScript using Konva.js for canvas manipulation, this tool provides an intuitive interface for educators and students of Vedanga Jyotisha.
 
-## Features
+## Project Overview
 
-### Chart Types
-- South Indian Chart: Traditional square grid layout with fixed Rashi positions
-- North Indian Chart: Diamond-shaped layout with dynamic house positioning
-- Lagna Setting: Right-click to set any house as Lagna (Ascendant)
-- First House Selection: For North Indian charts, designate any house as the first house
+Citrana is a browser-based application that allows users to create both South Indian and North Indian astrological charts. The application features a floating planet library, comprehensive drawing tools, context menus, and export capabilities. It runs entirely in the browser with no build process required, making it immediately deployable on GitHub Pages or any web server.
 
-### Planet Management
-- 10 Major Grahas: Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu, and Maandi
-- Drag & Drop: Intuitive planet placement from sidebar to chart houses
-- Multiple Instances: Place the same planet multiple times
-- Dynamic Sizing: Text automatically scales based on house occupancy
-- Mobile Support: Touch-friendly interface for tablets and phones
+## Technology Stack
 
-### Drawing Tools
-- Select Tool: Choose and modify existing elements
-- Arrow Tool: Create directional indicators
-- Line Tool: Draw straight lines and connections
-- Pen Tool: Freehand drawing for annotations
-- Text Tool: Add custom labels and descriptions
-- Undo/Redo: Full action history with keyboard shortcuts
-
-### Export & Sharing
-- High-Resolution PNG: Professional quality exports (300 DPI)
-- Auto-Save: Automatic chart data persistence
-- Cross-Platform: Works on desktop, tablet, and mobile devices
-
-### User Experience
-- Dark/Light Theme: Automatic system preference detection with manual toggle
-- Responsive Design: Optimized for all screen sizes
-- Keyboard Shortcuts: Power user features for efficiency
-- Context Menus: Right-click for quick actions
-- Status Updates: Real-time feedback and notifications
-
-## Quick Start
-
-### Prerequisites
-- Modern web browser (Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)
-- No server setup required - runs entirely in the browser
-
-### Installation
-1. Clone or download this repository
-2. Open index.html in your web browser
-3. Start creating Vedic charts!
-
-### For GitHub Pages
-Simply push the files to a GitHub repository and enable GitHub Pages. The application will work immediately without any build process.
-
-### Quick Start
-The application is ready to use immediately - no setup required!
-
-## Usage Guide
-
-### Creating Your First Chart
-
-1. Choose Chart Type: Select between South Indian or North Indian layout
-2. Set Lagna: Right-click any house and select "Set as Lagna (Ascendant)"
-3. Add Planets: Drag planets from the sidebar to chart houses
-4. Add Annotations: Use drawing tools to add notes and aspects
-5. Export: Click "Export PNG" to save your chart
-
-### Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| Ctrl+1 | Switch to South Indian Chart |
-| Ctrl+2 | Switch to North Indian Chart |
-| Ctrl+S | Save chart |
-| Ctrl+E | Export as PNG |
-| 1-5 | Switch drawing tools |
-| Ctrl+Z | Undo |
-| Ctrl+Y | Redo |
-| Escape | Clear selection |
-
-### Planet Abbreviations
-
-| Planet | Abbreviation |
-|--------|--------------|
-| Sun | Su |
-| Moon | Mo |
-| Mercury | Me |
-| Venus | Ve |
-| Mars | Ma |
-| Jupiter | Ju |
-| Saturn | Sa |
-| Rahu | Ra |
-| Ketu | Ke |
-| Maandi | Md |
-
-## South Indian Chart: Lagna Indicator (2024-)
-
-- When any Bhava (house) is set as Lagna in the South Indian chart, a single diagonal line appears at the top-left corner of that Bhava.
-- The line matches the grid color (`#374151`) and its ends touch the top and left sides of the house rectangle, forming a clear corner mark.
-- When Lagna is changed, the indicator is removed from the previous Bhava and drawn on the new one.
-- This provides a clear, modern, and visually consistent way to identify the Lagna Bhava.
-
-## Technical Architecture
-
-### Technology Stack
 - Frontend: Pure HTML5, CSS3, JavaScript (ES6+)
-- Graphics: HTML5 Canvas API with Fabric.js
-- Styling: Tailwind CSS (CDN)
-- Libraries: Fabric.js for canvas manipulation
+- Graphics: HTML5 Canvas API with Konva.js
+- Styling: Tailwind CSS (CDN) with custom CSS
+- Icons: Lucide Icons
 - Storage: Browser localStorage for data persistence
+- Analytics: Google Analytics and Google Tag Manager
+- No build process required - runs entirely in browser
 
-### Project Structure
+## Complete Project Structure
+
 ```
 Soothsayer-Citrana/
-├── index.html              # Main application file
+├── index.html                    # Main application entry point
 ├── assets/
 │   ├── css/
-│   │   └── styles.css      # Custom styles and theme support
+│   │   └── styles.css            # Complete styling system (1517 lines)
 │   ├── js/
-│   │   ├── utils.js        # Utility functions and constants
-│   │   ├── chart-templates.js  # Chart layout and rendering
-│   │   ├── planet-system.js    # Planet management and drag-drop
-│   │   ├── drawing-tools.js    # Drawing tools and annotations
-│   │   └── app.js          # Main application logic
-│   ├── images/             # Image assets
-│   ├── favicon/            # Favicon files
-│   └── svgs/               # SVG graphics
-├── SPECIFICATION.md        # Detailed project specification
-├── README.md              # Empty file
-└── IMPLEMENTATION_SUMMARY.md # Implementation summary
+│   │   ├── app.js                # Main application coordinator (1145 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (261 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (961 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (921 lines)
+│   │   ├── planet-system.js      # Planet library and drag-drop (456 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1567 lines)
+│   │   ├── context-menu.js       # Context menu system (456 lines)
+│   │   ├── edit-ui.js            # Edit interface controls (786 lines)
+│   │   └── utils.js              # Utility functions (340 lines)
+│   ├── images/
+│   │   └── soothsayer_social-preview.jpg  # Social media preview image
+│   ├── svgs/
+│   │   ├── north-indian.svg      # North Indian chart template
+│   │   └── south-indian.svg      # South Indian chart template
+│   └── favicon/                  # Complete favicon set (32 files)
+│       ├── favicon.ico           # Main favicon
+│       ├── manifest.json         # PWA manifest
+│       ├── browserconfig.xml     # IE browser config
+│       ├── apple-icon-*.png      # Apple touch icons (12 files)
+│       ├── android-icon-*.png    # Android icons (6 files)
+│       ├── favicon-*.png         # Standard favicons (6 files)
+│       └── ms-icon-*.png         # Microsoft icons (4 files)
+├── .github/
+│   └── workflows/                # GitHub Actions (if configured)
+├── AGENT.md                      # This comprehensive documentation
+├── .cursorrules                  # Cursor IDE configuration
+├── CHANGELOG.md                  # Version history and changes
+├── README.md                     # Project readme
+├── LICENSE                       # MIT License
+├── SECURITY.md                   # Security policy
+└── .gitignore                    # Git ignore rules
 ```
 
-### Key Components
+## Core Components Architecture
 
-#### ChartTemplates Class
-- Handles South Indian and North Indian chart layouts
-- Manages Lagna and house numbering
-- Provides chart data persistence
+### Main Application (app.js - 1145 lines)
+The central coordinator that manages all application components and lifecycle.
 
-#### PlanetSystem Class
-- Manages planet library and drag-and-drop
-- Handles planet placement and validation
-- Provides touch support for mobile devices
-
-#### DrawingTools Class
-- Implements drawing tools (arrow, line, pen, text)
+**Key Responsibilities:**
+- Initializes Konva.js stage and layer
+- Coordinates all component interactions
+- Manages tool selection and drawing state
+- Handles keyboard shortcuts and event listeners
 - Manages undo/redo functionality
-- Handles canvas interactions
+- Handles chart export and auto-save
+- Provides mobile touch support and Safari compatibility
+- Manages zoom controls and canvas transformations
 
-#### Utils Class
-- Provides utility functions for common operations
-- Manages theme switching and localStorage
-- Handles export functionality
+**Key Methods:**
+- `init()`: Application initialization
+- `setupCanvas()`: Konva.js stage setup
+- `setupComponents()`: Component initialization
+- `setupEventListeners()`: Event binding
+- `setupKeyboardShortcuts()`: Keyboard navigation
+- `exportChart()`: High-resolution PNG export
+- `autoSave()`: Automatic data persistence
+- `handleMouseDown/Move/Up()`: Mouse interaction handling
+- `handleTouchStart/Move/End()`: Touch interaction handling
 
-## Customization
+### Chart Coordinator (chart-coordinator.js - 261 lines)
+Manages the relationship between South Indian and North Indian chart templates.
+
+**Key Responsibilities:**
+- Routes operations to appropriate chart template
+- Manages chart type switching
+- Provides unified interface for chart operations
+- Handles chart data persistence and loading
+- Manages zoom operations across chart types
+
+**Key Methods:**
+- `createSouthIndianChart()`: Initialize South Indian layout
+- `createNorthIndianChart()`: Initialize North Indian layout
+- `setLagnaHouse()`: Set ascendant house
+- `setFirstHouse()`: Set first house for North Indian charts
+- `getChartData()`: Serialize chart data
+- `loadChartData()`: Restore chart from data
+
+### South Indian Chart Template (chart-templates-south.js - 961 lines)
+Handles the traditional South Indian chart layout with 4x4 grid structure.
+
+**Key Responsibilities:**
+- Creates 4x4 grid layout with center empty space
+- Manages house numbering and Lagna indicators
+- Handles planet placement and text scaling
+- Provides house highlighting and selection
+- Manages Rashi and Bhava number boxes
+- Implements context menu functionality for houses
+
+**Key Features:**
+- Traditional square grid layout
+- Center empty space for annotations
+- Lagna indicator with diagonal line
+- Dynamic planet text sizing
+- House renumbering based on Lagna position
+- Touch and mouse interaction support
+
+**Key Methods:**
+- `createSouthIndianChart()`: Build chart layout
+- `createHouse()`: Create individual house elements
+- `addPlanetToHouse()`: Place planets in houses
+- `setLagnaHouse()`: Set ascendant with visual indicator
+- `renumberHouses()`: Update house numbering
+- `highlightHouse()`: Visual house selection
+
+### North Indian Chart Template (chart-templates-north.js - 921 lines)
+Handles the diamond-shaped North Indian chart layout with polygon-based houses.
+
+**Key Responsibilities:**
+- Creates diamond-shaped polygon layout
+- Manages complex house positioning
+- Handles tiny Rashi number boxes
+- Provides advanced Rashi numbering logic
+- Manages planet placement in polygon houses
+- Implements dynamic house renumbering
+
+**Key Features:**
+- Diamond-shaped polygon layout
+- Precise house positioning using SVG coordinates
+- Tiny Rashi number boxes with exact positioning
+- Advanced Rashi numbering system
+- Dynamic house renumbering
+- Polygon-based hit detection
+
+**Key Methods:**
+- `createNorthIndianChart()`: Build diamond layout
+- `addPlanetToHouse()`: Place planets in polygon houses
+- `setLagnaHouse()`: Set ascendant house
+- `renumberHouses()`: Update house numbering
+- `isPointInPolygon()`: Hit detection for polygon houses
+- `getRashiNumberForHouse()`: Rashi calculation
+
+### Planet System (planet-system.js - 456 lines)
+Manages the floating planet library and drag-and-drop functionality.
+
+**Key Responsibilities:**
+- Creates and manages floating planet library UI
+- Implements drag-and-drop for planet placement
+- Handles touch and mouse interactions
+- Manages planet data and visual representations
+- Provides drop zone detection and validation
+- Implements mobile-friendly drag preview
+
+**Key Features:**
+- Floating, draggable planet library
+- 12 planets including Lagna and Custom
+- Drag preview with visual feedback
+- Touch and mouse support
+- Drop zone validation
+- Mobile-optimized interactions
+
+**Planet Library:**
+- Lg: Lagna (Ascendant)
+- Su: Sun
+- Mo: Moon
+- Me: Mercury
+- Ve: Venus
+- Ma: Mars
+- Ju: Jupiter
+- Sa: Saturn
+- Ra: Rahu
+- Ke: Ketu
+- Md: Maandi
+- Cu: Custom
+
+**Key Methods:**
+- `init()`: Initialize planet library
+- `createPlanetLibrary()`: Build UI elements
+- `setupDragAndDrop()`: Configure drag functionality
+- `handleDragStart/Move/End()`: Drag interaction handling
+- `handleTouchStart/Move/End()`: Touch interaction handling
+- `findHouseAtPosition()`: Drop zone detection
+
+### Drawing Tools (drawing-tools.js - 1567 lines)
+Comprehensive drawing system with multiple tools and editing capabilities.
+
+**Key Responsibilities:**
+- Implements all drawing tools (select, arrow, line, pen, text, heading)
+- Manages undo/redo functionality
+- Handles shape selection and editing
+- Provides precise positioning and hit detection
+- Manages Edit UI integration
+- Implements planet text editing
+
+**Available Tools:**
+- Select Tool: Choose and modify existing elements
+- Arrow Tool: Create directional indicators with arrowheads
+- Line Tool: Draw straight lines and connections
+- Pen Tool: Freehand drawing for annotations
+- Text Tool: Add editable text boxes
+- Heading Tool: Create chart headings and titles
+
+**Key Features:**
+- Pixel-perfect positioning
+- Touch and mouse support
+- Shape selection and editing
+- Color and stroke customization
+- Text editing with font controls
+- Planet text editing with retrograde support
+- Undo/redo with 50-step history
+
+**Key Methods:**
+- `startDrawing()`: Begin drawing operation
+- `draw()`: Continue drawing
+- `stopDrawing()`: Complete drawing
+- `makeShapeSelectable()`: Enable shape interaction
+- `undo()/redo()`: History management
+- `showEditUIForShape()`: Edit interface integration
+- `makePlanetTextEditable()`: Planet text editing
+
+### Context Menu (context-menu.js - 456 lines)
+Provides right-click and long-press context menus for chart interaction.
+
+**Key Responsibilities:**
+- Creates context-sensitive menus
+- Handles right-click and long-press interactions
+- Provides chart creation and management options
+- Manages house and planet-specific actions
+- Implements mobile-friendly touch interactions
+
+**Menu Types:**
+- Chart Creation Menu: Create new charts
+- House Menu: House-specific actions (set Lagna, clear house)
+- Planet Menu: Planet-specific actions (edit, delete, retrograde)
+- Existing Chart Menu: Chart management options
+
+**Key Features:**
+- Desktop right-click support
+- Mobile long-press support
+- Context-sensitive menu items
+- Submenu support
+- Touch-optimized interactions
+
+**Key Methods:**
+- `init()`: Initialize context menu system
+- `showChartMenu()`: Display main chart menu
+- `showHouseMenu()`: Display house-specific menu
+- `showPlanetMenu()`: Display planet-specific menu
+- `handleAction()`: Process menu selections
+
+### Edit UI (edit-ui.js - 786 lines)
+Provides context-sensitive editing controls for drawing elements.
+
+**Key Responsibilities:**
+- Creates floating edit interface
+- Provides tool-specific controls
+- Manages shape property editing
+- Handles color and stroke customization
+- Implements text editing controls
+- Provides mobile-optimized interface
+
+**Edit Controls:**
+- Stroke width and color controls
+- Font size, weight, and style controls
+- Text color customization
+- Delete functionality
+- Mobile touch support
+
+**Key Features:**
+- Floating, draggable interface
+- Tool-specific controls
+- Real-time property updates
+- Mobile-optimized design
+- Touch-friendly controls
+
+**Key Methods:**
+- `show()`: Display edit interface
+- `hide()`: Hide edit interface
+- `createToolControls()`: Build tool-specific controls
+- `updateStrokeWidth()`: Modify stroke properties
+- `updateFontSize()`: Modify text properties
+- `positionEditUI()`: Position interface
+
+### Utils (utils.js - 340 lines)
+Provides utility functions for common operations across the application.
+
+**Key Responsibilities:**
+- Provides debouncing and throttling functions
+- Manages status updates and notifications
+- Handles localStorage operations
+- Provides export functionality
+- Implements coordinate calculations
+- Manages file operations
+
+**Key Functions:**
+- `debounce()`: Performance optimization
+- `showNotification()`: User feedback
+- `saveChartData()`: Data persistence
+- `exportCanvasAsPNG()`: Chart export
+- `distance()`: Coordinate calculations
+- `generateId()`: Unique ID generation
+- `isMobile()`: Device detection
+
+## Core Features
+
+### Chart Types
+- **South Indian Chart**: Traditional 4x4 square grid layout with center empty space
+- **North Indian Chart**: Diamond-shaped polygon layout with dynamic positioning
+- **Lagna Setting**: Right-click context menu to set any house as Lagna (Ascendant)
+- **First House Selection**: For North Indian charts, designate any house as first house
+- **Dynamic House Numbering**: Automatic renumbering based on Lagna position
+
+### Planet Management
+- **12 Major Grahas**: Including Lagna, Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Rahu, Ketu, Maandi, and Custom
+- **Text-based Display**: Uses abbreviations instead of symbols for better compatibility
+- **Drag & Drop**: Intuitive planet placement from floating library to chart houses
+- **Multiple Instances**: Same planet can be placed multiple times
+- **Dynamic Text Sizing**: Planet text scales based on house occupancy
+- **Touch Support**: Mobile-friendly touch interactions with visual feedback
+
+### Drawing Tools
+- **Select Tool**: Choose and modify existing elements with Edit UI
+- **Arrow Tool**: Create directional indicators with customizable arrowheads
+- **Line Tool**: Draw straight lines and connections
+- **Pen Tool**: Freehand drawing for annotations
+- **Text Tool**: Add editable text boxes anywhere on canvas
+- **Heading Tool**: Create chart headings and titles
+- **Undo/Redo**: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+
+### User Experience
+- **Dark/Light Theme**: Automatic system preference detection with manual toggle
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **Keyboard Shortcuts**: Power user features for efficiency
+- **Context Menus**: Right-click and long-press for quick actions
+- **Status Updates**: Real-time feedback and notifications
+- **Auto-Save**: Automatic chart data persistence every 30 seconds
+
+### Export & Sharing
+- **High-Resolution PNG**: Professional quality exports (300 DPI)
+- **Auto-Save**: Chart data saved to localStorage
+- **Cross-Platform**: Works on all modern browsers
+- **GitHub Pages Compatible**: No build process required
+
+## Browser Compatibility
+
+- **Desktop**: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- **Mobile**: iOS Safari 13+, Android Chrome 80+
+- **Features**: Canvas API, localStorage, ES6 modules, Touch Events
+
+**Mobile Browser Limitations:**
+- Limited support for older mobile browsers
+- Some advanced features may not work on older iOS Safari versions
+- Touch interactions optimized for modern mobile browsers
+- Performance may vary on low-end mobile devices
+
+## Performance Optimization
+
+- **Efficient Canvas Rendering**: Konva.js optimization
+- **Debounced Resize Handlers**: 250ms debouncing
+- **Optimized Planet Placement**: Efficient algorithms
+- **Minimal DOM Manipulation**: Canvas-based rendering
+- **Smart Auto-Save**: 30-second intervals
+- **Touch Event Optimization**: Mobile performance
+
+## Development Guidelines
+
+### Code Style
+- Use ES6+ JavaScript features
+- Follow existing naming conventions
+- Add comprehensive comments for new features
+- Maintain modular architecture
+- Use Tailwind CSS classes for styling
+
+### File Organization
+- Keep all assets in the assets/ directory
+- JavaScript files in assets/js/
+- CSS files in assets/css/
+- Images in assets/images/
+- SVGs in assets/svgs/
+- Favicons in assets/favicon/
+
+### Browser Compatibility
+- Test on multiple browsers and devices
+- Ensure touch and mouse support
+- Validate responsive design
+- Check performance on mobile devices
+
+## Customization Guidelines
 
 ### Adding New Planets
-Edit the `planets` object in `assets/js/planet-system.js`:
-
+Edit the planets object in assets/js/planet-system.js:
 ```javascript
 this.planets = {
     'Su': { name: 'Sun', fullName: 'Sun', color: '#000000' },
-    // Add your new planet here
+    // Add new planet here
     'New': { name: 'New Planet', fullName: 'New Planet', color: '#FF0000' }
 };
 ```
 
-### Customizing Chart Styles
-Modify the chart rendering methods in assets/js/chart-templates.js to change:
-- House colors and borders
-- Grid line styles
-- Text formatting
-- Layout dimensions
+### Modifying Chart Styles
+- House colors and borders in chart template files
+- Grid line styles and text formatting
+- Layout dimensions and spacing
+- Theme colors and visual elements
 
 ### Theme Customization
-The application uses Tailwind CSS classes. Customize the theme by:
-- Modifying assets/css/styles.css for custom component styles
-- Updating color schemes in the JavaScript files
-- Adding new theme variants
+- Modify assets/css/styles.css for custom component styles
+- Update color schemes in JavaScript files
+- Add new theme variants
+- Customize responsive breakpoints
 
-## Development
+## Important Notes
 
-### Local Development
-1. Clone the repository
-2. Open index.html in a web browser
-3. Use browser developer tools for debugging
-4. No build process required
+### No Symbol Support
+- The application does NOT use planet symbols
+- All planets are displayed using text abbreviations (Su, Mo, Ma, etc.)
+- This ensures better compatibility and accessibility
 
-### Browser Compatibility
-- Desktop: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
-- Mobile: iOS Safari 13+, Android Chrome 80+
-- Features: Canvas API, localStorage, ES6 modules
+### No Build Process
+- Application runs entirely in the browser
+- No server-side dependencies
+- No build tools or compilation required
+- Ready for immediate deployment on GitHub Pages
 
-### Performance Optimization
-- Efficient canvas rendering with Fabric.js
-- Debounced resize handlers
-- Optimized planet placement algorithms
-- Minimal DOM manipulation
+### Data Management
+- All data stored locally in browser localStorage
+- No external API calls or data collection
+- Privacy-first approach with no tracking
+- Auto-save every 30 seconds
 
-## Contributing
-
-### Development Guidelines
-1. Follow the existing code structure and naming conventions
-2. Add comprehensive comments for new features
-3. Test on multiple browsers and devices
-4. Update documentation for new features
-
-### Feature Requests
-- Check existing issues before creating new ones
-- Provide detailed descriptions of requested features
-- Include use cases and expected behavior
-
-### Bug Reports
-- Include browser and OS information
-- Provide steps to reproduce the issue
-- Include console errors if applicable
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Excalidraw: Inspiration for the user interface and interaction patterns
-- Fabric.js: Canvas manipulation library
-- Tailwind CSS: Utility-first CSS framework
-- Vedanga Jyotisha Community: Domain expertise and feedback
-
-## Support
-
-For questions, issues, or feature requests:
-- Create an issue on GitHub
-- Check the help section in the application (click the help button)
-- Review the detailed specification in SPECIFICATION.md
-
-## Roadmap
+## Future Enhancements
 
 ### Phase 2 (Planned)
-- Aspect line drawing
-- Custom planet sets
+- Aspect line drawing between planets
+- Custom planet sets and configurations
 - Multi-language support (Tamil, Hindi)
-- Advanced export options
+- Advanced export options (SVG, PDF)
 
 ### Phase 3 (Future)
 - Batch chart generation
 - Cloud storage integration
-- Collaborative editing
+- Collaborative editing features
 - API for external integrations
 
-Built with love for the Vedanga Jyotisha community 
+## Support and Documentation
+
+- **AGENT.md**: This comprehensive project documentation
+- **SPECIFICATION.md**: Detailed original project specification
+- **IMPLEMENTATION_SUMMARY.md**: Complete implementation details
+- **README.md**: Project overview and quick start
+
+## Development Commands
+
+- Open index.html in browser to run application
+- No build commands required
+- Use browser developer tools for debugging
+- All changes are immediately visible on refresh
+
+Built with love for the Vedanga Jyotisha community. 
