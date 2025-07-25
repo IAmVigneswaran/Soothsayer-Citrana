@@ -12,7 +12,7 @@ class SouthIndianChartTemplate {
         this.firstHouseSouth = 1;
         this.selectedHouse = null; // Track selected house for highlight
         this.southIndianHouseOrder = null;
-        
+
         if (stage && layer) {
             console.log('South Indian Chart Template initialized with stage and layer');
         }
@@ -63,21 +63,69 @@ class SouthIndianChartTemplate {
         // Create 4x4 grid with center empty (South Indian layout)
         const positions = [
             // Top row (houses 12, 1, 2, 3)
-            { x: startX, y: startY, house: 12 },
-            { x: startX + houseSize, y: startY, house: 1 },
-            { x: startX + houseSize * 2, y: startY, house: 2 },
-            { x: startX + houseSize * 3, y: startY, house: 3 },
+            {
+                x: startX,
+                y: startY,
+                house: 12
+            },
+            {
+                x: startX + houseSize,
+                y: startY,
+                house: 1
+            },
+            {
+                x: startX + houseSize * 2,
+                y: startY,
+                house: 2
+            },
+            {
+                x: startX + houseSize * 3,
+                y: startY,
+                house: 3
+            },
             // Second row (houses 11, empty, empty, 4)
-            { x: startX, y: startY + houseSize, house: 11 },
-            { x: startX + houseSize * 3, y: startY + houseSize, house: 4 },
+            {
+                x: startX,
+                y: startY + houseSize,
+                house: 11
+            },
+            {
+                x: startX + houseSize * 3,
+                y: startY + houseSize,
+                house: 4
+            },
             // Third row (houses 10, empty, empty, 5)
-            { x: startX, y: startY + houseSize * 2, house: 10 },
-            { x: startX + houseSize * 3, y: startY + houseSize * 2, house: 5 },
+            {
+                x: startX,
+                y: startY + houseSize * 2,
+                house: 10
+            },
+            {
+                x: startX + houseSize * 3,
+                y: startY + houseSize * 2,
+                house: 5
+            },
             // Bottom row (houses 9, 8, 7, 6)
-            { x: startX, y: startY + houseSize * 3, house: 9 },
-            { x: startX + houseSize, y: startY + houseSize * 3, house: 8 },
-            { x: startX + houseSize * 2, y: startY + houseSize * 3, house: 7 },
-            { x: startX + houseSize * 3, y: startY + houseSize * 3, house: 6 }
+            {
+                x: startX,
+                y: startY + houseSize * 3,
+                house: 9
+            },
+            {
+                x: startX + houseSize,
+                y: startY + houseSize * 3,
+                house: 8
+            },
+            {
+                x: startX + houseSize * 2,
+                y: startY + houseSize * 3,
+                house: 7
+            },
+            {
+                x: startX + houseSize * 3,
+                y: startY + houseSize * 3,
+                house: 6
+            }
         ];
 
         // Store the visual order for renumbering
@@ -120,7 +168,9 @@ class SouthIndianChartTemplate {
         // In-place editing on double-click
         centerText.on('dblclick dbltap', () => {
             const stage = this.stage;
-            const textRect = centerText.getClientRect({ relativeTo: stage });
+            const textRect = centerText.getClientRect({
+                relativeTo: stage
+            });
             const stageBox = stage.container().getBoundingClientRect();
             // Calculate position relative to viewport
             const areaPosition = {
@@ -198,7 +248,7 @@ class SouthIndianChartTemplate {
 
         // Zoom to fit
         this.zoomToFit();
-        
+
         console.log('South Indian chart created');
     }
 
@@ -228,7 +278,7 @@ class SouthIndianChartTemplate {
             '9', // Sagittarius
             '10', // Capricorn
             '11', // Aquarius
-            '12'  // Pisces
+            '12' // Pisces
         ];
 
         const rashiIndex = (houseNumber - 1) % 12;
@@ -330,7 +380,7 @@ class SouthIndianChartTemplate {
             this.highlightHouse(houseNumber);
             window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
         });
-        
+
         // Add touch support for mobile context menu
         let longPressTimer = null;
         let longPressTriggered = false;
@@ -346,20 +396,20 @@ class SouthIndianChartTemplate {
                 }, 500);
             }
         });
-        
+
         house.on('touchmove', (e) => {
             if (longPressTimer) {
                 clearTimeout(longPressTimer);
                 longPressTimer = null;
             }
         });
-        
+
         house.on('touchend', (e) => {
             if (longPressTimer) {
                 clearTimeout(longPressTimer);
                 longPressTimer = null;
             }
-            
+
             // If long press was triggered, prevent the menu from being hidden
             if (longPressTriggered) {
                 e.evt.preventDefault();
@@ -370,14 +420,14 @@ class SouthIndianChartTemplate {
                 }, 100);
             }
         });
-        
+
         // Add click event for selection
         house.on('click', (e) => {
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
             console.log('[SELECT] South Indian Chart House selected:', houseNumber);
         });
-        
+
         // Add touch event for mobile selection
         house.on('tap', (e) => {
             this.highlightHouse(houseNumber);
@@ -416,9 +466,9 @@ class SouthIndianChartTemplate {
         const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
         const planet = window.app.planetSystem.getPlanetInfo(planetAbbr);
         const planetColor = planet ? planet.color : '#000000';
-        house.planets.push({ 
-            abbr: planetAbbr, 
-            label: label || planetAbbr, 
+        house.planets.push({
+            abbr: planetAbbr,
+            label: label || planetAbbr,
             id: planetId,
             color: planetColor
         });
@@ -456,18 +506,18 @@ class SouthIndianChartTemplate {
         const BASE_FONT = 24;
         const MIN_FONT = 14;
         const STEP = 4;
-        const fontSize = Math.max(MIN_FONT, BASE_FONT - (n-1)*STEP);
+        const fontSize = Math.max(MIN_FONT, BASE_FONT - (n - 1) * STEP);
         // Perfectly center all planet texts both horizontally and vertically in the house
-        const totalHeight = n * fontSize + (n-1) * 4;
-        const startY = house.y + house.height/2 - totalHeight/2;
+        const totalHeight = n * fontSize + (n - 1) * 4;
+        const startY = house.y + house.height / 2 - totalHeight / 2;
         house.planets.forEach((planetObj, i) => {
             const planet = window.app.planetSystem.getPlanetInfo(planetObj.abbr);
             const planetY = startY + i * (fontSize + 4);
-            
+
             // Add a transparent rectangle for easier hit area
             const hitRect = new Konva.Rect({
-                x: house.x + house.width/2 - fontSize,
-                y: planetY - fontSize/2,
+                x: house.x + house.width / 2 - fontSize,
+                y: planetY - fontSize / 2,
                 width: fontSize * 2,
                 height: fontSize,
                 fill: 'rgba(0,0,0,0)',
@@ -475,17 +525,17 @@ class SouthIndianChartTemplate {
                 listening: true,
                 draggable: true // Make hit rect draggable too for Safari
             });
-            
+
             // Safari-specific: Add touch event handling to hit rect
             hitRect.on('touchstart', (e) => {
                 e.evt.preventDefault();
                 console.log(`[DEBUG] Touch start for hit rect of planet ${planetObj.abbr} from house ${houseNumber}`);
             });
-            
+
             hitRect.on('touchmove', (e) => {
                 e.evt.preventDefault();
             });
-            
+
             hitRect.on('touchend', (e) => {
                 e.evt.preventDefault();
             });
@@ -493,7 +543,7 @@ class SouthIndianChartTemplate {
             // The planet text - perfectly centered
             const isMobile = /Mobile|Android|iP(ad|hone|od)/.test(navigator.userAgent);
             const planetText = new Konva.Text({
-                x: house.x + house.width/2,
+                x: house.x + house.width / 2,
                 y: planetY,
                 text: planetObj.label,
                 fontSize: fontSize,
@@ -507,34 +557,34 @@ class SouthIndianChartTemplate {
                 offsetX: 0,
                 offsetY: 0,
             });
-            
+
             // Calculate exact center position
             setTimeout(() => {
                 const textWidth = planetText.width();
                 const textHeight = planetText.height();
-                planetText.x(house.x + house.width/2 - textWidth/2);
-                planetText.y(planetY - textHeight/2);
+                planetText.x(house.x + house.width / 2 - textWidth / 2);
+                planetText.y(planetY - textHeight / 2);
                 this.layer.batchDraw();
             }, 10);
-            
+
             planetText._planetHouseNumber = houseNumber;
             planetText._planetId = planetObj.id;
-            
+
             // Safari-specific: Ensure draggable is properly set
             setTimeout(() => {
                 planetText.draggable(true);
             }, 10);
-            
+
             // Safari-specific: Add touch event handling
             planetText.on('touchstart', (e) => {
                 e.evt.preventDefault();
                 console.log(`[DEBUG] Touch start for planet ${planetObj.abbr} from house ${houseNumber}`);
             });
-            
+
             planetText.on('touchmove', (e) => {
                 e.evt.preventDefault();
             });
-            
+
             planetText.on('touchend', (e) => {
                 e.evt.preventDefault();
             });
@@ -550,16 +600,16 @@ class SouthIndianChartTemplate {
                         // Update the planet text and color
                         planetText.text(newLabel);
                         planetText.fill(newColor);
-                        
+
                         // Re-center the text after editing
                         setTimeout(() => {
                             const textWidth = planetText.width();
                             const textHeight = planetText.height();
-                            planetText.x(house.x + house.width/2 - textWidth/2);
-                            planetText.y(planetY - textHeight/2);
+                            planetText.x(house.x + house.width / 2 - textWidth / 2);
+                            planetText.y(planetY - textHeight / 2);
                             this.layer.batchDraw();
                         }, 10);
-                        
+
                         this.layer.batchDraw();
                         console.log(`[DEBUG] Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
                         // Trigger snapshot for undo/redo
@@ -584,7 +634,7 @@ class SouthIndianChartTemplate {
             };
             hitRect.on('contextmenu', contextHandler);
             planetText.on('contextmenu', contextHandler);
-            
+
             // Touch support for mobile context menu
             let planetLongPressTimer = null;
             let planetLongPressTriggered = false;
@@ -600,20 +650,20 @@ class SouthIndianChartTemplate {
                     }, 500);
                 }
             };
-            
+
             const touchMoveHandler = (e) => {
                 if (planetLongPressTimer) {
                     clearTimeout(planetLongPressTimer);
                     planetLongPressTimer = null;
                 }
             };
-            
+
             const touchEndHandler = (e) => {
                 if (planetLongPressTimer) {
                     clearTimeout(planetLongPressTimer);
                     planetLongPressTimer = null;
                 }
-                
+
                 // If long press was triggered, prevent the menu from being hidden
                 if (planetLongPressTriggered) {
                     e.evt.preventDefault();
@@ -624,22 +674,22 @@ class SouthIndianChartTemplate {
                     }, 100);
                 }
             };
-            
+
             hitRect.on('touchstart', touchContextHandler);
             planetText.on('touchstart', touchContextHandler);
             hitRect.on('touchmove', touchMoveHandler);
             planetText.on('touchmove', touchMoveHandler);
             hitRect.on('touchend', touchEndHandler);
             planetText.on('touchend', touchEndHandler);
-            
+
             // Safari-compatible drag handlers for both hit rect and planet text
             const dragStartHandler = (e) => {
                 console.log(`[DEBUG] Drag start for planet ${planetObj.abbr} from house ${houseNumber}`);
-                
-                this._dragSource = { 
-                    houseNumber, 
-                    abbr: planetObj.abbr, 
-                    id: planetObj.id, 
+
+                this._dragSource = {
+                    houseNumber,
+                    abbr: planetObj.abbr,
+                    id: planetObj.id,
                     label: planetObj.label,
                     color: planetObj.color
                 };
@@ -650,32 +700,32 @@ class SouthIndianChartTemplate {
                 this.layer.batchDraw();
                 console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
             };
-            
+
             const dragEndHandler = (e) => {
                 planetText.opacity(1);
                 hitRect.opacity(1);
-                
+
                 // Safari-compatible drop detection
                 let targetHouse = null;
                 let pointer = null;
-                
+
                 // Try multiple methods to get pointer position for Safari compatibility
                 try {
                     // Method 1: Use stage pointer position
                     pointer = this.stage.getPointerPosition();
-                    
+
                     // Method 2: If stage pointer fails, try event position
                     if (!pointer && e.evt) {
                         const stageBox = this.stage.container().getBoundingClientRect();
                         const scale = this.stage.scaleX();
                         const stagePos = this.stage.position();
-                        
+
                         pointer = {
                             x: (e.evt.clientX - stageBox.left - stagePos.x) / scale,
                             y: (e.evt.clientY - stageBox.top - stagePos.y) / scale
                         };
                     }
-                    
+
                     // Method 3: If still no pointer, use the planet's current position
                     if (!pointer) {
                         pointer = {
@@ -683,7 +733,7 @@ class SouthIndianChartTemplate {
                             y: planetText.y()
                         };
                     }
-                    
+
                     // Method 4: Safari fallback - use the planet's final position after drag
                     if (!pointer) {
                         const planetPos = planetText.position();
@@ -692,13 +742,13 @@ class SouthIndianChartTemplate {
                             y: planetPos.y
                         };
                     }
-                    
+
                     // --- NEW: Always transform pointer to stage coordinates ---
                     const scale = this.stage.scaleX();
                     const stagePos = this.stage.position();
                     const px = (pointer.x - stagePos.x) / scale;
                     const py = (pointer.y - stagePos.y) / scale;
-                    
+
                     // Find which bhava the drop is over
                     for (const hNum in this.houseDataSouth) {
                         const h = this.houseDataSouth[hNum];
@@ -711,7 +761,7 @@ class SouthIndianChartTemplate {
                             break;
                         }
                     }
-                    
+
                     // Method 5: If still no target house found, try a broader search
                     if (!targetHouse) {
                         console.log('[DEBUG] No target house found, trying broader search...');
@@ -720,10 +770,10 @@ class SouthIndianChartTemplate {
                             const centerX = h.x + h.width / 2;
                             const centerY = h.y + h.height / 2;
                             const distance = Math.sqrt(
-                                Math.pow(px - centerX, 2) + 
+                                Math.pow(px - centerX, 2) +
                                 Math.pow(py - centerY, 2)
                             );
-                            
+
                             // If planet is within reasonable distance of house center
                             if (distance < Math.max(h.width, h.height) / 2) {
                                 targetHouse = parseInt(hNum);
@@ -732,11 +782,11 @@ class SouthIndianChartTemplate {
                             }
                         }
                     }
-                    
+
                 } catch (error) {
                     console.error('[DEBUG] Error in drop detection:', error);
                 }
-                
+
                 if (targetHouse && targetHouse !== houseNumber) {
                     // Move planet to new bhava by ID
                     this.removePlanetFromHouseById(houseNumber, planetObj.id);
@@ -759,7 +809,7 @@ class SouthIndianChartTemplate {
                 this._dragSource = null;
                 this.layer.batchDraw();
             };
-            
+
             // Add drag handlers to both hit rect and planet text
             hitRect.on('dragstart', dragStartHandler);
             planetText.on('dragstart', dragStartHandler);
@@ -776,15 +826,20 @@ class SouthIndianChartTemplate {
     // --- Selection and Keyboard Delete ---
     selectPlanet(planetText, houseNumber, abbr, id) {
         this.clearSelectedPlanet();
-        this.selectedPlanet = { planetText, houseNumber, abbr, id };
+        this.selectedPlanet = {
+            planetText,
+            houseNumber,
+            abbr,
+            id
+        };
         planetText.stroke('#f59e42');
         planetText.strokeWidth(2);
         this.layer.batchDraw();
         if (!this._deleteKeyListener) {
             this._deleteKeyListener = (e) => {
-                            if (e.key === 'Delete' && this.selectedPlanet) {
-                this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
-            }
+                if (e.key === 'Delete' && this.selectedPlanet) {
+                    this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
+                }
             };
             window.addEventListener('keydown', this._deleteKeyListener);
         }
@@ -837,35 +892,39 @@ class SouthIndianChartTemplate {
     renumberHouses() {
         // Initialize debug array at the beginning
         const debugBhavas = [];
-        
+
         // Visual order for South Indian chart (house numbers)
         const visualOrder = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
         let houseOrder;
-        
+
         // Rotate visual order so Lagna is first
         const lagnaIdx = visualOrder.indexOf(this.lagnaHouseSouth);
         houseOrder = visualOrder.slice(lagnaIdx).concat(visualOrder.slice(0, lagnaIdx));
-        
+
         const rashis = [
             '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
         ];
-        
+
         for (let i = 0; i < houseOrder.length; i++) {
             const houseNum = houseOrder[i];
             const bhavaNum = i + 1;
-            
+
             // For South Indian chart, use the original logic
             const rashiIndex = (houseNum - 1) % 12;
             const rashiName = rashis[rashiIndex];
-            
-            debugBhavas.push({bhavaNum, houseNum, rashiName});
-            
+
+            debugBhavas.push({
+                bhavaNum,
+                houseNum,
+                rashiName
+            });
+
             // Update South Indian chart bhava numbers
             if (this.houseDataSouth[houseNum] && this.houseDataSouth[houseNum].bhavaNumberSouthText) {
                 this.houseDataSouth[houseNum].bhavaNumberSouthText.text(bhavaNum.toString());
             }
         }
-        
+
         this.layer.batchDraw();
         console.log('Bhava mapping:', debugBhavas);
         console.log('Houses renumbered');
@@ -878,14 +937,20 @@ class SouthIndianChartTemplate {
         }
         this.houseDataSouth = {};
         this.selectedHouse = null;
-        
+
         // Reset stage scale and position
         if (this.stage) {
-            this.stage.scale({ x: 1, y: 1 });
-            this.stage.position({ x: 0, y: 0 });
+            this.stage.scale({
+                x: 1,
+                y: 1
+            });
+            this.stage.position({
+                x: 0,
+                y: 0
+            });
             this.stage.batchDraw();
         }
-        
+
         console.log('South Indian chart cleared');
     }
 
@@ -905,7 +970,10 @@ class SouthIndianChartTemplate {
         const scaleY = (stageHeight * scaleFactor) / chartBounds.height;
         const scale = Math.min(scaleX, scaleY, 2); // Max scale of 2
 
-        this.stage.scale({ x: scale, y: scale });
+        this.stage.scale({
+            x: scale,
+            y: scale
+        });
 
         // Center the chart, but add extra top margin for the label
         const chartCenter = {
@@ -935,15 +1003,15 @@ class SouthIndianChartTemplate {
 
     loadChartData(data) {
         if (!data || data.chartType !== 'south-indian') return;
-        
+
         try {
             this.lagnaHouseSouth = data.lagnaHouse || 1;
             this.firstHouseSouth = data.firstHouse || 1;
             this.houseDataSouth = data.houseData || {};
-            
+
             // Recreate the chart
             this.createSouthIndianChart();
-            
+
             console.log('South Indian chart data loaded successfully');
         } catch (error) {
             console.error('Error loading South Indian chart data:', error);
@@ -958,4 +1026,4 @@ class SouthIndianChartTemplate {
         this.layer.batchDraw();
         console.log('All planets cleared from South Indian chart');
     }
-} 
+}

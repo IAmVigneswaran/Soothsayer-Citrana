@@ -17,14 +17,14 @@ class DrawingTools {
         this.isTouchDevice = this.detectTouchDevice();
         this.selectedShape = null;
         this.isDragging = false;
-        
+
         // Track editing state to prevent conflicts
         this.isEditingPlanet = false;
         this.currentlyEditingPlanet = null;
-        
+
         // Initialize Edit UI
         this.editUI = new EditUI();
-        
+
         // Do NOT call setupTouchEvents(); let app.js handle all mobile touch events
     }
 
@@ -40,7 +40,7 @@ class DrawingTools {
     getPrecisePosition(event) {
         // Get the stage container's bounding rect
         const stageBox = this.stage.container().getBoundingClientRect();
-        
+
         // Get client coordinates
         let clientX, clientY;
         if (event.clientX !== undefined) {
@@ -52,19 +52,19 @@ class DrawingTools {
             clientX = event.clientX || event.pageX;
             clientY = event.clientY || event.pageY;
         }
-        
+
         // Calculate position relative to stage container
         const x = (clientX - stageBox.left) / this.stage.scaleX();
         const y = (clientY - stageBox.top) / this.stage.scaleY();
-        
+
         // Account for stage position
         const finalX = x - this.stage.x() / this.stage.scaleX();
         const finalY = y - this.stage.y() / this.stage.scaleY();
-        
+
         // Ensure pixel-perfect positioning
-        return { 
-            x: Math.round(finalX * 100) / 100, 
-            y: Math.round(finalY * 100) / 100 
+        return {
+            x: Math.round(finalX * 100) / 100,
+            y: Math.round(finalY * 100) / 100
         };
     }
 
@@ -76,25 +76,28 @@ class DrawingTools {
     getPrecisePositionFromKonva(e) {
         const pos = this.stage.getPointerPosition();
         if (!pos) return null;
-        
+
         // Account for stage transformations
         const scaleX = this.stage.scaleX();
         const scaleY = this.stage.scaleY();
         const stageX = this.stage.x();
         const stageY = this.stage.y();
-        
+
         // Ensure we get pixel-perfect positioning
         const finalX = Math.round((pos.x - stageX) / scaleX * 100) / 100;
         const finalY = Math.round((pos.y - stageY) / scaleY * 100) / 100;
-        
-        return { x: finalX, y: finalY };
+
+        return {
+            x: finalX,
+            y: finalY
+        };
     }
 
     startDrawing(pos, tool) {
         if (!pos || !this.stage || !this.layer) return;
-        
+
         // Validate position coordinates
-        if (typeof pos.x !== 'number' || typeof pos.y !== 'number' || 
+        if (typeof pos.x !== 'number' || typeof pos.y !== 'number' ||
             isNaN(pos.x) || isNaN(pos.y)) {
             console.warn('Invalid position coordinates:', pos);
             return;
@@ -125,9 +128,9 @@ class DrawingTools {
 
     draw(pos, tool) {
         if (!this.isDrawing || !this.currentShape || !pos) return;
-        
+
         // Validate position coordinates
-        if (typeof pos.x !== 'number' || typeof pos.y !== 'number' || 
+        if (typeof pos.x !== 'number' || typeof pos.y !== 'number' ||
             isNaN(pos.x) || isNaN(pos.y)) {
             console.warn('Invalid position coordinates in draw:', pos);
             return;
@@ -149,31 +152,31 @@ class DrawingTools {
                 this.updatePen(pos);
                 break;
         }
-        
+
         this.lastPoint = pos;
     }
 
     stopDrawing() {
         if (!this.isDrawing) return;
-        
+
         // Add the completed shape to undo stack
         if (this.currentShape) {
             this.addToUndoStack(this.currentShape, 'add');
         }
-        
+
         this.isDrawing = false;
         this.currentShape = null;
         this.currentTool = null;
         this.lastPoint = null;
-        
+
         // Ensure the layer is updated
         this.layer.batchDraw();
-        
+
         // Trigger snapshot for undo/redo
         if (window.app && window.app.pushSnapshot) {
             window.app.pushSnapshot();
         }
-        
+
         console.log('Drawing stopped');
     }
 
@@ -183,13 +186,13 @@ class DrawingTools {
      */
     makeShapeSelectable(shape) {
         if (!shape) return;
-        
+
         // Ensure the shape is listening for events
         shape.setAttrs({
             listening: true,
             draggable: false // Will be enabled when select tool is active
         });
-        
+
         // Add a small delay to ensure the shape is fully rendered
         setTimeout(() => {
             // Re-add double-tap support if it's a touch device
@@ -227,7 +230,7 @@ class DrawingTools {
         arrow.on('click', () => {
             this.showEditUI(arrow, 'arrow');
         });
-        
+
         // Add double-tap support for mobile
         this.addDoubleTapSupport(arrow, 'arrow');
 
@@ -239,19 +242,19 @@ class DrawingTools {
 
     updateArrow(pos) {
         if (!this.currentShape) return;
-        
+
         const points = this.currentShape.points();
         points[2] = pos.x;
         points[3] = pos.y;
         this.currentShape.points(points);
-        
+
         // Update bounding box if it exists
         if (this.currentShape.boundingBox) {
             this.updateBoundingBox(this.currentShape.boundingBox, this.currentShape);
         }
-        
+
         this.layer.batchDraw();
-        
+
         // Make the shape selectable after drawing
         this.makeShapeSelectable(this.currentShape);
     }
@@ -275,7 +278,7 @@ class DrawingTools {
         line.on('click', () => {
             this.showEditUI(line, 'line');
         });
-        
+
         // Add double-tap support for mobile
         this.addDoubleTapSupport(line, 'line');
 
@@ -287,19 +290,19 @@ class DrawingTools {
 
     updateLine(pos) {
         if (!this.currentShape) return;
-        
+
         const points = this.currentShape.points();
         points[2] = pos.x;
         points[3] = pos.y;
         this.currentShape.points(points);
-        
+
         // Update bounding box if it exists
         if (this.currentShape.boundingBox) {
             this.updateBoundingBox(this.currentShape.boundingBox, this.currentShape);
         }
-        
+
         this.layer.batchDraw();
-        
+
         // Make the shape selectable after drawing
         this.makeShapeSelectable(this.currentShape);
     }
@@ -327,7 +330,7 @@ class DrawingTools {
             e.cancelBubble = true;
             this.showEditUI(line, 'pen');
         });
-        
+
         // Add double-tap support for mobile
         this.addDoubleTapSupport(line, 'pen');
 
@@ -339,18 +342,18 @@ class DrawingTools {
 
     updatePen(pos) {
         if (!this.currentShape) return;
-        
+
         const points = this.currentShape.points();
         points.push(pos.x, pos.y);
         this.currentShape.points(points);
-        
+
         // Update bounding box if it exists
         if (this.currentShape.boundingBox) {
             this.updateBoundingBox(this.currentShape.boundingBox, this.currentShape);
         }
-        
+
         this.layer.batchDraw();
-        
+
         // Make the shape selectable after drawing
         this.makeShapeSelectable(this.currentShape);
     }
@@ -377,19 +380,19 @@ class DrawingTools {
 
         // Make text editable immediately and on double-click
         this.makeTextEditable(text);
-        
+
         // Add click handler for Edit UI
         text.on('click', (e) => {
             // Prevent event bubbling
             e.cancelBubble = true;
-            
+
             // Show Edit UI (always show Edit UI on click)
             this.showEditUI(text, 'text');
         });
-        
+
         // Add double-tap support for mobile Edit UI
         this.addDoubleTapSupport(text, 'text');
-        
+
         // Auto-switch to select tool after creating text
         setTimeout(() => {
             if (window.app) {
@@ -403,16 +406,16 @@ class DrawingTools {
         text.on('dblclick', () => {
             this.editText(text);
         });
-        
+
         // Double-tap to edit (mobile)
         let lastTap = 0;
         let tapCount = 0;
         let tapTimer = null;
-        
+
         text.on('tap', (e) => {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
-            
+
             if (tapLength < 500 && tapLength > 0) {
                 // Double tap detected
                 tapCount++;
@@ -424,9 +427,9 @@ class DrawingTools {
             } else {
                 tapCount = 1;
             }
-            
+
             lastTap = currentTime;
-            
+
             // Reset tap count after a delay
             if (tapTimer) clearTimeout(tapTimer);
             tapTimer = setTimeout(() => {
@@ -443,23 +446,23 @@ class DrawingTools {
         }
 
         // Get the absolute position of the text
-            const textPosition = text.absolutePosition();
+        const textPosition = text.absolutePosition();
         const stageBox = this.stage.container().getBoundingClientRect();
-            
+
         // Calculate position relative to viewport
-            const areaPosition = {
-                x: stageBox.left + textPosition.x,
-                y: stageBox.top + textPosition.y
-            };
+        const areaPosition = {
+            x: stageBox.left + textPosition.x,
+            y: stageBox.top + textPosition.y
+        };
 
         // Create textarea
-            const textarea = document.createElement('textarea');
+        const textarea = document.createElement('textarea');
         textarea.className = 'konva-textarea';
-            document.body.appendChild(textarea);
+        document.body.appendChild(textarea);
 
         // Set initial value
         textarea.value = text.text() === 'Double-click to edit' ? '' : text.text();
-        
+
         // Style the textarea
         textarea.style.position = 'absolute';
         textarea.style.top = areaPosition.y + 'px';
@@ -489,11 +492,11 @@ class DrawingTools {
         textarea.style.WebkitTouchAction = 'manipulation';
 
         // Focus and select all text
-            textarea.focus();
+        textarea.focus();
         textarea.select();
 
         // Disable dragging while editing and hide the original text
-                text.setAttrs({
+        text.setAttrs({
             draggable: false,
             visible: false // Hide the original text while editing
         });
@@ -505,14 +508,14 @@ class DrawingTools {
             } else {
                 text.text('Double-click to edit');
             }
-            
+
             textarea.remove();
-            text.setAttrs({ 
+            text.setAttrs({
                 draggable: true,
                 visible: true // Show the text again after editing
             });
             this.layer.batchDraw();
-            
+
             // Remove event listeners
             document.removeEventListener('click', handleOutsideClick);
             document.removeEventListener('keydown', handleKeyDown);
@@ -526,11 +529,11 @@ class DrawingTools {
                 e.preventDefault();
                 textarea.value = text.text();
                 finishEditing();
-                }
+            }
         };
 
-            const handleOutsideClick = (e) => {
-                if (e.target !== textarea) {
+        const handleOutsideClick = (e) => {
+            if (e.target !== textarea) {
                 finishEditing();
             }
         };
@@ -538,10 +541,10 @@ class DrawingTools {
         // Add event listeners
         textarea.addEventListener('blur', finishEditing);
         document.addEventListener('keydown', handleKeyDown);
-        
+
         // Delay outside click handler to prevent immediate closure
-            setTimeout(() => {
-                document.addEventListener('click', handleOutsideClick);
+        setTimeout(() => {
+            document.addEventListener('click', handleOutsideClick);
         }, 100);
     }
 
@@ -549,22 +552,22 @@ class DrawingTools {
         if (this.undoStack.length >= this.maxUndoSteps) {
             this.undoStack.shift(); // Remove oldest action
         }
-        
+
         this.undoStack.push({
             type: actionType,
             shape: shape
         });
-        
+
         // Clear redo stack when new action is added
         this.redoStack = [];
     }
 
     undo() {
         if (this.undoStack.length === 0) return;
-        
+
         const lastAction = this.undoStack.pop();
         this.redoStack.push(lastAction);
-        
+
         if (lastAction.type === 'add') {
             // Remove the shape and its bounding box
             if (lastAction.shape) {
@@ -577,7 +580,7 @@ class DrawingTools {
             // Restore the shape and recreate its bounding box
             if (lastAction.shape) {
                 this.layer.add(lastAction.shape);
-                
+
                 // Recreate bounding box if it's a drawing object
                 if (lastAction.shape.name() && lastAction.shape.name().startsWith('drawing-')) {
                     const toolType = lastAction.shape.name().replace('drawing-', '');
@@ -587,22 +590,22 @@ class DrawingTools {
                 }
             }
         }
-        
+
         this.layer.batchDraw();
         this.clearSelection();
     }
 
     redo() {
         if (this.redoStack.length === 0) return;
-        
+
         const lastAction = this.redoStack.pop();
         this.undoStack.push(lastAction);
-        
+
         if (lastAction.type === 'add') {
             // Restore the shape and recreate its bounding box
             if (lastAction.shape) {
                 this.layer.add(lastAction.shape);
-                
+
                 // Recreate bounding box if it's a drawing object
                 if (lastAction.shape.name() && lastAction.shape.name().startsWith('drawing-')) {
                     const toolType = lastAction.shape.name().replace('drawing-', '');
@@ -620,7 +623,7 @@ class DrawingTools {
                 lastAction.shape.destroy();
             }
         }
-        
+
         this.layer.batchDraw();
         this.clearSelection();
     }
@@ -630,10 +633,10 @@ class DrawingTools {
         const drawingObjects = this.layer.find(node => node.name() && node.name().startsWith('drawing-'));
         drawingObjects.forEach(obj => obj.destroy());
         this.layer.batchDraw();
-        
+
         this.undoStack = [];
         this.redoStack = [];
-        
+
         console.log('All drawings cleared');
     }
 
@@ -642,7 +645,7 @@ class DrawingTools {
         const lines = this.layer.find(node => node.name() === 'drawing-line').length;
         const penStrokes = this.layer.find(node => node.name() === 'drawing-pen').length;
         const texts = this.layer.find(node => node.name() === 'drawing-text').length;
-        
+
         return {
             arrows,
             lines,
@@ -658,10 +661,10 @@ class DrawingTools {
      */
     setTool(tool) {
         this.currentTool = tool;
-        
+
         // Clear selection when switching tools
         this.clearSelection();
-        
+
         // Enable/disable dragging for all drawing objects based on tool
         this.updateDrawingObjectsDraggable(tool === 'select');
     }
@@ -671,17 +674,17 @@ class DrawingTools {
      * @param {boolean} draggable - Whether objects should be draggable
      */
     updateDrawingObjectsDraggable(draggable) {
-        const drawingObjects = this.layer.find(node => 
+        const drawingObjects = this.layer.find(node =>
             node.name() && node.name().startsWith('drawing-')
         );
-        
+
         drawingObjects.forEach(obj => {
             if (obj.name() !== 'drawing-text') {
                 // Text objects handle their own dragging
                 obj.draggable(draggable);
             }
         });
-        
+
         console.log(`Updated ${drawingObjects.length} drawing objects to draggable: ${draggable}`);
     }
 
@@ -701,7 +704,7 @@ class DrawingTools {
      */
     selectShape(shape) {
         this.clearSelection();
-        
+
         if (shape && shape.name() && shape.name().startsWith('drawing-')) {
             this.selectedShape = shape;
             // No visual selection indicator - just track the selected shape
@@ -718,22 +721,22 @@ class DrawingTools {
         if (!pos) return;
 
         const clickedShape = e.target;
-        
+
         // Check if clicked on a drawing object or its bounding box
         if (clickedShape && (
-            (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
-            (clickedShape.name() && clickedShape.name().startsWith('bounding-box-'))
-        )) {
+                (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
+                (clickedShape.name() && clickedShape.name().startsWith('bounding-box-'))
+            )) {
             // If clicked on bounding box, get the actual shape
             let actualShape = clickedShape;
             if (clickedShape.name().startsWith('bounding-box-')) {
                 // Find the actual drawing shape that this bounding box belongs to
                 const shapes = this.layer.find('*');
-                actualShape = shapes.find(shape => 
+                actualShape = shapes.find(shape =>
                     shape.boundingBox === clickedShape
                 );
             }
-            
+
             if (actualShape) {
                 this.selectShape(actualShape);
                 this.isDragging = true;
@@ -743,7 +746,7 @@ class DrawingTools {
             this.clearSelection();
         }
     }
-    
+
     /**
      * Handle touch down for select tool (mobile)
      * @param {Object} pos - Touch position
@@ -753,26 +756,26 @@ class DrawingTools {
         if (!pos) return;
 
         const clickedShape = e.target;
-        
+
         // Check if clicked on a drawing object or its bounding box
         if (clickedShape && (
-            (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
-            (clickedShape.name() && clickedShape.name().startsWith('bounding-box-'))
-        )) {
+                (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
+                (clickedShape.name() && clickedShape.name().startsWith('bounding-box-'))
+            )) {
             // If clicked on bounding box, get the actual shape
             let actualShape = clickedShape;
             if (clickedShape.name().startsWith('bounding-box-')) {
                 // Find the actual drawing shape that this bounding box belongs to
                 const shapes = this.layer.find('*');
-                actualShape = shapes.find(shape => 
+                actualShape = shapes.find(shape =>
                     shape.boundingBox === clickedShape
                 );
             }
-            
+
             if (actualShape) {
                 this.selectShape(actualShape);
                 this.isDragging = true;
-                
+
                 // Add double-tap detection for Edit UI
                 this.setupDoubleTapForEditUI(actualShape);
             }
@@ -781,14 +784,14 @@ class DrawingTools {
             this.clearSelection();
         }
     }
-    
+
     /**
      * Handle touch up for select tool
      */
     handleSelectTouchUp() {
         this.isDragging = false;
     }
-    
+
     /**
      * Setup double-tap detection for showing Edit UI
      * @param {KonvaObject} shape - The shape to monitor
@@ -797,11 +800,11 @@ class DrawingTools {
         let lastTap = 0;
         let tapCount = 0;
         let tapTimer = null;
-        
+
         const handleTap = (e) => {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
-            
+
             if (tapLength < 500 && tapLength > 0) {
                 // Double tap detected
                 tapCount++;
@@ -813,30 +816,30 @@ class DrawingTools {
             } else {
                 tapCount = 1;
             }
-            
+
             lastTap = currentTime;
-            
+
             // Reset tap count after a delay
             if (tapTimer) clearTimeout(tapTimer);
             tapTimer = setTimeout(() => {
                 tapCount = 0;
             }, 500);
         };
-        
+
         // Add tap event listener
         shape.on('tap', handleTap);
-        
+
         // Store the handler for cleanup
         shape._tapHandler = handleTap;
     }
-    
+
     /**
      * Show Edit UI for a specific shape
      * @param {KonvaObject} shape - The shape to show Edit UI for
      */
     showEditUIForShape(shape) {
         if (!shape || !shape.name()) return;
-        
+
         // Determine tool type from shape name
         let toolType = 'text'; // default
         if (shape.name().includes('drawing-arrow')) {
@@ -848,13 +851,13 @@ class DrawingTools {
         } else if (shape.name().includes('drawing-text')) {
             toolType = 'text';
         }
-        
+
         // Show Edit UI
         if (this.editUI) {
             this.editUI.show(shape, toolType);
         }
     }
-    
+
     /**
      * Get the EditUI instance
      * @returns {EditUI} The EditUI instance
@@ -884,26 +887,26 @@ class DrawingTools {
      */
     deleteSelectedShape() {
         if (!this.selectedShape) return;
-        
+
         // Add to undo stack before deleting
         this.addToUndoStack(this.selectedShape, 'delete');
-        
+
         // Remove bounding box if it exists
         if (this.selectedShape.boundingBox) {
             this.selectedShape.boundingBox.destroy();
         }
-        
+
         // Remove the shape
         this.selectedShape.destroy();
         this.selectedShape = null;
-        
+
         // Hide Edit UI
         if (this.editUI) {
             this.editUI.hide();
         }
-        
+
         this.layer.batchDraw();
-        
+
         // Trigger snapshot for undo/redo
         if (window.app && window.app.pushSnapshot) {
             window.app.pushSnapshot();
@@ -925,37 +928,37 @@ class DrawingTools {
             }
             this.editPlanetText(planetText, onUpdate);
         });
-        
+
         // Double-tap to edit planet text (mobile)
         let lastTap = 0;
         let tapCount = 0;
         let tapTimer = null;
-        
+
         planetText.on('tap', (e) => {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
-            
+
             if (tapLength < 500 && tapLength > 0) {
                 // Double tap detected
                 tapCount++;
                 if (tapCount === 2) {
                     clearTimeout(tapTimer);
                     tapCount = 0;
-                    
+
                     // Prevent multiple editing sessions
                     if (this.isEditingPlanet) {
                         console.log('[DEBUG] Already editing a planet, ignoring double-tap');
                         return;
                     }
-                    
+
                     this.editPlanetText(planetText, onUpdate);
                 }
             } else {
                 tapCount = 1;
             }
-            
+
             lastTap = currentTime;
-            
+
             // Reset tap count after a delay
             if (tapTimer) clearTimeout(tapTimer);
             tapTimer = setTimeout(() => {
@@ -976,17 +979,17 @@ class DrawingTools {
             console.log('[DEBUG] Text edit controls already visible, ignoring edit request');
             return;
         }
-        
+
         // Set editing state
         this.isEditingPlanet = true;
         this.currentlyEditingPlanet = planetText;
-        
+
         const currentText = planetText.text();
         const currentColor = planetText.fill() || '#000000';
-        
+
         // Store reference to the specific planet being edited
         const editingPlanetText = planetText;
-        
+
         // Get the text edit UI elements
         const textEditInput = document.getElementById('text-edit-input');
         const textEditColor = document.getElementById('text-edit-color');
@@ -994,14 +997,14 @@ class DrawingTools {
         const cancelButton = document.getElementById('text-edit-cancel');
         const deleteButton = document.getElementById('text-edit-delete');
         const retrogradeButton = document.getElementById('text-edit-retrograde');
-        
+
         if (!textEditControls || !textEditInput || !textEditColor || !saveButton || !cancelButton) {
             console.error('Text edit UI elements not found');
             this.isEditingPlanet = false;
             this.currentlyEditingPlanet = null;
             return;
         }
-        
+
         // Set up retrograde button
         const isRetrograde = currentText.includes('ᵣ'); // Unicode subscript R
         if (retrogradeButton) {
@@ -1011,12 +1014,12 @@ class DrawingTools {
             } else {
                 retrogradeButton.classList.remove('active');
             }
-            
+
             // Add click event listener
             const handleRetrograde = () => {
                 const currentInputText = textEditInput.value;
                 let newText;
-                
+
                 if (currentInputText.includes('ᵣ')) {
                     // Remove retrograde "R" subscript
                     newText = currentInputText.replace(/ᵣ/g, '');
@@ -1026,28 +1029,28 @@ class DrawingTools {
                     newText = currentInputText + 'ᵣ';
                     retrogradeButton.classList.add('active');
                 }
-                
+
                 textEditInput.value = newText;
                 // Trigger input event to update any live preview
                 textEditInput.dispatchEvent(new Event('input'));
             };
-            
+
             retrogradeButton.addEventListener('click', handleRetrograde);
         }
-        
+
         // Always show the Delete button for planet text
         if (deleteButton) {
             deleteButton.style.display = 'inline-flex';
         }
-        
+
         // Clear any existing value and set initial value
         textEditInput.value = '';
         textEditInput.value = currentText;
         textEditColor.value = currentColor;
-        
+
         // Show the text edit UI
         textEditControls.style.display = 'flex';
-        
+
         // Focus the input and place cursor at the end (after a small delay to ensure UI is ready)
         setTimeout(() => {
             textEditInput.focus();
@@ -1059,18 +1062,18 @@ class DrawingTools {
             const length = textEditInput.value.length;
             textEditInput.setSelectionRange(length, length);
         }, 100);
-        
+
         // Disable dragging while editing
         editingPlanetText.draggable(false);
-        
+
         const finishEditing = (save = false) => {
             // Clear editing state
             this.isEditingPlanet = false;
             this.currentlyEditingPlanet = null;
-            
+
             // Hide the text edit UI
             textEditControls.style.display = 'none';
-            
+
             if (save) {
                 const newText = textEditInput.value.trim();
                 const newColor = textEditColor.value;
@@ -1090,10 +1093,10 @@ class DrawingTools {
                 editingPlanetText.text(currentText);
                 editingPlanetText.fill(currentColor);
             }
-            
+
             // Re-enable dragging
             editingPlanetText.draggable(true);
-            
+
             // Remove event listeners
             saveButton.removeEventListener('click', handleSave);
             cancelButton.removeEventListener('click', handleCancel);
@@ -1108,11 +1111,11 @@ class DrawingTools {
                 retrogradeButton.removeEventListener('click', handleRetrograde);
             }
         };
-        
+
         const handleSave = () => {
             finishEditing(true);
         };
-        
+
         const handleCancel = () => {
             finishEditing(false);
         };
@@ -1121,10 +1124,10 @@ class DrawingTools {
             // Clear editing state
             this.isEditingPlanet = false;
             this.currentlyEditingPlanet = null;
-            
+
             // Hide the text edit UI
             textEditControls.style.display = 'none';
-            
+
             // Remove the planet from its house
             if (typeof editingPlanetText._planetHouseNumber !== 'undefined' && typeof editingPlanetText._planetId !== 'undefined') {
                 // Try to remove from South or North chart
@@ -1137,10 +1140,10 @@ class DrawingTools {
                     }
                 }
             }
-            
+
             // Re-enable dragging
             editingPlanetText.draggable(true);
-            
+
             // Remove event listeners
             saveButton.removeEventListener('click', handleSave);
             cancelButton.removeEventListener('click', handleCancel);
@@ -1155,7 +1158,7 @@ class DrawingTools {
                 retrogradeButton.removeEventListener('click', handleRetrograde);
             }
         };
-        
+
         const handleKeyDown = (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -1166,10 +1169,10 @@ class DrawingTools {
             }
             // Allow backspace to work normally in the input field
         };
-        
+
         const handleInput = () => {
             let newText = textEditInput.value;
-            
+
             // Enforce 6 character limit, but allow "ᵣ" to be added beyond it
             const baseText = newText.replace(/ᵣ/g, ''); // Remove R subscript for length check
             if (baseText.length > 6) {
@@ -1179,22 +1182,22 @@ class DrawingTools {
                 newText = hasR ? truncatedBase + 'ᵣ' : truncatedBase;
                 textEditInput.value = newText;
             }
-            
+
             // Update ONLY the specific planet text being edited
             editingPlanetText.text(newText);
             this.layer.batchDraw();
         };
-        
+
         const handleColorChange = (e) => {
             const newColor = e.target.value;
-            
+
             console.log(`[DEBUG] Color changed to: ${newColor} for planet text`);
-            
+
             // Update ONLY the specific planet text being edited
             editingPlanetText.fill(newColor);
             this.layer.batchDraw();
         };
-        
+
         // Add event listeners
         saveButton.addEventListener('click', handleSave);
         cancelButton.addEventListener('click', handleCancel);
@@ -1205,7 +1208,7 @@ class DrawingTools {
         if (deleteButton) {
             deleteButton.addEventListener('click', handleDelete);
         }
-        
+
         // Ensure the input field is properly initialized
         textEditInput.removeAttribute('placeholder');
         textEditInput.value = currentText;
@@ -1222,14 +1225,14 @@ class DrawingTools {
             if (textEditControls) {
                 textEditControls.style.display = 'none';
             }
-            
+
             // Re-enable dragging
             this.currentlyEditingPlanet.draggable(true);
-            
+
             // Clear editing state
             this.isEditingPlanet = false;
             this.currentlyEditingPlanet = null;
-            
+
             console.log('[DEBUG] Cancelled existing planet editing session');
         }
     }
@@ -1241,24 +1244,24 @@ class DrawingTools {
      */
     showEditUI(element, tool) {
         console.log(`[EDIT UI] Showing Edit UI for ${tool} tool, element:`, element);
-        
+
         // Cancel any existing planet editing
         this.cancelPlanetEditing();
-        
+
         // Hide any existing Edit UI first
         this.editUI.hide();
-        
+
         // Set up delete callback
         this.editUI.setDeleteCallback(() => {
             this.deleteSelectedShape();
         });
-        
+
         // Show Edit UI for the clicked element
         if (tool === 'heading') {
             // Show Edit UI with 2-line limit
             this.editUI.show(element, 'heading');
         } else {
-        this.editUI.show(element, tool);
+            this.editUI.show(element, tool);
         }
     }
 
@@ -1280,10 +1283,10 @@ class DrawingTools {
             e.cancelBubble = true;
             e.evt.preventDefault();
             e.evt.stopPropagation();
-            
+
             // Prevent processing if already handling a tap
             if (isProcessingTap) return;
-            
+
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
 
@@ -1294,7 +1297,7 @@ class DrawingTools {
                     clearTimeout(tapTimer);
                     tapCount = 0;
                     isProcessingTap = true;
-                    
+
                     // Small delay to ensure drawing is complete
                     setTimeout(() => {
                         this.showEditUIForShape(shape);
@@ -1318,7 +1321,7 @@ class DrawingTools {
         // Add tap event listener with higher priority
         shape.on('tap', handleTap);
         shape._tapHandler = handleTap; // Store handler for cleanup
-        
+
         // Also add click handler for desktop compatibility
         shape.on('click', (e) => {
             // Only handle click if not on mobile
@@ -1381,7 +1384,9 @@ class DrawingTools {
             }
             lastTap = currentTime;
             if (tapTimer) clearTimeout(tapTimer);
-            tapTimer = setTimeout(() => { tapCount = 0; }, 500);
+            tapTimer = setTimeout(() => {
+                tapCount = 0;
+            }, 500);
         });
         // Show Edit UI on click (desktop)
         heading.on('click', (e) => {
@@ -1507,7 +1512,7 @@ class DrawingTools {
             padding = 40; // Much larger for mobile
         }
         const bounds = shape.getClientRect();
-        
+
         const boundingBox = new Konva.Rect({
             x: bounds.x - padding,
             y: bounds.y - padding,
@@ -1554,14 +1559,14 @@ class DrawingTools {
             padding = 40;
         }
         const bounds = shape.getClientRect();
-        
+
         boundingBox.setAttrs({
             x: bounds.x - padding,
             y: bounds.y - padding,
             width: bounds.width + (padding * 2),
             height: bounds.height + (padding * 2)
         });
-        
+
         this.layer.batchDraw();
     }
-} 
+}

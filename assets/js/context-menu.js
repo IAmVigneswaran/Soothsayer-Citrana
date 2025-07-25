@@ -31,18 +31,18 @@ class ContextMenu {
     setupEventListeners() {
         // Prevent default context menu on canvas
         const canvas = document.getElementById('canvas-container');
-        
+
         if (canvas) {
             // Desktop: Right-click context menu
             canvas.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 this.showChartMenu(e.clientX, e.clientY);
             });
-            
+
             // Mobile: Long press for context menu
             let longPressTimer = null;
             let longPressTriggered = false;
-            
+
             canvas.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 1) { // Single touch only
                     longPressTriggered = false;
@@ -54,7 +54,7 @@ class ContextMenu {
                     }, 500);
                 }
             });
-            
+
             canvas.addEventListener('touchmove', (e) => {
                 // Cancel long press if user moves finger
                 if (longPressTimer) {
@@ -62,14 +62,14 @@ class ContextMenu {
                     longPressTimer = null;
                 }
             });
-            
+
             canvas.addEventListener('touchend', (e) => {
                 // Cancel long press if user lifts finger before threshold
                 if (longPressTimer) {
                     clearTimeout(longPressTimer);
                     longPressTimer = null;
                 }
-                
+
                 // If long press was triggered, prevent the menu from being hidden
                 if (longPressTriggered) {
                     e.preventDefault();
@@ -80,7 +80,7 @@ class ContextMenu {
                     }, 100);
                 }
             });
-            
+
             canvas.addEventListener('touchcancel', (e) => {
                 // Cancel long press if touch is cancelled
                 if (longPressTimer) {
@@ -98,7 +98,7 @@ class ContextMenu {
                 this.hide();
             }
         });
-        
+
         // Hide menu when touching outside (mobile) - but not immediately after long press
         document.addEventListener('touchend', (e) => {
             // Add a small delay to prevent immediate hiding after long press
@@ -108,7 +108,7 @@ class ContextMenu {
                 }
             }, 150);
         });
-        
+
         // Prevent immediate hiding when touching inside the menu
         document.addEventListener('touchstart', (e) => {
             console.log('[CONTEXT MENU] Document touchstart, target:', e.target);
@@ -117,7 +117,9 @@ class ContextMenu {
                 // Prevent the touchstart from triggering the hide logic
                 e.stopPropagation();
             }
-        }, { passive: false });
+        }, {
+            passive: false
+        });
 
         // Hide menu on escape key
         document.addEventListener('keydown', (e) => {
@@ -129,7 +131,7 @@ class ContextMenu {
 
     showChartMenu(x, y) {
         const chartType = window.app?.chartTemplates?.currentChartType;
-        
+
         if (chartType) {
             // Chart exists - show chart-specific menu
             this.showExistingChartMenu(x, y, chartType);
@@ -154,7 +156,7 @@ class ContextMenu {
     showExistingChartMenu(x, y, chartType) {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        
+
         let menuHtml = `
             <div class="context-menu-header">${chartName} Chart</div>
             <div class="context-menu-separator"></div>
@@ -170,19 +172,54 @@ class ContextMenu {
         if (chartType === 'north-indian') {
             if (isMobile) {
                 // Mobile: "Set as Lagna" header followed by list of rashis as regular menu items
-                const rashis = [
-                    { name: 'Aries', symbol: '\u2648' },
-                    { name: 'Taurus', symbol: '\u2649' },
-                    { name: 'Gemini', symbol: '\u264A' },
-                    { name: 'Cancer', symbol: '\u264B' },
-                    { name: 'Leo', symbol: '\u264C' },
-                    { name: 'Virgo', symbol: '\u264D' },
-                    { name: 'Libra', symbol: '\u264E' },
-                    { name: 'Scorpio', symbol: '\u264F' },
-                    { name: 'Sagittarius', symbol: '\u2650' },
-                    { name: 'Capricorn', symbol: '\u2651' },
-                    { name: 'Aquarius', symbol: '\u2652' },
-                    { name: 'Pisces', symbol: '\u2653' }
+                const rashis = [{
+                        name: 'Aries',
+                        symbol: '\u2648'
+                    },
+                    {
+                        name: 'Taurus',
+                        symbol: '\u2649'
+                    },
+                    {
+                        name: 'Gemini',
+                        symbol: '\u264A'
+                    },
+                    {
+                        name: 'Cancer',
+                        symbol: '\u264B'
+                    },
+                    {
+                        name: 'Leo',
+                        symbol: '\u264C'
+                    },
+                    {
+                        name: 'Virgo',
+                        symbol: '\u264D'
+                    },
+                    {
+                        name: 'Libra',
+                        symbol: '\u264E'
+                    },
+                    {
+                        name: 'Scorpio',
+                        symbol: '\u264F'
+                    },
+                    {
+                        name: 'Sagittarius',
+                        symbol: '\u2650'
+                    },
+                    {
+                        name: 'Capricorn',
+                        symbol: '\u2651'
+                    },
+                    {
+                        name: 'Aquarius',
+                        symbol: '\u2652'
+                    },
+                    {
+                        name: 'Pisces',
+                        symbol: '\u2653'
+                    }
                 ];
                 menuHtml += `
                 <div class="context-menu-item" data-action="set-lagna"><i data-lucide="target"></i> Set as Lagna</div>
@@ -191,21 +228,56 @@ class ContextMenu {
                 `;
             } else {
                 // Desktop: Submenu with all 12 rashis
-            const rashis = [
-                { name: 'Aries', symbol: '\u2648' },
-                { name: 'Taurus', symbol: '\u2649' },
-                { name: 'Gemini', symbol: '\u264A' },
-                { name: 'Cancer', symbol: '\u264B' },
-                { name: 'Leo', symbol: '\u264C' },
-                { name: 'Virgo', symbol: '\u264D' },
-                { name: 'Libra', symbol: '\u264E' },
-                { name: 'Scorpio', symbol: '\u264F' },
-                { name: 'Sagittarius', symbol: '\u2650' },
-                { name: 'Capricorn', symbol: '\u2651' },
-                { name: 'Aquarius', symbol: '\u2652' },
-                { name: 'Pisces', symbol: '\u2653' }
-            ];
-            menuHtml += `
+                const rashis = [{
+                        name: 'Aries',
+                        symbol: '\u2648'
+                    },
+                    {
+                        name: 'Taurus',
+                        symbol: '\u2649'
+                    },
+                    {
+                        name: 'Gemini',
+                        symbol: '\u264A'
+                    },
+                    {
+                        name: 'Cancer',
+                        symbol: '\u264B'
+                    },
+                    {
+                        name: 'Leo',
+                        symbol: '\u264C'
+                    },
+                    {
+                        name: 'Virgo',
+                        symbol: '\u264D'
+                    },
+                    {
+                        name: 'Libra',
+                        symbol: '\u264E'
+                    },
+                    {
+                        name: 'Scorpio',
+                        symbol: '\u264F'
+                    },
+                    {
+                        name: 'Sagittarius',
+                        symbol: '\u2650'
+                    },
+                    {
+                        name: 'Capricorn',
+                        symbol: '\u2651'
+                    },
+                    {
+                        name: 'Aquarius',
+                        symbol: '\u2652'
+                    },
+                    {
+                        name: 'Pisces',
+                        symbol: '\u2653'
+                    }
+                ];
+                menuHtml += `
             <div class="context-menu-item has-submenu" data-action="set-lagna-parent"><i data-lucide="target"></i> Set Lagna as ...
                 <div class="context-submenu context-menu">
                     ${rashis.map((rashi, i) => `<div class='context-menu-item' data-action='set-lagna' data-house='${i+1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`).join('')}
@@ -224,10 +296,10 @@ class ContextMenu {
         lucide.createIcons();
         this.show(x, y);
         this.setupMenuEventListeners();
-        
+
         // Setup submenu hover logic only for desktop
         if (!isMobile) {
-        this.setupSubmenuHover();
+            this.setupSubmenuHover();
         }
     }
 
@@ -318,14 +390,16 @@ class ContextMenu {
             this.handleAction(action, houseNumber);
             this.hide();
         };
-        
+
         // Add touch event handling for mobile
         this.menu.addEventListener('touchstart', (e) => {
             console.log('[CONTEXT MENU] touchstart on menu, target:', e.target);
             // Prevent touch events from bubbling up to document
             e.stopPropagation();
-        }, { passive: false });
-        
+        }, {
+            passive: false
+        });
+
         this.menu.addEventListener('touchend', (e) => {
             console.log('[CONTEXT MENU] touchend on menu, target:', e.target);
             const item = e.target.closest('.context-menu-item');
@@ -341,7 +415,9 @@ class ContextMenu {
             } else {
                 console.log('[CONTEXT MENU] No menu item found');
             }
-        }, { passive: false });
+        }, {
+            passive: false
+        });
     }
 
     handleAction(action, houseNumber) {
@@ -349,11 +425,11 @@ class ContextMenu {
             case 'create-south-indian':
                 window.app.chartTemplates.createSouthIndianChart();
                 break;
-                
+
             case 'create-north-indian':
                 window.app.chartTemplates.createNorthIndianChart();
                 break;
-                
+
             case 'clear-chart':
                 window.app.showConfirmationDialog(
                     'This will completely clear the entire chart, including all planets, drawings, and chart structure. This action cannot be undone.',
@@ -366,18 +442,18 @@ class ContextMenu {
                     () => window.app.resetChart()
                 );
                 break;
-                
+
             case 'set-lagna':
                 // Set the right-clicked house as Lagna directly
                 console.log('[DEBUG] Context Menu - set-lagna action triggered');
                 console.log('[DEBUG] House number from menu:', houseNumber);
                 console.log('[DEBUG] Parsed house number:', parseInt(houseNumber));
-                
+
                 if (window.app && window.app.chartTemplates) {
                     if (houseNumber) {
                         // If house number is provided (from house-specific menu), set that house as Lagna
-                    console.log('[DEBUG] Calling chartTemplates.setLagnaHouse with:', parseInt(houseNumber));
-                    window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber));
+                        console.log('[DEBUG] Calling chartTemplates.setLagnaHouse with:', parseInt(houseNumber));
+                        window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber));
                     } else {
                         // If no house number (from chart context menu), show a prompt or use default
                         console.log('[DEBUG] No house number provided, using default behavior');
@@ -389,13 +465,13 @@ class ContextMenu {
                     console.log('[DEBUG] ERROR: Cannot set Lagna - missing app or chartTemplates');
                 }
                 break;
-                
+
             case 'set-first-house':
                 if (houseNumber) {
                     window.app.chartTemplates.setFirstHouse(parseInt(houseNumber));
                 }
                 break;
-                
+
             case 'clear-house':
                 if (houseNumber) {
                     // Implement house clearing logic
@@ -403,21 +479,21 @@ class ContextMenu {
                 }
                 break;
 
-            // Add planet actions
-            if (action === 'rename-planet') {
-                const abbr = this.menu.querySelector('[data-action="rename-planet"]').dataset.abbr;
-                const planetId = this.menu.querySelector('[data-action="rename-planet"]').dataset.planetid;
-                const newLabel = prompt('Enter new label for this planet:');
-                if (newLabel && window.app.chartTemplates.currentChartType === 'south-indian') {
-                    window.app.chartTemplates.southIndianTemplate.renamePlanetInHouseById(parseInt(houseNumber), planetId, newLabel);
+                // Add planet actions
+                if (action === 'rename-planet') {
+                    const abbr = this.menu.querySelector('[data-action="rename-planet"]').dataset.abbr;
+                    const planetId = this.menu.querySelector('[data-action="rename-planet"]').dataset.planetid;
+                    const newLabel = prompt('Enter new label for this planet:');
+                    if (newLabel && window.app.chartTemplates.currentChartType === 'south-indian') {
+                        window.app.chartTemplates.southIndianTemplate.renamePlanetInHouseById(parseInt(houseNumber), planetId, newLabel);
+                    }
+                } else if (action === 'delete-planet') {
+                    const abbr = this.menu.querySelector('[data-action="delete-planet"]').dataset.abbr;
+                    const planetId = this.menu.querySelector('[data-action="delete-planet"]').dataset.planetid;
+                    if (window.app.chartTemplates.currentChartType === 'south-indian') {
+                        window.app.chartTemplates.southIndianTemplate.removePlanetFromHouseById(parseInt(houseNumber), planetId);
+                    }
                 }
-            } else if (action === 'delete-planet') {
-                const abbr = this.menu.querySelector('[data-action="delete-planet"]').dataset.abbr;
-                const planetId = this.menu.querySelector('[data-action="delete-planet"]').dataset.planetid;
-                if (window.app.chartTemplates.currentChartType === 'south-indian') {
-                    window.app.chartTemplates.southIndianTemplate.removePlanetFromHouseById(parseInt(houseNumber), planetId);
-                }
-            }
         }
     }
 
@@ -427,20 +503,20 @@ class ContextMenu {
         this.menu.style.left = x + 'px';
         this.menu.style.top = y + 'px';
         this.menu.style.zIndex = '2000';
-        
+
         // Ensure menu doesn't go off-screen
         const rect = this.menu.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        
+
         if (rect.right > viewportWidth) {
             this.menu.style.left = (x - rect.width) + 'px';
         }
-        
+
         if (rect.bottom > viewportHeight) {
             this.menu.style.top = (y - rect.height) + 'px';
         }
-        
+
         this.menu.classList.remove('hidden');
         this.isVisible = true;
     }
@@ -453,4 +529,4 @@ class ContextMenu {
     isMenuVisible() {
         return this.isVisible;
     }
-} 
+}

@@ -1,348 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    	<!-- Primary Meta Tags -->
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0, minimum-scale=0.1, viewport-fit=cover">
-	<title>Citrana by Vigneswaran Rajkumar</title>
-    <meta name="robots" content="noarchive">
-	<meta name="googlebot" content="noarchive">
-	<meta name="msvalidate.01" content="325120C12888C61306930ACDFB17A57E" />
- 	<meta name="keywords" content="Soothsayer, Citrana, Vigneswaran Rajkumar, Vedanga Jyotisha, Jyotisha, Vedic Astrology, Jothidam, Indian Astrology, Hindu Astrology, Nakshatras,  Karma, Destiny, Dosha, Remedies, Panchangam, Siddhanta Jyotisha, Tamil Jothidam, Vimshottari Dasha, Puranic Astrology,  Super-Science, Singapore"> 
-	<meta name="description" content="Citrana is a whiteboard Vedic chart creator for Vedanga Jyotisha Practitioners."> 
-  	<meta name="author" content="Citrana">
-    <!-- Canonical -->
-    <link rel="canonical" href="https://citrana.soothsayer.life/">
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://citrana.soothsayer.life/">
-    <meta property="og:title" content="Citrana">
-    <meta property="og:description" content="Citrana is a whiteboard Vedic chart creator for Vedanga Jyotisha Practitioners.">
-    <meta property="og:image" content="https://soothsayer.life/assets/images/soothsayer_social-preview.jpg">
-    <meta property="og:site_name" content="Citrana">
-    <!-- Twitter / X -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://citrana.soothsayer.life/">
-    <meta property="twitter:title" content="Citrana">
-    <meta property="twitter:description" content="Citrana is a whiteboard Vedic chart creator for Vedanga Jyotisha Practitioners.">
-    <meta property="twitter:image" content="https://soothsayer.life/assets/images/soothsayer_social-preview.jpg">
-    <!-- apple -->
-    <meta name="apple-mobile-web-app-title" content="Citrana">
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<!-- stylesheets -->
-	<link rel="stylesheet" href="assets/css/styles.css">
-	<!-- favicon -->
-	<link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon/apple-icon-57x57.png">
-	<link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon/apple-icon-60x60.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-icon-72x72.png">
-	<link rel="apple-touch-icon" sizes="76x76" href="/assets/favicon/apple-icon-76x76.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="/assets/favicon/apple-icon-114x114.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="/assets/favicon/apple-icon-120x120.png">
-	<link rel="apple-touch-icon" sizes="144x144" href="/assets/favicon/apple-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="/assets/favicon/apple-icon-152x152.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-icon-180x180.png">
-	<link rel="icon" type="image/png" sizes="192x192"  href="/assets/favicon/android-icon-192x192.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon/favicon-48x48.png">
-	<link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon/favicon-96x96.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
-	<link rel="icon" type="image/x-icon" href="/assets/favicon/favicon.ico">
-	<link rel="manifest" href="/assets/favicon/manifest.json">
-	<meta name="msapplication-TileColor" content="#000000">
-	<meta name="msapplication-TileImage" content="/assets/favicon/ms-icon-144x144.png">
-	<meta name="theme-color" content="#000000">
-	<!-- Scripts -->
-	<script src="https://unpkg.com/konva@9/konva.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HSXDGXST4D"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-HSXDGXST4D');
-    </script>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-MNSV7LM4');</script>
-    <!-- End Google Tag Manager -->
-</head>
-<body class="bg-white text-gray-900">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MNSV7LM4"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <div class="app-container">
-        <!-- Help Button (Desktop Only) -->
-        <button id="help-btn" class="help-btn" title="Keyboard Shortcuts & Help">
-            <i data-lucide="help-circle"></i>
-        </button>
-
-        <!-- Floating Top Toolbar -->
-        <div class="floating-top-toolbar">
+   <head>
+      <!-- Primary Meta Tags -->
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0, minimum-scale=0.1, viewport-fit=cover">
+      <title>Citrana by Vigneswaran Rajkumar</title>
+      <meta name="robots" content="noarchive">
+      <meta name="googlebot" content="noarchive">
+      <meta name="msvalidate.01" content="325120C12888C61306930ACDFB17A57E" />
+      <meta name="keywords" content="Soothsayer, Citrana, Vigneswaran Rajkumar, Vedanga Jyotisha, Jyotisha, Vedic Astrology, Jothidam, Indian Astrology, Hindu Astrology, Nakshatras,  Karma, Destiny, Dosha, Remedies, Panchangam, Siddhanta Jyotisha, Tamil Jothidam, Vimshottari Dasha, Puranic Astrology,  Super-Science, Singapore">
+      <meta name="description" content="Citrana is a whiteboard Vedic chart creator for Vedanga Jyotisha Practitioners.">
+      <meta name="author" content="Citrana">
+      <!-- Canonical -->
+      <link rel="canonical" href="https://citrana.soothsayer.life/">
+      <!-- Open Graph / Facebook -->
+      <meta property="og:type" content="website">
+      <meta property="og:url" content="https://citrana.soothsayer.life/">
+      <meta property="og:title" content="Citrana">
+      <meta property="og:description" content="Citrana is a whiteboard Vedic chart creator for Vedanga Jyotisha Practitioners.">
+      <meta property="og:image" content="https://soothsayer.life/assets/images/soothsayer_social-preview.jpg">
+      <meta property="og:site_name" content="Citrana">
+      <!-- Twitter / X -->
+      <meta property="twitter:card" content="summary_large_image">
+      <meta property="twitter:url" content="https://citrana.soothsayer.life/">
+      <meta property="twitter:title" content="Citrana">
+      <meta property="twitter:description" content="Citrana is a whiteboard Vedic chart creator for Vedanga Jyotisha Practitioners.">
+      <meta property="twitter:image" content="https://soothsayer.life/assets/images/soothsayer_social-preview.jpg">
+      <!-- apple -->
+      <meta name="apple-mobile-web-app-title" content="Citrana">
+      <meta name="theme-color" content="#000000">
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+      <!-- stylesheets -->
+      <link rel="stylesheet" href="assets/css/styles.css">
+      <!-- favicon -->
+      <link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon/apple-icon-57x57.png">
+      <link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon/apple-icon-60x60.png">
+      <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-icon-72x72.png">
+      <link rel="apple-touch-icon" sizes="76x76" href="/assets/favicon/apple-icon-76x76.png">
+      <link rel="apple-touch-icon" sizes="114x114" href="/assets/favicon/apple-icon-114x114.png">
+      <link rel="apple-touch-icon" sizes="120x120" href="/assets/favicon/apple-icon-120x120.png">
+      <link rel="apple-touch-icon" sizes="144x144" href="/assets/favicon/apple-icon-144x144.png">
+      <link rel="apple-touch-icon" sizes="152x152" href="/assets/favicon/apple-icon-152x152.png">
+      <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-icon-180x180.png">
+      <link rel="icon" type="image/png" sizes="192x192"  href="/assets/favicon/android-icon-192x192.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon/favicon-48x48.png">
+      <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon/favicon-96x96.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+      <link rel="icon" type="image/x-icon" href="/assets/favicon/favicon.ico">
+      <link rel="manifest" href="/assets/favicon/manifest.json">
+      <meta name="msapplication-TileColor" content="#000000">
+      <meta name="msapplication-TileImage" content="/assets/favicon/ms-icon-144x144.png">
+      <meta name="theme-color" content="#000000">
+      <!-- Scripts -->
+      <script src="https://unpkg.com/konva@9/konva.min.js"></script>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-HSXDGXST4D"></script>
+      <script>
+         window.dataLayer = window.dataLayer || [];
+         function gtag(){dataLayer.push(arguments);}
+         gtag('js', new Date());
+         
+         gtag('config', 'G-HSXDGXST4D');
+      </script>
+      <!-- Google Tag Manager -->
+      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+         'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+         })(window,document,'script','dataLayer','GTM-MNSV7LM4');
+      </script>
+      <!-- End Google Tag Manager -->
+   </head>
+   <body class="bg-white text-gray-900">
+      <!-- Google Tag Manager (noscript) -->
+      <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MNSV7LM4"
+         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+      <!-- End Google Tag Manager (noscript) -->
+      <div class="app-container">
+         <!-- Help Button (Desktop Only) -->
+         <button id="help-btn" class="help-btn" title="Keyboard Shortcuts & Help">
+         <i data-lucide="help-circle"></i>
+         </button>
+         <!-- Floating Top Toolbar -->
+         <div class="floating-top-toolbar">
             <!-- Drawing Tools -->
             <div class="toolbar-group">
-                <button id="select-tool" class="toolbar-btn active" title="Select (V)">
-                    <i data-lucide="mouse-pointer"></i>
-                </button>
-                <button id="arrow-tool" class="toolbar-btn" title="Arrow">
-                    <i data-lucide="arrow-right"></i>
-                </button>
-                <button id="line-tool" class="toolbar-btn" title="Line">
-                    <i data-lucide="minus"></i>
-                </button>
-                <button id="pen-tool" class="toolbar-btn" title="Pen">
-                    <i data-lucide="pen-tool"></i>
-                </button>
-                <button id="text-tool" class="toolbar-btn" title="Text">
-                    <i data-lucide="type"></i>
-                </button>
-                <button id="heading-tool" class="toolbar-btn" title="Heading">
-                    <i data-lucide="heading"></i>
-                </button>
+               <button id="select-tool" class="toolbar-btn active" title="Select (V)">
+               <i data-lucide="mouse-pointer"></i>
+               </button>
+               <button id="arrow-tool" class="toolbar-btn" title="Arrow">
+               <i data-lucide="arrow-right"></i>
+               </button>
+               <button id="line-tool" class="toolbar-btn" title="Line">
+               <i data-lucide="minus"></i>
+               </button>
+               <button id="pen-tool" class="toolbar-btn" title="Pen">
+               <i data-lucide="pen-tool"></i>
+               </button>
+               <button id="text-tool" class="toolbar-btn" title="Text">
+               <i data-lucide="type"></i>
+               </button>
+               <button id="heading-tool" class="toolbar-btn" title="Heading">
+               <i data-lucide="heading"></i>
+               </button>
             </div>
-
             <!-- Hand Tool -->
             <div class="toolbar-group">
-                <button id="hand-tool" class="toolbar-btn" title="Hand (H)">
-                    <i data-lucide="hand"></i>
-                </button>
+               <button id="hand-tool" class="toolbar-btn" title="Hand (H)">
+               <i data-lucide="hand"></i>
+               </button>
             </div>
-
             <!-- Action Buttons -->
             <div class="toolbar-group">
-                <button id="undo-btn" class="toolbar-btn" title="Undo (Ctrl+Z)">
-                    <i data-lucide="undo"></i>
-                </button>
-                <button id="redo-btn" class="toolbar-btn" title="Redo (Ctrl+Y)">
-                    <i data-lucide="redo"></i>
-                </button>
-                <button id="toggle-transparency-btn" class="toolbar-btn" title="Toggle Transparency">
-                    <i data-lucide="image-off"></i>
-                </button>
-                <button id="export-btn" class="toolbar-btn" title="Export">
-                    <i data-lucide="save"></i>
-                </button>
+               <button id="undo-btn" class="toolbar-btn" title="Undo (Ctrl+Z)">
+               <i data-lucide="undo"></i>
+               </button>
+               <button id="redo-btn" class="toolbar-btn" title="Redo (Ctrl+Y)">
+               <i data-lucide="redo"></i>
+               </button>
+               <button id="toggle-transparency-btn" class="toolbar-btn" title="Toggle Transparency">
+               <i data-lucide="image-off"></i>
+               </button>
+               <button id="export-btn" class="toolbar-btn" title="Export">
+               <i data-lucide="save"></i>
+               </button>
             </div>
-        </div>
-
-        <!-- Floating Graha Library -->
-        <div class="floating-planet-library" id="graha-library" style="border-radius: 0.75rem; overflow: visible;">
+         </div>
+         <!-- Floating Graha Library -->
+         <div class="floating-planet-library" id="graha-library" style="border-radius: 0.75rem; overflow: visible;">
             <div class="planet-library-header" style="background: #fff; color: #000; padding: 0.5rem 1rem; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 2.5rem; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">Graha Library</div>
             <div class="planet-grid" id="planet-library" style="overflow: visible;">
-                <!-- Grahas will be populated by JavaScript -->
+               <!-- Grahas will be populated by JavaScript -->
             </div>
-        </div>
-
-        <!-- Canvas Container -->
-        <div class="canvas-container" id="canvas-container">
+         </div>
+         <!-- Canvas Container -->
+         <div class="canvas-container" id="canvas-container">
             <canvas id="canvas"></canvas>
-        </div>
-
-        <!-- Floating Zoom Controls -->
-        <div class="floating-zoom-controls">
+         </div>
+         <!-- Floating Zoom Controls -->
+         <div class="floating-zoom-controls">
             <button id="zoom-out" title="Zoom Out (-)">
-                <i data-lucide="zoom-out"></i>
+            <i data-lucide="zoom-out"></i>
             </button>
             <span id="zoom-level" class="zoom-level">100%</span>
             <button id="zoom-in" title="Zoom In (+)">
-                <i data-lucide="zoom-in"></i>
+            <i data-lucide="zoom-in"></i>
             </button>
             <button id="reset-zoom" title="Reset Zoom">
-                <i data-lucide="maximize-2"></i>
+            <i data-lucide="maximize-2"></i>
             </button>
             <span class="zoom-divider" style="width:1px;height:24px;background:#000;opacity:0.15;margin:0 8px;display:inline-block;"></span>
             <button id="zoom-hand-tool" title="Hand Tool (H)">
-                <i data-lucide="hand"></i>
+            <i data-lucide="hand"></i>
             </button>
-        </div>
-
-        <!-- Floating Text Edit Controls -->
-        <div class="floating-text-edit-controls" id="text-edit-controls" style="display: none;">
+         </div>
+         <!-- Floating Text Edit Controls -->
+         <div class="floating-text-edit-controls" id="text-edit-controls" style="display: none;">
             <input type="text" id="text-edit-input" placeholder="Enter text (max 6 chars)" maxlength="6" class="text-edit-input">
             <input type="color" id="text-edit-color" class="text-edit-color-input" title="Text color">
             <button id="text-edit-retrograde" title="Toggle Retrograde">
-                <i data-lucide="rotate-ccw"></i>
+            <i data-lucide="rotate-ccw"></i>
             </button>
             <button id="text-edit-save" title="Save">
-                <i data-lucide="check"></i>
+            <i data-lucide="check"></i>
             </button>
             <button id="text-edit-cancel" title="Cancel">
-                <i data-lucide="x"></i>
+            <i data-lucide="x"></i>
             </button>
             <button id="text-edit-delete" title="Delete" class="text-edit-delete danger" style="display: none;">
-                <i data-lucide="trash-2"></i>
+            <i data-lucide="trash-2"></i>
             </button>
-        </div>
-    </div>
-
-    <!-- Help Modal -->
-    <div id="help-modal" class="help-modal">
-        <div class="help-modal-content">
+         </div>
+      </div>
+      <!-- Help Modal -->
+      <div id="help-modal" class="help-modal">
+         <div class="help-modal-content">
             <div class="help-modal-header">
-                <h2 class="help-modal-title">Keyboard Shortcuts & Help</h2>
-                <button class="help-modal-close" id="help-modal-close">
-                    <i data-lucide="x"></i>
-                </button>
+               <h2 class="help-modal-title">Keyboard Shortcuts & Help</h2>
+               <button class="help-modal-close" id="help-modal-close">
+               <i data-lucide="x"></i>
+               </button>
             </div>
-            
             <div class="help-section">
-                <h3 class="help-section-title">Keyboard Shortcuts</h3>
-                <div class="help-shortcuts">
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Select Tool</span>
-                        <span class="help-shortcut-key">V</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Arrow Tool</span>
-                        <span class="help-shortcut-key">A</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Line Tool</span>
-                        <span class="help-shortcut-key">L</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Pen Tool</span>
-                        <span class="help-shortcut-key">P</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Text Tool</span>
-                        <span class="help-shortcut-key">T</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Hand Tool</span>
-                        <span class="help-shortcut-key">H</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Undo</span>
-                        <span class="help-shortcut-key">Ctrl+Z</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Redo</span>
-                        <span class="help-shortcut-key">Ctrl+Y</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Zoom In</span>
-                        <span class="help-shortcut-key">+</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Zoom Out</span>
-                        <span class="help-shortcut-key">-</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Reset Zoom</span>
-                        <span class="help-shortcut-key">0</span>
-                    </div>
-                    <div class="help-shortcut">
-                        <span class="help-shortcut-desc">Delete Selected</span>
-                        <span class="help-shortcut-key">Delete</span>
-                    </div>
-                </div>
+               <h3 class="help-section-title">Keyboard Shortcuts</h3>
+               <div class="help-shortcuts">
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Select Tool</span>
+                     <span class="help-shortcut-key">V</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Arrow Tool</span>
+                     <span class="help-shortcut-key">A</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Line Tool</span>
+                     <span class="help-shortcut-key">L</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Pen Tool</span>
+                     <span class="help-shortcut-key">P</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Text Tool</span>
+                     <span class="help-shortcut-key">T</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Hand Tool</span>
+                     <span class="help-shortcut-key">H</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Undo</span>
+                     <span class="help-shortcut-key">Ctrl+Z</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Redo</span>
+                     <span class="help-shortcut-key">Ctrl+Y</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Zoom In</span>
+                     <span class="help-shortcut-key">+</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Zoom Out</span>
+                     <span class="help-shortcut-key">-</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Reset Zoom</span>
+                     <span class="help-shortcut-key">0</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Delete Selected</span>
+                     <span class="help-shortcut-key">Delete</span>
+                  </div>
+               </div>
             </div>
-            
             <div class="help-section">
-                <h3 class="help-section-title">Basic Usage</h3>
-                <div class="help-instructions">
-                    <p><strong>Browser Compatibility:</strong> <strong>Citrana</strong> is best used in desktop browsers (Chrome, Firefox, Safari, Edge) for optimal performance and full feature access.</p>
-                    
-                    <p><strong>Mobile Browser Support:</strong> There is extremely limited support for mobile browsers. Low to zero/minimal support is provided for mobile browsers due to their constraints and limitations. For the best experience, please use <strong>Citrana</strong> on desktop browsers.</p>
-                    
-                    <p><strong>Mobile Drawing Tools:</strong> The drawing tools are not currently available on mobile devices. Users can utilise iOS or Android's built-in annotation tools for additional markups on exported images.</p>
-                    
-                    <p><strong>Chart Types:</strong> <strong>Citrana</strong> supports both South Indian and North Indian chart layouts. Each has unique features:</p>
-                    
-                    <p><strong>South Indian Chart:</strong> Traditional 4x4 grid layout with centre empty. Right-click any house to set it as Lagna (Ascendant). A diagonal line indicator will appear at the top-left corner of the Lagna house.</p>
-                    
-                    <p><strong>North Indian Chart:</strong> Diamond layout with dynamic positioning. Right-click any house to set it as Lagna. All Grahas (planets) placed in the Bhavas will automatically rotate and renumbered based on the new Lagna position.</p>
-                    
-                    <p><strong>Adding Planets:</strong> Drag Grahas from the Graha Library (top-left) to chart houses. You can place the same Graha multiple times. Double-click any Graha to open a floating editing panel where you can modify text and set it as retrograde (a small "r" subscript will appear).</p>
-                    
-                    <p><strong>Custom Graha:</strong> There is also a "Custom" Graha available in the library. Drag and drop it into any house, then double-click to edit the name. There is a maximum character limit of 6 characters for all Graha names.</p>
-                    
-                    <p><strong>Drawing Tools:</strong> Use the toolbar to add arrows, lines, text, and heading. Double-click text elements to edit them. Use the Hand tool to pan around the chart.</p>
-                    
-                    <p><strong>Navigation:</strong> Use zoom controls or mouse wheel to zoom in/out. The Hand tool allows you to pan around the chart for detailed work.</p>
-                    
-                    <p><strong>Export Options:</strong> Click the save button to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image.</p>
-                    
-                    <p><strong>Export Viewpoint:</strong> Exported images will always follow and inherit the browser's current viewpoint. If you resize the browser window, the exported image will reflect the visible area accordingly. Adjust your browser window size and zoom level before exporting to achieve the desired output.</p>
-                    
-                    <p><strong>Single Chart Limitation:</strong> <strong>Citrana</strong> does not and will not support multiple charts in a single canvas. To create another chart, open a new browser window or tab. This ensures optimal performance and prevents conflicts between different chart configurations.</p>
-                    
-                    <p><strong>Undo/Redo:</strong> Use Ctrl+Z and Ctrl+Y to undo and redo your actions. All changes are automatically saved to your browser's local storage.</p>
-                    <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
-                    <p><strong>Note:</strong> All sessions are ephemeral. The moment the browser refreshes, all data and progress will be reset and cleared. <strong>Citrana</strong> is privacy-focused and nothing is stored on the server.</p>
-                </div>
+               <h3 class="help-section-title">Basic Usage</h3>
+               <div class="help-instructions">
+                  <p><strong>Browser Compatibility:</strong> <strong>Citrana</strong> is best used in desktop browsers (Chrome, Firefox, Safari, Edge) for optimal performance and full feature access.</p>
+                  <p><strong>Mobile Browser Support:</strong> There is extremely limited support for mobile browsers. Low to zero/minimal support is provided for mobile browsers due to their constraints and limitations. For the best experience, please use <strong>Citrana</strong> on desktop browsers.</p>
+                  <p><strong>Mobile Drawing Tools:</strong> The drawing tools are not currently available on mobile devices. Users can utilise iOS or Android's built-in annotation tools for additional markups on exported images.</p>
+                  <p><strong>Chart Types:</strong> <strong>Citrana</strong> supports both South Indian and North Indian chart layouts. Each has unique features:</p>
+                  <p><strong>South Indian Chart:</strong> Traditional 4x4 grid layout with centre empty. Right-click any house to set it as Lagna (Ascendant). A diagonal line indicator will appear at the top-left corner of the Lagna house.</p>
+                  <p><strong>North Indian Chart:</strong> Diamond layout with dynamic positioning. Right-click any house to set it as Lagna. All Grahas (planets) placed in the Bhavas will automatically rotate and renumbered based on the new Lagna position.</p>
+                  <p><strong>Adding Planets:</strong> Drag Grahas from the Graha Library (top-left) to chart houses. You can place the same Graha multiple times. Double-click any Graha to open a floating editing panel where you can modify text and set it as retrograde (a small "r" subscript will appear).</p>
+                  <p><strong>Custom Graha:</strong> There is also a "Custom" Graha available in the library. Drag and drop it into any house, then double-click to edit the name. There is a maximum character limit of 6 characters for all Graha names.</p>
+                  <p><strong>Drawing Tools:</strong> Use the toolbar to add arrows, lines, text, and heading. Double-click text elements to edit them. Use the Hand tool to pan around the chart.</p>
+                  <p><strong>Navigation:</strong> Use zoom controls or mouse wheel to zoom in/out. The Hand tool allows you to pan around the chart for detailed work.</p>
+                  <p><strong>Export Options:</strong> Click the save button to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image.</p>
+                  <p><strong>Export Viewpoint:</strong> Exported images will always follow and inherit the browser's current viewpoint. If you resize the browser window, the exported image will reflect the visible area accordingly. Adjust your browser window size and zoom level before exporting to achieve the desired output.</p>
+                  <p><strong>Single Chart Limitation:</strong> <strong>Citrana</strong> does not and will not support multiple charts in a single canvas. To create another chart, open a new browser window or tab. This ensures optimal performance and prevents conflicts between different chart configurations.</p>
+                  <p><strong>Undo/Redo:</strong> Use Ctrl+Z and Ctrl+Y to undo and redo your actions. All changes are automatically saved to your browser's local storage.</p>
+                  <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
+                  <p><strong>Note:</strong> All sessions are ephemeral. The moment the browser refreshes, all data and progress will be reset and cleared. <strong>Citrana</strong> is privacy-focused and nothing is stored on the server.</p>
+               </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Confirmation Dialog Modal -->
-    <div id="confirmation-modal" class="confirmation-modal">
-        <div class="confirmation-modal-content">
+         </div>
+      </div>
+      <!-- Confirmation Dialog Modal -->
+      <div id="confirmation-modal" class="confirmation-modal">
+         <div class="confirmation-modal-content">
             <div class="confirmation-modal-header">
-                <h2 class="confirmation-modal-title">Confirm Action</h2>
-                <button class="confirmation-modal-close" id="confirmation-modal-close">
-                    <i data-lucide="x"></i>
-                </button>
+               <h2 class="confirmation-modal-title">Confirm Action</h2>
+               <button class="confirmation-modal-close" id="confirmation-modal-close">
+               <i data-lucide="x"></i>
+               </button>
             </div>
-            
             <div class="confirmation-modal-body">
-                <p id="confirmation-message">Are you sure you want to proceed? This action cannot be undone.</p>
-                <p class="confirmation-warning"><strong>Warning:</strong> Be sure to save your image before proceeding.</p>
+               <p id="confirmation-message">Are you sure you want to proceed? This action cannot be undone.</p>
+               <p class="confirmation-warning"><strong>Warning:</strong> Be sure to save your image before proceeding.</p>
             </div>
-            
             <div class="confirmation-modal-actions">
-                <button class="confirmation-btn confirmation-btn-yes" id="confirmation-yes">Yes</button>
-                <button class="confirmation-btn confirmation-btn-no" id="confirmation-no">No</button>
+               <button class="confirmation-btn confirmation-btn-yes" id="confirmation-yes">Yes</button>
+               <button class="confirmation-btn confirmation-btn-no" id="confirmation-no">No</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Export Progress Modal -->
-    <div id="export-progress-modal" class="export-progress-modal">
-        <div class="export-progress-modal-content">
+         </div>
+      </div>
+      <!-- Export Progress Modal -->
+      <div id="export-progress-modal" class="export-progress-modal">
+         <div class="export-progress-modal-content">
             <div class="export-progress-modal-header">
-                <h2 class="export-progress-modal-title">Exporting Chart</h2>
+               <h2 class="export-progress-modal-title">Exporting Chart</h2>
             </div>
-            
             <div class="export-progress-modal-body">
-                <div class="export-progress-container">
-                    <div class="export-progress-bar">
-                        <div class="export-progress-fill" id="export-progress-fill"></div>
-                    </div>
-                    <div class="export-progress-text" id="export-progress-text">Preparing chart for export...</div>
-                </div>
+               <div class="export-progress-container">
+                  <div class="export-progress-bar">
+                     <div class="export-progress-fill" id="export-progress-fill"></div>
+                  </div>
+                  <div class="export-progress-text" id="export-progress-text">Preparing chart for export...</div>
+               </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="assets/js/utils.js"></script>
-    <script src="assets/js/chart-templates-south.js"></script>
-    <script src="assets/js/chart-templates-north.js"></script>
-    <script src="assets/js/chart-coordinator.js"></script>
-    <script src="assets/js/planet-system.js"></script>
-    <script src="assets/js/drawing-tools.js"></script>
-    <script src="assets/js/edit-ui.js"></script>
-    <script src="assets/js/context-menu.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-        
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing Citrana...');
-            window.app = new CitranaApp();
-        });
-    </script>
-</body>
-</html> 
+         </div>
+      </div>
+      <!-- Scripts -->
+      <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+      <script src="assets/js/utils.js"></script>
+      <script src="assets/js/chart-templates-south.js"></script>
+      <script src="assets/js/chart-templates-north.js"></script>
+      <script src="assets/js/chart-coordinator.js"></script>
+      <script src="assets/js/planet-system.js"></script>
+      <script src="assets/js/drawing-tools.js"></script>
+      <script src="assets/js/edit-ui.js"></script>
+      <script src="assets/js/context-menu.js"></script>
+      <script src="assets/js/app.js"></script>
+      <script>
+         // Initialize Lucide icons
+         lucide.createIcons();
+         
+         // Initialize the app
+         document.addEventListener('DOMContentLoaded', function() {
+             console.log('DOM loaded, initializing Citrana...');
+             window.app = new CitranaApp();
+         });
+      </script>
+   </body>
+</html>

@@ -13,7 +13,7 @@ class NorthIndianChartTemplate {
         this.lagnaHouseNorth = 1;
         this.firstHouseNorth = 1;
         this.selectedHouse = null; // Track selected house for highlight
-        
+
         if (stage && layer) {
             console.log('North Indian Chart Template initialized with stage and layer');
         }
@@ -135,29 +135,67 @@ class NorthIndianChartTemplate {
 
         // Global offset for rashi number boxes - adjust these values to move all rashi number boxes
         const globalOffsetNorth = {
-            x: 8,  // Adjust X offset (positive = right, negative = left)
-            y: 8   // Adjust Y offset (positive = down, negative = up)
+            x: 8, // Adjust X offset (positive = right, negative = left)
+            y: 8 // Adjust Y offset (positive = down, negative = up)
         };
 
         // Exact rashi number box positions from reference SVG - treated as individual elements
         // These positions are fixed and independent of house polygons
         const tinyBoxPositionsNorth = {
-            1: { x: 230.8155 + globalOffsetNorth.x, y: 209.75027 + globalOffsetNorth.y }, // center diamond
-            2: { x: 111.8155 + globalOffsetNorth.x, y: 87.72997 + globalOffsetNorth.y },  // top left triangle
-            3: { x: 90.53612 + globalOffsetNorth.x, y: 111.8155 + globalOffsetNorth.y },  // top left corner
-            4: { x: 208.55092 + globalOffsetNorth.x, y: 230.8155 + globalOffsetNorth.y }, // left side
-            5: { x: 252.67113 + globalOffsetNorth.x, y: 230.8155 + globalOffsetNorth.y }, // right side
-            6: { x: 230.8155 + globalOffsetNorth.x, y: 254.56586 + globalOffsetNorth.y }, // bottom center
-            7: { x: 90.53612 + globalOffsetNorth.x, y: 349.8655 + globalOffsetNorth.y },  // bottom left
-            8: { x: 111.7655 + globalOffsetNorth.x, y: 373.90103 + globalOffsetNorth.y }, // bottom left corner
-            9: { x: 349.8655 + globalOffsetNorth.x, y: 371.49796 + globalOffsetNorth.y }, // bottom right
-            10: { x: 371.09488 + globalOffsetNorth.x, y: 349.8155 + globalOffsetNorth.y }, // bottom right corner
-            11: { x: 371.09488 + globalOffsetNorth.x, y: 111.7655 + globalOffsetNorth.y }, // top right corner
-            12: { x: 349.8155 + globalOffsetNorth.x, y: 90.13304 + globalOffsetNorth.y }   // top right
+            1: {
+                x: 230.8155 + globalOffsetNorth.x,
+                y: 209.75027 + globalOffsetNorth.y
+            }, // center diamond
+            2: {
+                x: 111.8155 + globalOffsetNorth.x,
+                y: 87.72997 + globalOffsetNorth.y
+            }, // top left triangle
+            3: {
+                x: 90.53612 + globalOffsetNorth.x,
+                y: 111.8155 + globalOffsetNorth.y
+            }, // top left corner
+            4: {
+                x: 208.55092 + globalOffsetNorth.x,
+                y: 230.8155 + globalOffsetNorth.y
+            }, // left side
+            5: {
+                x: 252.67113 + globalOffsetNorth.x,
+                y: 230.8155 + globalOffsetNorth.y
+            }, // right side
+            6: {
+                x: 230.8155 + globalOffsetNorth.x,
+                y: 254.56586 + globalOffsetNorth.y
+            }, // bottom center
+            7: {
+                x: 90.53612 + globalOffsetNorth.x,
+                y: 349.8655 + globalOffsetNorth.y
+            }, // bottom left
+            8: {
+                x: 111.7655 + globalOffsetNorth.x,
+                y: 373.90103 + globalOffsetNorth.y
+            }, // bottom left corner
+            9: {
+                x: 349.8655 + globalOffsetNorth.x,
+                y: 371.49796 + globalOffsetNorth.y
+            }, // bottom right
+            10: {
+                x: 371.09488 + globalOffsetNorth.x,
+                y: 349.8155 + globalOffsetNorth.y
+            }, // bottom right corner
+            11: {
+                x: 371.09488 + globalOffsetNorth.x,
+                y: 111.7655 + globalOffsetNorth.y
+            }, // top right corner
+            12: {
+                x: 349.8155 + globalOffsetNorth.x,
+                y: 90.13304 + globalOffsetNorth.y
+            } // top right
         };
 
         // Save the original positions
-        const originalTinyBoxPositionsNorth = { ...tinyBoxPositionsNorth };
+        const originalTinyBoxPositionsNorth = {
+            ...tinyBoxPositionsNorth
+        };
 
         tinyBoxPositionsNorth[5] = originalTinyBoxPositionsNorth[7];
         tinyBoxPositionsNorth[6] = originalTinyBoxPositionsNorth[8];
@@ -168,7 +206,7 @@ class NorthIndianChartTemplate {
 
         houseDefinitionsNorth.forEach((houseDefNorth) => {
             const houseNumberNorth = houseDefNorth.number;
-            
+
             // Create house polygon
             const housePolygonNorth = new Konva.Line({
                 points: houseDefNorth.points,
@@ -202,7 +240,7 @@ class NorthIndianChartTemplate {
                 this.highlightHouse(houseNumberNorth);
                 window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumberNorth);
             });
-            
+
             // Add touch support for mobile context menu
             let longPressTimer = null;
             let longPressTriggered = false;
@@ -218,20 +256,20 @@ class NorthIndianChartTemplate {
                     }, 500);
                 }
             });
-            
+
             housePolygonNorth.on('touchmove', (e) => {
                 if (longPressTimer) {
                     clearTimeout(longPressTimer);
                     longPressTimer = null;
                 }
             });
-            
+
             housePolygonNorth.on('touchend', (e) => {
                 if (longPressTimer) {
                     clearTimeout(longPressTimer);
                     longPressTimer = null;
                 }
-                
+
                 // If long press was triggered, prevent the menu from being hidden
                 if (longPressTriggered) {
                     e.evt.preventDefault();
@@ -278,8 +316,8 @@ class NorthIndianChartTemplate {
 
             // Create rashi number box
             const rashiNumberBoxNorth = new Konva.Rect({
-                x: positionNorth.x - rashiNumberBoxSizeNorth/2,
-                y: positionNorth.y - rashiNumberBoxSizeNorth/2,
+                x: positionNorth.x - rashiNumberBoxSizeNorth / 2,
+                y: positionNorth.y - rashiNumberBoxSizeNorth / 2,
                 width: rashiNumberBoxSizeNorth,
                 height: rashiNumberBoxSizeNorth,
                 fill: '#000000',
@@ -290,8 +328,8 @@ class NorthIndianChartTemplate {
 
             // Create Rashi text
             const rashiNumberTextNorth = new Konva.Text({
-                x: positionNorth.x - rashiNumberBoxSizeNorth/2,
-                y: positionNorth.y - rashiNumberBoxSizeNorth/2,
+                x: positionNorth.x - rashiNumberBoxSizeNorth / 2,
+                y: positionNorth.y - rashiNumberBoxSizeNorth / 2,
                 width: rashiNumberBoxSizeNorth,
                 height: rashiNumberBoxSizeNorth,
                 text: rashiNameNorth,
@@ -304,7 +342,7 @@ class NorthIndianChartTemplate {
                 name: `RashiNumberTextNorth${houseNumNorth}`,
                 id: uniqueId // Assign unique ID
             });
-            
+
             console.log(`[DEBUG] Created Rashi text element with name: RashiNumberTextNorth${houseNumNorth}`);
 
             // Add click event to rashi number box for debug
@@ -329,12 +367,12 @@ class NorthIndianChartTemplate {
         // Add both groups to layer - rashi number boxes on top
         this.layer.add(this.chartGroupNorth);
         this.layer.add(this.tinyBoxGroupNorth);
-        
+
         // Ensure house polygons are always on top for hit detection
         this.chartGroupNorth.moveToTop();
         this.tinyBoxGroupNorth.moveToTop();
         this.layer.batchDraw();
-        
+
         console.log('[DEBUG] North Indian chart created with clickable Rashi Number Boxes');
 
         // Call renumberHouses to set correct Rashi numbers based on Lagna and First House
@@ -342,7 +380,7 @@ class NorthIndianChartTemplate {
 
         // Zoom to fit
         this.zoomToFit();
-        
+
         console.log('North Indian chart created');
 
         // Do not add or handle the center label anymore.
@@ -372,25 +410,25 @@ class NorthIndianChartTemplate {
     setLagnaHouse(houseNumber) {
         console.log('[DEBUG] North Indian Chart - setLagnaHouse called with house number:', houseNumber);
         console.log('[DEBUG] Previous Lagna House:', this.lagnaHouseNorth);
-        
+
         this.lagnaHouseNorth = houseNumber;
-        
+
         console.log('[DEBUG] New Lagna House set to:', this.lagnaHouseNorth);
         console.log('[DEBUG] Calling renumberHouses() to update Rashi numbers...');
-        
+
         this.renumberHouses();
         this.clearHighlight();
-        
+
         // Reposition all planets based on their stored Rashi numbers
         this.repositionPlanetsForNewLagna();
-        
+
         // Get zodiac sign name for the Lagna
         const zodiacSigns = [
             'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
             'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
         ];
         const lagnaSignName = zodiacSigns[houseNumber - 1] || 'Unknown';
-        
+
         console.log(`[DEBUG] North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
         console.log('[DEBUG] Chart should now display updated Rashi numbers for the new Lagna');
         console.log('[DEBUG] All planets have been repositioned to their correct Rashis');
@@ -434,7 +472,7 @@ class NorthIndianChartTemplate {
      */
     repositionPlanetsForNewLagna() {
         console.log('[DEBUG] Repositioning planets for new Lagna...');
-        
+
         // Collect all planets with their Rashi numbers
         const allPlanets = [];
         for (const houseNum in this.houseDataNorth) {
@@ -450,19 +488,19 @@ class NorthIndianChartTemplate {
                 });
             }
         }
-        
+
         console.log(`[DEBUG] Found ${allPlanets.length} planets to reposition`);
-        
+
         // Clear all planets from current positions
         for (const houseNum in this.houseDataNorth) {
             this.houseDataNorth[houseNum].planets = [];
         }
-        
+
         // Reposition each planet to its correct house based on Rashi
         allPlanets.forEach(planet => {
             const newHouseNumber = this.getHouseNumberForRashi(planet.rashiNumber);
             console.log(`[DEBUG] Planet ${planet.abbr} (Rashi ${planet.rashiNumber}) moving from house ${planet.currentHouse} to house ${newHouseNumber}`);
-            
+
             // Add planet to new house
             const house = this.houseDataNorth[newHouseNumber];
             if (house) {
@@ -476,12 +514,12 @@ class NorthIndianChartTemplate {
                 });
             }
         });
-        
+
         // Update visual representation for all houses
         for (const houseNum in this.houseDataNorth) {
             this.updatePlanetsInHouse(parseInt(houseNum));
         }
-        
+
         this.layer.batchDraw();
         console.log('[DEBUG] Planet repositioning completed');
     }
@@ -525,14 +563,20 @@ class NorthIndianChartTemplate {
         }
         this.houseDataNorth = {};
         this.selectedHouse = null;
-        
+
         // Reset stage scale and position
         if (this.stage) {
-            this.stage.scale({ x: 1, y: 1 });
-            this.stage.position({ x: 0, y: 0 });
+            this.stage.scale({
+                x: 1,
+                y: 1
+            });
+            this.stage.position({
+                x: 0,
+                y: 0
+            });
             this.stage.batchDraw();
         }
-        
+
         console.log('North Indian chart cleared');
     }
 
@@ -541,10 +585,10 @@ class NorthIndianChartTemplate {
 
         const stageWidth = this.stage.width();
         const stageHeight = this.stage.height();
-        
+
         // Get the chart bounds in local coordinates (not screen coordinates)
         const chartBounds = this.chartGroupNorth.getClientRect();
-        
+
         // Convert screen bounds to local bounds
         const scale = this.stage.scaleX();
         const stagePos = this.stage.position();
@@ -564,7 +608,10 @@ class NorthIndianChartTemplate {
         const scaleY = (stageHeight * scaleFactor) / localBounds.height;
         const newScale = Math.min(scaleX, scaleY, 2); // Max scale of 2
 
-        this.stage.scale({ x: newScale, y: newScale });
+        this.stage.scale({
+            x: newScale,
+            y: newScale
+        });
 
         // Center the chart, but add extra top margin for the label
         const chartCenter = {
@@ -581,7 +628,7 @@ class NorthIndianChartTemplate {
         };
         this.stage.position(newPos);
         this.stage.batchDraw();
-        
+
         console.log('[DEBUG] North Indian zoomToFit - scale:', newScale, 'position:', newPos, 'extraTopMargin:', extraTopMargin);
     }
 
@@ -596,18 +643,18 @@ class NorthIndianChartTemplate {
 
     loadChartData(data) {
         if (!data || data.chartType !== 'north-indian') return;
-        
+
         try {
             this.lagnaHouseNorth = data.lagnaHouse || 1;
             this.firstHouseNorth = data.firstHouse || 1;
             this.houseDataNorth = data.houseData || {};
-            
+
             // Recreate the chart
             this.createNorthIndianChart();
-            
+
             // Reposition planets if they have Rashi numbers stored
             this.repositionPlanetsForNewLagna();
-            
+
             console.log('North Indian chart data loaded successfully');
         } catch (error) {
             console.error('Error loading North Indian chart data:', error);
@@ -630,18 +677,18 @@ class NorthIndianChartTemplate {
         if (!house.planets) house.planets = [];
         // Use unique ID for each planet instance
         const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
-        
+
         // If this is a planet being moved (has existing Rashi), preserve it
         // Otherwise, calculate the Rashi number for this house with current Lagna
         const rashiNumber = existingRashiNumber || this.getRashiNumberForHouse(houseNumber);
-        
+
         // Get planet color
         const planet = window.app.planetSystem.getPlanetInfo(planetAbbr);
         const planetColor = planet ? planet.color : '#000000';
-        
-        house.planets.push({ 
-            abbr: planetAbbr, 
-            label: label || planetAbbr, 
+
+        house.planets.push({
+            abbr: planetAbbr,
+            label: label || planetAbbr,
             id: planetId,
             rashiNumber: rashiNumber, // Store the Rashi number when planet is placed
             color: planetColor
@@ -671,18 +718,18 @@ class NorthIndianChartTemplate {
         const BASE_FONT = 20;
         const MIN_FONT = 10;
         const STEP = 4;
-        const fontSize = Math.max(MIN_FONT, BASE_FONT - (n-1)*STEP);
+        const fontSize = Math.max(MIN_FONT, BASE_FONT - (n - 1) * STEP);
         // Perfectly center all planet texts both horizontally and vertically in the house
-        const totalHeight = n * fontSize + (n-1) * 4;
-        const startY = house.y - totalHeight/2;
+        const totalHeight = n * fontSize + (n - 1) * 4;
+        const startY = house.y - totalHeight / 2;
         house.planets.forEach((planetObj, i) => {
             const planet = window.app.planetSystem.getPlanetInfo(planetObj.abbr);
             const planetY = startY + i * (fontSize + 4);
-            
+
             // Add a transparent rectangle for easier hit area
             const hitRect = new Konva.Rect({
                 x: house.x - fontSize,
-                y: planetY - fontSize/2,
+                y: planetY - fontSize / 2,
                 width: fontSize * 2,
                 height: fontSize,
                 fill: 'rgba(0,0,0,0)',
@@ -706,16 +753,16 @@ class NorthIndianChartTemplate {
                 offsetX: 0,
                 offsetY: 0,
             });
-            
+
             // Calculate exact center position
             setTimeout(() => {
                 const textWidth = planetText.width();
                 const textHeight = planetText.height();
-                planetText.x(house.x - textWidth/2);
-                planetText.y(planetY - textHeight/2);
+                planetText.x(house.x - textWidth / 2);
+                planetText.y(planetY - textHeight / 2);
                 this.layer.batchDraw();
             }, 10);
-            
+
             planetText._planetHouseNumber = houseNumber;
             planetText._planetId = planetObj.id;
 
@@ -730,16 +777,16 @@ class NorthIndianChartTemplate {
                         // Update the planet text and color
                         planetText.text(newLabel);
                         planetText.fill(newColor);
-                        
+
                         // Re-center the text after editing
                         setTimeout(() => {
                             const textWidth = planetText.width();
                             const textHeight = planetText.height();
-                            planetText.x(house.x - textWidth/2);
-                            planetText.y(planetY - textHeight/2);
+                            planetText.x(house.x - textWidth / 2);
+                            planetText.y(planetY - textHeight / 2);
                             this.layer.batchDraw();
                         }, 10);
-                        
+
                         this.layer.batchDraw();
                         console.log(`[DEBUG] Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
                         // Trigger snapshot for undo/redo
@@ -764,7 +811,7 @@ class NorthIndianChartTemplate {
             };
             hitRect.on('contextmenu', contextHandler);
             planetText.on('contextmenu', contextHandler);
-            
+
             // Touch support for mobile context menu
             let planetLongPressTimer = null;
             let planetLongPressTriggered = false;
@@ -780,20 +827,20 @@ class NorthIndianChartTemplate {
                     }, 500);
                 }
             };
-            
+
             const touchMoveHandler = (e) => {
                 if (planetLongPressTimer) {
                     clearTimeout(planetLongPressTimer);
                     planetLongPressTimer = null;
                 }
             };
-            
+
             const touchEndHandler = (e) => {
                 if (planetLongPressTimer) {
                     clearTimeout(planetLongPressTimer);
                     planetLongPressTimer = null;
                 }
-                
+
                 // If long press was triggered, prevent the menu from being hidden
                 if (planetLongPressTriggered) {
                     e.evt.preventDefault();
@@ -804,7 +851,7 @@ class NorthIndianChartTemplate {
                     }, 100);
                 }
             };
-            
+
             hitRect.on('touchstart', touchContextHandler);
             planetText.on('touchstart', touchContextHandler);
             hitRect.on('touchmove', touchMoveHandler);
@@ -813,10 +860,10 @@ class NorthIndianChartTemplate {
             planetText.on('touchend', touchEndHandler);
             // Drag-and-drop between bhavas
             planetText.on('dragstart', (e) => {
-                this._dragSource = { 
-                    houseNumber, 
-                    abbr: planetObj.abbr, 
-                    id: planetObj.id, 
+                this._dragSource = {
+                    houseNumber,
+                    abbr: planetObj.abbr,
+                    id: planetObj.id,
                     label: planetObj.label,
                     rashiNumber: planetObj.rashiNumber, // Store the Rashi number for the move
                     color: planetObj.color
@@ -884,15 +931,20 @@ class NorthIndianChartTemplate {
 
     selectPlanet(planetText, houseNumber, abbr, id) {
         this.clearSelectedPlanet();
-        this.selectedPlanet = { planetText, houseNumber, abbr, id };
+        this.selectedPlanet = {
+            planetText,
+            houseNumber,
+            abbr,
+            id
+        };
         planetText.stroke('#f59e42');
         planetText.strokeWidth(2);
         this.layer.batchDraw();
         if (!this._deleteKeyListener) {
             this._deleteKeyListener = (e) => {
-                            if (e.key === 'Delete' && this.selectedPlanet) {
-                this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
-            }
+                if (e.key === 'Delete' && this.selectedPlanet) {
+                    this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
+                }
             };
             window.addEventListener('keydown', this._deleteKeyListener);
         }
@@ -910,12 +962,14 @@ class NorthIndianChartTemplate {
     static isPointInPolygon(points, px, py) {
         let inside = false;
         for (let i = 0, j = points.length / 2 - 1; i < points.length / 2; j = i++) {
-            const xi = points[2 * i], yi = points[2 * i + 1];
-            const xj = points[2 * j], yj = points[2 * j + 1];
+            const xi = points[2 * i],
+                yi = points[2 * i + 1];
+            const xj = points[2 * j],
+                yj = points[2 * j + 1];
             const intersect = ((yi > py) !== (yj > py)) &&
                 (px < (xj - xi) * (py - yi) / (yj - yi + 0.00001) + xi);
             if (intersect) inside = !inside;
         }
         return inside;
     }
-} 
+}

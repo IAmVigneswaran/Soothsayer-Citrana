@@ -1,5 +1,5 @@
 /**
- * Utility Functions for Vedic Astrology Chart Builder
+ * Utility Functions for Citrana Web Application
  * Konva.js Implementation
  */
 
@@ -40,7 +40,7 @@ class Utils {
         // Create notification element
         const notification = document.createElement('div');
         notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transition-all duration-300 transform translate-x-full`;
-        
+
         // Set background color based on type
         switch (type) {
             case 'success':
@@ -55,15 +55,15 @@ class Utils {
             default:
                 notification.style.backgroundColor = '#3B82F6';
         }
-        
+
         notification.textContent = message;
         document.body.appendChild(notification);
-        
+
         // Animate in
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
         }, 100);
-        
+
         // Remove after 3 seconds
         setTimeout(() => {
             notification.style.transform = 'translateX(full)';
@@ -142,10 +142,10 @@ class Utils {
      * Check if point is inside rectangle
      */
     static pointInRect(point, rect) {
-        return point.x >= rect.left && 
-               point.x <= rect.left + rect.width && 
-               point.y >= rect.top && 
-               point.y <= rect.top + rect.height;
+        return point.x >= rect.left &&
+            point.x <= rect.left + rect.width &&
+            point.y >= rect.top &&
+            point.y <= rect.top + rect.height;
     }
 
     /**
@@ -167,7 +167,7 @@ class Utils {
      */
     static validateChartData(data) {
         if (!data) return false;
-        
+
         const requiredFields = ['type', 'lagna', 'firstHouse', 'houses'];
         return requiredFields.every(field => data.hasOwnProperty(field));
     }
@@ -177,18 +177,18 @@ class Utils {
      */
     static getChartStatistics(chartData) {
         if (!chartData || !chartData.houses) return null;
-        
+
         const stats = {
             totalPlanets: 0,
             housesWithPlanets: 0,
             emptyHouses: [],
             planetDistribution: {}
         };
-        
+
         chartData.houses.forEach((house, index) => {
             const planetCount = house.length;
             stats.totalPlanets += planetCount;
-            
+
             if (planetCount > 0) {
                 stats.housesWithPlanets++;
                 house.forEach(planet => {
@@ -198,7 +198,7 @@ class Utils {
                 stats.emptyHouses.push(index + 1);
             }
         });
-        
+
         return stats;
     }
 
@@ -207,11 +207,11 @@ class Utils {
      */
     static formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
-        
+
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        
+
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
@@ -232,7 +232,9 @@ class Utils {
      * Download data as file
      */
     static downloadFile(data, filename, type = 'text/plain') {
-        const blob = new Blob([data], { type });
+        const blob = new Blob([data], {
+            type
+        });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -337,4 +339,4 @@ class Utils {
 }
 
 // Export for use in other modules
-window.Utils = Utils; 
+window.Utils = Utils;
