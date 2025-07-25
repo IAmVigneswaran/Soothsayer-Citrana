@@ -28,7 +28,6 @@ This codebase is developed using AI agents.
   - [Working with Planets](#working-with-planets)
   - [Drawing and Navigation](#drawing-and-navigation)
   - [Export and Limitations](#export-and-limitations)
-  - [Keyboard Shortcuts](#keyboard-shortcuts)
   - [Important Notes](#important-notes)
 - [Browser Compatibility](#browser-compatibility)
 - [Credits](#credits)
@@ -85,23 +84,6 @@ Export Options: Click the save button to export your chart as a PNG file with ti
 Export Viewpoint: Exported images will always follow and inherit the browser's current viewpoint. If you resize the browser window, the exported image will reflect the visible area accordingly. Adjust your browser window size and zoom level before exporting to achieve the desired output.
 
 Single Chart Limitation: Citrana does not and will not support multiple charts in a single canvas. To create another chart, open a new browser window or tab. This ensures optimal performance and prevents conflicts between different chart configurations.
-
-### Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| V | Select Tool |
-| A | Arrow Tool |
-| L | Line Tool |
-| P | Pen Tool |
-| T | Text Tool |
-| H | Hand Tool |
-| Ctrl+Z | Undo |
-| Ctrl+Y | Redo |
-| + | Zoom In |
-| - | Zoom Out |
-| 0 | Reset Zoom |
-| Delete | Delete Selected |
 
 ### Important Notes
 
