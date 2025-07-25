@@ -155,20 +155,38 @@ class DrawingTools {
 
     stopDrawing() {
         if (!this.isDrawing) return;
-
+        
         this.isDrawing = false;
-        
-        if (this.currentShape) {
-            this.addToUndoStack(this.currentShape);
-            this.currentShape = null;
-        }
-        
+        this.currentShape = null;
+        this.currentTool = null;
         this.lastPoint = null;
         
-        // Trigger snapshot for undo/redo
-        if (window.app && window.app.pushSnapshot) {
-            window.app.pushSnapshot();
-        }
+        // Ensure the layer is updated
+        this.layer.batchDraw();
+        
+        console.log('Drawing stopped');
+    }
+
+    /**
+     * Ensure drawing objects are properly selectable after creation
+     * @param {KonvaShape} shape - The shape to make selectable
+     */
+    makeShapeSelectable(shape) {
+        if (!shape) return;
+        
+        // Ensure the shape is listening for events
+        shape.setAttrs({
+            listening: true,
+            draggable: false // Will be enabled when select tool is active
+        });
+        
+        // Add a small delay to ensure the shape is fully rendered
+        setTimeout(() => {
+            // Re-add double-tap support if it's a touch device
+            if (this.isTouchDevice) {
+                this.addDoubleTapSupport(shape, this.currentTool);
+            }
+        }, 150);
     }
 
     getDistance(pos1, pos2) {
@@ -212,6 +230,9 @@ class DrawingTools {
         points[3] = pos.y;
         this.currentShape.points(points);
         this.layer.batchDraw();
+        
+        // Make the shape selectable after drawing
+        this.makeShapeSelectable(this.currentShape);
     }
 
     startLine(pos) {
@@ -246,6 +267,9 @@ class DrawingTools {
         points[3] = pos.y;
         this.currentShape.points(points);
         this.layer.batchDraw();
+        
+        // Make the shape selectable after drawing
+        this.makeShapeSelectable(this.currentShape);
     }
 
     startPen(pos) {
@@ -283,6 +307,9 @@ class DrawingTools {
         points.push(pos.x, pos.y);
         this.currentShape.points(points);
         this.layer.batchDraw();
+        
+        // Make the shape selectable after drawing
+        this.makeShapeSelectable(this.currentShape);
     }
 
     startText(pos) {
@@ -1107,8 +1134,17 @@ class DrawingTools {
         let lastTap = 0;
         let tapCount = 0;
         let tapTimer = null;
+        let isProcessingTap = false;
 
         const handleTap = (e) => {
+            // Prevent event bubbling and default behavior
+            e.cancelBubble = true;
+            e.evt.preventDefault();
+            e.evt.stopPropagation();
+            
+            // Prevent processing if already handling a tap
+            if (isProcessingTap) return;
+            
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
 
@@ -1118,7 +1154,13 @@ class DrawingTools {
                 if (tapCount === 2) {
                     clearTimeout(tapTimer);
                     tapCount = 0;
-                    this.showEditUIForShape(shape);
+                    isProcessingTap = true;
+                    
+                    // Small delay to ensure drawing is complete
+                    setTimeout(() => {
+                        this.showEditUIForShape(shape);
+                        isProcessingTap = false;
+                    }, 50);
                 }
             } else {
                 tapCount = 1;
@@ -1130,11 +1172,21 @@ class DrawingTools {
             if (tapTimer) clearTimeout(tapTimer);
             tapTimer = setTimeout(() => {
                 tapCount = 0;
+                isProcessingTap = false;
             }, 500);
         };
 
+        // Add tap event listener with higher priority
         shape.on('tap', handleTap);
         shape._tapHandler = handleTap; // Store handler for cleanup
+        
+        // Also add click handler for desktop compatibility
+        shape.on('click', (e) => {
+            // Only handle click if not on mobile
+            if (!this.isTouchDevice) {
+                this.showEditUIForShape(shape);
+            }
+        });
     }
 
     startHeading(pos) {

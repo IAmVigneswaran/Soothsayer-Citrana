@@ -722,6 +722,17 @@ class CitranaApp {
         } else {
             this.isDrawing = false;
             this.drawingTools.stopDrawing();
+            
+            // After drawing is complete, ensure the shape can be selected
+            if (this.drawingTools.currentShape) {
+                // Small delay to ensure the shape is fully created
+                setTimeout(() => {
+                    this.drawingTools.currentShape.setAttrs({
+                        listening: true,
+                        draggable: false // Will be enabled when select tool is active
+                    });
+                }, 100);
+            }
         }
     }
 
