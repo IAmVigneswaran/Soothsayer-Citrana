@@ -156,6 +156,11 @@ class DrawingTools {
     stopDrawing() {
         if (!this.isDrawing) return;
         
+        // Add the completed shape to undo stack
+        if (this.currentShape) {
+            this.addToUndoStack(this.currentShape, 'add');
+        }
+        
         this.isDrawing = false;
         this.currentShape = null;
         this.currentTool = null;
@@ -163,6 +168,11 @@ class DrawingTools {
         
         // Ensure the layer is updated
         this.layer.batchDraw();
+        
+        // Trigger snapshot for undo/redo
+        if (window.app && window.app.pushSnapshot) {
+            window.app.pushSnapshot();
+        }
         
         console.log('Drawing stopped');
     }
@@ -209,6 +219,10 @@ class DrawingTools {
             draggable: false // Will be enabled when select tool is active
         });
 
+        // Create invisible bounding box for easier selection
+        const boundingBox = this.createBoundingBox(arrow, 'arrow');
+        arrow.boundingBox = boundingBox;
+
         // Add click handler for Edit UI
         arrow.on('click', () => {
             this.showEditUI(arrow, 'arrow');
@@ -219,16 +233,23 @@ class DrawingTools {
 
         this.currentShape = arrow;
         this.layer.add(arrow);
+        this.layer.add(boundingBox);
         this.layer.batchDraw();
     }
 
     updateArrow(pos) {
         if (!this.currentShape) return;
-
+        
         const points = this.currentShape.points();
         points[2] = pos.x;
         points[3] = pos.y;
         this.currentShape.points(points);
+        
+        // Update bounding box if it exists
+        if (this.currentShape.boundingBox) {
+            this.updateBoundingBox(this.currentShape.boundingBox, this.currentShape);
+        }
+        
         this.layer.batchDraw();
         
         // Make the shape selectable after drawing
@@ -246,6 +267,10 @@ class DrawingTools {
             draggable: false // Will be enabled when select tool is active
         });
 
+        // Create invisible bounding box for easier selection
+        const boundingBox = this.createBoundingBox(line, 'line');
+        line.boundingBox = boundingBox;
+
         // Add click handler for Edit UI
         line.on('click', () => {
             this.showEditUI(line, 'line');
@@ -256,16 +281,23 @@ class DrawingTools {
 
         this.currentShape = line;
         this.layer.add(line);
+        this.layer.add(boundingBox);
         this.layer.batchDraw();
     }
 
     updateLine(pos) {
         if (!this.currentShape) return;
-
+        
         const points = this.currentShape.points();
         points[2] = pos.x;
         points[3] = pos.y;
         this.currentShape.points(points);
+        
+        // Update bounding box if it exists
+        if (this.currentShape.boundingBox) {
+            this.updateBoundingBox(this.currentShape.boundingBox, this.currentShape);
+        }
+        
         this.layer.batchDraw();
         
         // Make the shape selectable after drawing
@@ -286,6 +318,10 @@ class DrawingTools {
             tension: 0.1 // Smooth curves
         });
 
+        // Create invisible bounding box for easier selection
+        const boundingBox = this.createBoundingBox(line, 'pen');
+        line.boundingBox = boundingBox;
+
         // Add click handler for Edit UI
         line.on('click', (e) => {
             e.cancelBubble = true;
@@ -297,15 +333,22 @@ class DrawingTools {
 
         this.currentShape = line;
         this.layer.add(line);
+        this.layer.add(boundingBox);
         this.layer.batchDraw();
     }
 
     updatePen(pos) {
         if (!this.currentShape) return;
-
+        
         const points = this.currentShape.points();
         points.push(pos.x, pos.y);
         this.currentShape.points(points);
+        
+        // Update bounding box if it exists
+        if (this.currentShape.boundingBox) {
+            this.updateBoundingBox(this.currentShape.boundingBox, this.currentShape);
+        }
+        
         this.layer.batchDraw();
         
         // Make the shape selectable after drawing
@@ -502,37 +545,84 @@ class DrawingTools {
         }, 100);
     }
 
-    addToUndoStack(shape) {
-        this.undoStack.push(shape);
-        this.redoStack = []; // Clear redo stack when new action is performed
-        
-        if (this.undoStack.length > this.maxUndoSteps) {
-            this.undoStack.shift();
+    addToUndoStack(shape, actionType = 'add') {
+        if (this.undoStack.length >= this.maxUndoSteps) {
+            this.undoStack.shift(); // Remove oldest action
         }
+        
+        this.undoStack.push({
+            type: actionType,
+            shape: shape
+        });
+        
+        // Clear redo stack when new action is added
+        this.redoStack = [];
     }
 
     undo() {
         if (this.undoStack.length === 0) return;
-
-        const shape = this.undoStack.pop();
-        this.redoStack.push(shape);
         
-        shape.destroy();
+        const lastAction = this.undoStack.pop();
+        this.redoStack.push(lastAction);
+        
+        if (lastAction.type === 'add') {
+            // Remove the shape and its bounding box
+            if (lastAction.shape) {
+                if (lastAction.shape.boundingBox) {
+                    lastAction.shape.boundingBox.destroy();
+                }
+                lastAction.shape.destroy();
+            }
+        } else if (lastAction.type === 'delete') {
+            // Restore the shape and recreate its bounding box
+            if (lastAction.shape) {
+                this.layer.add(lastAction.shape);
+                
+                // Recreate bounding box if it's a drawing object
+                if (lastAction.shape.name() && lastAction.shape.name().startsWith('drawing-')) {
+                    const toolType = lastAction.shape.name().replace('drawing-', '');
+                    const boundingBox = this.createBoundingBox(lastAction.shape, toolType);
+                    lastAction.shape.boundingBox = boundingBox;
+                    this.layer.add(boundingBox);
+                }
+            }
+        }
+        
         this.layer.batchDraw();
-        
-        console.log('Undo performed');
+        this.clearSelection();
     }
 
     redo() {
         if (this.redoStack.length === 0) return;
-
-        const shape = this.redoStack.pop();
-        this.undoStack.push(shape);
         
-        this.layer.add(shape);
+        const lastAction = this.redoStack.pop();
+        this.undoStack.push(lastAction);
+        
+        if (lastAction.type === 'add') {
+            // Restore the shape and recreate its bounding box
+            if (lastAction.shape) {
+                this.layer.add(lastAction.shape);
+                
+                // Recreate bounding box if it's a drawing object
+                if (lastAction.shape.name() && lastAction.shape.name().startsWith('drawing-')) {
+                    const toolType = lastAction.shape.name().replace('drawing-', '');
+                    const boundingBox = this.createBoundingBox(lastAction.shape, toolType);
+                    lastAction.shape.boundingBox = boundingBox;
+                    this.layer.add(boundingBox);
+                }
+            }
+        } else if (lastAction.type === 'delete') {
+            // Remove the shape and its bounding box
+            if (lastAction.shape) {
+                if (lastAction.shape.boundingBox) {
+                    lastAction.shape.boundingBox.destroy();
+                }
+                lastAction.shape.destroy();
+            }
+        }
+        
         this.layer.batchDraw();
-        
-        console.log('Redo performed');
+        this.clearSelection();
     }
 
     clearAll() {
@@ -620,7 +710,7 @@ class DrawingTools {
     }
 
     /**
-     * Handle mouse down for select tool
+     * Handle mouse down for select tool (desktop)
      * @param {Object} pos - Mouse position
      * @param {KonvaEvent} e - Konva event
      */
@@ -629,10 +719,25 @@ class DrawingTools {
 
         const clickedShape = e.target;
         
-        // Check if clicked on a drawing object
-        if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
-            this.selectShape(clickedShape);
-            this.isDragging = true;
+        // Check if clicked on a drawing object or its bounding box
+        if (clickedShape && (
+            (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
+            (clickedShape.name() && clickedShape.name().startsWith('bounding-box-'))
+        )) {
+            // If clicked on bounding box, get the actual shape
+            let actualShape = clickedShape;
+            if (clickedShape.name().startsWith('bounding-box-')) {
+                // Find the actual drawing shape that this bounding box belongs to
+                const shapes = this.layer.find('*');
+                actualShape = shapes.find(shape => 
+                    shape.boundingBox === clickedShape
+                );
+            }
+            
+            if (actualShape) {
+                this.selectShape(actualShape);
+                this.isDragging = true;
+            }
         } else {
             // Clicked on empty space, clear selection
             this.clearSelection();
@@ -649,13 +754,28 @@ class DrawingTools {
 
         const clickedShape = e.target;
         
-        // Check if clicked on a drawing object
-        if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
-            this.selectShape(clickedShape);
-            this.isDragging = true;
+        // Check if clicked on a drawing object or its bounding box
+        if (clickedShape && (
+            (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
+            (clickedShape.name() && clickedShape.name().startsWith('bounding-box-'))
+        )) {
+            // If clicked on bounding box, get the actual shape
+            let actualShape = clickedShape;
+            if (clickedShape.name().startsWith('bounding-box-')) {
+                // Find the actual drawing shape that this bounding box belongs to
+                const shapes = this.layer.find('*');
+                actualShape = shapes.find(shape => 
+                    shape.boundingBox === clickedShape
+                );
+            }
             
-            // Add double-tap detection for Edit UI
-            this.setupDoubleTapForEditUI(clickedShape);
+            if (actualShape) {
+                this.selectShape(actualShape);
+                this.isDragging = true;
+                
+                // Add double-tap detection for Edit UI
+                this.setupDoubleTapForEditUI(actualShape);
+            }
         } else {
             // Clicked on empty space, clear selection
             this.clearSelection();
@@ -763,11 +883,30 @@ class DrawingTools {
      * Delete selected shape
      */
     deleteSelectedShape() {
-        if (this.selectedShape) {
-            this.selectedShape.destroy();
-            this.selectedShape = null;
-            this.layer.batchDraw();
-            console.log('Selected shape deleted');
+        if (!this.selectedShape) return;
+        
+        // Add to undo stack before deleting
+        this.addToUndoStack(this.selectedShape, 'delete');
+        
+        // Remove bounding box if it exists
+        if (this.selectedShape.boundingBox) {
+            this.selectedShape.boundingBox.destroy();
+        }
+        
+        // Remove the shape
+        this.selectedShape.destroy();
+        this.selectedShape = null;
+        
+        // Hide Edit UI
+        if (this.editUI) {
+            this.editUI.hide();
+        }
+        
+        this.layer.batchDraw();
+        
+        // Trigger snapshot for undo/redo
+        if (window.app && window.app.pushSnapshot) {
+            window.app.pushSnapshot();
         }
     }
 
@@ -1353,5 +1492,69 @@ class DrawingTools {
             heading.text(textarea.value);
             this.layer.batchDraw();
         });
+    }
+
+    /**
+     * Create an invisible bounding box around a drawing object for easier selection
+     * @param {KonvaShape} shape - The shape to create a bounding box for
+     * @param {string} toolType - The type of drawing tool
+     * @returns {KonvaRect} The invisible bounding box
+     */
+    createBoundingBox(shape, toolType) {
+        // Get the shape's bounding box with some padding
+        const padding = 15; // 15px padding around the shape
+        const bounds = shape.getClientRect();
+        
+        const boundingBox = new Konva.Rect({
+            x: bounds.x - padding,
+            y: bounds.y - padding,
+            width: bounds.width + (padding * 2),
+            height: bounds.height + (padding * 2),
+            fill: 'transparent',
+            stroke: 'transparent',
+            strokeWidth: 0,
+            name: `bounding-box-${toolType}`,
+            listening: true,
+            draggable: false,
+            perfectDrawEnabled: false
+        });
+
+        // Add event handlers to the bounding box that delegate to the shape
+        boundingBox.on('click', () => {
+            this.showEditUI(shape, toolType);
+        });
+
+        boundingBox.on('tap', (e) => {
+            // Delegate tap events to the shape
+            if (shape._tapHandler) {
+                shape._tapHandler(e);
+            }
+        });
+
+        // Update bounding box position when shape moves
+        shape.on('dragmove', () => {
+            this.updateBoundingBox(boundingBox, shape);
+        });
+
+        return boundingBox;
+    }
+
+    /**
+     * Update bounding box position when shape moves
+     * @param {KonvaRect} boundingBox - The bounding box to update
+     * @param {KonvaShape} shape - The shape being moved
+     */
+    updateBoundingBox(boundingBox, shape) {
+        const padding = 15;
+        const bounds = shape.getClientRect();
+        
+        boundingBox.setAttrs({
+            x: bounds.x - padding,
+            y: bounds.y - padding,
+            width: bounds.width + (padding * 2),
+            height: bounds.height + (padding * 2)
+        });
+        
+        this.layer.batchDraw();
     }
 } 
