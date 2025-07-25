@@ -186,8 +186,8 @@ body {
 }
 
 .page-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: #d1d5db;
     cursor: pointer;
@@ -564,8 +564,8 @@ body {
     }
     
     .page-dot {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
     }
     
     .floating-zoom-controls {
