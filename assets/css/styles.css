@@ -581,7 +581,7 @@ body {
   
   /* iOS Safari-specific Graha Library bottom offset */
   body.ios-safari .floating-planet-library {
-    bottom: 160px !important; /* Increased from 80px to 160px for iOS Safari only */
+    bottom: 140px !important; /* Increased from 80px to 140px for iOS Safari only */
   }
   
   /* Safari-specific top toolbar fix */
