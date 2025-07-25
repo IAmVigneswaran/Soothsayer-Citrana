@@ -1202,6 +1202,13 @@ body {
     .help-btn {
         display: none;
     }
+    
+    /* Temporarily hide buggy drawing tools on mobile */
+    #arrow-tool,
+    #line-tool,
+    #pen-tool {
+        display: none !important;
+    }
 }
 
 /* Confirmation Dialog Modal */
