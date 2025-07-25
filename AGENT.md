@@ -406,11 +406,72 @@ Provides utility functions for common operations across the application.
 ### Adding New Planets
 Edit the planets object in assets/js/planet-system.js:
 ```javascript
-this.planets = {
-    'Su': { name: 'Sun', fullName: 'Sun', color: '#000000' },
-    // Add new planet here
-    'New': { name: 'New Planet', fullName: 'New Planet', color: '#FF0000' }
-};
+// Planet data
+        this.planets = {
+            'Lg': {
+                name: 'Lagna',
+                fullName: 'Lagna',
+                color: '#000000'
+            },
+            'Su': {
+                name: 'Sun',
+                fullName: 'Sun',
+                color: '#e2792e'
+            },
+            'Mo': {
+                name: 'Moon',
+                fullName: 'Moon',
+                color: '#868484'
+            },
+            'Me': {
+                name: 'Mercury',
+                fullName: 'Mercury',
+                color: '#08b130'
+            },
+            'Ve': {
+                name: 'Venus',
+                fullName: 'Venus',
+                color: '#eb539f'
+            },
+            'Ma': {
+                name: 'Mars',
+                fullName: 'Mars',
+                color: '#da3b26'
+            },
+            'Ju': {
+                name: 'Jupiter',
+                fullName: 'Jupiter',
+                color: '#ffa200'
+            },
+            'Sa': {
+                name: 'Saturn',
+                fullName: 'Saturn',
+                color: '#3274b5'
+            },
+            'Ra': {
+                name: 'Rahu',
+                fullName: 'Rahu',
+                color: '#4c4b4b'
+            },
+            'Ke': {
+                name: 'Ketu',
+                fullName: 'Ketu',
+                color: '#4c4b4b'
+            },
+            'Md': {
+                name: 'Maandi',
+                fullName: 'Maandi',
+                color: '#000000'
+            },
+            'Cu': {
+                name: 'Custom',
+                fullName: 'Custom',
+                color: '#000000'
+            }
+        };
+        this.draggedPlanet = null;
+        this.dropZones = [];
+    }
 ```
 
 ### Modifying Chart Styles
@@ -446,23 +507,13 @@ this.planets = {
 
 ## Future Enhancements
 
-### Phase 2 (Planned)
-- Aspect line drawing between planets
+### Planned Ideas
 - Custom planet sets and configurations
 - Multi-language support (Tamil, Hindi)
-- Advanced export options (SVG, PDF)
-
-### Phase 3 (Future)
-- Batch chart generation
-- Cloud storage integration
-- Collaborative editing features
-- API for external integrations
 
 ## Support and Documentation
 
 - **AGENT.md**: This comprehensive project documentation
-- **SPECIFICATION.md**: Detailed original project specification
-- **IMPLEMENTATION_SUMMARY.md**: Complete implementation details
 - **README.md**: Project overview and quick start
 
 ## Development Commands
