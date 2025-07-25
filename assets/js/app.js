@@ -42,6 +42,7 @@ class CitranaApp {
             height: container.offsetHeight
         });
         
+        // Test trigger for Code Quality workflow
         // Safari-specific configuration for better drag and drop
         this.stage.draggable(false); // Disable stage dragging by default
         this.stage.on('dragstart', (e) => {
