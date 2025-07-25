@@ -579,11 +579,6 @@ body {
     z-index: 9999 !important;
   }
   
-  /* iOS Safari-specific Graha Library bottom offset */
-  body.ios-safari .floating-planet-library {
-    bottom: 140px !important; /* Increased from 80px to 140px for iOS Safari only */
-  }
-  
   /* Safari-specific top toolbar fix */
   .floating-top-toolbar {
     /* Force visibility and positioning */

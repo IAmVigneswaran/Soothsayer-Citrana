@@ -831,11 +831,16 @@ class CitranaApp {
         const isIOS = /iPad|iPhone|iPod/.test(ua);
         // Only true Safari: has 'Safari' but not 'CriOS', 'FxiOS', 'EdgiOS', or 'OPiOS'
         const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-        if (isIOS && isSafari) {
-            document.body.classList.add('ios-safari');
-            console.log('iOS Safari detected. Applying iOS Safari specific fixes.');
-        } else {
-            document.body.classList.remove('ios-safari');
+
+        const grahaLib = document.querySelector('.floating-planet-library');
+        if (grahaLib) {
+            if (isIOS && isSafari) {
+                grahaLib.style.bottom = '180px';
+                console.log('iOS Safari detected. Graha Library offset set to 180px.');
+            } else {
+                grahaLib.style.bottom = '80px';
+                console.log('Not iOS Safari. Graha Library offset set to 80px.');
+            }
         }
     }
 }
