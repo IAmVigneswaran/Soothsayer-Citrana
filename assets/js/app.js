@@ -327,29 +327,78 @@ class CitranaApp {
 
     exportChart() {
         try {
+            // 1. Get the current stage size (do not resize or move content)
+            const width = this.stage.width();
+            const height = this.stage.height();
+
+            // 2. Add a white background rectangle at the bottom of the Konva layer
+            //    This ensures the exported PNG has a solid white background (no transparency)
+            const bgRect = new Konva.Rect({
+                x: 0,
+                y: 0,
+                width: width,
+                height: height,
+                fill: 'white',
+                listening: false,
+                name: 'export-bg-rect'
+            });
+            this.layer.add(bgRect);
+            bgRect.moveToBottom();
+            this.layer.batchDraw();
+
+            // 3. Export the PNG from Konva (with white background)
+            //    The exported image will have the same dimensions as the stage, at pixelRatio*size
             const dataURL = this.stage.toDataURL({
                 pixelRatio: 2,
                 mimeType: 'image/png'
             });
-            
-            // Generate timestamp in user's timezone
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            const timestamp = `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
-            const filename = `citrana-chart-${timestamp}.png`;
-            
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = dataURL;
-            link.click();
-            
-            console.log(`Chart exported successfully as: ${filename}`);
+
+            // 4. Remove the temporary white background rectangle from the layer
+            this.layer.batchDraw();
+            bgRect.destroy();
+            this.layer.batchDraw();
+
+            // 5. Add 100px white padding to all sides using an offscreen canvas
+            //    This does NOT affect the app or Konva stage—only the exported file
+            const img = new window.Image();
+            img.onload = () => {
+                // Calculate new dimensions with 100px padding on each side
+                const paddedWidth = img.width + 200;
+                const paddedHeight = img.height + 200;
+                // Create an offscreen canvas
+                const offscreen = document.createElement('canvas');
+                offscreen.width = paddedWidth;
+                offscreen.height = paddedHeight;
+                const ctx = offscreen.getContext('2d');
+
+                // Fill the entire offscreen canvas with white
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, paddedWidth, paddedHeight);
+
+                // Draw the exported PNG at (100, 100) to center it with padding
+                ctx.drawImage(img, 100, 100);
+
+                // 6. Download the padded image as PNG
+                const paddedDataURL = offscreen.toDataURL('image/png');
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                const timestamp = `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
+                const filename = `citrana-chart-${timestamp}.png`;
+
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = paddedDataURL;
+                link.click();
+
+                console.log(`Chart exported successfully as: ${filename}`);
+            };
+            // Start loading the exported PNG into the offscreen canvas
+            img.src = dataURL;
         } catch (error) {
             console.error('Error exporting chart:', error);
         }
