@@ -206,9 +206,9 @@ class PlanetSystem {
                 fullName: 'மாந்தி',
                 color: '#000000'
             },
-            'தனி': {
-                name: 'தனிப்பயன்',
-                fullName: 'தனிப்பயன்',
+            'ப': {
+                name: 'பயன்',
+                fullName: 'பயன்',
                 color: '#000000'
             }
         };
