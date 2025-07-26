@@ -297,6 +297,14 @@ body {
   align-self: center;
 }
 
+/* Hide separator and hand tool on desktop */
+@media (min-width: 769px) {
+  .zoom-divider,
+  #zoom-hand-tool {
+    display: none !important;
+  }
+}
+
 /* Floating Text Edit Controls */
 .floating-text-edit-controls {
     position: absolute;
