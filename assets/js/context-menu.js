@@ -147,6 +147,8 @@ class ContextMenu {
             <div class="context-menu-separator"></div>
             <div class="context-menu-item" data-action="create-north-indian"><i data-lucide="plus-circle"></i> North Indian Chart</div>
             <div class="context-menu-item" data-action="create-south-indian"><i data-lucide="plus-circle"></i> South Indian Chart</div>
+            <div class="context-menu-separator"></div>
+            <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>
         `;
         lucide.createIcons();
         this.show(x, y);

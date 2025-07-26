@@ -22,6 +22,14 @@ class DrawingTools {
         this.isEditingPlanet = false;
         this.currentlyEditingPlanet = null;
 
+        // Control points for Arrow and Line tools
+        this.controlPoints = {
+            startPoint: null,
+            endPoint: null,
+            isDraggingControlPoint: false,
+            draggedPoint: null
+        };
+
         // Initialize Edit UI
         this.editUI = new EditUI();
 
@@ -191,34 +199,254 @@ class DrawingTools {
     }
 
     /**
-     * Ensure drawing objects are properly selectable after creation
-     * @param {KonvaShape} shape - The shape to make selectable
+     * Ensure Arrow and Line shapes have proper drag event handlers for control points
+     * @param {Konva.Shape} shape - The shape to add handlers to
+     */
+    ensureShapeHasDragHandlers(shape) {
+        if (!shape || !['drawing-arrow', 'drawing-line'].includes(shape.name())) {
+            return;
+        }
+
+        // Remove existing drag handlers to avoid duplicates
+        shape.off('dragmove');
+
+        // Add drag event handler for control point updates
+        shape.on('dragmove', () => {
+            // Update control points position when shape is dragged
+            this.updateControlPointsPosition(shape);
+        });
+    }
+
+    /**
+     * Make a shape selectable and add necessary event handlers
+     * @param {Konva.Shape} shape - The shape to make selectable
      */
     makeShapeSelectable(shape) {
         if (!shape) return;
 
-        // Ensure the shape is listening for events and set correct draggable state
-        const shouldBeDraggable = this.currentTool === 'select';
-        shape.setAttrs({
-            listening: true,
-            draggable: shouldBeDraggable
-        });
+        // Ensure Arrow and Line shapes have drag handlers for control points
+        this.ensureShapeHasDragHandlers(shape);
 
-        console.log(`Made shape ${shape.name()} selectable, draggable: ${shouldBeDraggable}, current tool: ${this.currentTool}`);
+        // Set draggable based on current tool
+        shape.draggable(this.currentTool === 'select');
 
-        // Add a small delay to ensure the shape is fully rendered
-        setTimeout(() => {
-            // Re-add double-tap support if it's a touch device
-            if (this.isTouchDevice) {
-                this.addDoubleTapSupport(shape, this.currentTool);
-            }
-        }, 150);
+        // Add click handler for Edit UI if not already present
+        if (!shape.hasName('drawing-text')) {
+            // Remove existing click handler to avoid duplicates
+            shape.off('click');
+            
+            shape.on('click', () => {
+                const toolType = this.getToolTypeFromShape(shape);
+                this.showEditUI(shape, toolType);
+            });
+        }
+
+        // Add double-tap support for mobile if not already present
+        this.addDoubleTapSupport(shape, this.getToolTypeFromShape(shape));
     }
 
     getDistance(pos1, pos2) {
-        const dx = pos1.x - pos2.x;
-        const dy = pos1.y - pos2.y;
+        const dx = pos2.x - pos1.x;
+        const dy = pos2.y - pos1.y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    /**
+     * Create control points for Arrow and Line shapes
+     * @param {Konva.Shape} shape - The shape to create control points for
+     */
+    createControlPoints(shape) {
+        if (!shape || !['drawing-arrow', 'drawing-line'].includes(shape.name())) {
+            return;
+        }
+
+        const points = shape.points();
+        if (points.length < 4) return;
+
+        // Get the shape's current position (transformation)
+        const shapeX = shape.x();
+        const shapeY = shape.y();
+
+        // Calculate absolute positions by adding shape's position to local points
+        const startX = points[0] + shapeX;
+        const startY = points[1] + shapeY;
+        const endX = points[2] + shapeX;
+        const endY = points[3] + shapeY;
+
+        // Create start point control
+        this.controlPoints.startPoint = new Konva.Circle({
+            x: startX,
+            y: startY,
+            radius: 6,
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeWidth: 2,
+            name: 'control-point-start',
+            listening: true,
+            draggable: true
+        });
+
+        // Create end point control
+        this.controlPoints.endPoint = new Konva.Circle({
+            x: endX,
+            y: endY,
+            radius: 6,
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeWidth: 2,
+            name: 'control-point-end',
+            listening: true,
+            draggable: true
+        });
+
+        // Add drag event handlers for start point
+        this.controlPoints.startPoint.on('dragstart', () => {
+            this.controlPoints.isDraggingControlPoint = true;
+            this.controlPoints.draggedPoint = 'start';
+        });
+
+        this.controlPoints.startPoint.on('dragmove', () => {
+            if (this.controlPoints.isDraggingControlPoint) {
+                const newPos = this.controlPoints.startPoint.position();
+                this.updateShapeFromControlPoint(shape, 'start', newPos);
+            }
+        });
+
+        this.controlPoints.startPoint.on('dragend', () => {
+            this.controlPoints.isDraggingControlPoint = false;
+            this.controlPoints.draggedPoint = null;
+            // Add to undo stack when control point drag ends
+            this.addToUndoStack(shape, 'modify');
+        });
+
+        // Add drag event handlers for end point
+        this.controlPoints.endPoint.on('dragstart', () => {
+            this.controlPoints.isDraggingControlPoint = true;
+            this.controlPoints.draggedPoint = 'end';
+        });
+
+        this.controlPoints.endPoint.on('dragmove', () => {
+            if (this.controlPoints.isDraggingControlPoint) {
+                const newPos = this.controlPoints.endPoint.position();
+                this.updateShapeFromControlPoint(shape, 'end', newPos);
+            }
+        });
+
+        this.controlPoints.endPoint.on('dragend', () => {
+            this.controlPoints.isDraggingControlPoint = false;
+            this.controlPoints.draggedPoint = null;
+            // Add to undo stack when control point drag ends
+            this.addToUndoStack(shape, 'modify');
+        });
+
+        // Add control points to layer
+        this.layer.add(this.controlPoints.startPoint);
+        this.layer.add(this.controlPoints.endPoint);
+        this.layer.batchDraw();
+    }
+
+    /**
+     * Show control points for a selected Arrow or Line shape
+     * @param {Konva.Shape} shape - The shape to show control points for
+     */
+    showControlPoints(shape) {
+        if (!shape || !['drawing-arrow', 'drawing-line'].includes(shape.name())) {
+            return;
+        }
+
+        // Hide any existing control points first
+        this.hideControlPoints();
+
+        // Create new control points for this shape
+        this.createControlPoints(shape);
+    }
+
+    /**
+     * Hide control points
+     */
+    hideControlPoints() {
+        if (this.controlPoints.startPoint) {
+            this.controlPoints.startPoint.destroy();
+            this.controlPoints.startPoint = null;
+        }
+        if (this.controlPoints.endPoint) {
+            this.controlPoints.endPoint.destroy();
+            this.controlPoints.endPoint = null;
+        }
+        this.controlPoints.isDraggingControlPoint = false;
+        this.controlPoints.draggedPoint = null;
+        this.layer.batchDraw();
+    }
+
+    /**
+     * Update shape points based on control point movement
+     * @param {Konva.Shape} shape - The shape to update
+     * @param {string} pointType - 'start' or 'end'
+     * @param {Object} newPos - New position {x, y}
+     */
+    updateShapeFromControlPoint(shape, pointType, newPos) {
+        if (!shape) return;
+
+        const points = shape.points();
+        if (points.length < 4) return;
+
+        // Get the shape's current position (transformation)
+        const shapeX = shape.x();
+        const shapeY = shape.y();
+
+        if (pointType === 'start') {
+            // Convert absolute position back to local coordinates
+            points[0] = newPos.x - shapeX;
+            points[1] = newPos.y - shapeY;
+            // Update start control point position
+            if (this.controlPoints.startPoint) {
+                this.controlPoints.startPoint.position(newPos);
+            }
+        } else if (pointType === 'end') {
+            // Convert absolute position back to local coordinates
+            points[2] = newPos.x - shapeX;
+            points[3] = newPos.y - shapeY;
+            // Update end control point position
+            if (this.controlPoints.endPoint) {
+                this.controlPoints.endPoint.position(newPos);
+            }
+        }
+
+        shape.points(points);
+
+        // Update bounding box if it exists
+        if (shape.boundingBox) {
+            this.updateBoundingBox(shape.boundingBox, shape);
+        }
+
+        this.layer.batchDraw();
+    }
+
+    /**
+     * Update control points position when shape is moved
+     * @param {Konva.Shape} shape - The shape that was moved
+     */
+    updateControlPointsPosition(shape) {
+        if (!shape || !this.controlPoints.startPoint || !this.controlPoints.endPoint) {
+            return;
+        }
+
+        const points = shape.points();
+        if (points.length < 4) return;
+
+        // Get the shape's current position (transformation)
+        const shapeX = shape.x();
+        const shapeY = shape.y();
+
+        // Calculate absolute positions by adding shape's position to local points
+        const startX = points[0] + shapeX;
+        const startY = points[1] + shapeY;
+        const endX = points[2] + shapeX;
+        const endY = points[3] + shapeY;
+
+        this.controlPoints.startPoint.position({ x: startX, y: startY });
+        this.controlPoints.endPoint.position({ x: endX, y: endY });
+        this.layer.batchDraw();
     }
 
     startArrow(pos) {
@@ -242,19 +470,6 @@ class DrawingTools {
         // Add click handler for Edit UI
         arrow.on('click', () => {
             this.showEditUI(arrow, 'arrow');
-        });
-
-        // Add drag event handlers for debugging
-        arrow.on('dragstart', () => {
-            console.log('Arrow drag started');
-        });
-
-        arrow.on('dragmove', () => {
-            console.log('Arrow dragging');
-        });
-
-        arrow.on('dragend', () => {
-            console.log('Arrow drag ended');
         });
 
         // Add double-tap support for mobile
@@ -303,19 +518,6 @@ class DrawingTools {
         // Add click handler for Edit UI
         line.on('click', () => {
             this.showEditUI(line, 'line');
-        });
-
-        // Add drag event handlers for debugging
-        line.on('dragstart', () => {
-            console.log('Line drag started');
-        });
-
-        line.on('dragmove', () => {
-            console.log('Line dragging');
-        });
-
-        line.on('dragend', () => {
-            console.log('Line drag ended');
         });
 
         // Add double-tap support for mobile
@@ -684,6 +886,10 @@ class DrawingTools {
         // Remove all drawing objects (not chart objects)
         const drawingObjects = this.layer.find(node => node.name() && node.name().startsWith('drawing-'));
         drawingObjects.forEach(obj => obj.destroy());
+        
+        // Hide control points
+        this.hideControlPoints();
+        
         this.layer.batchDraw();
 
         this.undoStack = [];
@@ -736,6 +942,10 @@ class DrawingTools {
             if (obj.name() !== 'drawing-text') {
                 // Text objects handle their own dragging
                 obj.draggable(draggable);
+                
+                // Ensure Arrow and Line shapes have drag handlers for control points
+                this.ensureShapeHasDragHandlers(obj);
+                
                 console.log(`Updated ${obj.name()} draggable to: ${draggable}`);
             }
         });
@@ -794,6 +1004,7 @@ class DrawingTools {
             this.selectedShape = null;
         }
         this.layer.batchDraw();
+        this.hideControlPoints(); // Hide control points when clearing selection
     }
 
     /**
@@ -805,6 +1016,12 @@ class DrawingTools {
 
         if (shape && shape.name() && shape.name().startsWith('drawing-')) {
             this.selectedShape = shape;
+            
+            // Show control points for Arrow and Line shapes
+            if (['drawing-arrow', 'drawing-line'].includes(shape.name())) {
+                this.showControlPoints(shape);
+            }
+            
             // No visual selection indicator - just track the selected shape
             this.layer.batchDraw();
         }
@@ -819,6 +1036,11 @@ class DrawingTools {
         if (!pos) return;
 
         const clickedShape = e.target;
+
+        // Ignore clicks on control points
+        if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('control-point-')) {
+            return;
+        }
 
         // Check if clicked on a drawing object or its bounding box
         if (clickedShape && (
@@ -854,6 +1076,11 @@ class DrawingTools {
         if (!pos) return;
 
         const clickedShape = e.target;
+
+        // Ignore touches on control points
+        if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('control-point-')) {
+            return;
+        }
 
         // Check if clicked on a drawing object or its bounding box
         if (clickedShape && (
@@ -993,6 +1220,9 @@ class DrawingTools {
         if (this.selectedShape.boundingBox) {
             this.selectedShape.boundingBox.destroy();
         }
+
+        // Hide control points
+        this.hideControlPoints();
 
         // Remove the shape
         this.selectedShape.destroy();
