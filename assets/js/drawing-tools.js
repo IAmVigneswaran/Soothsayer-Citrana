@@ -256,7 +256,7 @@ class DrawingTools {
      * @param {Konva.Shape} shape - The shape to create control points for
      */
     createControlPoints(shape) {
-        if (!shape || !['drawing-arrow', 'drawing-line'].includes(shape.name())) {
+        if (!shape || (!shape.name().startsWith('drawing-arrow') && !shape.name().startsWith('drawing-line'))) {
             return;
         }
 
@@ -343,6 +343,9 @@ class DrawingTools {
         this.layer.add(this.controlPoints.startPoint);
         this.layer.add(this.controlPoints.endPoint);
         this.layer.batchDraw();
+        
+        // Store reference to the shape these control points belong to
+        this.controlPoints.ownerShape = shape;
     }
 
     /**
@@ -350,12 +353,26 @@ class DrawingTools {
      * @param {Konva.Shape} shape - The shape to show control points for
      */
     showControlPoints(shape) {
-        if (!shape || !['drawing-arrow', 'drawing-line'].includes(shape.name())) {
+        if (!shape || (!shape.name().startsWith('drawing-arrow') && !shape.name().startsWith('drawing-line'))) {
             return;
         }
 
-        // Hide any existing control points first
+        // Check if control points already exist for this shape
+        if (this.controlPoints.ownerShape === shape) {
+            return;
+        }
+
+        // Always hide any existing control points first to prevent interference
         this.hideControlPoints();
+        
+        // Reset control points state
+        this.controlPoints = {
+            startPoint: null,
+            endPoint: null,
+            isDraggingControlPoint: false,
+            draggedPoint: null,
+            ownerShape: null
+        };
 
         // Create new control points for this shape
         this.createControlPoints(shape);
@@ -375,6 +392,7 @@ class DrawingTools {
         }
         this.controlPoints.isDraggingControlPoint = false;
         this.controlPoints.draggedPoint = null;
+        this.controlPoints.ownerShape = null;
         this.layer.batchDraw();
     }
 
@@ -386,6 +404,15 @@ class DrawingTools {
      */
     updateShapeFromControlPoint(shape, pointType, newPos) {
         if (!shape) return;
+        
+        // Ensure we're updating the correct shape (the one that owns these control points)
+        if (!this.controlPoints.ownerShape) {
+            return;
+        }
+        
+        if (this.controlPoints.ownerShape !== shape) {
+            return;
+        }
 
         const points = shape.points();
         if (points.length < 4) return;
@@ -1023,7 +1050,7 @@ class DrawingTools {
             }
             
             // Show control points for Arrow and Line shapes
-            if (['drawing-arrow', 'drawing-line'].includes(shape.name())) {
+            if (shape.name().startsWith('drawing-arrow') || shape.name().startsWith('drawing-line')) {
                 this.showControlPoints(shape);
             }
             
@@ -1292,13 +1319,31 @@ class DrawingTools {
         duplicatedShape.x(offsetX);
         duplicatedShape.y(offsetY);
 
-        // Generate a new unique name for the duplicated shape
+        // Generate a new unique name for the duplicated shape using proper UUID
         const originalName = duplicatedShape.name();
         if (originalName) {
-            const nameParts = originalName.split('-');
-            const baseName = nameParts.slice(0, -1).join('-');
-            const newId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-            duplicatedShape.name(`${baseName}-${newId}`);
+            // Extract the base tool type (arrow, line, pen, text, heading)
+            let baseName = 'drawing';
+            if (originalName.includes('drawing-arrow')) {
+                baseName = 'drawing-arrow';
+            } else if (originalName.includes('drawing-line')) {
+                baseName = 'drawing-line';
+            } else if (originalName.includes('drawing-pen')) {
+                baseName = 'drawing-pen';
+            } else if (originalName.includes('drawing-text')) {
+                baseName = 'drawing-text';
+            } else if (originalName.includes('drawing-heading')) {
+                baseName = 'drawing-heading';
+            }
+            
+            // Generate a proper UUID
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            
+            duplicatedShape.name(`${baseName}-${uuid}`);
         }
 
         // Add the duplicated shape to the layer
@@ -1324,6 +1369,9 @@ class DrawingTools {
         const shouldBeDraggable = this.currentTool === 'select';
         this.updateShapeDraggable(duplicatedShape, shouldBeDraggable);
 
+        // Add drag handlers for control points (for Arrow and Line shapes)
+        this.ensureShapeHasDragHandlers(duplicatedShape);
+
         // Add to undo stack
         this.addToUndoStack(duplicatedShape, 'add');
 
@@ -1337,10 +1385,6 @@ class DrawingTools {
         if (window.app && window.app.pushSnapshot) {
             window.app.pushSnapshot();
         }
-
-        console.log('Shape duplicated successfully');
-        console.log('Duplicated shape draggable state:', duplicatedShape.draggable());
-        console.log('Current tool:', this.currentTool);
     }
 
     /**

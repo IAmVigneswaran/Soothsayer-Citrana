@@ -772,8 +772,17 @@ class CitranaApp {
     }
 
     setupKeyboardShortcuts() {
+        // Prevent multiple event listeners from being attached
+        if (this.keyboardShortcutsSetup) {
+            console.log('Keyboard shortcuts already setup, skipping...');
+            return;
+        }
+        this.keyboardShortcutsSetup = true;
+        
+        // Add debounce for duplicate operation
+        this.lastDuplicateTime = 0;
+        
         document.addEventListener('keydown', (e) => {
-            console.log('Keyboard event detected:', e.key, 'Active element:', document.activeElement);
             
             // Check if we're in text editing mode
             const textarea = document.querySelector('.konva-textarea');
@@ -824,7 +833,25 @@ class CitranaApp {
                     this.redo();
                 } else if (e.key === 'd' || e.key === 'D') {
                     e.preventDefault();
-                    // Allow duplication regardless of current tool, but temporarily switch to select mode
+                    
+                    // Debounce duplicate operation to prevent double execution
+                    const currentTime = Date.now();
+                    if (currentTime - this.lastDuplicateTime < 500) {
+                        console.log('Duplicate operation debounced - too soon after last duplicate');
+                        return;
+                    }
+                    this.lastDuplicateTime = currentTime;
+                    
+                    // Check if the selected shape is an Arrow or Line (disable duplication for these)
+                    if (this.drawingTools.selectedShape) {
+                        const shapeName = this.drawingTools.selectedShape.name();
+                        if (shapeName && (shapeName.startsWith('drawing-arrow') || shapeName.startsWith('drawing-line'))) {
+                            console.log('Duplicate disabled for Arrow and Line tools');
+                            return;
+                        }
+                    }
+                    
+                    // Allow duplication for other tools, but temporarily switch to select mode
                     const previousTool = this.currentTool;
                     if (previousTool !== 'select') {
                         this.setTool('select');
@@ -855,17 +882,9 @@ class CitranaApp {
 
             // Delete selected shape (Delete key or Backspace key)
             if (e.key === 'Delete' || e.key === 'Backspace') {
-                console.log('=== DELETE/BACKSPACE KEY DETECTED ===');
-                console.log('Key pressed:', e.key, 'Current tool:', this.currentTool, 'Selected shape:', this.drawingTools.selectedShape);
-                console.log('Active element:', document.activeElement);
-                console.log('Canvas container focused:', document.getElementById('canvas-container') === document.activeElement);
-                
                 if (this.currentTool === 'select' || this.drawingTools.selectedShape) {
                     e.preventDefault();
-                    console.log('Deleting selected shape...');
                     this.drawingTools.deleteSelectedShape();
-                } else {
-                    console.log('Delete key ignored - no shape selected or wrong tool');
                 }
             }
 
