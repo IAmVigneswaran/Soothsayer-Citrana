@@ -378,12 +378,11 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - Provides precise positioning and hit detection
 - Manages Edit UI integration
 - Implements planet text editing
-- Provides interactive control points for Arrow and Line tools to adjust start and end points
 
 **Available Tools:**
 - Select Tool: Choose and modify existing elements
-- Arrow Tool: Create directional indicators with customisable arrowheads and interactive control points for start and end
-- Line Tool: Draw straight lines and connections with interactive control points for start and end
+- Arrow Tool: Create directional indicators with arrowheads
+- Line Tool: Draw straight lines and connections
 - Pen Tool: Freehand drawing for annotations
 - Text Tool: Add editable text boxes
 - Heading Tool: Create chart headings and titles
@@ -396,8 +395,7 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - Text editing with font controls
 - Planet text editing with retrograde support
 - Undo/redo with 50-step history
-- Duplicate functionality with Ctrl+D/Cmd+D (disabled for Arrow and Line tools)
-- Interactive control points for Arrow and Line tools to adjust start and end positions
+- Duplicate functionality with Ctrl+D/Cmd+D
 
 **Key Methods:**
 - `startDrawing()`: Begin drawing operation
@@ -408,8 +406,6 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - `showEditUIForShape()`: Edit interface integration
 - `makePlanetTextEditable()`: Planet text editing
 - `duplicateSelectedShape()`: Duplicate selected elements
-- `showControlPoints()`: Show and manage control points for Arrow and Line tools
-- `updateShapeFromControlPoint()`: Update Arrow/Line shape from control point movement
 
 ### Context Menu (context-menu.js - 456 lines)
 Provides right-click and long-press context menus for chart interaction.
@@ -514,13 +510,13 @@ Provides utility functions for common operations across the application.
 
 ### Drawing Tools
 - Select Tool: Choose and modify existing elements with Edit UI
-- Arrow Tool: Create directional indicators with customisable arrowheads and interactive control points for start and end
-- Line Tool: Draw straight lines and connections with interactive control points for start and end
+- Arrow Tool: Create directional indicators with customisable arrowheads
+- Line Tool: Draw straight lines and connections
 - Pen Tool: Freehand drawing for annotations
 - Text Tool: Add editable text boxes anywhere on canvas
 - Heading Tool: Create chart headings and titles
 - Undo/Redo: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
-- Duplicate: Duplicate selected elements with Ctrl+D/Cmd+D (disabled for Arrow and Line tools)
+- Duplicate: Duplicate selected elements with Ctrl+D/Cmd+D
 
 ### User Experience
 - Light Theme: Clean, professional appearance with high contrast
