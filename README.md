@@ -23,11 +23,13 @@ This codebase is developed using AI agents.
 ## Core Features
 
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic house numbering
-- Drag & Drop Planets: Navagrahas with intuitive placement and multiple instances support
+- Graha Library: 51 planets across 5 pages including, Jaimini Karakas, Tamil Grahas, Hindi Grahas, and Outer Planets
+- Drag & Drop Planets: Intuitive placement with multiple instances support and dynamic text sizing
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools with undo/redo
 - Professional Export: High-resolution PNG exports (300 DPI) with auto-save functionality
 - Context Menus: Right-click and long-press support for quick chart management
 - Keyboard Shortcuts: Power user features for efficient workflow
+- Multi-language Support: Planets available in English, Tamil, and Hindi scripts
 - Privacy focused: No data collection, no tracking, no server-side storage
 
 ## Table of Contents

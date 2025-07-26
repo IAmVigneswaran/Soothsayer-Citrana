@@ -156,7 +156,7 @@ Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 - `isPointInPolygon()`: Hit detection for polygon houses
 - `getRashiNumberForHouse()`: Rashi calculation
 
-### Planet System (planet-system.js - 715 lines)
+### Planet System (planet-system.js - 876 lines)
 Manages the floating planet library and drag-and-drop functionality with paging system.
 
 **Key Responsibilities:**
@@ -170,13 +170,13 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 
 **Key Features:**
 - Floating, draggable planet library with paging
-- 24 planets across two pages (12 per page)
+- 51 planets across five pages with varying counts per page
 - Desktop navigation with clickable page dots
 - Mobile swipe navigation (left/right)
 - Drag preview with visual feedback
 - Touch and mouse support
 - Drop zone validation
-- Mobile-optimized interactions
+- Mobile-optimised interactions
 
 **Planet Library - Page 1 (Traditional Grahas):**
 - Lg: Lagna (Ascendant)
@@ -192,7 +192,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - Md: Maandi
 - Cu: Custom
 
-**Planet Library - Page 2 (Additional Grahas):**
+**Planet Library - Page 2 (Jaimini Karakas):**
 - AK: Atmakaraka
 - AmK: Amatyakaraka
 - BK: Bhratrikaraka
@@ -205,6 +205,39 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - KL: Karakamsa Lagna
 - IL: Indu Lagna
 - SL: Sree Lagna
+
+**Planet Library - Page 3 (Tamil Grahas):**
+- ல: லக்கினம் (Lagna)
+- சூ: சூரியன் (Sun)
+- சந்: சந்திரன் (Moon)
+- பு: புதன் (Mercury)
+- சுக்: சுக்ரன் (Venus)
+- செவ்: செவ்வாய் (Mars)
+- குரு: குரு (Jupiter)
+- சனி: சனி (Saturn)
+- ரா: ராகு (Rahu)
+- கே: கேது (Ketu)
+- மா: மாந்தி (Maandi)
+- ப: பயன் (Custom)
+
+**Planet Library - Page 4 (Hindi Grahas):**
+- लग्न: लग्न (Lagna)
+- सूर्य: सूर्य (Sun)
+- चंद्र: चंद्र (Moon)
+- बुद्ध: बुद्ध (Mercury)
+- शुक्र: शुक्र (Venus)
+- मंगल: मंगल (Mars)
+- गुरु: गुरु (Jupiter)
+- शनि: शनि (Saturn)
+- राहु: राहु (Rahu)
+- केतु: केतु (Ketu)
+- मांदी: मांदी (Maandi)
+- कस: कस्टम (Custom)
+
+**Planet Library - Page 5 (Outer Planets):**
+- Ur: Uranus
+- Ne: Neptune
+- Pl: Pluto
 
 **Key Methods:**
 - `init()`: Initialize planet library
@@ -348,8 +381,8 @@ Provides utility functions for common operations across the application.
 - **Dynamic House Numbering**: Automatic renumbering based on Lagna position
 
 ### Planet Management
-- **24 Major Grahas**: 12 traditional Grahas on Page 1 and 12 additional Grahas on Page 2
-- **Paging System**: Two-page navigation with desktop dots and mobile swipe
+- **51 Major Grahas**: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
+- **Paging System**: Five-page navigation with desktop dots and mobile swipe
 - **Text-based Display**: Uses abbreviations instead of symbols for better compatibility
 - **Drag & Drop**: Intuitive planet placement from floating library to chart houses
 - **Multiple Instances**: Same planet can be placed multiple times
@@ -492,73 +525,220 @@ Edit the planets objects in assets/js/planet-system.js:
             }
         };
 
-        // Planet data - Page 2 (Additional Grahas)
+        // Planet data - Page 2 (Jaimini Karakas)
         this.planetsPage2 = {
             'AK': {
                 name: 'AK',
-                fullName: 'Atmakaraka',
+                fullName: 'AK',
                 color: '#000000'
             },
             'AmK': {
                 name: 'AmK',
-                fullName: 'Amatyakaraka',
+                fullName: 'AmK',
                 color: '#000000'
             },
             'BK': {
                 name: 'BK',
-                fullName: 'Bhratrikaraka',
+                fullName: 'BK',
                 color: '#000000'
             },
             'MK': {
                 name: 'MK',
-                fullName: 'Matrikaraka',
+                fullName: 'MK',
                 color: '#000000'
             },
             'PK': {
                 name: 'PK',
-                fullName: 'Pitrikaraka',
+                fullName: 'PK',
                 color: '#000000'
             },
             'GK': {
                 name: 'GK',
-                fullName: 'Gnatikaraka',
+                fullName: 'GK',
                 color: '#000000'
             },
             'DK': {
                 name: 'DK',
-                fullName: 'Dara Karaka',
+                fullName: 'DK',
                 color: '#000000'
             },
             'AL': {
                 name: 'AL',
-                fullName: 'Arudha Lagna',
+                fullName: 'AL',
                 color: '#000000'
             },
             'UL': {
                 name: 'UL',
-                fullName: 'Upapada Lagna',
+                fullName: 'UL',
                 color: '#000000'
             },
             'KL': {
                 name: 'KL',
-                fullName: 'Karakamsa Lagna',
+                fullName: 'KL',
                 color: '#000000'
             },
             'IL': {
                 name: 'IL',
-                fullName: 'Indu Lagna',
+                fullName: 'IL',
                 color: '#000000'
             },
             'SL': {
                 name: 'SL',
-                fullName: 'Sree Lagna',
+                fullName: 'SL',
+                color: '#000000'
+            }
+        };
+
+        // Planet data - Page 3 (In Tamil)
+        this.planetsPage3 = {
+            'ல': {
+                name: 'லக்கினம்',
+                fullName: 'லக்கினம்',
+                color: '#000000'
+            },
+            'சூ': {
+                name: 'சூரியன்',
+                fullName: 'சூரியன்',
+                color: '#e2792e'
+            },
+            'சந்': {
+                name: 'சந்திரன்',
+                fullName: 'சந்திரன்',
+                color: '#868484'
+            },
+            'பு': {
+                name: 'புதன்',
+                fullName: 'புதன்',
+                color: '#08b130'
+            },
+            'சுக்': {
+                name: 'சுக்ரன்',
+                fullName: 'சுக்ரன்',
+                color: '#eb539f'
+            },
+            'செவ்': {
+                name: 'செவ்வாய்',
+                fullName: 'செவ்வாய்',
+                color: '#da3b26'
+            },
+            'குரு': {
+                name: 'குரு',
+                fullName: 'குரு',
+                color: '#ffa200'
+            },
+            'சனி': {
+                name: 'சனி',
+                fullName: 'சனி',
+                color: '#3274b5'
+            },
+            'ரா': {
+                name: 'ராகு',
+                fullName: 'ராகு',
+                color: '#4c4b4b'
+            },
+            'கே': {
+                name: 'கேது',
+                fullName: 'கேது',
+                color: '#4c4b4b'
+            },
+            'மா': {
+                name: 'மாந்தி',
+                fullName: 'மாந்தி',
+                color: '#000000'
+            },
+            'ப': {
+                name: 'பயன்',
+                fullName: 'பயன்',
+                color: '#000000'
+            }
+        };
+
+        // Planet data - Page 4 (In Hindi)
+        this.planetsPage4 = {
+            'लग्न': {
+                name: 'लग्न',
+                fullName: 'लग्न',
+                color: '#000000'
+            },
+            'सूर्य': {
+                name: 'सूर्य',
+                fullName: 'सूर्य',
+                color: '#e2792e'
+            },
+            'चंद्र': {
+                name: 'चंद्र',
+                fullName: 'चंद्र',
+                color: '#868484'
+            },
+            'बुद्ध': {
+                name: 'बुद्ध',
+                fullName: 'बुद्ध',
+                color: '#08b130'
+            },
+            'शुक्र': {
+                name: 'शुक्र',
+                fullName: 'शुक्र',
+                color: '#eb539f'
+            },
+            'मंगल': {
+                name: 'मंगल',
+                fullName: 'मंगल',
+                color: '#da3b26'
+            },
+            'गुरु': {
+                name: 'गुरु',
+                fullName: 'गुरु',
+                color: '#ffa200'
+            },
+            'शनि': {
+                name: 'शनि',
+                fullName: 'शनि',
+                color: '#3274b5'
+            },
+            'राहु': {
+                name: 'राहु',
+                fullName: 'राहु',
+                color: '#4c4b4b'
+            },
+            'केतु': {
+                name: 'केतु',
+                fullName: 'केतु',
+                color: '#4c4b4b'
+            },
+            'मांदी': {
+                name: 'मांदी',
+                fullName: 'मांदी',
+                color: '#000000'
+            },
+            'कस': {
+                name: 'कस्टम',
+                fullName: 'कस्टम',
+                color: '#000000'
+            }
+        };
+
+        // Planet data - Page 5 (Outer Planets)
+        this.planetsPage5 = {
+            'Ur': {
+                name: 'Uranus',
+                fullName: 'Uranus',
+                color: '#000000'
+            },
+            'Ne': {
+                name: 'Neptune',
+                fullName: 'Neptune',
+                color: '#000000'
+            },
+            'Pl': {
+                name: 'Pluto',
+                fullName: 'Pluto',
                 color: '#000000'
             }
         };
         
         // Paging state
         this.currentPage = 1;
-        this.totalPages = 2;
+        this.totalPages = 5;
         this.draggedPlanet = null;
         this.dropZones = [];
     }
@@ -594,12 +774,6 @@ Edit the planets objects in assets/js/planet-system.js:
 - No external API calls or data collection
 - Privacy-first approach with no tracking
 - Auto-save every 30 seconds
-
-## Future Enhancements
-
-### Planned Ideas
-- Custom planet sets and configurations
-- Multi-language support (Tamil, Hindi)
 
 ## Support and Documentation
 
