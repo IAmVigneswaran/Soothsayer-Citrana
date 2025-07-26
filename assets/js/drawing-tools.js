@@ -740,45 +740,45 @@ class DrawingTools {
                 // Get the control point position in stage coordinates
                 const controlX = this.controlPoints.startPoint.x();
                 const controlY = this.controlPoints.startPoint.y();
-                
+
                 // Convert to shape's local coordinates
                 const shapeX = this.selectedShape.x();
                 const shapeY = this.selectedShape.y();
                 const scaleX = this.selectedShape.scaleX();
                 const scaleY = this.selectedShape.scaleY();
                 const rotation = this.selectedShape.rotation();
-                
+
                 // Remove shape's position offset
                 let localX = controlX - shapeX;
                 let localY = controlY - shapeY;
-                
+
                 // Apply inverse rotation if any
                 if (rotation !== 0) {
                     const cos = Math.cos(-rotation * Math.PI / 180);
                     const sin = Math.sin(-rotation * Math.PI / 180);
-                    
+
                     const rotatedX = localX * cos - localY * sin;
                     const rotatedY = localX * sin + localY * cos;
-                    
+
                     localX = rotatedX;
                     localY = rotatedY;
                 }
-                
+
                 // Apply inverse scale
                 localX = localX / scaleX;
                 localY = localY / scaleY;
-                
+
                 // Update shape points
                 const newPoints = this.selectedShape.points();
                 newPoints[0] = localX;
                 newPoints[1] = localY;
                 this.selectedShape.points(newPoints);
-                
+
                 // Update bounding box if it exists
                 if (this.selectedShape.boundingBox) {
                     this.updateBoundingBox(this.selectedShape.boundingBox, this.selectedShape);
                 }
-                
+
                 this.layer.batchDraw();
             }
         });
@@ -801,45 +801,45 @@ class DrawingTools {
                 // Get the control point position in stage coordinates
                 const controlX = this.controlPoints.endPoint.x();
                 const controlY = this.controlPoints.endPoint.y();
-                
+
                 // Convert to shape's local coordinates
                 const shapeX = this.selectedShape.x();
                 const shapeY = this.selectedShape.y();
                 const scaleX = this.selectedShape.scaleX();
                 const scaleY = this.selectedShape.scaleY();
                 const rotation = this.selectedShape.rotation();
-                
+
                 // Remove shape's position offset
                 let localX = controlX - shapeX;
                 let localY = controlY - shapeY;
-                
+
                 // Apply inverse rotation if any
                 if (rotation !== 0) {
                     const cos = Math.cos(-rotation * Math.PI / 180);
                     const sin = Math.sin(-rotation * Math.PI / 180);
-                    
+
                     const rotatedX = localX * cos - localY * sin;
                     const rotatedY = localX * sin + localY * cos;
-                    
+
                     localX = rotatedX;
                     localY = rotatedY;
                 }
-                
+
                 // Apply inverse scale
                 localX = localX / scaleX;
                 localY = localY / scaleY;
-                
+
                 // Update shape points
                 const newPoints = this.selectedShape.points();
                 newPoints[2] = localX;
                 newPoints[3] = localY;
                 this.selectedShape.points(newPoints);
-                
+
                 // Update bounding box if it exists
                 if (this.selectedShape.boundingBox) {
                     this.updateBoundingBox(this.selectedShape.boundingBox, this.selectedShape);
                 }
-                
+
                 this.layer.batchDraw();
             }
         });
@@ -885,7 +885,7 @@ class DrawingTools {
 
         // Get the shape's transformation matrix
         const transform = shape.getTransform();
-        
+
         // Calculate the actual position of the shape
         const shapeX = shape.x();
         const shapeY = shape.y();
@@ -898,7 +898,7 @@ class DrawingTools {
             x: points[0] * scaleX,
             y: points[1] * scaleY
         };
-        
+
         const endPoint = {
             x: points[2] * scaleX,
             y: points[3] * scaleY
@@ -908,12 +908,12 @@ class DrawingTools {
         if (rotation !== 0) {
             const cos = Math.cos(rotation * Math.PI / 180);
             const sin = Math.sin(rotation * Math.PI / 180);
-            
+
             const rotatedStartX = startPoint.x * cos - startPoint.y * sin;
             const rotatedStartY = startPoint.x * sin + startPoint.y * cos;
             const rotatedEndX = endPoint.x * cos - endPoint.y * sin;
             const rotatedEndY = endPoint.x * sin + endPoint.y * cos;
-            
+
             startPoint.x = rotatedStartX;
             startPoint.y = rotatedStartY;
             endPoint.x = rotatedEndX;
@@ -925,7 +925,7 @@ class DrawingTools {
         this.controlPoints.startPoint.y(shapeY + startPoint.y);
         this.controlPoints.endPoint.x(shapeX + endPoint.x);
         this.controlPoints.endPoint.y(shapeY + endPoint.y);
-        
+
         this.layer.batchDraw();
     }
 
@@ -1007,17 +1007,17 @@ class DrawingTools {
      */
     selectShape(shape) {
         this.clearSelection();
-        
+
         if (shape && shape.name() && shape.name().startsWith('drawing-')) {
             this.selectedShape = shape;
-            
+
             // Show control points for arrow and line shapes
             if (this.supportsControlPoints(shape)) {
                 this.createControlPoints(shape);
                 this.updateControlPointsPosition(shape); // Immediate sync
-                this.startControlPointSyncLoop(shape);   // Per-frame sync
+                this.startControlPointSyncLoop(shape); // Per-frame sync
             }
-            
+
             // No visual selection indicator - just track the selected shape
             this.layer.batchDraw();
         }
