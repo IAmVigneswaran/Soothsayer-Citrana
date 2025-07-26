@@ -353,11 +353,16 @@ class EditUI {
         const handleDelete = () => {
             console.log('[EDIT UI] Delete button pressed');
 
-            // Delete the element
-            if (this.currentElement) {
-                this.currentElement.destroy();
-                this.currentElement.getLayer().batchDraw();
-                console.log('[EDIT UI] Element deleted');
+            // Call the delete callback if it exists (to properly handle control points)
+            if (this.onDelete && typeof this.onDelete === 'function') {
+                this.onDelete(this.currentElement);
+            } else {
+                // Fallback: Delete the element directly
+                if (this.currentElement) {
+                    this.currentElement.destroy();
+                    this.currentElement.getLayer().batchDraw();
+                    console.log('[EDIT UI] Element deleted (fallback)');
+                }
             }
 
             // Hide the Edit UI
@@ -646,11 +651,16 @@ class EditUI {
         const handleDelete = () => {
             console.log('[EDIT UI] Delete button pressed');
 
-            // Delete the element
-            if (this.currentElement) {
-                this.currentElement.destroy();
-                this.currentElement.getLayer().batchDraw();
-                console.log('[EDIT UI] Element deleted');
+            // Call the delete callback if it exists (to properly handle control points)
+            if (this.onDelete && typeof this.onDelete === 'function') {
+                this.onDelete(this.currentElement);
+            } else {
+                // Fallback: Delete the element directly
+                if (this.currentElement) {
+                    this.currentElement.destroy();
+                    this.currentElement.getLayer().batchDraw();
+                    console.log('[EDIT UI] Element deleted (fallback)');
+                }
             }
 
             // Hide the Edit UI

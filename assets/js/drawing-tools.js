@@ -1177,6 +1177,13 @@ class DrawingTools {
 
         // Show Edit UI
         if (this.editUI) {
+            // Set up delete callback to properly handle control points
+            this.editUI.onDelete = (element) => {
+                // Set the selected shape to the element being deleted
+                this.selectedShape = element;
+                // Use the existing deleteSelectedShape method which properly handles control points
+                this.deleteSelectedShape();
+            };
             this.editUI.show(shape, toolType);
         }
     }
