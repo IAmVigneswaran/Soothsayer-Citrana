@@ -31,11 +31,6 @@ class CitranaApp {
         this.setupKeyboardShortcuts();
         this.loadSavedData();
 
-        // Ensure all drawing objects have correct draggable state after loading
-        if (this.drawingTools) {
-            this.drawingTools.forceRefreshDraggableState();
-        }
-
         console.log('App initialization complete');
     }
 
@@ -208,21 +203,6 @@ class CitranaApp {
 
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
-
-        // Ensure canvas container can receive focus for keyboard events
-        const canvasContainer = document.getElementById('canvas-container');
-        if (canvasContainer) {
-            canvasContainer.setAttribute('tabindex', '0');
-            canvasContainer.style.outline = 'none';
-
-            // Focus canvas container when clicked
-            canvasContainer.addEventListener('click', () => {
-                canvasContainer.focus();
-            });
-        }
-
-        // Keyboard shortcuts
-        this.setupKeyboardShortcuts();
 
         // Confirmation Dialog
         this.setupConfirmationDialog();
@@ -772,18 +752,7 @@ class CitranaApp {
     }
 
     setupKeyboardShortcuts() {
-        // Prevent multiple event listeners from being attached
-        if (this.keyboardShortcutsSetup) {
-            console.log('Keyboard shortcuts already setup, skipping...');
-            return;
-        }
-        this.keyboardShortcutsSetup = true;
-
-        // Add debounce for duplicate operation
-        this.lastDuplicateTime = 0;
-
         document.addEventListener('keydown', (e) => {
-
             // Check if we're in text editing mode
             const textarea = document.querySelector('.konva-textarea');
             const textEditInput = document.getElementById('text-edit-input');
@@ -831,40 +800,6 @@ class CitranaApp {
                 } else if (e.key === 'y') {
                     e.preventDefault();
                     this.redo();
-                } else if (e.key === 'd' || e.key === 'D') {
-                    e.preventDefault();
-
-                    // Debounce duplicate operation to prevent double execution
-                    const currentTime = Date.now();
-                    if (currentTime - this.lastDuplicateTime < 500) {
-                        console.log('Duplicate operation debounced - too soon after last duplicate');
-                        return;
-                    }
-                    this.lastDuplicateTime = currentTime;
-
-                    // Check if the selected shape is an Arrow or Line (disable duplication for these)
-                    if (this.drawingTools.selectedShape) {
-                        const shapeName = this.drawingTools.selectedShape.name();
-                        if (shapeName && (shapeName.startsWith('drawing-arrow') || shapeName.startsWith('drawing-line'))) {
-                            console.log('Duplicate disabled for Arrow and Line tools');
-                            return;
-                        }
-                    }
-
-                    // Allow duplication for other tools, but temporarily switch to select mode
-                    const previousTool = this.currentTool;
-                    if (previousTool !== 'select') {
-                        this.setTool('select');
-                    }
-                    this.drawingTools.duplicateSelectedShape();
-                    // Restore previous tool if it was different
-                    if (previousTool !== 'select') {
-                        this.setTool(previousTool);
-                    }
-                } else if (e.key === 'f' || e.key === 'F') {
-                    e.preventDefault();
-                    // Debug draggable state
-                    this.drawingTools.debugDraggableState();
                 }
             }
 
@@ -880,9 +815,9 @@ class CitranaApp {
                 this.chartTemplates.zoomToFit();
             }
 
-            // Delete selected shape (Delete key or Backspace key)
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                if (this.currentTool === 'select' || this.drawingTools.selectedShape) {
+            // Delete selected shape (only with Delete key, not Backspace)
+            if (e.key === 'Delete') {
+                if (this.currentTool === 'select') {
                     e.preventDefault();
                     this.drawingTools.deleteSelectedShape();
                 }
@@ -1151,11 +1086,6 @@ class CitranaApp {
             this.layer.add(shape);
         });
         this.layer.batchDraw();
-
-        // Ensure all restored drawing objects have correct draggable state
-        if (this.drawingTools) {
-            this.drawingTools.forceRefreshDraggableState();
-        }
     }
 
     undo() {
