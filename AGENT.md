@@ -23,14 +23,14 @@ Soothsayer-Citrana/
 ├── index.html                    # Main application entry point
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (1517 lines)
+│   │   └── styles.css            # Complete styling system (1586 lines)
 │   ├── js/
 │   │   ├── app.js                # Main application coordinator (1145 lines)
 │   │   ├── chart-coordinator.js  # Chart type management (261 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (961 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (921 lines)
-│   │   ├── planet-system.js      # Planet library and drag-drop (456 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1567 lines)
+│   │   ├── planet-system.js      # Planet library and drag-drop (876 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1779 lines)
 │   │   ├── context-menu.js       # Context menu system (456 lines)
 │   │   ├── edit-ui.js            # Edit interface controls (786 lines)
 │   │   └── utils.js              # Utility functions (340 lines)
@@ -58,13 +58,130 @@ Soothsayer-Citrana/
 └── .gitignore                    # Git ignore rules
 ```
 
+## CSS Styling and Theme System
+
+### Design Philosophy
+Citrana uses a clean, minimalist design approach with a consistent light theme throughout the application. The design prioritises readability, accessibility, and professional presentation suitable for educational and astrological work.
+
+### Colour Scheme
+- **Primary Background**: Pure white (#ffffff)
+- **Primary Text**: Black (#000000)
+- **Secondary Text**: Dark grey (#495057, #374151)
+- **Muted Text**: Medium grey (#6b7280)
+- **Borders**: Black (#000000)
+- **Interactive Elements**: Black background with white text on hover/active states
+- **Planet Colours**: Individual planet-specific colours (Sun: #e2792e, Moon: #868484, etc.)
+
+### Typography
+- **Primary Font Stack**: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif
+- **Font Sizes**: Responsive scaling from 12px to 18px based on device
+- **Font Weights**: Normal (400) and Bold (700)
+- **Line Heights**: Optimised for readability across devices
+
+### Layout System
+The application uses a floating UI system with absolute positioning for all interactive elements:
+
+#### Floating Top Toolbar
+- Positioned at top centre with 20px margin
+- White background with black border
+- Box shadow for depth (0 4px 12px rgba(0, 0, 0, 0.15))
+- Rounded corners (8px border-radius)
+- Responsive design with smaller buttons on mobile
+
+#### Floating Planet Library
+- Positioned at top right with 20px margins
+- White background with black border
+- Grid layout for planet items
+- Paging system with dot navigation
+- Mobile-optimised with swipe gestures
+
+#### Floating Zoom Controls
+- Positioned at bottom right
+- White background with black border
+- Zoom level display
+- Responsive positioning for different screen sizes
+
+#### Floating Edit UI
+- Context-sensitive positioning
+- White background with black border
+- Tool-specific controls
+- Mobile-optimised touch targets
+
+### Component Styling
+
+#### Buttons
+- 40px x 40px touch targets (desktop)
+- 36px x 36px on mobile devices
+- Transparent background with black text
+- Hover state: black background with white text
+- Active state: scale transform (0.95)
+- Smooth transitions (0.2s ease)
+
+#### Input Fields
+- Black border with focus state
+- Smooth border colour transitions
+- Mobile-optimised with larger touch targets
+- Safari-specific fixes for colour inputs
+
+#### Context Menus
+- White background with black border
+- Hover states with black background and white text
+- Submenu support with proper nesting
+- Mobile-optimised with larger touch targets
+
+#### Modals
+- Centred positioning with backdrop
+- White background with black border
+- Responsive sizing for different screen sizes
+- Smooth animations for show/hide states
+
+### Responsive Design
+The application uses a mobile-first approach with three main breakpoints:
+
+#### Desktop (769px and above)
+- Full toolbar with all controls visible
+- Larger touch targets and spacing
+- Side-by-side layout for complex controls
+
+#### Tablet (768px and below)
+- Compact toolbar with essential controls
+- Reduced button sizes (36px x 36px)
+- Optimised spacing for touch interaction
+
+#### Mobile (600px and below)
+- Minimal toolbar with core functions
+- Full-width modals and controls
+- Enhanced touch targets for accessibility
+- Simplified navigation patterns
+
+### Safari and Mobile Optimisations
+- WebKit-specific fixes for colour inputs
+- Tap highlight colour removal for clean interaction
+- Input zoom prevention on mobile devices
+- Touch event optimisation for smooth performance
+- Safari-specific toolbar visibility handling
+
+### Accessibility Features
+- High contrast colour scheme
+- Adequate touch target sizes (minimum 36px)
+- Keyboard navigation support
+- Screen reader friendly structure
+- Focus indicators for interactive elements
+
+### Performance Optimisations
+- Hardware-accelerated animations
+- Efficient CSS selectors
+- Minimal DOM manipulation
+- Optimised canvas rendering
+- Debounced resize handlers
+
 ## Core Components Architecture
 
 ### Main Application (app.js - 1145 lines)
 The central coordinator that manages all application components and lifecycle.
 
 **Key Responsibilities:**
-- Initializes Konva.js stage and layer
+- Initialises Konva.js stage and layer
 - Coordinates all component interactions
 - Manages tool selection and drawing state
 - Handles keyboard shortcuts and event listeners
@@ -74,9 +191,9 @@ The central coordinator that manages all application components and lifecycle.
 - Manages zoom controls and canvas transformations
 
 **Key Methods:**
-- `init()`: Application initialization
+- `init()`: Application initialisation
 - `setupCanvas()`: Konva.js stage setup
-- `setupComponents()`: Component initialization
+- `setupComponents()`: Component initialisation
 - `setupEventListeners()`: Event binding
 - `setupKeyboardShortcuts()`: Keyboard navigation
 - `exportChart()`: High-resolution PNG export
@@ -95,18 +212,18 @@ Manages the relationship between South Indian and North Indian chart templates.
 - Manages zoom operations across chart types
 
 **Key Methods:**
-- `createSouthIndianChart()`: Initialize South Indian layout
-- `createNorthIndianChart()`: Initialize North Indian layout
+- `createSouthIndianChart()`: Initialise South Indian layout
+- `createNorthIndianChart()`: Initialise North Indian layout
 - `setLagnaHouse()`: Set ascendant house
 - `setFirstHouse()`: Set first house for North Indian charts
-- `getChartData()`: Serialize chart data
+- `getChartData()`: Serialise chart data
 - `loadChartData()`: Restore chart from data
 
 ### South Indian Chart Template (chart-templates-south.js - 961 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 **Key Responsibilities:**
-- Creates 4x4 grid layout with center empty space
+- Creates 4x4 grid layout with centre empty space
 - Manages house numbering and Lagna indicators
 - Handles planet placement and text scaling
 - Provides house highlighting and selection
@@ -115,7 +232,7 @@ Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 **Key Features:**
 - Traditional square grid layout
-- Center empty space for annotations
+- Centre empty space for annotations
 - Lagna indicator with diagonal line
 - Dynamic planet text sizing
 - House renumbering based on Lagna position
@@ -240,7 +357,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - Pl: Pluto
 
 **Key Methods:**
-- `init()`: Initialize planet library
+- `init()`: Initialise planet library
 - `createPlanetLibrary()`: Build UI elements with paging
 - `createPageDots()`: Create desktop navigation dots
 - `setupSwipeEvents()`: Configure mobile swipe navigation
@@ -251,7 +368,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - `findHouseAtPosition()`: Drop zone detection
 - `getPlanetInfo()`: Retrieve planet data from paged structure
 
-### Drawing Tools (drawing-tools.js - 1567 lines)
+### Drawing Tools (drawing-tools.js - 1779 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 **Key Responsibilities:**
@@ -274,10 +391,11 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - Pixel-perfect positioning
 - Touch and mouse support
 - Shape selection and editing
-- Color and stroke customization
+- Colour and stroke customisation
 - Text editing with font controls
 - Planet text editing with retrograde support
 - Undo/redo with 50-step history
+- Duplicate functionality with Ctrl+D/Cmd+D
 
 **Key Methods:**
 - `startDrawing()`: Begin drawing operation
@@ -287,6 +405,7 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - `undo()/redo()`: History management
 - `showEditUIForShape()`: Edit interface integration
 - `makePlanetTextEditable()`: Planet text editing
+- `duplicateSelectedShape()`: Duplicate selected elements
 
 ### Context Menu (context-menu.js - 456 lines)
 Provides right-click and long-press context menus for chart interaction.
@@ -309,10 +428,10 @@ Provides right-click and long-press context menus for chart interaction.
 - Mobile long-press support
 - Context-sensitive menu items
 - Submenu support
-- Touch-optimized interactions
+- Touch-optimised interactions
 
 **Key Methods:**
-- `init()`: Initialize context menu system
+- `init()`: Initialise context menu system
 - `showChartMenu()`: Display main chart menu
 - `showHouseMenu()`: Display house-specific menu
 - `showPlanetMenu()`: Display planet-specific menu
@@ -325,14 +444,14 @@ Provides context-sensitive editing controls for drawing elements.
 - Creates floating edit interface
 - Provides tool-specific controls
 - Manages shape property editing
-- Handles color and stroke customization
+- Handles colour and stroke customisation
 - Implements text editing controls
-- Provides mobile-optimized interface
+- Provides mobile-optimised interface
 
 **Edit Controls:**
-- Stroke width and color controls
+- Stroke width and colour controls
 - Font size, weight, and style controls
-- Text color customization
+- Text colour customisation
 - Delete functionality
 - Mobile touch support
 
@@ -340,7 +459,7 @@ Provides context-sensitive editing controls for drawing elements.
 - Floating, draggable interface
 - Tool-specific controls
 - Real-time property updates
-- Mobile-optimized design
+- Mobile-optimised design
 - Touch-friendly controls
 
 **Key Methods:**
@@ -363,7 +482,7 @@ Provides utility functions for common operations across the application.
 - Manages file operations
 
 **Key Functions:**
-- `debounce()`: Performance optimization
+- `debounce()`: Performance optimisation
 - `showNotification()`: User feedback
 - `saveChartData()`: Data persistence
 - `exportCanvasAsPNG()`: Chart export
@@ -374,64 +493,65 @@ Provides utility functions for common operations across the application.
 ## Core Features
 
 ### Chart Types
-- **South Indian Chart**: Traditional 4x4 square grid layout with center empty space
-- **North Indian Chart**: Diamond-shaped polygon layout with dynamic positioning
-- **Lagna Setting**: Right-click context menu to set any house as Lagna (Ascendant)
-- **First House Selection**: For North Indian charts, designate any house as first house
-- **Dynamic House Numbering**: Automatic renumbering based on Lagna position
+- South Indian Chart: Traditional 4x4 square grid layout with centre empty space
+- North Indian Chart: Diamond-shaped polygon layout with dynamic positioning
+- Lagna Setting: Right-click context menu to set any house as Lagna (Ascendant)
+- First House Selection: For North Indian charts, designate any house as first house
+- Dynamic House Numbering: Automatic renumbering based on Lagna position
 
 ### Planet Management
-- **51 Major Grahas**: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
-- **Paging System**: Five-page navigation with desktop dots and mobile swipe
-- **Text-based Display**: Uses abbreviations instead of symbols for better compatibility
-- **Drag & Drop**: Intuitive planet placement from floating library to chart houses
-- **Multiple Instances**: Same planet can be placed multiple times
-- **Dynamic Text Sizing**: Planet text scales based on house occupancy
-- **Touch Support**: Mobile-friendly touch interactions with visual feedback
+- 51 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
+- Paging System: Five-page navigation with desktop dots and mobile swipe
+- Text-based Display: Uses abbreviations instead of symbols for better compatibility
+- Drag & Drop: Intuitive planet placement from floating library to chart houses
+- Multiple Instances: Same planet can be placed multiple times
+- Dynamic Text Sizing: Planet text scales based on house occupancy
+- Touch Support: Mobile-friendly touch interactions with visual feedback
 
 ### Drawing Tools
-- **Select Tool**: Choose and modify existing elements with Edit UI
-- **Arrow Tool**: Create directional indicators with customizable arrowheads
-- **Line Tool**: Draw straight lines and connections
-- **Pen Tool**: Freehand drawing for annotations
-- **Text Tool**: Add editable text boxes anywhere on canvas
-- **Heading Tool**: Create chart headings and titles
-- **Undo/Redo**: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+- Select Tool: Choose and modify existing elements with Edit UI
+- Arrow Tool: Create directional indicators with customisable arrowheads
+- Line Tool: Draw straight lines and connections
+- Pen Tool: Freehand drawing for annotations
+- Text Tool: Add editable text boxes anywhere on canvas
+- Heading Tool: Create chart headings and titles
+- Undo/Redo: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+- Duplicate: Duplicate selected elements with Ctrl+D/Cmd+D
 
 ### User Experience
-- **Dark/Light Theme**: Automatic system preference detection with manual toggle
-- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Keyboard Shortcuts**: Power user features for efficiency
-- **Context Menus**: Right-click and long-press for quick actions
-- **Status Updates**: Real-time feedback and notifications
-- **Auto-Save**: Automatic chart data persistence every 30 seconds
+- Light Theme: Clean, professional appearance with high contrast
+- Responsive Design: Optimised for desktop, tablet, and mobile devices
+- Keyboard Shortcuts: Power user features for efficiency
+- Context Menus: Right-click and long-press for quick actions
+- Status Updates: Real-time feedback and notifications
+- Auto-Save: Automatic chart data persistence every 30 seconds
 
 ### Export & Sharing
-- **High-Resolution PNG**: Professional quality exports (300 DPI)
-- **Auto-Save**: Chart data saved to localStorage
-- **Cross-Platform**: Works on all modern browsers
-- **GitHub Pages Compatible**: No build process required
+- High-Resolution PNG: Professional quality exports (300 DPI)
+- Auto-Save: Chart data saved to localStorage
+- Cross-Platform: Works on all modern browsers
+- GitHub Pages Compatible: No build process required
 
 ## Browser Compatibility
 
-- **Desktop**: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
-- **Mobile**: iOS Safari 13+, Android Chrome 80+
-- **Features**: Canvas API, localStorage, ES6 modules, Touch Events
+- Desktop: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- Mobile: iOS Safari 13+, Android Chrome 80+
+- Features: Canvas API, localStorage, ES6 modules, Touch Events
 
 **Mobile Browser Limitations:**
 - Limited support for older mobile browsers
 - Some advanced features may not work on older iOS Safari versions
-- Touch interactions optimized for modern mobile browsers
+- Touch interactions optimised for modern mobile browsers
 - Performance may vary on low-end mobile devices
 
-## Performance Optimization
+## Performance Optimisation
 
-- **Efficient Canvas Rendering**: Konva.js optimization
-- **Debounced Resize Handlers**: 250ms debouncing
-- **Optimized Planet Placement**: Efficient algorithms
-- **Minimal DOM Manipulation**: Canvas-based rendering
-- **Smart Auto-Save**: 30-second intervals
-- **Touch Event Optimization**: Mobile performance
+- Efficient Canvas Rendering: Konva.js optimisation
+- Debounced Resize Handlers: 250ms debouncing
+- Optimised Planet Placement: Efficient algorithms
+- Minimal DOM Manipulation: Canvas-based rendering
+- Smart Auto-Save: 30-second intervals
+- Touch Event Optimisation: Mobile performance
 
 ## Development Guidelines
 
@@ -442,7 +562,7 @@ Provides utility functions for common operations across the application.
 - Maintain modular architecture
 - Use Tailwind CSS classes for styling
 
-### File Organization
+### File Organisation
 - Keep all assets in the assets/ directory
 - JavaScript files in assets/js/
 - CSS files in assets/css/
@@ -456,7 +576,7 @@ Provides utility functions for common operations across the application.
 - Validate responsive design
 - Check performance on mobile devices
 
-## Customization Guidelines
+## Customisation Guidelines
 
 ### Adding New Planets
 Edit the planets objects in assets/js/planet-system.js:
@@ -745,16 +865,16 @@ Edit the planets objects in assets/js/planet-system.js:
 ```
 
 ### Modifying Chart Styles
-- House colors and borders in chart template files
+- House colours and borders in chart template files
 - Grid line styles and text formatting
 - Layout dimensions and spacing
-- Theme colors and visual elements
+- Theme colours and visual elements
 
-### Theme Customization
+### Theme Customisation
 - Modify assets/css/styles.css for custom component styles
-- Update color schemes in JavaScript files
+- Update colour schemes in JavaScript files
 - Add new theme variants
-- Customize responsive breakpoints
+- Customise responsive breakpoints
 
 ## Important Notes
 
@@ -777,8 +897,8 @@ Edit the planets objects in assets/js/planet-system.js:
 
 ## Support and Documentation
 
-- **AGENT.md**: This comprehensive project documentation
-- **README.md**: Project overview and quick start
+- AGENT.md: This comprehensive project documentation
+- README.md: Project overview and quick start
 
 ## Development Commands
 
