@@ -162,6 +162,16 @@ class DrawingTools {
         // Add the completed shape to undo stack
         if (this.currentShape) {
             this.addToUndoStack(this.currentShape, 'add');
+            
+            // Ensure the completed shape has the correct draggable state
+            // Check if the current tool is 'select' (which might have changed during drawing)
+            const currentTool = window.app ? window.app.currentTool : this.currentTool;
+            const shouldBeDraggable = currentTool === 'select';
+            
+            if (this.currentShape.name() !== 'drawing-text') {
+                this.currentShape.draggable(shouldBeDraggable);
+                console.log(`Set completed shape ${this.currentShape.name()} draggable to: ${shouldBeDraggable}, current tool: ${currentTool}`);
+            }
         }
 
         this.isDrawing = false;
@@ -187,11 +197,14 @@ class DrawingTools {
     makeShapeSelectable(shape) {
         if (!shape) return;
 
-        // Ensure the shape is listening for events
+        // Ensure the shape is listening for events and set correct draggable state
+        const shouldBeDraggable = this.currentTool === 'select';
         shape.setAttrs({
             listening: true,
-            draggable: false // Will be enabled when select tool is active
+            draggable: shouldBeDraggable
         });
+
+        console.log(`Made shape ${shape.name()} selectable, draggable: ${shouldBeDraggable}, current tool: ${this.currentTool}`);
 
         // Add a small delay to ensure the shape is fully rendered
         setTimeout(() => {
@@ -219,7 +232,7 @@ class DrawingTools {
             name: 'drawing-arrow',
             perfectDrawEnabled: true,
             listening: true,
-            draggable: false // Will be enabled when select tool is active
+            draggable: this.currentTool === 'select' // Set based on current tool
         });
 
         // Create invisible bounding box for easier selection
@@ -229,6 +242,19 @@ class DrawingTools {
         // Add click handler for Edit UI
         arrow.on('click', () => {
             this.showEditUI(arrow, 'arrow');
+        });
+
+        // Add drag event handlers for debugging
+        arrow.on('dragstart', () => {
+            console.log('Arrow drag started');
+        });
+
+        arrow.on('dragmove', () => {
+            console.log('Arrow dragging');
+        });
+
+        arrow.on('dragend', () => {
+            console.log('Arrow drag ended');
         });
 
         // Add double-tap support for mobile
@@ -267,7 +293,7 @@ class DrawingTools {
             name: 'drawing-line',
             perfectDrawEnabled: true,
             listening: true,
-            draggable: false // Will be enabled when select tool is active
+            draggable: this.currentTool === 'select' // Set based on current tool
         });
 
         // Create invisible bounding box for easier selection
@@ -277,6 +303,19 @@ class DrawingTools {
         // Add click handler for Edit UI
         line.on('click', () => {
             this.showEditUI(line, 'line');
+        });
+
+        // Add drag event handlers for debugging
+        line.on('dragstart', () => {
+            console.log('Line drag started');
+        });
+
+        line.on('dragmove', () => {
+            console.log('Line dragging');
+        });
+
+        line.on('dragend', () => {
+            console.log('Line drag ended');
         });
 
         // Add double-tap support for mobile
@@ -317,7 +356,7 @@ class DrawingTools {
             name: 'drawing-pen',
             perfectDrawEnabled: true,
             listening: true,
-            draggable: false, // Will be enabled when select tool is active
+            draggable: this.currentTool === 'select', // Set based on current tool
             tension: 0.1 // Smooth curves
         });
 
@@ -329,6 +368,19 @@ class DrawingTools {
         line.on('click', (e) => {
             e.cancelBubble = true;
             this.showEditUI(line, 'pen');
+        });
+
+        // Add drag event handlers for debugging
+        line.on('dragstart', () => {
+            console.log('Pen drag started');
+        });
+
+        line.on('dragmove', () => {
+            console.log('Pen dragging');
+        });
+
+        line.on('dragend', () => {
+            console.log('Pen drag ended');
         });
 
         // Add double-tap support for mobile
@@ -667,6 +719,8 @@ class DrawingTools {
 
         // Enable/disable dragging for all drawing objects based on tool
         this.updateDrawingObjectsDraggable(tool === 'select');
+        
+        console.log(`Tool switched to: ${tool}, draggable state: ${tool === 'select'}`);
     }
 
     /**
@@ -682,10 +736,54 @@ class DrawingTools {
             if (obj.name() !== 'drawing-text') {
                 // Text objects handle their own dragging
                 obj.draggable(draggable);
+                console.log(`Updated ${obj.name()} draggable to: ${draggable}`);
             }
         });
 
         console.log(`Updated ${drawingObjects.length} drawing objects to draggable: ${draggable}`);
+    }
+
+    /**
+     * Update draggable state for a specific shape
+     * @param {KonvaShape} shape - The shape to update
+     * @param {boolean} draggable - Whether the shape should be draggable
+     */
+    updateShapeDraggable(shape, draggable) {
+        if (shape && shape.name() && shape.name().startsWith('drawing-')) {
+            if (shape.name() !== 'drawing-text') {
+                // Text objects handle their own dragging
+                shape.draggable(draggable);
+            }
+        }
+    }
+
+    /**
+     * Force refresh draggable state for all shapes based on current tool
+     * Useful for debugging and ensuring all shapes have correct state
+     */
+    forceRefreshDraggableState() {
+        const shouldBeDraggable = this.currentTool === 'select';
+        this.updateDrawingObjectsDraggable(shouldBeDraggable);
+        console.log(`Force refreshed draggable state to: ${shouldBeDraggable} for all drawing objects`);
+    }
+
+    /**
+     * Debug method to check draggable state of all shapes
+     */
+    debugDraggableState() {
+        const drawingObjects = this.layer.find(node =>
+            node.name() && node.name().startsWith('drawing-')
+        );
+
+        console.log('=== Draggable State Debug ===');
+        console.log(`Current tool: ${this.currentTool}`);
+        console.log(`Should be draggable: ${this.currentTool === 'select'}`);
+        console.log(`Total drawing objects: ${drawingObjects.length}`);
+        
+        drawingObjects.forEach((obj, index) => {
+            console.log(`Object ${index + 1}: ${obj.name()}, draggable: ${obj.draggable()}, listening: ${obj.listening()}`);
+        });
+        console.log('=== End Debug ===');
     }
 
     /**
@@ -911,6 +1009,127 @@ class DrawingTools {
         if (window.app && window.app.pushSnapshot) {
             window.app.pushSnapshot();
         }
+    }
+
+    /**
+     * Duplicate the selected shape
+     */
+    duplicateSelectedShape() {
+        // If no shape is selected, try to find the last created drawing object
+        if (!this.selectedShape) {
+            const drawingObjects = this.layer.find(node =>
+                node.name() && node.name().startsWith('drawing-')
+            );
+            
+            if (drawingObjects.length === 0) {
+                console.log('No drawing objects to duplicate');
+                return;
+            }
+            
+            // Select the last created drawing object
+            const lastShape = drawingObjects[drawingObjects.length - 1];
+            this.selectShape(lastShape);
+        }
+        
+        if (!this.selectedShape) return;
+
+        // Get the shape's current properties
+        const originalShape = this.selectedShape;
+        const shapeData = originalShape.toObject();
+        
+        // Create a new shape with the same properties
+        let duplicatedShape;
+        
+        if (originalShape instanceof Konva.Arrow) {
+            duplicatedShape = Konva.Node.create(shapeData);
+        } else if (originalShape instanceof Konva.Line) {
+            duplicatedShape = Konva.Node.create(shapeData);
+        } else if (originalShape instanceof Konva.Text) {
+            duplicatedShape = Konva.Node.create(shapeData);
+        } else {
+            console.warn('Unsupported shape type for duplication');
+            return;
+        }
+
+        // Offset the duplicated shape slightly (20px down and right)
+        const offsetX = duplicatedShape.x() + 20;
+        const offsetY = duplicatedShape.y() + 20;
+        duplicatedShape.x(offsetX);
+        duplicatedShape.y(offsetY);
+
+        // Generate a new unique name for the duplicated shape
+        const originalName = duplicatedShape.name();
+        if (originalName) {
+            const nameParts = originalName.split('-');
+            const baseName = nameParts.slice(0, -1).join('-');
+            const newId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+            duplicatedShape.name(`${baseName}-${newId}`);
+        }
+
+        // Add the duplicated shape to the layer
+        this.layer.add(duplicatedShape);
+
+        // Make the duplicated shape selectable and add event handlers
+        this.makeShapeSelectable(duplicatedShape);
+
+        // Add click handler for Edit UI
+        duplicatedShape.on('click', () => {
+            this.showEditUI(duplicatedShape, this.getToolTypeFromShape(duplicatedShape));
+        });
+
+        // Add double-tap support for mobile
+        this.addDoubleTapSupport(duplicatedShape, this.getToolTypeFromShape(duplicatedShape));
+
+        // Create bounding box for the duplicated shape
+        const boundingBox = this.createBoundingBox(duplicatedShape, this.getToolTypeFromShape(duplicatedShape));
+        duplicatedShape.boundingBox = boundingBox;
+        this.layer.add(boundingBox);
+
+        // Set the correct draggable state based on current tool
+        const shouldBeDraggable = this.currentTool === 'select';
+        this.updateShapeDraggable(duplicatedShape, shouldBeDraggable);
+
+        // Add to undo stack
+        this.addToUndoStack(duplicatedShape, 'add');
+
+        // Select the duplicated shape
+        this.selectShape(duplicatedShape);
+
+        // Update the layer
+        this.layer.batchDraw();
+
+        // Trigger snapshot for undo/redo
+        if (window.app && window.app.pushSnapshot) {
+            window.app.pushSnapshot();
+        }
+
+        console.log('Shape duplicated successfully');
+        console.log('Duplicated shape draggable state:', duplicatedShape.draggable());
+        console.log('Current tool:', this.currentTool);
+    }
+
+    /**
+     * Get the tool type from a shape object
+     * @param {KonvaShape} shape - The shape to analyze
+     * @returns {string} The tool type
+     */
+    getToolTypeFromShape(shape) {
+        if (shape instanceof Konva.Arrow) {
+            return 'arrow';
+        } else if (shape instanceof Konva.Line) {
+            // Check if it's a pen drawing by looking at the name
+            if (shape.name() && shape.name().includes('drawing-pen')) {
+                return 'pen';
+            }
+            return 'line';
+        } else if (shape instanceof Konva.Text) {
+            // Check if it's a heading by looking at the name
+            if (shape.name() && shape.name().includes('drawing-heading')) {
+                return 'heading';
+            }
+            return 'text';
+        }
+        return 'unknown';
     }
 
     /**
@@ -1522,21 +1741,9 @@ class DrawingTools {
             stroke: 'transparent',
             strokeWidth: 0,
             name: `bounding-box-${toolType}`,
-            listening: true,
+            listening: false, // Don't listen for events - let the shape handle them
             draggable: false,
             perfectDrawEnabled: false
-        });
-
-        // Add event handlers to the bounding box that delegate to the shape
-        boundingBox.on('click', () => {
-            this.showEditUI(shape, toolType);
-        });
-
-        boundingBox.on('tap', (e) => {
-            // Delegate tap events to the shape
-            if (shape._tapHandler) {
-                shape._tapHandler(e);
-            }
         });
 
         // Update bounding box position when shape moves

@@ -31,6 +31,11 @@ class CitranaApp {
         this.setupKeyboardShortcuts();
         this.loadSavedData();
 
+        // Ensure all drawing objects have correct draggable state after loading
+        if (this.drawingTools) {
+            this.drawingTools.forceRefreshDraggableState();
+        }
+
         console.log('App initialization complete');
     }
 
@@ -800,6 +805,22 @@ class CitranaApp {
                 } else if (e.key === 'y') {
                     e.preventDefault();
                     this.redo();
+                } else if (e.key === 'd' || e.key === 'D') {
+                    e.preventDefault();
+                    // Allow duplication regardless of current tool, but temporarily switch to select mode
+                    const previousTool = this.currentTool;
+                    if (previousTool !== 'select') {
+                        this.setTool('select');
+                    }
+                    this.drawingTools.duplicateSelectedShape();
+                    // Restore previous tool if it was different
+                    if (previousTool !== 'select') {
+                        this.setTool(previousTool);
+                    }
+                } else if (e.key === 'f' || e.key === 'F') {
+                    e.preventDefault();
+                    // Debug draggable state
+                    this.drawingTools.debugDraggableState();
                 }
             }
 
@@ -1086,6 +1107,11 @@ class CitranaApp {
             this.layer.add(shape);
         });
         this.layer.batchDraw();
+        
+        // Ensure all restored drawing objects have correct draggable state
+        if (this.drawingTools) {
+            this.drawingTools.forceRefreshDraggableState();
+        }
     }
 
     undo() {
