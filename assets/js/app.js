@@ -209,6 +209,21 @@ class CitranaApp {
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
 
+        // Ensure canvas container can receive focus for keyboard events
+        const canvasContainer = document.getElementById('canvas-container');
+        if (canvasContainer) {
+            canvasContainer.setAttribute('tabindex', '0');
+            canvasContainer.style.outline = 'none';
+            
+            // Focus canvas container when clicked
+            canvasContainer.addEventListener('click', () => {
+                canvasContainer.focus();
+            });
+        }
+
+        // Keyboard shortcuts
+        this.setupKeyboardShortcuts();
+
         // Confirmation Dialog
         this.setupConfirmationDialog();
     }
@@ -758,6 +773,8 @@ class CitranaApp {
 
     setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
+            console.log('Keyboard event detected:', e.key, 'Active element:', document.activeElement);
+            
             // Check if we're in text editing mode
             const textarea = document.querySelector('.konva-textarea');
             const textEditInput = document.getElementById('text-edit-input');
@@ -836,11 +853,19 @@ class CitranaApp {
                 this.chartTemplates.zoomToFit();
             }
 
-            // Delete selected shape (only with Delete key, not Backspace)
-            if (e.key === 'Delete') {
-                if (this.currentTool === 'select') {
+            // Delete selected shape (Delete key or Backspace key)
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                console.log('=== DELETE/BACKSPACE KEY DETECTED ===');
+                console.log('Key pressed:', e.key, 'Current tool:', this.currentTool, 'Selected shape:', this.drawingTools.selectedShape);
+                console.log('Active element:', document.activeElement);
+                console.log('Canvas container focused:', document.getElementById('canvas-container') === document.activeElement);
+                
+                if (this.currentTool === 'select' || this.drawingTools.selectedShape) {
                     e.preventDefault();
+                    console.log('Deleting selected shape...');
                     this.drawingTools.deleteSelectedShape();
+                } else {
+                    console.log('Delete key ignored - no shape selected or wrong tool');
                 }
             }
 

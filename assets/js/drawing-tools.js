@@ -1017,6 +1017,11 @@ class DrawingTools {
         if (shape && shape.name() && shape.name().startsWith('drawing-')) {
             this.selectedShape = shape;
             
+            // Ensure the tool is set to 'select' mode when a shape is selected
+            if (window.app && window.app.currentTool !== 'select') {
+                window.app.setTool('select');
+            }
+            
             // Show control points for Arrow and Line shapes
             if (['drawing-arrow', 'drawing-line'].includes(shape.name())) {
                 this.showControlPoints(shape);
