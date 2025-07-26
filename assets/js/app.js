@@ -31,6 +31,9 @@ class CitranaApp {
         this.setupKeyboardShortcuts();
         this.loadSavedData();
 
+        // Orion browser immediate fix
+        this.setupOrionBrowserFix();
+
         console.log('App initialization complete');
     }
 
@@ -219,6 +222,13 @@ class CitranaApp {
         const editUI = document.querySelector('.floating-edit-ui');
         const textEditControls = document.querySelector('.floating-text-edit-controls');
 
+        // Detect Orion browser
+        const isOrion = /Orion/.test(navigator.userAgent);
+        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        const isBrave = navigator.brave && navigator.brave.isBrave();
+        
+        console.log('[BROWSER DETECTION] Orion:', isOrion, 'Chrome:', isChrome, 'Brave:', isBrave);
+
         // Fix UI elements visibility after focus events (keyboard dismissal)
         const fixUIElementsVisibility = () => {
             setTimeout(() => {
@@ -226,8 +236,20 @@ class CitranaApp {
                 if (toolbar) {
                     toolbar.style.visibility = 'visible';
                     toolbar.style.opacity = '1';
-                    // Don't force display - let existing CSS control it
-                    console.log('[SAFARI] Top toolbar visibility restored');
+                    toolbar.style.display = 'flex';
+                    
+                    // Orion-specific fixes
+                    if (isOrion) {
+                        toolbar.style.transform = 'translate3d(-50%, 0, 0)';
+                        toolbar.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+                        toolbar.style.backfaceVisibility = 'hidden';
+                        toolbar.style.webkitBackfaceVisibility = 'hidden';
+                        toolbar.style.zIndex = '1000';
+                        console.log('[ORION] Top toolbar visibility restored with Orion-specific fixes');
+                    } else {
+                        // Don't force display - let existing CSS control it
+                        console.log('[SAFARI] Top toolbar visibility restored');
+                    }
                 }
 
                 // Fix floating edit UI - only if it should be visible
@@ -290,6 +312,19 @@ class CitranaApp {
                 fixUIElementsVisibility();
             }
 
+            // Orion-specific aggressive fix
+            if (isOrion && toolbar) {
+                // Force toolbar visibility for Orion
+                toolbar.style.visibility = 'visible';
+                toolbar.style.opacity = '1';
+                toolbar.style.display = 'flex';
+                toolbar.style.transform = 'translate3d(-50%, 0, 0)';
+                toolbar.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+                toolbar.style.backfaceVisibility = 'hidden';
+                toolbar.style.webkitBackfaceVisibility = 'hidden';
+                toolbar.style.zIndex = '1000';
+            }
+
             // Check floating edit UI - only if it should be visible
             if (editUI && editUI.style.display !== 'none' && (editUI.style.visibility === 'hidden' || editUI.style.opacity === '0')) {
                 fixUIElementsVisibility();
@@ -300,6 +335,31 @@ class CitranaApp {
                 fixUIElementsVisibility();
             }
         }, 2000);
+
+        // Orion-specific initialization
+        if (isOrion) {
+            console.log('[ORION] Applying Orion-specific toolbar fixes');
+            
+            // Initial fix on load
+            setTimeout(() => {
+                if (toolbar) {
+                    toolbar.style.visibility = 'visible';
+                    toolbar.style.opacity = '1';
+                    toolbar.style.display = 'flex';
+                    toolbar.style.transform = 'translate3d(-50%, 0, 0)';
+                    toolbar.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+                    toolbar.style.backfaceVisibility = 'hidden';
+                    toolbar.style.webkitBackfaceVisibility = 'hidden';
+                    toolbar.style.zIndex = '1000';
+                    console.log('[ORION] Initial toolbar fix applied');
+                }
+            }, 100);
+
+            // Additional Orion-specific event listeners
+            window.addEventListener('load', fixUIElementsVisibility);
+            window.addEventListener('DOMContentLoaded', fixUIElementsVisibility);
+            document.addEventListener('readystatechange', fixUIElementsVisibility);
+        }
     }
 
     /**
@@ -1186,6 +1246,64 @@ class CitranaApp {
         });
         this.stage.batchDraw();
         this.updateZoomLevel();
+    }
+
+    /**
+     * Setup Orion browser specific fixes
+     */
+    setupOrionBrowserFix() {
+        // Detect Orion browser
+        const isOrion = /Orion/.test(navigator.userAgent);
+        
+        if (isOrion) {
+            console.log('[ORION] Orion browser detected, applying specific fixes');
+            
+            // Immediate fix for toolbar
+            const toolbar = document.querySelector('.floating-top-toolbar');
+            if (toolbar) {
+                // Force immediate visibility
+                toolbar.style.visibility = 'visible';
+                toolbar.style.opacity = '1';
+                toolbar.style.display = 'flex';
+                toolbar.style.transform = 'translate3d(-50%, 0, 0)';
+                toolbar.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+                toolbar.style.backfaceVisibility = 'hidden';
+                toolbar.style.webkitBackfaceVisibility = 'hidden';
+                toolbar.style.zIndex = '1000';
+                console.log('[ORION] Immediate toolbar fix applied');
+            }
+            
+            // Set up aggressive monitoring for Orion
+            const ensureToolbarVisibility = () => {
+                const toolbar = document.querySelector('.floating-top-toolbar');
+                if (toolbar) {
+                    // Force visibility every time
+                    toolbar.style.visibility = 'visible';
+                    toolbar.style.opacity = '1';
+                    toolbar.style.display = 'flex';
+                    toolbar.style.transform = 'translate3d(-50%, 0, 0)';
+                    toolbar.style.webkitTransform = 'translate3d(-50%, 0, 0)';
+                    toolbar.style.backfaceVisibility = 'hidden';
+                    toolbar.style.webkitBackfaceVisibility = 'hidden';
+                    toolbar.style.zIndex = '1000';
+                }
+            };
+            
+            // Run immediately and then every 500ms for Orion
+            ensureToolbarVisibility();
+            setInterval(ensureToolbarVisibility, 500);
+            
+            // Additional event listeners for Orion
+            window.addEventListener('load', ensureToolbarVisibility);
+            window.addEventListener('DOMContentLoaded', ensureToolbarVisibility);
+            document.addEventListener('readystatechange', ensureToolbarVisibility);
+            window.addEventListener('resize', ensureToolbarVisibility);
+            window.addEventListener('scroll', ensureToolbarVisibility);
+            window.addEventListener('focus', ensureToolbarVisibility);
+            window.addEventListener('blur', ensureToolbarVisibility);
+            
+            console.log('[ORION] Orion-specific fixes applied with aggressive monitoring');
+        }
     }
 }
 

@@ -50,6 +50,17 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     border-radius: 8px;
+    /* Orion browser fixes */
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Force hardware acceleration for Orion */
+    -webkit-transform: translate3d(-50%, 0, 0);
+    transform: translate3d(-50%, 0, 0);
+    /* Ensure proper stacking context */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Prevent any potential hiding */
+    display: flex !important;
 }
 
 .toolbar-group {
@@ -523,6 +534,22 @@ body {
         transform: translateX(-50%);
         padding: 6px;
         gap: 4px;
+        /* Orion browser mobile fixes */
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+        /* Force hardware acceleration for Orion mobile */
+        -webkit-transform: translate3d(-50%, 0, 0);
+        transform: translate3d(-50%, 0, 0);
+        /* Ensure proper stacking context */
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        /* Additional Orion-specific properties */
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: transparent;
+        /* Force repaint */
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
     }
     
     .toolbar-btn {
@@ -748,6 +775,57 @@ body {
     -webkit-user-select: none;
     user-select: none;
   }
+}
+
+/* Orion browser specific fixes */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari and potentially Orion */
+    .floating-top-toolbar {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+        -webkit-transform: translate3d(-50%, 0, 0) !important;
+        transform: translate3d(-50%, 0, 0) !important;
+        -webkit-backface-visibility: hidden !important;
+        backface-visibility: hidden !important;
+        z-index: 1000 !important;
+    }
+}
+
+/* Additional Orion-specific fix using user agent targeting */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .floating-top-toolbar {
+        /* Force visibility for WebKit-based browsers including Orion */
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+    }
+}
+
+/* Orion browser viewport and positioning fixes */
+@media screen and (max-width: 768px) {
+    .floating-top-toolbar {
+        /* Additional Orion mobile fixes */
+        position: fixed !important;
+        top: 10px !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: translate3d(-50%, 0, 0) !important;
+        -webkit-transform: translate3d(-50%, 0, 0) !important;
+        /* Force hardware acceleration */
+        -webkit-transform: translateZ(0) translate3d(-50%, 0, 0) !important;
+        transform: translateZ(0) translate3d(-50%, 0, 0) !important;
+        /* Ensure visibility */
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+        /* Prevent any hiding */
+        pointer-events: auto !important;
+        /* Force repaint */
+        -webkit-transform: translateZ(0) !important;
+        transform: translateZ(0) !important;
+    }
 }
 
 /* Tool states */
