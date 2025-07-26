@@ -234,7 +234,7 @@ class DrawingTools {
         if (!shape.hasName('drawing-text')) {
             // Remove existing click handler to avoid duplicates
             shape.off('click');
-            
+
             shape.on('click', () => {
                 const toolType = this.getToolTypeFromShape(shape);
                 this.showEditUI(shape, toolType);
@@ -343,7 +343,7 @@ class DrawingTools {
         this.layer.add(this.controlPoints.startPoint);
         this.layer.add(this.controlPoints.endPoint);
         this.layer.batchDraw();
-        
+
         // Store reference to the shape these control points belong to
         this.controlPoints.ownerShape = shape;
     }
@@ -364,7 +364,7 @@ class DrawingTools {
 
         // Always hide any existing control points first to prevent interference
         this.hideControlPoints();
-        
+
         // Reset control points state
         this.controlPoints = {
             startPoint: null,
@@ -404,12 +404,12 @@ class DrawingTools {
      */
     updateShapeFromControlPoint(shape, pointType, newPos) {
         if (!shape) return;
-        
+
         // Ensure we're updating the correct shape (the one that owns these control points)
         if (!this.controlPoints.ownerShape) {
             return;
         }
-        
+
         if (this.controlPoints.ownerShape !== shape) {
             return;
         }
@@ -471,8 +471,14 @@ class DrawingTools {
         const endX = points[2] + shapeX;
         const endY = points[3] + shapeY;
 
-        this.controlPoints.startPoint.position({ x: startX, y: startY });
-        this.controlPoints.endPoint.position({ x: endX, y: endY });
+        this.controlPoints.startPoint.position({
+            x: startX,
+            y: startY
+        });
+        this.controlPoints.endPoint.position({
+            x: endX,
+            y: endY
+        });
         this.layer.batchDraw();
     }
 
@@ -913,10 +919,10 @@ class DrawingTools {
         // Remove all drawing objects (not chart objects)
         const drawingObjects = this.layer.find(node => node.name() && node.name().startsWith('drawing-'));
         drawingObjects.forEach(obj => obj.destroy());
-        
+
         // Hide control points
         this.hideControlPoints();
-        
+
         this.layer.batchDraw();
 
         this.undoStack = [];
@@ -969,10 +975,10 @@ class DrawingTools {
             if (obj.name() !== 'drawing-text') {
                 // Text objects handle their own dragging
                 obj.draggable(draggable);
-                
+
                 // Ensure Arrow and Line shapes have drag handlers for control points
                 this.ensureShapeHasDragHandlers(obj);
-                
+
                 console.log(`Updated ${obj.name()} draggable to: ${draggable}`);
             }
         });
@@ -1043,17 +1049,17 @@ class DrawingTools {
 
         if (shape && shape.name() && shape.name().startsWith('drawing-')) {
             this.selectedShape = shape;
-            
+
             // Ensure the tool is set to 'select' mode when a shape is selected
             if (window.app && window.app.currentTool !== 'select') {
                 window.app.setTool('select');
             }
-            
+
             // Show control points for Arrow and Line shapes
             if (shape.name().startsWith('drawing-arrow') || shape.name().startsWith('drawing-line')) {
                 this.showControlPoints(shape);
             }
-            
+
             // No visual selection indicator - just track the selected shape
             this.layer.batchDraw();
         }
@@ -1335,14 +1341,14 @@ class DrawingTools {
             } else if (originalName.includes('drawing-heading')) {
                 baseName = 'drawing-heading';
             }
-            
+
             // Generate a proper UUID
             const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 const r = Math.random() * 16 | 0;
                 const v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
-            
+
             duplicatedShape.name(`${baseName}-${uuid}`);
         }
 

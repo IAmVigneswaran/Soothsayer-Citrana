@@ -214,7 +214,7 @@ class CitranaApp {
         if (canvasContainer) {
             canvasContainer.setAttribute('tabindex', '0');
             canvasContainer.style.outline = 'none';
-            
+
             // Focus canvas container when clicked
             canvasContainer.addEventListener('click', () => {
                 canvasContainer.focus();
@@ -778,12 +778,12 @@ class CitranaApp {
             return;
         }
         this.keyboardShortcutsSetup = true;
-        
+
         // Add debounce for duplicate operation
         this.lastDuplicateTime = 0;
-        
+
         document.addEventListener('keydown', (e) => {
-            
+
             // Check if we're in text editing mode
             const textarea = document.querySelector('.konva-textarea');
             const textEditInput = document.getElementById('text-edit-input');
@@ -833,7 +833,7 @@ class CitranaApp {
                     this.redo();
                 } else if (e.key === 'd' || e.key === 'D') {
                     e.preventDefault();
-                    
+
                     // Debounce duplicate operation to prevent double execution
                     const currentTime = Date.now();
                     if (currentTime - this.lastDuplicateTime < 500) {
@@ -841,7 +841,7 @@ class CitranaApp {
                         return;
                     }
                     this.lastDuplicateTime = currentTime;
-                    
+
                     // Check if the selected shape is an Arrow or Line (disable duplication for these)
                     if (this.drawingTools.selectedShape) {
                         const shapeName = this.drawingTools.selectedShape.name();
@@ -850,7 +850,7 @@ class CitranaApp {
                             return;
                         }
                     }
-                    
+
                     // Allow duplication for other tools, but temporarily switch to select mode
                     const previousTool = this.currentTool;
                     if (previousTool !== 'select') {
