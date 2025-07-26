@@ -149,9 +149,156 @@ class PlanetSystem {
             }
         };
 
+        // Planet data - Page 3 (In Tamil)
+        this.planetsPage3 = {
+            'ல': {
+                name: 'லக்கினம்',
+                fullName: 'லக்கினம்',
+                color: '#000000'
+            },
+            'சூ': {
+                name: 'சூரியன்',
+                fullName: 'சூரியன்',
+                color: '#e2792e'
+            },
+            'சந்': {
+                name: 'சந்திரன்',
+                fullName: 'சந்திரன்',
+                color: '#868484'
+            },
+            'பு': {
+                name: 'புதன்',
+                fullName: 'புதன்',
+                color: '#08b130'
+            },
+            'சுக்': {
+                name: 'சுக்ரன்',
+                fullName: 'சுக்ரன்',
+                color: '#eb539f'
+            },
+            'செவ்': {
+                name: 'செவ்வாய்',
+                fullName: 'செவ்வாய்',
+                color: '#da3b26'
+            },
+            'குரு': {
+                name: 'குரு',
+                fullName: 'குரு',
+                color: '#ffa200'
+            },
+            'சனி': {
+                name: 'சனி',
+                fullName: 'சனி',
+                color: '#3274b5'
+            },
+            'ரா': {
+                name: 'ராகு',
+                fullName: 'ராகு',
+                color: '#4c4b4b'
+            },
+            'கே': {
+                name: 'கேது',
+                fullName: 'கேது',
+                color: '#4c4b4b'
+            },
+            'மா': {
+                name: 'மாந்தி',
+                fullName: 'மாந்தி',
+                color: '#000000'
+            },
+            'தனி': {
+                name: 'தனிப்பயன்',
+                fullName: 'தனிப்பயன்',
+                color: '#000000'
+            }
+        };
+
+        // Planet data - Page 4 (In Hindi)
+        this.planetsPage4 = {
+            'लग्न': {
+                name: 'लग्न',
+                fullName: 'लग्न',
+                color: '#000000'
+            },
+            'सूर्य': {
+                name: 'सूर्य',
+                fullName: 'सूर्य',
+                color: '#e2792e'
+            },
+            'चंद्र': {
+                name: 'चंद्र',
+                fullName: 'चंद्र',
+                color: '#868484'
+            },
+            'बुद्ध': {
+                name: 'बुद्ध',
+                fullName: 'बुद्ध',
+                color: '#08b130'
+            },
+            'शुक्र': {
+                name: 'शुक्र',
+                fullName: 'शुक्र',
+                color: '#eb539f'
+            },
+            'मंगल': {
+                name: 'मंगल',
+                fullName: 'मंगल',
+                color: '#da3b26'
+            },
+            'गुरु': {
+                name: 'गुरु',
+                fullName: 'गुरु',
+                color: '#ffa200'
+            },
+            'शनि': {
+                name: 'शनि',
+                fullName: 'शनि',
+                color: '#3274b5'
+            },
+            'राहु': {
+                name: 'राहु',
+                fullName: 'राहु',
+                color: '#4c4b4b'
+            },
+            'केतु': {
+                name: 'केतु',
+                fullName: 'केतु',
+                color: '#4c4b4b'
+            },
+            'मांदी': {
+                name: 'मांदी',
+                fullName: 'मांदी',
+                color: '#000000'
+            },
+            'कस': {
+                name: 'कस्टम',
+                fullName: 'कस्टम',
+                color: '#000000'
+            }
+        };
+
+        // Planet data - Page 5 (Outer Planets)
+        this.planetsPage5 = {
+            'Ur': {
+                name: 'Uranus',
+                fullName: 'Uranus',
+                color: '#000000'
+            },
+            'Ne': {
+                name: 'Neptune',
+                fullName: 'Neptune',
+                color: '#000000'
+            },
+            'Pl': {
+                name: 'Pluto',
+                fullName: 'Pluto',
+                color: '#000000'
+            }
+        };
+
         // Paging state
         this.currentPage = 1;
-        this.totalPages = 2;
+        this.totalPages = 5;
         this.swipeStartX = 0;
         this.swipeStartY = 0;
         this.isSwiping = false;
@@ -334,7 +481,18 @@ class PlanetSystem {
         library.innerHTML = '';
 
         // Get current page planets
-        const currentPlanets = this.currentPage === 1 ? this.planetsPage1 : this.planetsPage2;
+        let currentPlanets;
+        if (this.currentPage === 1) {
+            currentPlanets = this.planetsPage1;
+        } else if (this.currentPage === 2) {
+            currentPlanets = this.planetsPage2;
+        } else if (this.currentPage === 3) {
+            currentPlanets = this.planetsPage3;
+        } else if (this.currentPage === 4) {
+            currentPlanets = this.planetsPage4;
+        } else if (this.currentPage === 5) {
+            currentPlanets = this.planetsPage5;
+        }
 
         // Create planet items for current page
         Object.entries(currentPlanets).forEach(([abbr, planet]) => {
@@ -603,15 +761,18 @@ class PlanetSystem {
         this.chartTemplates.addPlanetToHouse(planetAbbr, houseIndex, label, id);
     }
     getPlanetInfo(abbr) {
-        // Check both pages for planet info
-        return this.planetsPage1[abbr] || this.planetsPage2[abbr] || null;
+        // Check all five pages for planet info
+        return this.planetsPage1[abbr] || this.planetsPage2[abbr] || this.planetsPage3[abbr] || this.planetsPage4[abbr] || this.planetsPage5[abbr] || null;
     }
 
     getAllPlanets() {
-        // Return all planets from both pages
+        // Return all planets from all five pages
         return {
             ...this.planetsPage1,
-            ...this.planetsPage2
+            ...this.planetsPage2,
+            ...this.planetsPage3,
+            ...this.planetsPage4,
+            ...this.planetsPage5
         };
     }
 
