@@ -1130,6 +1130,17 @@ body {
     margin-right: 8px; /* Margin to prevent scrollbar from touching edge */
 }
 
+/* Mobile: Smaller help modal */
+@media (max-width: 768px) {
+    .help-modal-content {
+        max-width: 90%;
+        max-height: 70vh;
+        padding: 20px;
+        padding-right: 30px;
+        margin-right: 6px;
+    }
+}
+
 /* Custom scrollbar styling for help modal */
 .help-modal-content::-webkit-scrollbar {
     width: 8px;
@@ -1248,10 +1259,17 @@ body {
     margin-bottom: 0;
 }
 
-/* Mobile: Hide help button */
+/* Mobile: Reposition help button to bottom left */
 @media (max-width: 768px) {
     .help-btn {
-        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        top: auto;
+        right: auto;
+        width: 40px;
+        height: 40px;
+        z-index: 1001;
     }
     
     /* Temporarily hide buggy drawing tools on mobile */
