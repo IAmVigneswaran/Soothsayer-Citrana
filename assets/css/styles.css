@@ -1584,3 +1584,41 @@ body {
         font-size: 0.8rem;
     }
 } 
+
+/* Control Points Styles */
+.control-point-start,
+.control-point-end {
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.control-point-start:hover,
+.control-point-end:hover {
+    transform: scale(1.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.control-point-start:active,
+.control-point-end:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+/* Mobile optimisations for control points */
+@media (max-width: 768px) {
+    .control-point-start,
+    .control-point-end {
+        /* Larger touch targets for mobile */
+        transform: scale(1.2);
+    }
+    
+    .control-point-start:hover,
+    .control-point-end:hover {
+        transform: scale(1.4);
+    }
+    
+    .control-point-start:active,
+    .control-point-end:active {
+        transform: scale(1.3);
+    }
+} 

@@ -22,10 +22,42 @@ class DrawingTools {
         this.isEditingPlanet = false;
         this.currentlyEditingPlanet = null;
 
+        // Control points functionality
+        this.controlPoints = {
+            startPoint: null,
+            endPoint: null
+        };
+        this.isDraggingControlPoint = false;
+        this.draggedControlPoint = null;
+
+        // Animation frame for bulletproof control point sync
+        this.controlPointAnimationFrame = null;
+
         // Initialize Edit UI
         this.editUI = new EditUI();
 
         // Do NOT call setupTouchEvents(); let app.js handle all mobile touch events
+    }
+
+    // Start per-frame sync for control points
+    startControlPointSyncLoop(shape) {
+        if (!shape || !this.supportsControlPoints(shape)) return;
+        this.stopControlPointSyncLoop();
+        const sync = () => {
+            if (this.selectedShape === shape && this.controlPoints.startPoint && this.controlPoints.endPoint) {
+                this.updateControlPointsPosition(shape);
+                this.controlPointAnimationFrame = requestAnimationFrame(sync);
+            }
+        };
+        this.controlPointAnimationFrame = requestAnimationFrame(sync);
+    }
+
+    // Stop per-frame sync
+    stopControlPointSyncLoop() {
+        if (this.controlPointAnimationFrame) {
+            cancelAnimationFrame(this.controlPointAnimationFrame);
+            this.controlPointAnimationFrame = null;
+        }
     }
 
     detectTouchDevice() {
@@ -193,6 +225,24 @@ class DrawingTools {
             draggable: false // Will be enabled when select tool is active
         });
 
+        // Add drag event handlers for shapes that support control points
+        if (this.supportsControlPoints(shape)) {
+            // Add dragmove handler to update control points when shape is dragged
+            shape.on('dragmove', () => {
+                if (this.selectedShape === shape && this.controlPoints.startPoint && this.controlPoints.endPoint) {
+                    this.updateControlPointsPosition(shape);
+                }
+            });
+
+            // Add dragend handler to add to undo stack and update control points
+            shape.on('dragend', () => {
+                if (this.selectedShape === shape) {
+                    this.addToUndoStack(shape, 'modify');
+                    this.updateControlPointsPosition(shape);
+                }
+            });
+        }
+
         // Add a small delay to ensure the shape is fully rendered
         setTimeout(() => {
             // Re-add double-tap support if it's a touch device
@@ -224,7 +274,6 @@ class DrawingTools {
 
         // Create invisible bounding box for easier selection
         const boundingBox = this.createBoundingBox(arrow, 'arrow');
-        arrow.boundingBox = boundingBox;
 
         // Add click handler for Edit UI
         arrow.on('click', () => {
@@ -629,15 +678,267 @@ class DrawingTools {
     }
 
     clearAll() {
-        // Remove all drawing objects (not chart objects)
-        const drawingObjects = this.layer.find(node => node.name() && node.name().startsWith('drawing-'));
-        drawingObjects.forEach(obj => obj.destroy());
+        // Clear all drawing objects
+        const shapes = this.layer.find('*');
+        shapes.forEach(shape => {
+            if (shape.name() && shape.name().startsWith('drawing-')) {
+                shape.destroy();
+            }
+        });
+        this.clearSelection();
+        this.clearControlPoints();
         this.layer.batchDraw();
+    }
 
-        this.undoStack = [];
-        this.redoStack = [];
+    /**
+     * Create control points for arrow or line shapes
+     * @param {KonvaObject} shape - The shape to add control points to
+     */
+    createControlPoints(shape) {
+        if (!shape || !shape.points) return;
 
-        console.log('All drawings cleared');
+        const points = shape.points();
+        if (points.length < 4) return; // Need at least start and end points
+
+        // Clear existing control points
+        this.clearControlPoints();
+
+        // Create start control point
+        this.controlPoints.startPoint = new Konva.Circle({
+            x: points[0],
+            y: points[1],
+            radius: 6,
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeWidth: 2,
+            name: 'control-point-start',
+            listening: true,
+            draggable: true
+        });
+
+        // Create end control point
+        this.controlPoints.endPoint = new Konva.Circle({
+            x: points[2],
+            y: points[3],
+            radius: 6,
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeWidth: 2,
+            name: 'control-point-end',
+            listening: true,
+            draggable: true
+        });
+
+        // Add drag event handlers for start point
+        this.controlPoints.startPoint.on('dragstart', () => {
+            this.isDraggingControlPoint = true;
+            this.draggedControlPoint = 'start';
+        });
+
+        this.controlPoints.startPoint.on('dragmove', () => {
+            if (this.isDraggingControlPoint && this.selectedShape) {
+                // Get the control point position in stage coordinates
+                const controlX = this.controlPoints.startPoint.x();
+                const controlY = this.controlPoints.startPoint.y();
+                
+                // Convert to shape's local coordinates
+                const shapeX = this.selectedShape.x();
+                const shapeY = this.selectedShape.y();
+                const scaleX = this.selectedShape.scaleX();
+                const scaleY = this.selectedShape.scaleY();
+                const rotation = this.selectedShape.rotation();
+                
+                // Remove shape's position offset
+                let localX = controlX - shapeX;
+                let localY = controlY - shapeY;
+                
+                // Apply inverse rotation if any
+                if (rotation !== 0) {
+                    const cos = Math.cos(-rotation * Math.PI / 180);
+                    const sin = Math.sin(-rotation * Math.PI / 180);
+                    
+                    const rotatedX = localX * cos - localY * sin;
+                    const rotatedY = localX * sin + localY * cos;
+                    
+                    localX = rotatedX;
+                    localY = rotatedY;
+                }
+                
+                // Apply inverse scale
+                localX = localX / scaleX;
+                localY = localY / scaleY;
+                
+                // Update shape points
+                const newPoints = this.selectedShape.points();
+                newPoints[0] = localX;
+                newPoints[1] = localY;
+                this.selectedShape.points(newPoints);
+                
+                // Update bounding box if it exists
+                if (this.selectedShape.boundingBox) {
+                    this.updateBoundingBox(this.selectedShape.boundingBox, this.selectedShape);
+                }
+                
+                this.layer.batchDraw();
+            }
+        });
+
+        this.controlPoints.startPoint.on('dragend', () => {
+            this.isDraggingControlPoint = false;
+            this.draggedControlPoint = null;
+            // Add to undo stack
+            this.addToUndoStack(this.selectedShape, 'modify');
+        });
+
+        // Add drag event handlers for end point
+        this.controlPoints.endPoint.on('dragstart', () => {
+            this.isDraggingControlPoint = true;
+            this.draggedControlPoint = 'end';
+        });
+
+        this.controlPoints.endPoint.on('dragmove', () => {
+            if (this.isDraggingControlPoint && this.selectedShape) {
+                // Get the control point position in stage coordinates
+                const controlX = this.controlPoints.endPoint.x();
+                const controlY = this.controlPoints.endPoint.y();
+                
+                // Convert to shape's local coordinates
+                const shapeX = this.selectedShape.x();
+                const shapeY = this.selectedShape.y();
+                const scaleX = this.selectedShape.scaleX();
+                const scaleY = this.selectedShape.scaleY();
+                const rotation = this.selectedShape.rotation();
+                
+                // Remove shape's position offset
+                let localX = controlX - shapeX;
+                let localY = controlY - shapeY;
+                
+                // Apply inverse rotation if any
+                if (rotation !== 0) {
+                    const cos = Math.cos(-rotation * Math.PI / 180);
+                    const sin = Math.sin(-rotation * Math.PI / 180);
+                    
+                    const rotatedX = localX * cos - localY * sin;
+                    const rotatedY = localX * sin + localY * cos;
+                    
+                    localX = rotatedX;
+                    localY = rotatedY;
+                }
+                
+                // Apply inverse scale
+                localX = localX / scaleX;
+                localY = localY / scaleY;
+                
+                // Update shape points
+                const newPoints = this.selectedShape.points();
+                newPoints[2] = localX;
+                newPoints[3] = localY;
+                this.selectedShape.points(newPoints);
+                
+                // Update bounding box if it exists
+                if (this.selectedShape.boundingBox) {
+                    this.updateBoundingBox(this.selectedShape.boundingBox, this.selectedShape);
+                }
+                
+                this.layer.batchDraw();
+            }
+        });
+
+        this.controlPoints.endPoint.on('dragend', () => {
+            this.isDraggingControlPoint = false;
+            this.draggedControlPoint = null;
+            // Add to undo stack
+            this.addToUndoStack(this.selectedShape, 'modify');
+        });
+
+        // Add control points to layer
+        this.layer.add(this.controlPoints.startPoint);
+        this.layer.add(this.controlPoints.endPoint);
+        this.layer.batchDraw();
+    }
+
+    /**
+     * Clear control points
+     */
+    clearControlPoints() {
+        if (this.controlPoints.startPoint) {
+            this.controlPoints.startPoint.destroy();
+            this.controlPoints.startPoint = null;
+        }
+        if (this.controlPoints.endPoint) {
+            this.controlPoints.endPoint.destroy();
+            this.controlPoints.endPoint = null;
+        }
+        this.isDraggingControlPoint = false;
+        this.draggedControlPoint = null;
+    }
+
+    /**
+     * Update control points position when shape is moved
+     * @param {KonvaObject} shape - The shape to update control points for
+     */
+    updateControlPointsPosition(shape) {
+        if (!shape || !shape.points || !this.controlPoints.startPoint || !this.controlPoints.endPoint) return;
+
+        const points = shape.points();
+        if (points.length < 4) return;
+
+        // Get the shape's transformation matrix
+        const transform = shape.getTransform();
+        
+        // Calculate the actual position of the shape
+        const shapeX = shape.x();
+        const shapeY = shape.y();
+        const scaleX = shape.scaleX();
+        const scaleY = shape.scaleY();
+        const rotation = shape.rotation();
+
+        // Apply transformation to the points
+        const startPoint = {
+            x: points[0] * scaleX,
+            y: points[1] * scaleY
+        };
+        
+        const endPoint = {
+            x: points[2] * scaleX,
+            y: points[3] * scaleY
+        };
+
+        // Apply rotation if any
+        if (rotation !== 0) {
+            const cos = Math.cos(rotation * Math.PI / 180);
+            const sin = Math.sin(rotation * Math.PI / 180);
+            
+            const rotatedStartX = startPoint.x * cos - startPoint.y * sin;
+            const rotatedStartY = startPoint.x * sin + startPoint.y * cos;
+            const rotatedEndX = endPoint.x * cos - endPoint.y * sin;
+            const rotatedEndY = endPoint.x * sin + endPoint.y * cos;
+            
+            startPoint.x = rotatedStartX;
+            startPoint.y = rotatedStartY;
+            endPoint.x = rotatedEndX;
+            endPoint.y = rotatedEndY;
+        }
+
+        // Add the shape's position offset
+        this.controlPoints.startPoint.x(shapeX + startPoint.x);
+        this.controlPoints.startPoint.y(shapeY + startPoint.y);
+        this.controlPoints.endPoint.x(shapeX + endPoint.x);
+        this.controlPoints.endPoint.y(shapeY + endPoint.y);
+        
+        this.layer.batchDraw();
+    }
+
+    /**
+     * Check if a shape supports control points
+     * @param {KonvaObject} shape - The shape to check
+     * @returns {boolean} True if shape supports control points
+     */
+    supportsControlPoints(shape) {
+        if (!shape || !shape.name()) {
+            return false;
+        }
+        return shape.name().includes('drawing-arrow') || shape.name().includes('drawing-line');
     }
 
     getDrawingStats() {
@@ -692,9 +993,11 @@ class DrawingTools {
      * Clear current selection
      */
     clearSelection() {
+        this.stopControlPointSyncLoop();
         if (this.selectedShape) {
             this.selectedShape = null;
         }
+        this.clearControlPoints();
         this.layer.batchDraw();
     }
 
@@ -704,9 +1007,17 @@ class DrawingTools {
      */
     selectShape(shape) {
         this.clearSelection();
-
+        
         if (shape && shape.name() && shape.name().startsWith('drawing-')) {
             this.selectedShape = shape;
+            
+            // Show control points for arrow and line shapes
+            if (this.supportsControlPoints(shape)) {
+                this.createControlPoints(shape);
+                this.updateControlPointsPosition(shape); // Immediate sync
+                this.startControlPointSyncLoop(shape);   // Per-frame sync
+            }
+            
             // No visual selection indicator - just track the selected shape
             this.layer.batchDraw();
         }
@@ -722,6 +1033,15 @@ class DrawingTools {
 
         const clickedShape = e.target;
 
+        // Check if clicked on a control point
+        if (clickedShape && (
+                clickedShape.name() === 'control-point-start' ||
+                clickedShape.name() === 'control-point-end'
+            )) {
+            // Let the control point handle its own dragging
+            return;
+        }
+
         // Check if clicked on a drawing object or its bounding box
         if (clickedShape && (
                 (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
@@ -730,11 +1050,8 @@ class DrawingTools {
             // If clicked on bounding box, get the actual shape
             let actualShape = clickedShape;
             if (clickedShape.name().startsWith('bounding-box-')) {
-                // Find the actual drawing shape that this bounding box belongs to
-                const shapes = this.layer.find('*');
-                actualShape = shapes.find(shape =>
-                    shape.boundingBox === clickedShape
-                );
+                // Use the direct relationship instead of searching
+                actualShape = clickedShape.actualShape;
             }
 
             if (actualShape) {
@@ -757,6 +1074,15 @@ class DrawingTools {
 
         const clickedShape = e.target;
 
+        // Check if clicked on a control point
+        if (clickedShape && (
+                clickedShape.name() === 'control-point-start' ||
+                clickedShape.name() === 'control-point-end'
+            )) {
+            // Let the control point handle its own dragging
+            return;
+        }
+
         // Check if clicked on a drawing object or its bounding box
         if (clickedShape && (
                 (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
@@ -765,11 +1091,8 @@ class DrawingTools {
             // If clicked on bounding box, get the actual shape
             let actualShape = clickedShape;
             if (clickedShape.name().startsWith('bounding-box-')) {
-                // Find the actual drawing shape that this bounding box belongs to
-                const shapes = this.layer.find('*');
-                actualShape = shapes.find(shape =>
-                    shape.boundingBox === clickedShape
-                );
+                // Use the direct relationship instead of searching
+                actualShape = clickedShape.actualShape;
             }
 
             if (actualShape) {
@@ -883,13 +1206,16 @@ class DrawingTools {
     }
 
     /**
-     * Delete selected shape
+     * Delete the currently selected shape
      */
     deleteSelectedShape() {
         if (!this.selectedShape) return;
 
         // Add to undo stack before deleting
         this.addToUndoStack(this.selectedShape, 'delete');
+
+        // Clear control points
+        this.clearControlPoints();
 
         // Remove bounding box if it exists
         if (this.selectedShape.boundingBox) {
@@ -1526,6 +1852,10 @@ class DrawingTools {
             draggable: false,
             perfectDrawEnabled: false
         });
+
+        // Establish two-way relationship
+        shape.boundingBox = boundingBox;
+        boundingBox.actualShape = shape;
 
         // Add event handlers to the bounding box that delegate to the shape
         boundingBox.on('click', () => {
