@@ -23,15 +23,15 @@ Soothsayer-Citrana/
 ├── index.html                    # Main application entry point
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (1517 lines)
+│   │   └── styles.css            # Complete styling system (1652 lines)
 │   ├── js/
 │   │   ├── app.js                # Main application coordinator (1145 lines)
 │   │   ├── chart-coordinator.js  # Chart type management (261 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (961 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (921 lines)
-│   │   ├── planet-system.js      # Planet library and drag-drop (456 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1567 lines)
-│   │   ├── context-menu.js       # Context menu system (456 lines)
+│   │   ├── planet-system.js      # Planet library and drag-drop (876 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1902 lines)
+│   │   ├── context-menu.js       # Context menu system (534 lines)
 │   │   ├── edit-ui.js            # Edit interface controls (786 lines)
 │   │   └── utils.js              # Utility functions (340 lines)
 │   ├── images/
@@ -251,7 +251,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - `findHouseAtPosition()`: Drop zone detection
 - `getPlanetInfo()`: Retrieve planet data from paged structure
 
-### Drawing Tools (drawing-tools.js - 1567 lines)
+### Drawing Tools (drawing-tools.js - 1902 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 **Key Responsibilities:**
@@ -274,10 +274,11 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - Pixel-perfect positioning
 - Touch and mouse support
 - Shape selection and editing
-- Color and stroke customization
+- Colour and stroke customisation
 - Text editing with font controls
 - Planet text editing with retrograde support
 - Undo/redo with 50-step history
+- Control points for precise arrow and line adjustment
 
 **Key Methods:**
 - `startDrawing()`: Begin drawing operation
@@ -287,8 +288,11 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - `undo()/redo()`: History management
 - `showEditUIForShape()`: Edit interface integration
 - `makePlanetTextEditable()`: Planet text editing
+- `createControlPoints()`: Create draggable control points for arrows and lines
+- `updateControlPointsPosition()`: Synchronise control points with shape movement
+- `clearControlPoints()`: Remove control points from display
 
-### Context Menu (context-menu.js - 456 lines)
+### Context Menu (context-menu.js - 534 lines)
 Provides right-click and long-press context menus for chart interaction.
 
 **Key Responsibilities:**
@@ -391,12 +395,30 @@ Provides utility functions for common operations across the application.
 
 ### Drawing Tools
 - **Select Tool**: Choose and modify existing elements with Edit UI
-- **Arrow Tool**: Create directional indicators with customizable arrowheads
-- **Line Tool**: Draw straight lines and connections
+- **Arrow Tool**: Create directional indicators with customisable arrowheads and control points
+- **Line Tool**: Draw straight lines and connections with control points
 - **Pen Tool**: Freehand drawing for annotations
 - **Text Tool**: Add editable text boxes anywhere on canvas
 - **Heading Tool**: Create chart headings and titles
 - **Undo/Redo**: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+- **Control Points**: Draggable handles for adjusting start and end points of arrows and lines
+
+### Control Points Feature
+The control points system provides precise adjustment capabilities for arrow and line elements:
+
+**Functionality:**
+- Control points appear automatically when arrows or lines are selected
+- Two draggable handles at the start and end points of each element
+- Real-time visual feedback during adjustment
+- Per-frame synchronisation ensures control points stay attached during shape movement
+- Works on both blank canvas and chart-loaded states
+
+**Technical Implementation:**
+- Konva.Circle objects with custom styling and event handling
+- Coordinate transformation between local shape coordinates and global stage coordinates
+- RequestAnimationFrame loop for continuous synchronisation
+- Touch and mouse support for cross-platform compatibility
+- Automatic cleanup when elements are deselected or deleted
 
 ### User Experience
 - **Dark/Light Theme**: Automatic system preference detection with manual toggle
