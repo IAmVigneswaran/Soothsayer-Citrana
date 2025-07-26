@@ -162,12 +162,12 @@ class DrawingTools {
         // Add the completed shape to undo stack
         if (this.currentShape) {
             this.addToUndoStack(this.currentShape, 'add');
-            
+
             // Ensure the completed shape has the correct draggable state
             // Check if the current tool is 'select' (which might have changed during drawing)
             const currentTool = window.app ? window.app.currentTool : this.currentTool;
             const shouldBeDraggable = currentTool === 'select';
-            
+
             if (this.currentShape.name() !== 'drawing-text') {
                 this.currentShape.draggable(shouldBeDraggable);
                 console.log(`Set completed shape ${this.currentShape.name()} draggable to: ${shouldBeDraggable}, current tool: ${currentTool}`);
@@ -719,7 +719,7 @@ class DrawingTools {
 
         // Enable/disable dragging for all drawing objects based on tool
         this.updateDrawingObjectsDraggable(tool === 'select');
-        
+
         console.log(`Tool switched to: ${tool}, draggable state: ${tool === 'select'}`);
     }
 
@@ -779,7 +779,7 @@ class DrawingTools {
         console.log(`Current tool: ${this.currentTool}`);
         console.log(`Should be draggable: ${this.currentTool === 'select'}`);
         console.log(`Total drawing objects: ${drawingObjects.length}`);
-        
+
         drawingObjects.forEach((obj, index) => {
             console.log(`Object ${index + 1}: ${obj.name()}, draggable: ${obj.draggable()}, listening: ${obj.listening()}`);
         });
@@ -1020,26 +1020,26 @@ class DrawingTools {
             const drawingObjects = this.layer.find(node =>
                 node.name() && node.name().startsWith('drawing-')
             );
-            
+
             if (drawingObjects.length === 0) {
                 console.log('No drawing objects to duplicate');
                 return;
             }
-            
+
             // Select the last created drawing object
             const lastShape = drawingObjects[drawingObjects.length - 1];
             this.selectShape(lastShape);
         }
-        
+
         if (!this.selectedShape) return;
 
         // Get the shape's current properties
         const originalShape = this.selectedShape;
         const shapeData = originalShape.toObject();
-        
+
         // Create a new shape with the same properties
         let duplicatedShape;
-        
+
         if (originalShape instanceof Konva.Arrow) {
             duplicatedShape = Konva.Node.create(shapeData);
         } else if (originalShape instanceof Konva.Line) {

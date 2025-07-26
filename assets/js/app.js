@@ -1107,7 +1107,7 @@ class CitranaApp {
             this.layer.add(shape);
         });
         this.layer.batchDraw();
-        
+
         // Ensure all restored drawing objects have correct draggable state
         if (this.drawingTools) {
             this.drawingTools.forceRefreshDraggableState();
