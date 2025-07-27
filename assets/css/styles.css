@@ -1122,6 +1122,55 @@ body {
   height: 20px;
 }
 
+/* About Button */
+.about-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #000000;
+  background: white;
+  color: #000000;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.about-btn:hover {
+  background: #000000;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.about-btn:active {
+  transform: translateY(0);
+}
+
+.about-btn-icon {
+  width: 25px;
+  height: 25px;
+  transition: all 0.2s ease;
+}
+
+.about-btn-icon-white {
+  display: none;
+}
+
+.about-btn:hover .about-btn-icon-black {
+  display: none;
+}
+
+.about-btn:hover .about-btn-icon-white {
+  display: block;
+}
+
 /* Help Modal */
 .help-modal {
   position: fixed;
@@ -1304,6 +1353,223 @@ body {
   #line-tool,
   #pen-tool {
     display: none !important;
+  }
+}
+
+/* About Modal */
+.about-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.about-modal.active {
+  display: flex;
+}
+
+.about-modal-content {
+  background: white;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.about-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.about-modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+.about-modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.about-modal-close:hover {
+  background: #f1f3f4;
+}
+
+.about-modal-close i {
+  width: 18px;
+  height: 18px;
+}
+
+.about-modal-body {
+  text-align: center;
+}
+
+.about-logo-container {
+  margin-bottom: 24px;
+}
+
+.about-logo {
+  max-width: 400px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.about-divider {
+  width: 100%;
+  height: 1px;
+  background: #000000;
+  margin: 24px 0;
+}
+
+.about-content {
+  text-align: center;
+}
+
+.about-app-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 8px 0;
+}
+
+.about-description {
+  font-size: 16px;
+  color: #495057;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.about-definition {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.about-definition strong {
+  color: #000000;
+}
+
+.about-definition em {
+  font-style: italic;
+  color: #495057;
+}
+
+.about-creator {
+  font-size: 16px;
+  color: #495057;
+  margin: 0 0 8px 0;
+}
+
+.about-email {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: default;
+}
+
+.about-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.about-link {
+  color: #000000;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 8px 16px;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.about-link:hover {
+  background: #000000;
+  color: white;
+}
+
+.about-copyright {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Mobile: Smaller about modal */
+@media (max-width: 768px) {
+  .about-modal-content {
+    max-width: 90%;
+    padding: 20px;
+  }
+  
+  .about-logo {
+    max-width: 320px;
+  }
+  
+  .about-app-name {
+    font-size: 20px;
+  }
+  
+  .about-description {
+    font-size: 14px;
+  }
+  
+  .about-definition {
+    font-size: 12px;
+    padding: 12px;
+  }
+  
+  .about-creator {
+    font-size: 14px;
+  }
+  
+  .about-email {
+    font-size: 12px;
+  }
+  
+  .about-links {
+    gap: 8px;
+  }
+  
+  .about-link {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+  
+  .about-copyright {
+    font-size: 12px;
   }
 }
 

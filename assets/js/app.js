@@ -142,6 +142,28 @@ class CitranaApp {
             });
         }
 
+        // About Button
+        const aboutBtn = document.getElementById('about-btn');
+        const aboutModal = document.getElementById('about-modal');
+        const aboutModalClose = document.getElementById('about-modal-close');
+
+        if (aboutBtn && aboutModal && aboutModalClose) {
+            aboutBtn.addEventListener('click', () => {
+                aboutModal.classList.add('active');
+            });
+
+            aboutModalClose.addEventListener('click', () => {
+                aboutModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            aboutModal.addEventListener('click', (e) => {
+                if (e.target === aboutModal) {
+                    aboutModal.classList.remove('active');
+                }
+            });
+        }
+
         // Zoom controls
         document.getElementById('zoom-in').addEventListener('click', () => this.chartTemplates.zoomIn());
         document.getElementById('zoom-out').addEventListener('click', () => this.chartTemplates.zoomOut());
