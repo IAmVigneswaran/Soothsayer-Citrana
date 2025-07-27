@@ -1542,45 +1542,45 @@ body {
     padding: 16px;
     overflow-y: auto;
   }
-  
+
   .about-logo {
     max-width: 220px;
   }
-  
+
   .about-app-name {
     font-size: 18px;
   }
-  
+
   .about-description {
     font-size: 13px;
   }
-  
+
   .about-definition {
     font-size: 11px;
     padding: 10px;
     margin: 0 0 16px 0;
   }
-  
+
   .about-creator {
     font-size: 13px;
     margin: 0 0 6px 0;
   }
-  
+
   .about-email {
     font-size: 11px;
     margin: 0 0 16px 0;
   }
-  
+
   .about-links {
     gap: 6px;
     margin-bottom: 16px;
   }
-  
+
   .about-link {
     font-size: 13px;
     padding: 5px 10px;
   }
-  
+
   .about-copyright {
     font-size: 11px;
   }
