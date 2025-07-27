@@ -30,7 +30,7 @@ Soothsayer-Citrana/
 │   │   ├── chart-templates-south.js  # South Indian chart logic (961 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (921 lines)
 │   │   ├── planet-system.js      # Planet library and drag-drop (876 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1902 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1909 lines)
 │   │   ├── context-menu.js       # Context menu system (534 lines)
 │   │   ├── edit-ui.js            # Edit interface controls (786 lines)
 │   │   └── utils.js              # Utility functions (340 lines)
@@ -466,6 +466,17 @@ The control points system provides precise adjustment capabilities for arrow and
 - Add comprehensive comments for new features
 - Maintain modular architecture
 - Use Tailwind CSS classes for styling
+
+### File Headers
+All JavaScript and CSS files use a standardised comment header format:
+```javascript
+/**
+ * filename.extension
+ * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
+ * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * One line description of the file
+ */
+```
 
 ### File Organization
 - Keep all assets in the assets/ directory

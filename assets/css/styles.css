@@ -1538,8 +1538,8 @@ body {
 @media (max-width: 768px) {
   .about-modal-content {
     max-width: 90%;
-    max-height: 85vh;
-    padding: 16px;
+    max-height: 95vh;
+    padding: 20px;
     overflow-y: auto;
   }
 
@@ -1583,6 +1583,7 @@ body {
 
   .about-copyright {
     font-size: 11px;
+    margin-bottom: 8px;
   }
 }
 
