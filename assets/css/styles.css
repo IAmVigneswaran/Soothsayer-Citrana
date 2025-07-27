@@ -601,7 +601,7 @@ body {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .floating-zoom-controls {
     left: 0 !important;
     right: 0 !important;
