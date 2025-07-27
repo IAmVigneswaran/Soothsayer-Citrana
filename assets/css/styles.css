@@ -304,11 +304,12 @@ body {
   align-self: center;
 }
 
-/* Hide separator and hand tool on desktop */
+/* Hide separator, hand tool, and select tool on desktop */
 @media (min-width: 769px) {
 
   .zoom-divider,
-  #zoom-hand-tool {
+  #zoom-hand-tool,
+  #zoom-select-tool {
     display: none !important;
   }
 }

@@ -94,11 +94,17 @@
          </button>
          <!-- Floating Top Toolbar -->
          <div class="floating-top-toolbar">
-            <!-- Drawing Tools -->
+            <!-- Selection Tools -->
             <div class="toolbar-group">
                <button id="select-tool" class="toolbar-btn active" title="Select (V)">
                <i data-lucide="mouse-pointer"></i>
                </button>
+               <button id="hand-tool" class="toolbar-btn" title="Hand (H)">
+               <i data-lucide="hand"></i>
+               </button>
+            </div>
+            <!-- Drawing Tools -->
+            <div class="toolbar-group">
                <button id="arrow-tool" class="toolbar-btn" title="Arrow">
                <i data-lucide="arrow-right"></i>
                </button>
@@ -115,13 +121,7 @@
                <i data-lucide="heading"></i>
                </button>
             </div>
-            <!-- Hand Tool -->
-            <div class="toolbar-group">
-               <button id="hand-tool" class="toolbar-btn" title="Hand (H)">
-               <i data-lucide="hand"></i>
-               </button>
-            </div>
-            <!-- Action Buttons -->
+            <!-- History Actions -->
             <div class="toolbar-group">
                <button id="undo-btn" class="toolbar-btn" title="Undo (Ctrl+Z)">
                <i data-lucide="undo"></i>
@@ -129,6 +129,9 @@
                <button id="redo-btn" class="toolbar-btn" title="Redo (Ctrl+Y)">
                <i data-lucide="redo"></i>
                </button>
+            </div>
+            <!-- Export Actions -->
+            <div class="toolbar-group">
                <button id="toggle-transparency-btn" class="toolbar-btn" title="Toggle Transparency">
                <i data-lucide="image-off"></i>
                </button>
@@ -161,6 +164,9 @@
             <i data-lucide="maximize-2"></i>
             </button>
             <span class="zoom-divider" style="width:1px;height:24px;background:#000;opacity:0.15;margin:0 8px;display:inline-block;"></span>
+            <button id="zoom-select-tool" title="Select Tool (V)">
+            <i data-lucide="mouse-pointer"></i>
+            </button>
             <button id="zoom-hand-tool" title="Hand Tool (H)">
             <i data-lucide="hand"></i>
             </button>

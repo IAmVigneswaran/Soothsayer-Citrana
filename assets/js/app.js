@@ -106,6 +106,10 @@ class CitranaApp {
             this.pushSnapshot();
         });
         // Add for zoom controls bar
+        document.getElementById('zoom-select-tool').addEventListener('click', () => {
+            this.setTool('select');
+            this.pushSnapshot();
+        });
         document.getElementById('zoom-hand-tool').addEventListener('click', () => {
             this.setTool('hand');
             this.pushSnapshot();
@@ -892,14 +896,25 @@ class CitranaApp {
         // Main toolbar
         const mainBtn = document.getElementById(`${tool}-tool`);
         if (mainBtn) mainBtn.classList.add('active');
-        // Special case: sync hand tool in zoom controls
+        // Special case: sync hand tool, and select tool in zoom controls
         if (tool === 'hand') {
             const zoomHandBtn = document.getElementById('zoom-hand-tool');
             if (zoomHandBtn) zoomHandBtn.classList.add('active');
-        } else {
-            // Always remove active from zoom-hand-tool if not hand
+            // Remove active from zoom select tool
+            const zoomSelectBtn = document.getElementById('zoom-select-tool');
+            if (zoomSelectBtn) zoomSelectBtn.classList.remove('active');
+        } else if (tool === 'select') {
+            const zoomSelectBtn = document.getElementById('zoom-select-tool');
+            if (zoomSelectBtn) zoomSelectBtn.classList.add('active');
+            // Remove active from zoom hand tool
             const zoomHandBtn = document.getElementById('zoom-hand-tool');
             if (zoomHandBtn) zoomHandBtn.classList.remove('active');
+        } else {
+            // Remove active from both zoom tools if not hand or select
+            const zoomHandBtn = document.getElementById('zoom-hand-tool');
+            if (zoomHandBtn) zoomHandBtn.classList.remove('active');
+            const zoomSelectBtn = document.getElementById('zoom-select-tool');
+            if (zoomSelectBtn) zoomSelectBtn.classList.remove('active');
         }
 
         // Update cursor and touch behavior
