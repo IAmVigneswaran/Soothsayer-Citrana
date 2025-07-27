@@ -466,6 +466,7 @@ body {
   border: none;
   margin: 0;
   color: #000;
+  white-space: nowrap;
   /* Ensure visible text */
 }
 
