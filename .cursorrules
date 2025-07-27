@@ -21,17 +21,17 @@ Soothsayer-Citrana/
 ├── index.html                    # Main application entry point
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (1652 lines)
+│   │   └── styles.css            # Complete styling system (2176 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (1145 lines)
-│   │   ├── chart-coordinator.js  # Chart type management (261 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (961 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (921 lines)
-│   │   ├── planet-system.js      # Planet library and drag-drop (876 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1909 lines)
-│   │   ├── context-menu.js       # Context menu system (534 lines)
-│   │   ├── edit-ui.js            # Edit interface controls (786 lines)
-│   │   └── utils.js              # Utility functions (340 lines)
+│   │   ├── app.js                # Main application coordinator (1289 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (275 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (1031 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (977 lines)
+│   │   ├── planet-system.js      # Planet library and drag-drop (878 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1910 lines)
+│   │   ├── context-menu.js       # Context menu system (536 lines)
+│   │   ├── edit-ui.js            # Edit interface controls (814 lines)
+│   │   └── utils.js              # Utility functions (343 lines)
 │   ├── images/
 │   │   ├── soothsayer_citrana_social-preview.jpg  # Social media preview image
 │   │   ├── Soothsayer-Citrana-Full-Logo-Black.png  # Full logo in black
@@ -423,7 +423,7 @@ Provides right-click and long-press context menus for chart interaction.
 - Implements mobile-friendly touch interactions
 
 **Menu Types:**
-- Chart Creation Menu: Create new charts
+- Chart Creation Menu: Create new charts and clear canvas
 - House Menu: House-specific actions (set Lagna, clear house)
 - Planet Menu: Planet-specific actions (edit, delete, retrograde)
 - Existing Chart Menu: Chart management options
@@ -515,13 +515,13 @@ Provides utility functions for common operations across the application.
 
 ### Drawing Tools
 - Select Tool: Choose and modify existing elements with Edit UI
-- Arrow Tool: Create directional indicators with customisable arrowheads
-- Line Tool: Draw straight lines and connections
+- Arrow Tool: Create directional indicators with customisable arrowheads and control points
+- Line Tool: Draw straight lines and connections with control points
 - Pen Tool: Freehand drawing for annotations
 - Text Tool: Add editable text boxes anywhere on canvas
 - Heading Tool: Create chart headings and titles
 - Undo/Redo: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
-- Duplicate: Duplicate selected elements with Ctrl+D/Cmd+D
+- Control Points: Draggable handles for adjusting start and end points of arrows and lines
 
 ### Control Points Feature
 The control points system provides precise adjustment capabilities for arrow and line elements:
@@ -547,6 +547,8 @@ The control points system provides precise adjustment capabilities for arrow and
 - Context Menus: Right-click and long-press for quick actions
 - Status Updates: Real-time feedback and notifications
 - Auto-Save: Automatic chart data persistence every 30 seconds
+- About Modal: Information about Citrana with creator details and links
+- Welcome Modal: First-time user experience with getting started guide
 
 ### Export & Sharing
 - High-Resolution PNG: Professional quality exports (300 DPI)
@@ -583,15 +585,15 @@ All JavaScript and CSS files use a standardised comment header format:
 - Favicons in assets/favicon/
 
 ### Browser Compatibility
-- Desktop: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
-- Mobile: iOS Safari 13+, Android Chrome 80+
+- Desktop: Brave, Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- Note: For Brave browser, disable Brave Shields for optimal functionality
 - Features: Canvas API, localStorage, ES6 modules, Touch Events
 
-**Mobile Browser Limitations:**
-- Limited support for older mobile browsers
-- Some advanced features may not work on older iOS Safari versions
-- Touch interactions optimised for modern mobile browsers
-- Performance may vary on low-end mobile devices
+**Mobile Support:**
+- Citrana is not supported on mobile devices
+
+**Special Note on Mobile Support:**
+While the codebase might have limited support for mobile, officially it is advertised as mobile is not supported due to its complexity and limited resources. Project owners have to acquire various mobile devices with different screen sizes. It is not a practical task for a free and open-source application.
 
 ### Performance Considerations
 - Efficient canvas rendering with Konva.js
@@ -599,7 +601,7 @@ All JavaScript and CSS files use a standardised comment header format:
 - Optimised planet placement algorithms
 - Minimal DOM manipulation
 - Smart auto-save (30-second intervals)
-- Touch event optimisation for mobile performance
+- Touch event optimisation for desktop performance
 
 ## Customisation Guidelines
 

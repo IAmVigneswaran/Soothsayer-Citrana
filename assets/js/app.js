@@ -32,10 +32,10 @@ class CitranaApp {
         this.setupKeyboardShortcuts();
         this.loadSavedData();
         this.autoSave();
-        
+
         // Show welcome modal on first visit
         this.showWelcomeModal();
-        
+
         console.log('App initialization complete');
     }
 
@@ -1244,12 +1244,12 @@ class CitranaApp {
         const welcomeModal = document.getElementById('welcome-modal');
         const welcomeLoadingFill = document.querySelector('.welcome-loading-fill');
         const welcomeLoadingText = document.querySelector('.welcome-loading-text');
-        
+
         if (!welcomeModal || !welcomeLoadingFill || !welcomeLoadingText) return;
 
         // Check if user has seen the welcome modal before
         const hasSeenWelcome = localStorage.getItem('citrana_welcome_seen');
-        
+
         if (hasSeenWelcome) {
             // User has seen it before, don't show
             return;
@@ -1263,9 +1263,9 @@ class CitranaApp {
         const loadingInterval = setInterval(() => {
             progress += Math.random() * 15; // Random progress increments
             if (progress > 100) progress = 100;
-            
+
             welcomeLoadingFill.style.width = progress + '%';
-            
+
             if (progress < 30) {
                 welcomeLoadingText.textContent = 'Loading Citrana...';
             } else if (progress < 60) {
@@ -1275,7 +1275,7 @@ class CitranaApp {
             } else {
                 welcomeLoadingText.textContent = 'Ready!';
             }
-            
+
             if (progress >= 100) {
                 clearInterval(loadingInterval);
                 // Don't auto-close - let user close manually

@@ -1605,10 +1605,10 @@ body {
   height: 18px;
 }
 
-  .welcome-modal-body {
-    text-align: center;
-    padding-bottom: 16px;
-  }
+.welcome-modal-body {
+  text-align: center;
+  padding-bottom: 16px;
+}
 
 .welcome-logo-container {
   margin-bottom: 24px;

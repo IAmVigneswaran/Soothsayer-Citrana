@@ -61,6 +61,8 @@ This codebase is developed using AI agents.
 
 ## Usage Guide
 
+Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
+
 ### Creating Your First Chart
 
 1. **Choose Chart Type**: Select between South Indian or North Indian layout
@@ -71,11 +73,9 @@ This codebase is developed using AI agents.
 
 ### Browser Compatibility
 
-Citrana is best used in desktop browsers (Chrome, Firefox, Safari, Edge) for optimal performance and full feature access.
+Citrana is best used in desktop browsers (Brave, Chrome, Firefox, Safari, Edge) for optimal performance and full feature access. For Brave browser, you would need to disable Brave Shields to use.
 
-Mobile Browser Support: There is extremely limited support for mobile browsers. Low to zero/minimal support is provided for mobile browsers due to their constraints and limitations. For the best experience, please use Citrana on desktop browsers.
-
-Mobile Drawing Tools: The drawing tools are not currently available on mobile devices. Users can utilise iOS or Android's built-in annotation tools for additional markups on exported images.
+Mobile Browser Support: Citrana is not supported on mobile devices. Please do not email about mobile support.
 
 ### Chart Types
 
@@ -111,13 +111,12 @@ Undo/Redo: Use Ctrl+Z and Ctrl+Y to undo and redo your actions. All changes are 
 
 ## Browser Compatibility
 
-- **Desktop**: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- **Desktop**: Brave, Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- **Note**: For Brave browser, disable Brave Shields for optimal functionality
 
 > [!IMPORTANT]
-> **Mobile Browser Limitations:**
-> - Limited support for mobile browsers
-> - Some advanced features may not work on mobile browsers
-> - Performance may vary on low-end mobile devices
+> **Mobile Support:**
+> - Citrana is not supported on mobile devices
 
 ## Credits
 

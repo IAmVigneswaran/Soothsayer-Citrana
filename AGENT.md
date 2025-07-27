@@ -23,17 +23,17 @@ Soothsayer-Citrana/
 ├── index.html                    # Main application entry point
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (1652 lines)
+│   │   └── styles.css            # Complete styling system (2176 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (1145 lines)
-│   │   ├── chart-coordinator.js  # Chart type management (261 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (961 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (921 lines)
-│   │   ├── planet-system.js      # Planet library and drag-drop (876 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1909 lines)
-│   │   ├── context-menu.js       # Context menu system (534 lines)
-│   │   ├── edit-ui.js            # Edit interface controls (786 lines)
-│   │   └── utils.js              # Utility functions (340 lines)
+│   │   ├── app.js                # Main application coordinator (1289 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (275 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (1031 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (977 lines)
+│   │   ├── planet-system.js      # Planet library and drag-drop (878 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1910 lines)
+│   │   ├── context-menu.js       # Context menu system (536 lines)
+│   │   ├── edit-ui.js            # Edit interface controls (814 lines)
+│   │   └── utils.js              # Utility functions (343 lines)
 │   ├── images/
 │   │   ├── soothsayer_citrana_social-preview.jpg  # Social media preview image
 │   │   ├── Soothsayer-Citrana-Full-Logo-Black.png  # Full logo in black
@@ -306,7 +306,7 @@ Provides right-click and long-press context menus for chart interaction.
 - Implements mobile-friendly touch interactions
 
 **Menu Types:**
-- Chart Creation Menu: Create new charts
+- Chart Creation Menu: Create new charts and clear canvas
 - House Menu: House-specific actions (set Lagna, clear house)
 - Planet Menu: Planet-specific actions (edit, delete, retrograde)
 - Existing Chart Menu: Chart management options
@@ -397,14 +397,14 @@ Provides utility functions for common operations across the application.
 - **Touch Support**: Mobile-friendly touch interactions with visual feedback
 
 ### Drawing Tools
-- **Select Tool**: Choose and modify existing elements with Edit UI
-- **Arrow Tool**: Create directional indicators with customisable arrowheads and control points
-- **Line Tool**: Draw straight lines and connections with control points
-- **Pen Tool**: Freehand drawing for annotations
-- **Text Tool**: Add editable text boxes anywhere on canvas
-- **Heading Tool**: Create chart headings and titles
-- **Undo/Redo**: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
-- **Control Points**: Draggable handles for adjusting start and end points of arrows and lines
+- Select Tool: Choose and modify existing elements with Edit UI
+- Arrow Tool: Create directional indicators with customisable arrowheads and control points
+- Line Tool: Draw straight lines and connections with control points
+- Pen Tool: Freehand drawing for annotations
+- Text Tool: Add editable text boxes anywhere on canvas
+- Heading Tool: Create chart headings and titles
+- Undo/Redo: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+- Control Points: Draggable handles for adjusting start and end points of arrows and lines
 
 ### Control Points Feature
 The control points system provides precise adjustment capabilities for arrow and line elements:
@@ -424,39 +424,41 @@ The control points system provides precise adjustment capabilities for arrow and
 - Automatic cleanup when elements are deselected or deleted
 
 ### User Experience
-- **Dark/Light Theme**: Automatic system preference detection with manual toggle
-- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Keyboard Shortcuts**: Power user features for efficiency
-- **Context Menus**: Right-click and long-press for quick actions
-- **Status Updates**: Real-time feedback and notifications
-- **Auto-Save**: Automatic chart data persistence every 30 seconds
+- Light Theme: Clean, professional appearance with high contrast
+- Responsive Design: Optimised for desktop, tablet, and mobile devices
+- Keyboard Shortcuts: Power user features for efficiency
+- Context Menus: Right-click and long-press for quick actions
+- Status Updates: Real-time feedback and notifications
+- Auto-Save: Automatic chart data persistence every 30 seconds
+- About Modal: Information about Citrana with creator details and links
+- Welcome Modal: First-time user experience with getting started guide
 
 ### Export & Sharing
-- **High-Resolution PNG**: Professional quality exports (300 DPI)
-- **Auto-Save**: Chart data saved to localStorage
-- **Cross-Platform**: Works on all modern browsers
-- **GitHub Pages Compatible**: No build process required
+- High-Resolution PNG: Professional quality exports (300 DPI)
+- Auto-Save: Chart data saved to localStorage
+- Cross-Platform: Works on all modern browsers
+- GitHub Pages Compatible: No build process required
 
 ## Browser Compatibility
 
-- **Desktop**: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
-- **Mobile**: iOS Safari 13+, Android Chrome 80+
-- **Features**: Canvas API, localStorage, ES6 modules, Touch Events
+- Desktop: Brave, Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- Note: For Brave browser, disable Brave Shields for optimal functionality
+- Features: Canvas API, localStorage, ES6 modules, Touch Events
 
-**Mobile Browser Limitations:**
-- Limited support for older mobile browsers
-- Some advanced features may not work on older iOS Safari versions
-- Touch interactions optimized for modern mobile browsers
-- Performance may vary on low-end mobile devices
+**Mobile Support:**
+- Citrana is not supported on mobile devices
 
-## Performance Optimization
+**Special Note on Mobile Support:**
+While the codebase might have limited support for mobile, officially it is advertised as mobile is not supported due to its complexity and limited resources. Project owners have to acquire various mobile devices with different screen sizes. It is not a practical task for a free and open-source application.
 
-- **Efficient Canvas Rendering**: Konva.js optimization
-- **Debounced Resize Handlers**: 250ms debouncing
-- **Optimized Planet Placement**: Efficient algorithms
-- **Minimal DOM Manipulation**: Canvas-based rendering
-- **Smart Auto-Save**: 30-second intervals
-- **Touch Event Optimization**: Mobile performance
+## Performance Optimisation
+
+- Efficient Canvas Rendering: Konva.js optimisation
+- Debounced Resize Handlers: 250ms debouncing
+- Optimised Planet Placement: Efficient algorithms
+- Minimal DOM Manipulation: Canvas-based rendering
+- Smart Auto-Save: 30-second intervals
+- Touch Event Optimisation: Mobile performance
 
 ## Development Guidelines
 
@@ -490,9 +492,9 @@ All JavaScript and CSS files use a standardised comment header format:
 - Test on multiple browsers and devices
 - Ensure touch and mouse support
 - Validate responsive design
-- Check performance on mobile devices
+- Check performance on desktop devices
 
-## Customization Guidelines
+## Customisation Guidelines
 
 ### Adding New Planets
 Edit the planets objects in assets/js/planet-system.js:
@@ -781,16 +783,16 @@ Edit the planets objects in assets/js/planet-system.js:
 ```
 
 ### Modifying Chart Styles
-- House colors and borders in chart template files
+- House colours and borders in chart template files
 - Grid line styles and text formatting
 - Layout dimensions and spacing
-- Theme colors and visual elements
+- Theme colours and visual elements
 
-### Theme Customization
+### Theme Customisation
 - Modify assets/css/styles.css for custom component styles
-- Update color schemes in JavaScript files
+- Update colour schemes in JavaScript files
 - Add new theme variants
-- Customize responsive breakpoints
+- Customise responsive breakpoints
 
 ## Important Notes
 
