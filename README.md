@@ -87,7 +87,7 @@ North Indian Chart: Diamond layout with dynamic positioning. Right-click any hou
 
 Adding Planets: Drag Grahas from the Graha Library (top-left) to chart houses. You can place the same Graha multiple times. Double-click any Graha to open a floating editing panel where you can modify text and set it as retrograde (a small "r" subscript will appear).
 
-Custom Graha: There is also a "Custom" Graha available in the library. Drag and drop it into any house, then double-click to edit the name. There is a maximum character limit of 6 characters for all Graha names.
+Custom Graha: There is also a "Custom" Graha available in the library. Drag and drop it into any house, then double-click to edit the name. There is a maximum character limit of 8 characters for all Graha names.
 
 ### Drawing and Navigation
 

@@ -192,6 +192,9 @@ class DrawingTools {
     stopDrawing() {
         if (!this.isDrawing) return;
 
+        // Store the current tool before resetting it
+        const completedTool = this.currentTool;
+
         // Add the completed shape to undo stack
         if (this.currentShape) {
             this.addToUndoStack(this.currentShape, 'add');
@@ -208,6 +211,11 @@ class DrawingTools {
         // Trigger snapshot for undo/redo
         if (window.app && window.app.pushSnapshot) {
             window.app.pushSnapshot();
+        }
+
+        // Auto-switch to Select Tool for Arrow and Line tools
+        if (window.app && (completedTool === 'arrow' || completedTool === 'line')) {
+            window.app.setTool('select');
         }
 
         console.log('Drawing stopped');
@@ -1412,7 +1420,7 @@ class DrawingTools {
                 const newText = textEditInput.value.trim();
                 const newColor = textEditColor.value;
                 const baseText = newText.replace(/ᵣ/g, ''); // Remove R subscript for length check
-                if (newText && baseText.length <= 6) {
+                if (newText && baseText.length <= 8) {
                     // Update the planet label through callback
                     if (onUpdate) {
                         onUpdate(newText, newColor);
@@ -1507,11 +1515,11 @@ class DrawingTools {
         const handleInput = () => {
             let newText = textEditInput.value;
 
-            // Enforce 6 character limit, but allow "ᵣ" to be added beyond it
+            // Enforce 8 character limit, but allow "ᵣ" to be added beyond it
             const baseText = newText.replace(/ᵣ/g, ''); // Remove R subscript for length check
-            if (baseText.length > 6) {
+            if (baseText.length > 8) {
                 // If base text is too long, truncate it but preserve R subscript if it was there
-                const truncatedBase = baseText.substring(0, 6);
+                const truncatedBase = baseText.substring(0, 8);
                 const hasR = newText.includes('ᵣ');
                 newText = hasR ? truncatedBase + 'ᵣ' : truncatedBase;
                 textEditInput.value = newText;
