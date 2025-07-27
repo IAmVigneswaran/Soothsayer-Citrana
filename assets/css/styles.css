@@ -1607,7 +1607,7 @@ body {
 
   .welcome-modal-body {
     text-align: center;
-    padding-bottom: 12px;
+    padding-bottom: 16px;
   }
 
 .welcome-logo-container {
@@ -1773,14 +1773,14 @@ body {
 
   /* Mobile: Smaller welcome modal */
   .welcome-modal-content {
-    max-width: 85%;
-    max-height: 85vh;
-    padding: 16px;
+    max-width: 90%;
+    max-height: 90vh;
+    padding: 20px;
     overflow-y: auto;
   }
 
   .welcome-logo {
-    max-width: 180px;
+    max-width: 220px;
   }
 
   .welcome-app-name {
