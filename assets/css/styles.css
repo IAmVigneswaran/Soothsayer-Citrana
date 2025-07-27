@@ -1534,6 +1534,190 @@ body {
   margin: 0;
 }
 
+/* Welcome Modal Styles */
+.welcome-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.welcome-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.welcome-modal-content {
+  background: white;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.welcome-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.welcome-modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+.welcome-modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.welcome-modal-close:hover {
+  background: #000000;
+  color: white;
+}
+
+.welcome-modal-close i {
+  width: 18px;
+  height: 18px;
+}
+
+.welcome-modal-body {
+  text-align: center;
+}
+
+.welcome-logo-container {
+  margin-bottom: 24px;
+}
+
+.welcome-logo {
+  max-width: 400px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.welcome-divider {
+  width: 100%;
+  height: 1px;
+  background: #000000;
+  margin: 24px 0;
+}
+
+.welcome-content {
+  text-align: center;
+}
+
+.welcome-app-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 8px 0;
+}
+
+.welcome-getting-started {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin: 16px 0 12px 0;
+}
+
+.welcome-instructions {
+  text-align: left;
+  margin: 16px 0;
+}
+
+.welcome-instructions-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 12px 0;
+}
+
+.welcome-steps {
+  font-size: 14px;
+  color: #495057;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  padding-left: 20px;
+  list-style-type: decimal;
+}
+
+.welcome-steps li {
+  margin-bottom: 8px;
+}
+
+.welcome-help-note {
+  font-size: 14px;
+  color: #495057;
+  margin: 16px 0 8px 0;
+  font-style: italic;
+}
+
+.welcome-browser-note {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 8px 0 16px 0;
+  font-style: italic;
+}
+
+.welcome-copyright {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 24px 0 16px 0;
+  text-align: center;
+}
+
+.welcome-loading-container {
+  margin-top: 20px;
+}
+
+.welcome-loading-bar {
+  width: 100%;
+  height: 4px;
+  background: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.welcome-loading-fill {
+  height: 100%;
+  background: #000000;
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.welcome-loading-text {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
 /* Mobile: Smaller about modal */
 @media (max-width: 768px) {
   .about-modal-content {
@@ -1584,6 +1768,65 @@ body {
   .about-copyright {
     font-size: 11px;
     margin-bottom: 8px;
+  }
+
+  /* Mobile: Smaller welcome modal */
+  .welcome-modal-content {
+    max-width: 90%;
+    max-height: 95vh;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .welcome-logo {
+    max-width: 220px;
+  }
+
+  .welcome-app-name {
+    font-size: 18px;
+  }
+
+  .welcome-getting-started {
+    font-size: 16px;
+    margin: 12px 0 8px 0;
+  }
+
+  .welcome-instructions-title {
+    font-size: 14px;
+    margin: 0 0 8px 0;
+  }
+
+  .welcome-steps {
+    font-size: 12px;
+    margin: 0 0 12px 0;
+    padding-left: 16px;
+  }
+
+  .welcome-steps li {
+    margin-bottom: 6px;
+  }
+
+  .welcome-help-note {
+    font-size: 12px;
+    margin: 12px 0 6px 0;
+  }
+
+  .welcome-browser-note {
+    font-size: 10px;
+    margin: 6px 0 12px 0;
+  }
+
+  .welcome-copyright {
+    font-size: 11px;
+    margin: 16px 0 12px 0;
+  }
+
+  .welcome-loading-container {
+    margin-top: 16px;
+  }
+
+  .welcome-loading-text {
+    font-size: 11px;
   }
 }
 
