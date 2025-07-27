@@ -1773,9 +1773,10 @@ body {
   /* Mobile: Smaller welcome modal */
   .welcome-modal-content {
     max-width: 90%;
-    max-height: 95vh;
+    max-height: 85vh;
     padding: 20px;
     overflow-y: auto;
+    margin: 20px 0;
   }
 
   .welcome-logo {
@@ -1823,10 +1824,12 @@ body {
 
   .welcome-loading-container {
     margin-top: 16px;
+    margin-bottom: 8px;
   }
 
   .welcome-loading-text {
     font-size: 11px;
+    margin-bottom: 8px;
   }
 }
 
