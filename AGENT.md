@@ -35,7 +35,10 @@ Soothsayer-Citrana/
 │   │   ├── edit-ui.js            # Edit interface controls (786 lines)
 │   │   └── utils.js              # Utility functions (340 lines)
 │   ├── images/
-│   │   └── soothsayer_social-preview.jpg  # Social media preview image
+│   │   ├── soothsayer_citrana_social-preview.jpg  # Social media preview image
+│   │   ├── Soothsayer-Citrana-Full-Logo-Black.png  # Full logo in black
+│   │   ├── Soothsayer-Citrana-Full-Logo-White.png  # Full logo in white
+│   │   └── Soothsayer-Logo-Black.png  # Compact logo in black
 │   ├── svgs/
 │   │   ├── north-indian.svg      # North Indian chart template
 │   │   └── south-indian.svg      # South Indian chart template
