@@ -31,6 +31,48 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install minification tools
+        run: |
+          npm install -g clean-css-cli terser
+      
+      - name: Minify CSS
+        run: |
+          cleancss -o assets/css/styles.min.css assets/css/styles.css
+      
+      - name: Minify local JavaScript files
+        run: |
+          terser assets/js/app.js -o assets/js/app.min.js --compress --mangle
+          terser assets/js/chart-coordinator.js -o assets/js/chart-coordinator.min.js --compress --mangle
+          terser assets/js/chart-templates-south.js -o assets/js/chart-templates-south.min.js --compress --mangle
+          terser assets/js/chart-templates-north.js -o assets/js/chart-templates-north.min.js --compress --mangle
+          terser assets/js/planet-system.js -o assets/js/planet-system.min.js --compress --mangle
+          terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
+          terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
+          terser assets/js/edit-ui.js -o assets/js/edit-ui.min.js --compress --mangle
+          terser assets/js/utils.js -o assets/js/utils.min.js --compress --mangle
+      
+      - name: Update HTML to use minified local files only
+        run: |
+          # Update CSS reference
+          sed -i 's|href="assets/css/styles.css"|href="assets/css/styles.min.css"|g' index.html
+          
+          # Update only local JS files (not CDN files)
+          sed -i 's|src="assets/js/utils.js"|src="assets/js/utils.min.js"|g' index.html
+          sed -i 's|src="assets/js/chart-templates-south.js"|src="assets/js/chart-templates-south.min.js"|g' index.html
+          sed -i 's|src="assets/js/chart-templates-north.js"|src="assets/js/chart-templates-north.min.js"|g' index.html
+          sed -i 's|src="assets/js/chart-coordinator.js"|src="assets/js/chart-coordinator.min.js"|g' index.html
+          sed -i 's|src="assets/js/planet-system.js"|src="assets/js/planet-system.min.js"|g' index.html
+          sed -i 's|src="assets/js/drawing-tools.js"|src="assets/js/drawing-tools.min.js"|g' index.html
+          sed -i 's|src="assets/js/edit-ui.js"|src="assets/js/edit-ui.min.js"|g' index.html
+          sed -i 's|src="assets/js/context-menu.js"|src="assets/js/context-menu.min.js"|g' index.html
+          sed -i 's|src="assets/js/app.js"|src="assets/js/app.min.js"|g' index.html
+      
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
