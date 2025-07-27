@@ -1,4 +1,8 @@
 <p align="center">
+  <p>
+  <img alt="Citrana Logo" src="https://raw.githubusercontent.com/IAmVigneswaran/Soothsayer-Citrana/main/assets/images/Soothsayer-Citrana-Full-Logo-Black.png#gh-light-mode-only">
+  <img alt="Citrana Logo" src="https://raw.githubusercontent.com/IAmVigneswaran/Soothsayer-Citrana/main/assets/images/Soothsayer-Citrana-Full-Logo-White.png#gh-dark-mode-only">
+  </p>
   <h1 align="center">Citrana</h1>
 </p>
 
