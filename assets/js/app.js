@@ -1,7 +1,8 @@
 /**
- * Main Application Class - Konva.js Implementation
- * Coordinates all components and manages the application lifecycle
- * Citrana Web Application
+ * app.js
+ * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
+ * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * Main application coordinator that manages all components and application lifecycle
  */
 class CitranaApp {
     constructor() {

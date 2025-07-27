@@ -1,5 +1,7 @@
 /**
- * Chart Coordinator Class
+ * chart-coordinator.js
+ * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
+ * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
  * Coordinates between South Indian and North Indian chart templates
  */
 class ChartCoordinator {

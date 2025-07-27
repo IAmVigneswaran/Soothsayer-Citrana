@@ -1,3 +1,10 @@
+/**
+ * styles.css
+ * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
+ * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * Complete styling system for the Citrana application
+ */
+
 /* Base Styles */
 * {
   margin: 0;
@@ -1537,7 +1544,7 @@ body {
   }
   
   .about-logo {
-    max-width: 180px;
+    max-width: 220px;
   }
   
   .about-app-name {

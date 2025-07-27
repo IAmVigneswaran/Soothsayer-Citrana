@@ -1,5 +1,7 @@
 /**
- * Planet System Class
+ * planet-system.js
+ * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
+ * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
  * Manages planet library, floating Graha Library UI, and drag-and-drop functionality
  */
 class PlanetSystem {

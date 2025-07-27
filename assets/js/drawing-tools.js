@@ -1,7 +1,8 @@
 /**
- * Drawing Tools Class
- * Handles all drawing functionality (arrow, line, pen, text)
- * 100% precise and accurate to mouse position
+ * drawing-tools.js
+ * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
+ * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * Handles all drawing functionality with precise mouse positioning and control points
  */
 class DrawingTools {
     constructor(stage, layer) {

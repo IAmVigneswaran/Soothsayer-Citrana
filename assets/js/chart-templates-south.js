@@ -1,5 +1,7 @@
 /**
- * South Indian Chart Template Class
+ * chart-templates-south.js
+ * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
+ * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
  * Handles South Indian chart layout and functionality
  */
 class SouthIndianChartTemplate {

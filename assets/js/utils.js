@@ -1,6 +1,8 @@
 /**
- * Utility Functions for Citrana Web Application
- * Konva.js Implementation
+ * utils.js
+ * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
+ * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * Utility functions for common operations across the application
  */
 
 /**
