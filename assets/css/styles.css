@@ -1420,7 +1420,8 @@ body {
 }
 
 .about-modal-close:hover {
-  background: #f1f3f4;
+  background: #000000;
+  color: white;
 }
 
 .about-modal-close i {
