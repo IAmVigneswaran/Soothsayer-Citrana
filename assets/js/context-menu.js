@@ -291,9 +291,10 @@ class ContextMenu {
             `;
             }
         }
-        // Add 'Reset Chart' and 'Clear Canvas' (renamed from 'Clear Chart')
+        // Add 'Reset Chart', 'Reset Drawings', and 'Clear Canvas' (renamed from 'Clear Chart')
         menuHtml += `
-            <div class="context-menu-item" data-action="reset-chart"><i data-lucide="refresh-ccw"></i> Reset Chart</div>
+            <div class="context-menu-item" data-action="reset-chart"><i data-lucide="trash-2"></i> Reset Chart</div>
+            <div class="context-menu-item" data-action="reset-drawings"><i data-lucide="trash-2"></i> Reset Drawings</div>
             <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>
         `;
         this.menu.innerHTML = menuHtml;
@@ -436,14 +437,21 @@ class ContextMenu {
 
             case 'clear-chart':
                 window.app.showConfirmationDialog(
-                    'This will completely clear the entire chart, including all planets, drawings, and chart structure. This action cannot be undone.',
+                    'This will completely clear the entire canvas, removing all charts, planets, drawings, and any other content. The canvas will be returned to its initial blank state. This action cannot be undone.',
                     () => window.app.clearChart()
                 );
                 break;
             case 'reset-chart':
                 window.app.showConfirmationDialog(
-                    'This will reset the chart by removing all planets and drawings, but keep the chart structure intact. This action cannot be undone.',
+                    'This will reset the current chart by removing all planets and drawing elements (arrows, lines, pen strokes, text, and headings), but will preserve the chart structure and layout. The chart type (South Indian or North Indian) will remain the same. This action cannot be undone.',
                     () => window.app.resetChart()
+                );
+                break;
+
+            case 'reset-drawings':
+                window.app.showConfirmationDialog(
+                    'This will remove all drawing elements (arrows, lines, pen strokes, text annotations, and headings) from the chart. The chart structure and all placed planets will remain unchanged. This action cannot be undone.',
+                    () => window.app.resetDrawings()
                 );
                 break;
 

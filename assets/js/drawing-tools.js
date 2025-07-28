@@ -687,13 +687,15 @@ class DrawingTools {
     }
 
     clearAll() {
-        // Clear all drawing objects
-        const shapes = this.layer.find('*');
-        shapes.forEach(shape => {
-            if (shape.name() && shape.name().startsWith('drawing-')) {
-                shape.destroy();
-            }
+        // Clear all drawing objects using the same method as updateDrawingObjectsDraggable
+        const drawingObjects = this.layer.find(node =>
+            node.name() && node.name().startsWith('drawing-')
+        );
+        
+        drawingObjects.forEach(shape => {
+            shape.destroy();
         });
+        
         this.clearSelection();
         this.clearControlPoints();
         this.layer.batchDraw();
