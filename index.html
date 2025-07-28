@@ -6,7 +6,7 @@
    <head>
       <!-- Primary Meta Tags -->
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0, minimum-scale=0.1, viewport-fit=cover">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui, viewport-fit=cover">
       <title>Citrana by Vigneswaran Rajkumar</title>
       <meta name="robots" content="noarchive">
       <meta name="googlebot" content="noarchive">
@@ -32,8 +32,8 @@
       <!-- apple -->
       <meta name="apple-mobile-web-app-title" content="Citrana">
       <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-status-bar-style" content="default">
       <meta name="theme-color" content="#000000">
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
       <!-- stylesheets -->
       <link rel="stylesheet" href="assets/css/styles.css">
       <!-- favicon -->
@@ -77,6 +77,35 @@
          })(window,document,'script','dataLayer','GTM-MNSV7LM4');
       </script>
       <!-- End Google Tag Manager -->
+      <!-- iOS Full Screen Support -->
+      <script>
+         // Detect if running in standalone mode (added to home screen)
+         if (window.navigator.standalone === true) {
+            document.documentElement.classList.add('standalone');
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+               const now = (new Date()).getTime();
+               if (now - lastTouchEnd <= 300) {
+                  event.preventDefault();
+               }
+               lastTouchEnd = now;
+            }, false);
+         }
+         
+         // Prevent zoom on iOS
+         document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+         });
+         
+         document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+         });
+         
+         document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+         });
+      </script>
    </head>
    <body class="bg-white text-gray-900">
       <!-- Google Tag Manager (noscript) -->
