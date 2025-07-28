@@ -75,7 +75,7 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 
 Citrana is best used in desktop browsers (Brave, Chrome, Firefox, Safari, Edge) for optimal performance and full feature access. For Brave browser, you would need to disable Brave Shields to use.
 
-Mobile Browser Support: Citrana is not supported on mobile devices. Please do not email about mobile support.
+Mobile Browser Support: Citrana is not supported on mobile devices.
 
 ### Chart Types
 
