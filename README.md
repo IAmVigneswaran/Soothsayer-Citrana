@@ -38,6 +38,8 @@ This codebase is developed using AI agents.
 
 ## Table of Contents
 
+- [Demo](#demo)
+- [Screenshot](#screenshot)
 - [Quick Start](#quick-start)
 - [Usage Guide](#usage-guide)
   - [Creating Your First Chart](#creating-your-first-chart)
@@ -52,6 +54,30 @@ This codebase is developed using AI agents.
 - [License](#license)
 - [Reporting Bugs](#reporting-bugs)
 - [Contribution](#contribution)
+
+## Demo
+
+<details><summary>Creating North Indian Chart (English)</summary>
+<p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-north-indian-chart.gif?raw=true"> </p>
+</p>
+</details>
+
+<details><summary>Creating South Indian Chart (Tamil)</summary>
+<p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-tamil-south-indian-chart.gif?raw=true"> </p>
+</p>
+</details>
+
+<details><summary>Creating North Indian Chart (Hindi)</summary>
+<p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-hindi-north-indian-chart.gif?raw=true"> </p>
+</p>
+</details>
+
+## Screenshot
+
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/citrana-browser-screenshot.png?raw=true"> </p>
 
 ## Quick Start
 
