@@ -75,6 +75,8 @@ This codebase is developed using AI agents.
 </p>
 </details>
 
+Note: Bhagwan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's interpretation and insghts.
+
 ## Screenshot
 
 <p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/citrana-browser-screenshot.png?raw=true"> </p>
