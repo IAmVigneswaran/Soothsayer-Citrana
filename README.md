@@ -135,15 +135,6 @@ Session Management: All sessions are ephemeral. The moment the browser refreshes
 
 Undo/Redo: Use Ctrl+Z and Ctrl+Y to undo and redo your actions. All changes are automatically saved to your browser's local storage.
 
-## Browser Compatibility
-
-- **Desktop**: Brave, Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
-- **Note**: For Brave browser, disable Brave Shields for optimal functionality
-
-> [!IMPORTANT]
-> **Mobile Support:**
-> - Citrana is not supported on mobile devices
-
 ## Credits
 
 Created by [Vigneswaran Rajkumar](https://soothsayer.life)
