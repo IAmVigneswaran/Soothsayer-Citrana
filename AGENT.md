@@ -30,10 +30,9 @@ Soothsayer-Citrana/
 │   │   ├── chart-templates-south.js  # South Indian chart logic (1031 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (977 lines)
 │   │   ├── planet-system.js      # Planet library and drag-drop (878 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1920 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1927 lines)
 │   │   ├── context-menu.js       # Context menu system (544 lines)
-│   │   ├── edit-ui.js            # Edit interface controls (814 lines)
-│   │   └── utils.js              # Utility functions (343 lines)
+│   │   └── edit-ui.js            # Edit interface controls (814 lines)
 │   ├── images/
 │   │   ├── soothsayer_citrana_social-preview.jpg  # Social media preview image
 │   │   ├── Soothsayer-Citrana-Full-Logo-Black.png  # Full logo in black
@@ -359,25 +358,7 @@ Provides context-sensitive editing controls for drawing elements.
 - `updateFontSize()`: Modify text properties
 - `positionEditUI()`: Position interface
 
-### Utils (utils.js - 340 lines)
-Provides utility functions for common operations across the application.
 
-**Key Responsibilities:**
-- Provides debouncing and throttling functions
-- Manages status updates and notifications
-- Handles localStorage operations
-- Provides export functionality
-- Implements coordinate calculations
-- Manages file operations
-
-**Key Functions:**
-- `debounce()`: Performance optimization
-- `showNotification()`: User feedback
-- `saveChartData()`: Data persistence
-- `exportCanvasAsPNG()`: Chart export
-- `distance()`: Coordinate calculations
-- `generateId()`: Unique ID generation
-- `isMobile()`: Device detection
 
 ## Core Features
 
@@ -464,7 +445,7 @@ While the codebase might have limited support for mobile, officially it is adver
 ## Performance Optimisation
 
 - Efficient Canvas Rendering: Konva.js optimisation
-- Debounced Resize Handlers: 250ms debouncing
+- Optimized resize handlers
 - Optimised Planet Placement: Efficient algorithms
 - Minimal DOM Manipulation: Canvas-based rendering
 - Smart Auto-Save: 30-second intervals
@@ -914,7 +895,6 @@ To enable minification for production builds, add these steps to `.github/workfl
     terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
     terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
     terser assets/js/edit-ui.js -o assets/js/edit-ui.min.js --compress --mangle
-    terser assets/js/utils.js -o assets/js/utils.min.js --compress --mangle
 
 - name: Update HTML to use minified local files only
   run: |
@@ -922,7 +902,6 @@ To enable minification for production builds, add these steps to `.github/workfl
     sed -i 's|href="assets/css/styles.css"|href="assets/css/styles.min.css"|g' index.html
     
     # Update only local JS files (not CDN files)
-    sed -i 's|src="assets/js/utils.js"|src="assets/js/utils.min.js"|g' index.html
     sed -i 's|src="assets/js/chart-templates-south.js"|src="assets/js/chart-templates-south.min.js"|g' index.html
     sed -i 's|src="assets/js/chart-templates-north.js"|src="assets/js/chart-templates-north.min.js"|g' index.html
     sed -i 's|src="assets/js/chart-coordinator.js"|src="assets/js/chart-coordinator.min.js"|g' index.html
@@ -1007,7 +986,6 @@ jobs:
           terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
           terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
           terser assets/js/edit-ui.js -o assets/js/edit-ui.min.js --compress --mangle
-          terser assets/js/utils.js -o assets/js/utils.min.js --compress --mangle
       
       - name: Update HTML to use minified local files only
         run: |
@@ -1015,7 +993,6 @@ jobs:
           sed -i 's|href="assets/css/styles.css"|href="assets/css/styles.min.css"|g' index.html
           
           # Update only local JS files (not CDN files)
-          sed -i 's|src="assets/js/utils.js"|src="assets/js/utils.min.js"|g' index.html
           sed -i 's|src="assets/js/chart-templates-south.js"|src="assets/js/chart-templates-south.min.js"|g' index.html
           sed -i 's|src="assets/js/chart-templates-north.js"|src="assets/js/chart-templates-north.min.js"|g' index.html
           sed -i 's|src="assets/js/chart-coordinator.js"|src="assets/js/chart-coordinator.min.js"|g' index.html
