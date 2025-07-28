@@ -1127,17 +1127,17 @@ class CitranaApp {
     resetDrawings() {
         // Clear only the drawings (arrows, lines, pen strokes, text, headings)
         this.drawingTools.clearAll();
-        
+
         // Clear any selected shapes
         if (this.selectedShape) {
             this.selectedShape = null;
         }
-        
+
         // Hide edit UI if it's showing
         if (window.editUI) {
             window.editUI.hide();
         }
-        
+
         this.layer.batchDraw();
         console.log('Drawings reset: all drawing elements cleared while keeping chart structure and planets');
     }

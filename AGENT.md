@@ -25,13 +25,13 @@ Soothsayer-Citrana/
 │   ├── css/
 │   │   └── styles.css            # Complete styling system (2177 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (1303 lines)
+│   │   ├── app.js                # Main application coordinator (1322 lines)
 │   │   ├── chart-coordinator.js  # Chart type management (275 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (1031 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (977 lines)
 │   │   ├── planet-system.js      # Planet library and drag-drop (878 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1917 lines)
-│   │   ├── context-menu.js       # Context menu system (536 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1920 lines)
+│   │   ├── context-menu.js       # Context menu system (544 lines)
 │   │   ├── edit-ui.js            # Edit interface controls (814 lines)
 │   │   └── utils.js              # Utility functions (343 lines)
 │   ├── images/

@@ -691,11 +691,11 @@ class DrawingTools {
         const drawingObjects = this.layer.find(node =>
             node.name() && node.name().startsWith('drawing-')
         );
-        
+
         drawingObjects.forEach(shape => {
             shape.destroy();
         });
-        
+
         this.clearSelection();
         this.clearControlPoints();
         this.layer.batchDraw();
