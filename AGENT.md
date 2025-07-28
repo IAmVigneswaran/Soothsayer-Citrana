@@ -382,11 +382,16 @@ Provides utility functions for common operations across the application.
 ## Core Features
 
 ### Chart Types
-- **South Indian Chart**: Traditional 4x4 square grid layout with center empty space
-- **North Indian Chart**: Diamond-shaped polygon layout with dynamic positioning
-- **Lagna Setting**: Right-click context menu to set any house as Lagna (Ascendant)
-- **First House Selection**: For North Indian charts, designate any house as first house
-- **Dynamic House Numbering**: Automatic renumbering based on Lagna position
+- South Indian Chart: Traditional 4x4 square grid layout with centre empty space
+- North Indian Chart: Diamond-shaped polygon layout with dynamic positioning
+- Lagna Setting: Right-click context menu to set any house as Lagna (Ascendant)
+- First House Selection: For North Indian charts, designate any house as first house
+- Dynamic House Numbering: Automatic renumbering based on Lagna position
+
+### Chart Management Actions
+- Clear Canvas: Removes everything (charts, planets, drawings) and returns to blank canvas
+- Reset Chart: Removes planets and drawings, but keeps chart structure/layout
+- Reset Drawings: Removes only drawings, keeps planets and chart structure
 
 ### Planet Management
 - **51 Major Grahas**: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
