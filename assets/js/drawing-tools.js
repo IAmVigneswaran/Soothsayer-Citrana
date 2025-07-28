@@ -66,6 +66,13 @@ class DrawingTools {
     }
 
     /**
+     * Check if device is mobile
+     */
+    isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    /**
      * Get precise mouse/touch position accounting for stage transformations
      * @param {Event|Touch} event - Mouse or touch event
      * @returns {Object} Precise position {x, y}
@@ -1852,7 +1859,7 @@ class DrawingTools {
     createBoundingBox(shape, toolType) {
         // Use larger padding for mobile devices for easier double-tap/selection
         let padding = 15;
-        if (window.Utils && window.Utils.isMobile && window.Utils.isMobile()) {
+        if (this.isMobile()) {
             padding = 40; // Much larger for mobile
         }
         const bounds = shape.getClientRect();
@@ -1903,7 +1910,7 @@ class DrawingTools {
     updateBoundingBox(boundingBox, shape) {
         // Use same padding logic as createBoundingBox
         let padding = 15;
-        if (window.Utils && window.Utils.isMobile && window.Utils.isMobile()) {
+        if (this.isMobile()) {
             padding = 40;
         }
         const bounds = shape.getClientRect();

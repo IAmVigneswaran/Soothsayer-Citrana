@@ -55,7 +55,6 @@ jobs:
           terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
           terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
           terser assets/js/edit-ui.js -o assets/js/edit-ui.min.js --compress --mangle
-          terser assets/js/utils.js -o assets/js/utils.min.js --compress --mangle
       
       - name: Update HTML to use minified local files only
         run: |
@@ -63,7 +62,6 @@ jobs:
           sed -i 's|href="assets/css/styles.css"|href="assets/css/styles.min.css"|g' index.html
           
           # Update only local JS files (not CDN files)
-          sed -i 's|src="assets/js/utils.js"|src="assets/js/utils.min.js"|g' index.html
           sed -i 's|src="assets/js/chart-templates-south.js"|src="assets/js/chart-templates-south.min.js"|g' index.html
           sed -i 's|src="assets/js/chart-templates-north.js"|src="assets/js/chart-templates-north.min.js"|g' index.html
           sed -i 's|src="assets/js/chart-coordinator.js"|src="assets/js/chart-coordinator.min.js"|g' index.html
