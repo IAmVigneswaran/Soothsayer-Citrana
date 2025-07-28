@@ -6,6 +6,7 @@
   <h1 align="center">Citrana</h1>
 </p>
 
+<p align="center"><a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="license"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana"><img src="https://img.shields.io/badge/platform-Web-lightgrey.svg?style=flat" alt="platform"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/static.yml"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/static.yml/badge.svg" alt="deploy"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/codeql.yml"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/codeql.yml/badge.svg" alt="codeql"/></a>&nbsp;<img src="https://img.shields.io/badge/JavaScript-ES6+-yellow.svg?style=flat" alt="JavaScript"/>&nbsp;<img src="https://img.shields.io/badge/HTML5-CSS3-orange.svg?style=flat" alt="HTML5-CSS3"/></p>
 
 Citrana is a whiteboard web application that allows students, gurus, and Vedanga Jyotisha practitioners and researchers to create Janma Kundali (Vedic charts) for study and reference. Built with pure HTML5, CSS3, and JavaScript, this modern, interactive tool provides an intuitive interface for creating both South Indian and North Indian astrological charts with drag-and-drop planet placement and comprehensive drawing tools.
 
