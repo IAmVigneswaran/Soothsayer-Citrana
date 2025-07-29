@@ -333,7 +333,7 @@ class ContextMenu {
             `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}"><i data-lucide="target"></i> Set as Lagna (Ascendant)</div>` +
             `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}"><i data-lucide="home"></i> Set as First House</div>` +
             `<div class="context-menu-separator"></div>` +
-            `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}"><i data-lucide="eraser"></i> Clear House</div>` +
+            `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}"><i data-lucide="trash-2"></i> Clear House</div>` +
             `<div class="context-menu-separator"></div>` +
             `<div class="context-menu-item" data-action="reset-chart"><i data-lucide="refresh-ccw"></i> Reset Chart</div>` +
             `<div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>`;
