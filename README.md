@@ -95,8 +95,8 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 ### Creating Your First Chart
 
 1. **Choose Chart Type**: Select between South Indian or North Indian layout
-2. **Set Lagna**: Right-click any house and select "Set as Lagna (Ascendant)"
-3. **Add Planets**: Drag planets from the sidebar to selected chart Bhava
+2. **Set Lagna**: Right-click any Bhava and select "Set as Lagna (Ascendant)"
+3. **Add Planets**: Drag Graha from Graha Library to selected Bhava
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click "Export" to save your chart in `.png`
 
