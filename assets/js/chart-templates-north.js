@@ -395,7 +395,7 @@ class NorthIndianChartTemplate {
         }
         // Highlight new
         if (this.houseDataNorth[houseNumber]) {
-            this.houseDataNorth[houseNumber].housePolygonNorth.fill('#f3f4f6'); // Tailwind gray-100
+            this.houseDataNorth[houseNumber].housePolygonNorth.fill('#f3f4f6'); // Light grey highlight
             this.selectedHouse = houseNumber;
             this.layer.batchDraw();
         }

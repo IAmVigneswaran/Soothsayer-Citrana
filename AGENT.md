@@ -10,7 +10,7 @@ Citrana is a browser-based application that allows users to create both South In
 
 - Frontend: Pure HTML5, CSS3, JavaScript (ES6+)
 - Graphics: HTML5 Canvas API with Konva.js
-- Styling: Tailwind CSS (CDN) with custom CSS
+- Styling: Custom CSS only
 - Icons: Lucide Icons
 - Storage: Browser localStorage for data persistence
 - Analytics: Google Analytics and Google Tag Manager
@@ -23,7 +23,7 @@ Soothsayer-Citrana/
 ├── index.html                    # Main application entry point
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (2177 lines)
+│   │   └── styles.css            # Complete styling system (2191 lines)
 │   ├── js/
 │   │   ├── app.js                # Main application coordinator (1322 lines)
 │   │   ├── chart-coordinator.js  # Chart type management (275 lines)
@@ -65,8 +65,8 @@ Soothsayer-Citrana/
 ### Main Application (app.js - 1303 lines)
 The central coordinator that manages all application components and lifecycle.
 
-**Key Responsibilities:**
-- Initializes Konva.js stage and layer
+Key Responsibilities:
+- Initialises Konva.js stage and layer
 - Coordinates all component interactions
 - Manages tool selection and drawing state
 - Handles keyboard shortcuts and event listeners
@@ -75,10 +75,10 @@ The central coordinator that manages all application components and lifecycle.
 - Provides mobile touch support and Safari compatibility
 - Manages zoom controls and canvas transformations
 
-**Key Methods:**
-- `init()`: Application initialization
+Key Methods:
+- `init()`: Application initialisation
 - `setupCanvas()`: Konva.js stage setup
-- `setupComponents()`: Component initialization
+- `setupComponents()`: Component initialisation
 - `setupEventListeners()`: Event binding
 - `setupKeyboardShortcuts()`: Keyboard navigation
 - `exportChart()`: High-resolution PNG export
@@ -89,41 +89,41 @@ The central coordinator that manages all application components and lifecycle.
 ### Chart Coordinator (chart-coordinator.js - 261 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
-**Key Responsibilities:**
+Key Responsibilities:
 - Routes operations to appropriate chart template
 - Manages chart type switching
 - Provides unified interface for chart operations
 - Handles chart data persistence and loading
 - Manages zoom operations across chart types
 
-**Key Methods:**
-- `createSouthIndianChart()`: Initialize South Indian layout
-- `createNorthIndianChart()`: Initialize North Indian layout
+Key Methods:
+- `createSouthIndianChart()`: Initialise South Indian layout
+- `createNorthIndianChart()`: Initialise North Indian layout
 - `setLagnaHouse()`: Set ascendant house
 - `setFirstHouse()`: Set first house for North Indian charts
-- `getChartData()`: Serialize chart data
+- `getChartData()`: Serialise chart data
 - `loadChartData()`: Restore chart from data
 
 ### South Indian Chart Template (chart-templates-south.js - 961 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
-**Key Responsibilities:**
-- Creates 4x4 grid layout with center empty space
+Key Responsibilities:
+- Creates 4x4 grid layout with centre empty space
 - Manages house numbering and Lagna indicators
 - Handles planet placement and text scaling
 - Provides house highlighting and selection
 - Manages Rashi and Bhava number boxes
 - Implements context menu functionality for houses
 
-**Key Features:**
+Key Features:
 - Traditional square grid layout
-- Center empty space for annotations
+- Centre empty space for annotations
 - Lagna indicator with diagonal line
 - Dynamic planet text sizing
 - House renumbering based on Lagna position
 - Touch and mouse interaction support
 
-**Key Methods:**
+Key Methods:
 - `createSouthIndianChart()`: Build chart layout
 - `createHouse()`: Create individual house elements
 - `addPlanetToHouse()`: Place planets in houses
@@ -134,7 +134,7 @@ Handles the traditional South Indian chart layout with 4x4 grid structure.
 ### North Indian Chart Template (chart-templates-north.js - 921 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 
-**Key Responsibilities:**
+Key Responsibilities:
 - Creates diamond-shaped polygon layout
 - Manages complex house positioning
 - Handles tiny Rashi number boxes
@@ -142,7 +142,7 @@ Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 - Manages planet placement in polygon houses
 - Implements dynamic house renumbering
 
-**Key Features:**
+Key Features:
 - Diamond-shaped polygon layout
 - Precise house positioning using SVG coordinates
 - Tiny Rashi number boxes with exact positioning
@@ -150,7 +150,7 @@ Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 - Dynamic house renumbering
 - Polygon-based hit detection
 
-**Key Methods:**
+Key Methods:
 - `createNorthIndianChart()`: Build diamond layout
 - `addPlanetToHouse()`: Place planets in polygon houses
 - `setLagnaHouse()`: Set ascendant house
@@ -161,7 +161,7 @@ Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 ### Planet System (planet-system.js - 876 lines)
 Manages the floating planet library and drag-and-drop functionality with paging system.
 
-**Key Responsibilities:**
+Key Responsibilities:
 - Creates and manages floating planet library UI with paging
 - Implements drag-and-drop for planet placement
 - Handles touch and mouse interactions
@@ -170,7 +170,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - Implements mobile-friendly drag preview
 - Manages paging navigation for desktop and mobile
 
-**Key Features:**
+Key Features:
 - Floating, draggable planet library with paging
 - 51 planets across five pages with varying counts per page
 - Desktop navigation with clickable page dots
@@ -180,7 +180,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - Drop zone validation
 - Mobile-optimised interactions
 
-**Planet Library - Page 1 (Traditional Grahas):**
+Planet Library - Page 1 (Traditional Grahas):
 - Lg: Lagna (Ascendant)
 - Su: Sun
 - Mo: Moon
@@ -194,7 +194,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - Md: Maandi
 - Cu: Custom
 
-**Planet Library - Page 2 (Jaimini Karakas):**
+Planet Library - Page 2 (Jaimini Karakas):
 - AK: Atmakaraka
 - AmK: Amatyakaraka
 - BK: Bhratrikaraka
@@ -208,7 +208,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - IL: Indu Lagna
 - SL: Sree Lagna
 
-**Planet Library - Page 3 (Tamil Grahas):**
+Planet Library - Page 3 (Tamil Grahas):
 - ல: லக்கினம் (Lagna)
 - சூ: சூரியன் (Sun)
 - சந்: சந்திரன் (Moon)
@@ -222,7 +222,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - மா: மாந்தி (Maandi)
 - ப: பயன் (Custom)
 
-**Planet Library - Page 4 (Hindi Grahas):**
+Planet Library - Page 4 (Hindi Grahas):
 - लग्न: लग्न (Lagna)
 - सूर्य: सूर्य (Sun)
 - चंद्र: चंद्र (Moon)
@@ -236,13 +236,13 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 - मांदी: मांदी (Maandi)
 - कस: कस्टम (Custom)
 
-**Planet Library - Page 5 (Outer Planets):**
+Planet Library - Page 5 (Outer Planets):
 - Ur: Uranus
 - Ne: Neptune
 - Pl: Pluto
 
-**Key Methods:**
-- `init()`: Initialize planet library
+Key Methods:
+- `init()`: Initialise planet library
 - `createPlanetLibrary()`: Build UI elements with paging
 - `createPageDots()`: Create desktop navigation dots
 - `setupSwipeEvents()`: Configure mobile swipe navigation
@@ -256,7 +256,7 @@ Manages the floating planet library and drag-and-drop functionality with paging 
 ### Drawing Tools (drawing-tools.js - 1917 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
-**Key Responsibilities:**
+Key Responsibilities:
 - Implements all drawing tools (select, arrow, line, pen, text, heading)
 - Manages undo/redo functionality
 - Handles shape selection and editing
@@ -264,7 +264,7 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - Manages Edit UI integration
 - Implements planet text editing
 
-**Available Tools:**
+Available Tools:
 - Select Tool: Choose and modify existing elements
 - Arrow Tool: Create directional indicators with arrowheads and control points
 - Line Tool: Draw straight lines and connections with control points
@@ -272,7 +272,7 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - Text Tool: Add editable text boxes
 - Heading Tool: Create chart headings and titles
 
-**Key Features:**
+Key Features:
 - Pixel-perfect positioning
 - Touch and mouse support
 - Shape selection and editing
@@ -283,7 +283,7 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 - Auto-switch to Select Tool after Arrow and Line creation
 - Control points for precise arrow and line adjustment
 
-**Key Methods:**
+Key Methods:
 - `startDrawing()`: Begin drawing operation
 - `draw()`: Continue drawing
 - `stopDrawing()`: Complete drawing
@@ -298,28 +298,28 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 ### Context Menu (context-menu.js - 534 lines)
 Provides right-click and long-press context menus for chart interaction.
 
-**Key Responsibilities:**
+Key Responsibilities:
 - Creates context-sensitive menus
 - Handles right-click and long-press interactions
 - Provides chart creation and management options
 - Manages house and planet-specific actions
 - Implements mobile-friendly touch interactions
 
-**Menu Types:**
+Menu Types:
 - Chart Creation Menu: Create new charts and clear canvas
 - House Menu: House-specific actions (set Lagna, clear house)
 - Planet Menu: Planet-specific actions (edit, delete, retrograde)
 - Existing Chart Menu: Chart management options
 
-**Key Features:**
+Key Features:
 - Desktop right-click support
 - Mobile long-press support
 - Context-sensitive menu items
 - Submenu support
-- Touch-optimized interactions
+- Touch-optimised interactions
 
-**Key Methods:**
-- `init()`: Initialize context menu system
+Key Methods:
+- `init()`: Initialise context menu system
 - `showChartMenu()`: Display main chart menu
 - `showHouseMenu()`: Display house-specific menu
 - `showPlanetMenu()`: Display planet-specific menu
@@ -328,37 +328,35 @@ Provides right-click and long-press context menus for chart interaction.
 ### Edit UI (edit-ui.js - 786 lines)
 Provides context-sensitive editing controls for drawing elements.
 
-**Key Responsibilities:**
+Key Responsibilities:
 - Creates floating edit interface
 - Provides tool-specific controls
 - Manages shape property editing
-- Handles color and stroke customization
+- Handles colour and stroke customisation
 - Implements text editing controls
-- Provides mobile-optimized interface
+- Provides mobile-optimised interface
 
-**Edit Controls:**
-- Stroke width and color controls
+Edit Controls:
+- Stroke width and colour controls
 - Font size, weight, and style controls
-- Text color customization
+- Text colour customisation
 - Delete functionality
 - Mobile touch support
 
-**Key Features:**
+Key Features:
 - Floating, draggable interface
 - Tool-specific controls
 - Real-time property updates
-- Mobile-optimized design
+- Mobile-optimised design
 - Touch-friendly controls
 
-**Key Methods:**
+Key Methods:
 - `show()`: Display edit interface
 - `hide()`: Hide edit interface
 - `createToolControls()`: Build tool-specific controls
 - `updateStrokeWidth()`: Modify stroke properties
 - `updateFontSize()`: Modify text properties
 - `positionEditUI()`: Position interface
-
-
 
 ## Core Features
 
@@ -375,15 +373,15 @@ Provides context-sensitive editing controls for drawing elements.
 - Reset Drawings: Removes only drawings, keeps planets and chart structure
 
 ### Planet Management
-- **51 Major Grahas**: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
-- **Paging System**: Five-page navigation with desktop dots and mobile swipe
-- **Text-based Display**: Uses abbreviations instead of symbols for better compatibility
-- **Drag & Drop**: Intuitive planet placement from floating library to chart houses
-- **Multiple Instances**: Same planet can be placed multiple times
-- **Dynamic Text Sizing**: Planet text scales based on house occupancy
-- **Touch Support**: Mobile-friendly touch interactions with visual feedback
-- **Degree Support**: Add degree positions to Grahas (e.g., "Su-20")
-- **8-Character Limit**: Extended character limit for Graha names and degree information
+- 51 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
+- Paging System: Five-page navigation with desktop dots and mobile swipe
+- Text-based Display: Uses abbreviations instead of symbols for better compatibility
+- Drag & Drop: Intuitive planet placement from floating library to chart houses
+- Multiple Instances: Same planet can be placed multiple times
+- Dynamic Text Sizing: Planet text scales based on house occupancy
+- Touch Support: Mobile-friendly touch interactions with visual feedback
+- Degree Support: Add degree positions to Grahas (e.g., "Su-20")
+- 8-Character Limit: Extended character limit for Graha names and degree information
 
 ### Drawing Tools
 - Select Tool: Choose and modify existing elements with Edit UI
@@ -399,14 +397,14 @@ Provides context-sensitive editing controls for drawing elements.
 ### Control Points Feature
 The control points system provides precise adjustment capabilities for arrow and line elements:
 
-**Functionality:**
+Functionality:
 - Control points appear automatically when arrows or lines are selected
 - Two draggable handles at the start and end points of each element
 - Real-time visual feedback during adjustment
 - Per-frame synchronisation ensures control points stay attached during shape movement
 - Works on both blank canvas and chart-loaded states
 
-**Technical Implementation:**
+Technical Implementation:
 - Konva.Circle objects with custom styling and event handling
 - Coordinate transformation between local shape coordinates and global stage coordinates
 - RequestAnimationFrame loop for continuous synchronisation
@@ -436,16 +434,16 @@ The control points system provides precise adjustment capabilities for arrow and
 - Note: For Brave browser, disable Brave Shields for optimal functionality
 - Features: Canvas API, localStorage, ES6 modules, Touch Events
 
-**Mobile Support:**
+Mobile Support:
 - Citrana is not supported on mobile devices
 
-**Special Note on Mobile Support:**
+Special Note on Mobile Support:
 While the codebase might have limited support for mobile, officially it is advertised as mobile is not supported due to its complexity and limited resources. Project owners have to acquire various mobile devices with different screen sizes. It is not a practical task for a free and open-source application.
 
 ## Performance Optimisation
 
 - Efficient Canvas Rendering: Konva.js optimisation
-- Optimized resize handlers
+- Optimised resize handlers
 - Optimised Planet Placement: Efficient algorithms
 - Minimal DOM Manipulation: Canvas-based rendering
 - Smart Auto-Save: 30-second intervals
@@ -458,7 +456,7 @@ While the codebase might have limited support for mobile, officially it is adver
 - Follow existing naming conventions
 - Add comprehensive comments for new features
 - Maintain modular architecture
-- Use Tailwind CSS classes for styling
+- Use custom CSS classes for styling
 
 ### File Headers
 All JavaScript and CSS files use a standardised comment header format:
@@ -471,7 +469,7 @@ All JavaScript and CSS files use a standardised comment header format:
  */
 ```
 
-### File Organization
+### File Organisation
 - Keep all assets in the assets/ directory
 - JavaScript files in assets/js/
 - CSS files in assets/css/
@@ -806,8 +804,8 @@ Edit the planets objects in assets/js/planet-system.js:
 
 ## Support and Documentation
 
-- **AGENT.md**: This comprehensive project documentation
-- **README.md**: Project overview and quick start
+- AGENT.md: This comprehensive project documentation
+- README.md: Project overview and quick start
 
 ## Development Commands
 
@@ -821,7 +819,7 @@ Edit the planets objects in assets/js/planet-system.js:
 ### Standard Deployment (Current)
 The default workflow deploys files without minification for faster builds and easier debugging.
 
-**Original static.yml (Standard Deployment):**
+Original static.yml (Standard Deployment):
 ```yaml
 # Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
@@ -912,22 +910,22 @@ To enable minification for production builds, add these steps to `.github/workfl
     sed -i 's|src="assets/js/app.js"|src="assets/js/app.min.js"|g' index.html
 ```
 
-**Benefits of Minification:**
+Benefits of Minification:
 - Reduced file sizes (30-70% smaller)
 - Faster loading times
 - Better performance for mobile users
 - Reduced bandwidth usage
 
-**Files Affected:**
+Files Affected:
 - CSS: `styles.css` → `styles.min.css`
 - JavaScript: All local `.js` files → `.min.js` versions
 - HTML: Updated to reference minified files
 - External CDN files remain untouched
 
-**To Disable Minification:**
+To Disable Minification:
 Remove all the above steps from the workflow file to return to standard deployment.
 
-**Complete Minified static.yml:**
+Complete Minified static.yml:
 ```yaml
 # Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages

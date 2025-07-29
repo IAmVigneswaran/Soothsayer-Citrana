@@ -445,7 +445,7 @@ class SouthIndianChartTemplate {
         }
         // Highlight new
         if (this.houseDataSouth[houseNumber]) {
-            this.houseDataSouth[houseNumber].houseRectSouth.fill('#f3f4f6'); // Tailwind gray-100
+            this.houseDataSouth[houseNumber].houseRectSouth.fill('#f3f4f6'); // Light grey highlight
             this.selectedHouse = houseNumber;
             this.layer.batchDraw();
         }
