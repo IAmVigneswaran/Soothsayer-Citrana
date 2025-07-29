@@ -8,7 +8,7 @@
 
 <p align="center"><a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="license"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana"><img src="https://img.shields.io/badge/platform-Web-lightgrey.svg?style=flat" alt="platform"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/static.yml"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/static.yml/badge.svg" alt="deploy"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/codeql.yml"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/codeql.yml/badge.svg" alt="codeql"/></a>&nbsp;<img src="https://img.shields.io/badge/JavaScript-ES6+-yellow.svg?style=flat" alt="JavaScript"/>&nbsp;<img src="https://img.shields.io/badge/HTML5-CSS3-orange.svg?style=flat" alt="HTML5-CSS3"/></p>
 
-Citrana is a whiteboard web application that allows students, gurus, and Vedanga Jyotisha practitioners and researchers to create Janma Kundali (Vedic charts) for study and reference. Built with pure HTML5, CSS3, and JavaScript, this modern, interactive tool provides an intuitive interface for creating both South Indian and North Indian astrological charts with drag-and-drop planet placement and comprehensive drawing tools.
+Citrana is a whiteboard web application that allows students, gurus, and Vedanga Jyotisha practitioners and researchers to create Janma Kundali (Vedic charts) for study and reference. Built with pure HTML5, CSS3, and JavaScript, this modern, interactive tool provides an intuitive interface for creating both South Indian and North Indian astrological charts with drag-and-drop Graha placement and comprehensive drawing tools.
 
 Perfect for educational purposes, research documentation, and professional chart analysis, Citrana offers a seamless experience for anyone studying or practising Vedanga Jyotisha (Vedic astrology). Whether you're a student learning the fundamentals, a guru teaching traditional methods, or a researcher documenting complex planetary configurations to decode Karma, Citrana provides the tools you need to create accurate, professional-quality astrological charts for online classes, presentations, and personal reference.
 
@@ -27,14 +27,14 @@ This codebase is developed using AI agents.
 
 ## Core Features
 
-- Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic house numbering
-- Graha Library: 51 planets across 5 pages including, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Planets
-- Drag & Drop Planets: Intuitive placement with multiple instances support and dynamic text sizing
+- Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
+- Graha Library: 51 Grahas across 5 pages including, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Grahas
+- Drag & Drop Grahas: Intuitive placement with multiple instances support and dynamic text sizing
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools with undo/redo
 - Professional Export: High-resolution PNG exports (300 DPI) with auto-save functionality
 - Context Menus: Right-click and long-press support for quick chart management
 - Keyboard Shortcuts: Power user features for efficient workflow
-- Multi-language Support: Planets available in English, Tamil, and Hindi
+- Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: No data collection, no tracking, no server-side storage
 
 ## Table of Contents
@@ -46,7 +46,7 @@ This codebase is developed using AI agents.
   - [Creating Your First Chart](#creating-your-first-chart)
   - [Browser Compatibility](#browser-compatibility)
   - [Chart Types](#chart-types)
-  - [Working with Planets](#working-with-planets)
+  - [Working with Grahas](#working-with-grahas)
   - [Drawing and Navigation](#drawing-and-navigation)
   - [Export and Limitations](#export-and-limitations)
   - [Important Notes](#important-notes)
@@ -96,7 +96,7 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 
 1. **Choose Chart Type**: Select between South Indian or North Indian layout
 2. **Set Lagna**: Right-click any Bhava and select "Set as Lagna (Ascendant)"
-3. **Add Planets**: Drag Graha from Graha Library to selected Bhava
+3. **Add Grahas**: Drag Graha from Graha Library to selected Bhava
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click "Export" to save your chart in `.png`
 
@@ -110,15 +110,15 @@ Mobile Browser Support: Citrana is not supported on mobile devices.
 
 ### Chart Types
 
-South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any house to set it as Lagna (Ascendant). A diagonal line indicator will appear at the top-left corner of the Lagna house.
+South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any Bhava to set it as Lagna (Ascendant). A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.
 
-North Indian Chart: Diamond layout with dynamic positioning. Right-click any house to set it as Lagna. All Grahas (planets) placed in the Bhavas will automatically rotate and renumbered based on the new Lagna position.
+North Indian Chart: Diamond layout with dynamic positioning. Right-click any Bhava to set it as Lagna. All Grahas placed in the Bhavas will automatically rotate and renumbered based on the new Lagna position.
 
-### Working with Planets
+### Working with Grahas
 
-Adding Planets: Drag Grahas from the Graha Library (top-left) to chart houses. You can place the same Graha multiple times. Double-click any Graha to open a floating editing panel where you can modify text and set it as retrograde (a small "r" subscript will appear).
+Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha to open a floating editing panel where you can modify text and set it as retrograde (a small "r" subscript will appear).
 
-Custom Graha: There is also a "Custom" Graha available in the library. Drag and drop it into any house, then double-click to edit the name. There is a maximum character limit of 8 characters for all Graha names.
+Custom Graha: There is also a "Custom" Graha available in the library. Drag and drop it into any Bhava, then double-click to edit the name. There is a maximum character limit of 8 characters for all Graha names.
 
 ### Drawing and Navigation
 
