@@ -1,6 +1,9 @@
 User-agent: *
 Disallow: /CNAME
 Disallow: /LICENSE
+Disallow: /AGENT.md
+Disallow: /CHANGELOG.md
+Disallow: /SECURITY.md
 Disallow: /README.md
 
 Sitemap: https://citrana.soothsayer.life/sitemap.xml
