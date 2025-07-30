@@ -36,6 +36,9 @@ class CitranaApp {
         // Show welcome modal on first visit
         this.showWelcomeModal();
 
+        // Scroll to bottom on iOS Safari mobile
+        this.scrollToBottomOnIOS();
+
         console.log('App initialization complete');
     }
 
@@ -1315,6 +1318,48 @@ class CitranaApp {
                 // Mark as seen when user closes the modal
             }
         }, 100);
+    }
+
+    /**
+     * Scroll to bottom on iOS Safari mobile devices
+     * This helps with the iOS Safari address bar behavior
+     */
+    scrollToBottomOnIOS() {
+        // Check if it's iOS Safari
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+        
+        if (isIOS && isSafari) {
+            console.log('iOS Safari detected, scrolling to bottom...');
+            
+            // Multiple attempts to ensure it works
+            const scrollToBottom = () => {
+                // Method 1: Scroll to body height
+                window.scrollTo(0, document.body.scrollHeight);
+                
+                // Method 2: Scroll to document element height
+                if (document.documentElement.scrollHeight > document.body.scrollHeight) {
+                    window.scrollTo(0, document.documentElement.scrollHeight);
+                }
+                
+                // Method 3: Use scrollIntoView on the last element
+                const lastElement = document.body.lastElementChild;
+                if (lastElement) {
+                    lastElement.scrollIntoView({ behavior: 'auto', block: 'end' });
+                }
+                
+                console.log('Scrolled to bottom on iOS Safari');
+            };
+            
+            // Try immediately
+            scrollToBottom();
+            
+            // Try again after a short delay
+            setTimeout(scrollToBottom, 100);
+            
+            // Try again after a longer delay to handle slow loading
+            setTimeout(scrollToBottom, 500);
+        }
     }
 }
 
