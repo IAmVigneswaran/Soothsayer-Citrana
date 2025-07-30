@@ -44,7 +44,7 @@ This codebase is developed using AI agents.
 - [Quick Start](#quick-start)
 - [Usage Guide](#usage-guide)
   - [Creating Your First Chart](#creating-your-first-chart)
-  - [Browser Compatibility](#browser-compatibility)
+  - [Browser and Device Compatibility](#browser-and-device-compatibility)
   - [Chart Types](#chart-types)
   - [Working with Grahas](#working-with-grahas)
   - [Drawing and Navigation](#drawing-and-navigation)
@@ -100,13 +100,11 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click "Export" to save your chart in `.png`
 
-### Browser Compatibility
+### Browser and Device Compatibility
 
-Citrana is best used in desktop browsers (Brave, Chrome, Firefox, Safari, Edge) for optimal performance and full feature access. For Brave browser, you would need to disable Brave Shields to use.
+Citrana is designed exclusively for desktop browsers only (Brave, Chrome, Firefox, Safari, Edge) and is not supported on mobile or touch devices. For optimal performance and full feature access, use a desktop environment. Note: Brave users must disable Brave Shields for full functionality.
 
 Screen Size: If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.
-
-Mobile Browser Support: Citrana is not supported on mobile or touch devices.
 
 ### Chart Types
 
