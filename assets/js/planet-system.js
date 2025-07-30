@@ -139,9 +139,9 @@ class PlanetSystem {
                 fullName: 'KL',
                 color: '#000000'
             },
-            'IL': {
-                name: 'IL',
-                fullName: 'IL',
+            'HL': {
+                name: 'HL',
+                fullName: 'HL',
                 color: '#000000'
             },
             'SL': {
