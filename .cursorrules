@@ -578,10 +578,10 @@ All JavaScript and CSS files use a standardised comment header format:
 - Features: Canvas API, localStorage, ES6 modules, Touch Events
 
 Mobile Support:
-- Citrana is not supported on mobile devices
+- Citrana is not supported on mobile or touch devices
 
 Special Note on Mobile Support:
-While the codebase might have limited support for mobile, officially it is advertised as mobile is not supported due to its complexity and limited resources. Project owners have to acquire various mobile devices with different screen sizes. It is not a practical task for a free and open-source application.
+While the codebase might have limited support for mobile or touch, officially it is advertised as mobile is not supported due to its complexity and limited resources. Project owners have to acquire various mobile or touch devices with different screen sizes. It is not a practical task for a free and open-source application.
 
 ### Performance Considerations
 - Efficient canvas rendering with Konva.js

@@ -106,7 +106,7 @@ Citrana is best used in desktop browsers (Brave, Chrome, Firefox, Safari, Edge) 
 
 Screen Size: If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.
 
-Mobile Browser Support: Citrana is not supported on mobile devices.
+Mobile Browser Support: Citrana is not supported on mobile or touch devices.
 
 ### Chart Types
 
