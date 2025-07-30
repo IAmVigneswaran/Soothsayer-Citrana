@@ -132,7 +132,7 @@ Export Options: Click the save button to export your chart as a PNG file with ti
 
 Export Viewpoint: Exported images will always follow and inherit the browser's current viewpoint. If you resize the browser window, the exported image will reflect the visible area accordingly. Adjust your browser window size and zoom level before exporting to achieve the desired output.
 
-Single Chart Limitation: Citrana does not and will not support multiple charts in a single canvas. To create another chart, open a new browser window or tab. This ensures optimal performance and prevents conflicts between different chart configurations. Additionally, images can be saved with transparency enabled (Toggle Transparency Button) and imported into other canvas applications such as [tldraw](https://www.tldraw.com/) for advanced annotation and note-taking workflows.
+Single Chart Limitation: Citrana does not and will not support multiple charts in a single canvas. To create another chart, open a new browser window or tab. This ensures optimal performance and prevents conflicts between different chart configurations. Additionally, images can be saved with transparency enabled (Toggle Transparency Button) and imported into other canvas applications such as tldraw for advanced annotation and note-taking workflows.
 
 ### Important Notes
 
@@ -150,7 +150,7 @@ Licensed under the MIT license. See [LICENSE](https://github.com/IAmVigneswaran/
 
 ## Reporting Bugs
 
-For bug reports, feature requests and suggestions you can create a new [issue](https://github.com/IAmVigneswaran/Soothsayer-Citrana/issues) to discuss.
+For bug reports and feature requests you can create a new [issue](https://github.com/IAmVigneswaran/Soothsayer-Citrana/issues) to discuss.
 
 ## Contribution
 
