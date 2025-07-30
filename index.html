@@ -408,30 +408,6 @@
          // Initialize Lucide icons
          lucide.createIcons();
          
-         // iOS Safari scroll to bottom fix
-         function scrollToBottomIOS() {
-             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-             const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-             
-             if (isIOS && isSafari) {
-                 // Try to scroll to bottom immediately
-                 window.scrollTo(0, document.body.scrollHeight);
-                 
-                 // Also try after a brief delay
-                 setTimeout(() => {
-                     window.scrollTo(0, document.body.scrollHeight);
-                     if (document.documentElement.scrollHeight > document.body.scrollHeight) {
-                         window.scrollTo(0, document.documentElement.scrollHeight);
-                     }
-                 }, 50);
-             }
-         }
-         
-         // Call immediately and on various events
-         scrollToBottomIOS();
-         window.addEventListener('load', scrollToBottomIOS);
-         window.addEventListener('DOMContentLoaded', scrollToBottomIOS);
-         
          // Initialize the app
          document.addEventListener('DOMContentLoaded', function() {
              console.log('DOM loaded, initializing Citrana...');
