@@ -30,7 +30,7 @@ This codebase is developed using AI agents.
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
 - Graha Library: 51 Grahas across 5 pages including, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Grahas
 - Drag & Drop Grahas: Intuitive placement with multiple instances support and dynamic text sizing
-- Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools with undo/redo
+- Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
 - Professional Export: High-resolution PNG exports (300 DPI) with auto-save functionality
 - Context Menus: Right-click and long-press support for quick chart management
 - Keyboard Shortcuts: Power user features for efficient workflow
@@ -135,8 +135,6 @@ Single Chart Limitation: Citrana does not and will not support multiple charts i
 ### Important Notes
 
 Session Management: All sessions are ephemeral. The moment the browser refreshes, all data and progress will be reset and cleared. Citrana is privacy-focused and nothing is stored on the server.
-
-Undo/Redo: Use Ctrl+Z and Ctrl+Y to undo and redo your actions. All changes are automatically saved to your browser's local storage.
 
 ## Credits
 

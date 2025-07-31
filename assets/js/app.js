@@ -116,8 +116,7 @@ class CitranaApp {
         });
 
         // Action buttons
-        document.getElementById('undo-btn').addEventListener('click', () => this.undo());
-        document.getElementById('redo-btn').addEventListener('click', () => this.redo());
+        // Removed undo/redo button event listeners - buttons no longer exist in HTML
         document.getElementById('export-btn').addEventListener('click', () => this.exportChart());
 
         // Toggle Transparency Button
@@ -847,13 +846,14 @@ class CitranaApp {
 
             // Action shortcuts
             if (e.ctrlKey || e.metaKey) {
-                if (e.key === 'z') {
-                    e.preventDefault();
-                    this.undo();
-                } else if (e.key === 'y') {
-                    e.preventDefault();
-                    this.redo();
-                }
+                // Temporarily disabled undo/redo keyboard shortcuts
+                // if (e.key === 'z') {
+                //     e.preventDefault();
+                //     this.undo();
+                // } else if (e.key === 'y') {
+                //     e.preventDefault();
+                //     this.redo();
+                // }
             }
 
             // Zoom shortcuts
