@@ -42,15 +42,15 @@ This codebase is developed using AI agents.
 - [Demo](#demo)
 - [Screenshot](#screenshot)
 - [Quick Start](#quick-start)
+  - [Prerequisites](#prerequisites)
+  - [Browser and Device Compatibility](#browser-and-device-compatibility)
 - [Usage Guide](#usage-guide)
   - [Creating Your First Chart](#creating-your-first-chart)
-  - [Browser and Device Compatibility](#browser-and-device-compatibility)
   - [Chart Types](#chart-types)
   - [Working with Grahas](#working-with-grahas)
   - [Drawing and Navigation](#drawing-and-navigation)
   - [Export and Limitations](#export-and-limitations)
   - [Important Notes](#important-notes)
-- [Browser Compatibility](#browser-compatibility)
 - [Credits](#credits)
 - [License](#license)
 - [Reporting Bugs](#reporting-bugs)
@@ -88,6 +88,12 @@ Note: Bhagwan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's inter
 - Modern desktop web browser (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+)
 - No setup required - runs entirely in the desktop web browser
 
+### Browser and Device Compatibility
+
+Citrana is designed exclusively for desktop browsers only (Brave, Chrome, Firefox, Safari, Edge) and is not supported on mobile or touch devices. For optimal performance and full feature access, use a desktop environment. Note: Brave users must disable Brave Shields for full functionality.
+
+Screen Size: If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.
+
 ## Usage Guide
 
 Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
@@ -99,12 +105,6 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 3. **Add Grahas**: Drag Graha from Graha Library to selected Bhava
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click "Export" to save your chart in `.png`
-
-### Browser and Device Compatibility
-
-Citrana is designed exclusively for desktop browsers only (Brave, Chrome, Firefox, Safari, Edge) and is not supported on mobile or touch devices. For optimal performance and full feature access, use a desktop environment. Note: Brave users must disable Brave Shields for full functionality.
-
-Screen Size: If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.
 
 ### Chart Types
 
