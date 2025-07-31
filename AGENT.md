@@ -70,7 +70,7 @@ Key Responsibilities:
 - Coordinates all component interactions
 - Manages tool selection and drawing state
 - Handles keyboard shortcuts and event listeners
-- Manages undo/redo functionality
+- Manages undo/redo functionality (currently disabled due to bugs)
 - Handles chart export and auto-save
 - Provides mobile touch support and Safari compatibility
 - Manages zoom controls and canvas transformations
@@ -258,7 +258,7 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
 - Implements all drawing tools (select, arrow, line, pen, text, heading)
-- Manages undo/redo functionality
+- Manages undo/redo functionality (currently disabled due to bugs)
 - Handles shape selection and editing
 - Provides precise positioning and hit detection
 - Manages Edit UI integration
@@ -279,7 +279,7 @@ Key Features:
 - Colour and stroke customisation
 - Text editing with font controls
 - Planet text editing with retrograde support
-- Undo/redo with 50-step history
+- Undo/redo with 50-step history (currently disabled due to bugs)
 - Auto-switch to Select Tool after Arrow and Line creation
 - Control points for precise arrow and line adjustment
 
@@ -288,7 +288,7 @@ Key Methods:
 - `draw()`: Continue drawing
 - `stopDrawing()`: Complete drawing
 - `makeShapeSelectable()`: Enable shape interaction
-- `undo()/redo()`: History management
+- `undo()/redo()`: History management (currently disabled due to bugs)
 - `showEditUIForShape()`: Edit interface integration
 - `makePlanetTextEditable()`: Planet text editing
 - `createControlPoints()`: Create draggable control points for arrows and lines
@@ -390,7 +390,7 @@ Key Methods:
 - Pen Tool: Freehand drawing for annotations
 - Text Tool: Add editable text boxes anywhere on canvas
 - Heading Tool: Create chart headings and titles
-- Undo/Redo: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+- Undo/Redo: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y) (currently disabled due to bugs)
 - Auto-Switch Behaviour: Arrow and Line tools automatically switch to Select Tool after creation
 - Control Points: Draggable handles for adjusting start and end points of arrows and lines
 
