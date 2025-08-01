@@ -76,7 +76,37 @@ This codebase is developed using AI agents.
 </p>
 </details>
 
-Note: Bhagwan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's interpretation and insghts.
+<details><summary>Editing Grahas (English)</summary>
+<p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-editing.gif?raw=true"> </p>
+</p>
+</details>
+
+<details><summary>Editing Grahas (Tamil)</summary>
+<p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-tamil-editing.gif?raw=true"> </p>
+</p>
+</details>
+
+<details><summary>Creating Arrows</summary>
+<p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-editing.gif?raw=true"> </p>
+</p>
+</details>
+
+<details><summary>North Indian Chart Rotation & Transparancy</summary>
+<p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-rotation-transparancy.gif?raw=true"> </p>
+</p>
+</details>
+
+<details><summary>Using Citrana with tldraw for Loading Multiple Charts & Advance Annotation</summary>
+<p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-using-with-tldraw.gif?raw=true"> </p>
+</p>
+</details>
+
+Note: Bhagwan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's interpretation and insights.
 
 ## Screenshot
 
