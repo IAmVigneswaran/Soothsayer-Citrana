@@ -39,7 +39,7 @@ This codebase is developed using AI agents.
 
 ## Table of Contents
 
-- [Demo](#demo)
+- [Tutorials](#tutorials)
 - [Screenshot](#screenshot)
 - [Quick Start](#quick-start)
   - [Prerequisites](#prerequisites)
@@ -56,7 +56,7 @@ This codebase is developed using AI agents.
 - [Reporting Bugs](#reporting-bugs)
 - [Contribution](#contribution)
 
-## Demo
+## Tutorials
 
 <details><summary>Creating North Indian Chart (English)</summary>
 <p>
@@ -90,7 +90,7 @@ This codebase is developed using AI agents.
 
 <details><summary>Creating Arrows</summary>
 <p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-editing.gif?raw=true"> </p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-arrows.gif?raw=true"> </p>
 </p>
 </details>
 
