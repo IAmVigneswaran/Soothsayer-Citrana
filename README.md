@@ -94,9 +94,9 @@ This codebase is developed using AI agents.
 </p>
 </details>
 
-<details><summary>North Indian Chart Rotation & Transparancy</summary>
+<details><summary>North Indian Chart Rotation & Transparency</summary>
 <p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-rotation-transparancy.gif?raw=true"> </p>
+<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-rotation-transparency.gif?raw=true"> </p>
 </p>
 </details>
 
