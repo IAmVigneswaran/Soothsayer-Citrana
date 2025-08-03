@@ -10,7 +10,7 @@
 
 Citrana is a planetary chart builder and a whiteboard web application that allows students, gurus, and Vedanga Jyotisha practitioners to create Janma Kundali (Vedic charts) for study and reference. Built with pure HTML5, CSS3, and JavaScript, this modern, interactive tool provides an intuitive interface for creating both South Indian and North Indian astrological charts with drag-and-drop Graha placement and basic drawing tools.
 
-Perfect for educational purposes, research documentation, and professional chart analysis, Citrana offers a seamless experience for anyone studying or practising Vedanga Jyotisha (Vedic astrology). Whether you're a student learning the fundamentals, a guru teaching traditional methods, or a researcher documenting complex planetary configurations to decode Karma, Citrana provides the tools you need to build Janma Kundali for online classes, presentations, and personal reference.
+Perfect for educational purposes, research documentation, and professional chart analysis, Citrana offers a seamless experience for anyone studying or practising Vedanga Jyotisha (Vedic astrology). Whether you're a student learning the fundamentals, a guru teaching traditional methods, or a researcher documenting complex planetary combinations to decode Karma, Citrana provides the tools you need to build Janma Kundali for online classes, presentations, and personal reference.
 
 This codebase is developed using AI agents.
 
