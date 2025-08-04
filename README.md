@@ -106,7 +106,7 @@ This codebase is developed using AI agents.
 </p>
 </details>
 
-Note: Bhagwan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's interpretation and insights.
+Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's interpretation and insights.
 
 ## Screenshot
 
