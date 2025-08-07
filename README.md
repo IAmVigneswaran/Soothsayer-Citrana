@@ -180,6 +180,6 @@ For bug reports and feature requests you can create a new [issue](https://github
 
 ## Contribution
 
-Community contributions are welcome and appreciated. Developers are encouraged to fork the repository and submit pull requests to enhance functionality or introduce thoughtful improvements. However, a key requirement is that nothing should break—all existing features and behaviours and logic must remain fully functional and unchanged. Once reviewed and approved, updates will be merged into the main branch.
+Community contributions are welcome and appreciated. Developers are encouraged to fork the repository and submit pull requests to enhance functionality or introduce thoughtful improvements. However, a key requirement is that nothing should break—all existing features and behaviours and logic must remain fully functional and unchanged. Please submit pull requests to the development branch rather than main, as the main branch is currently read-only. Once reviewed and approved, updates will be merged into the main branch.
 
 Built with ❤️ for the Vedanga Jyotisha community.
