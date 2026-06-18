@@ -181,14 +181,7 @@ class ContextMenu {
             <div class="context-menu-header">${chartName} Chart</div>
             <div class="context-menu-separator"></div>
         `;
-        // Add 'Set as Lagna' menu item for both South Indian and North Indian charts
-        if (chartType === 'south-indian') {
-            menuHtml += `
-            <div class="context-menu-item" data-action="set-lagna"><i data-lucide="target"></i> Set as Lagna</div>
-            <div class="context-menu-separator"></div>
-            `;
-        }
-        // Add different menu structure for North Indian chart based on device
+        // North Indian chart menu: Set Lagna as… (zodiac sign). South Indian Lagna is set via house right-click only.
         if (chartType === 'north-indian') {
             if (isMobile) {
                 // Mobile: "Set as Lagna" header followed by list of rashis as regular menu items
@@ -242,7 +235,7 @@ class ContextMenu {
                     }
                 ];
                 menuHtml += `
-                <div class="context-menu-item" data-action="set-lagna"><i data-lucide="target"></i> Set as Lagna</div>
+                <div class="context-menu-header">Set Lagna as…</div>
                 ${rashis.map((rashi, i) => `<div class='context-menu-item' data-action='set-lagna' data-house='${i+1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`).join('')}
                 <div class="context-menu-separator"></div>
                 `;

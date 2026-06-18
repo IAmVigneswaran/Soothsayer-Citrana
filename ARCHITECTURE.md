@@ -140,8 +140,7 @@ Key methods:
 ### Set Lagna
 
 - **South Indian**
-  - Chart menu → **Set as Lagna** (choose house 1–12 from Lagna-relative numbering)
-  - House menu → **Set as Lagna (Ascendant)** on the clicked bhava
+  - House menu → **Set as Lagna (Ascendant)** on the clicked bhava (no chart-level Lagna menu)
   - `setLagnaHouse(n)` → renumber bhava boxes, draw diagonal Lagna indicator
   - House menu header uses `getBhavaNumberForHouse()` so **House N** counts from Lagna, not fixed grid Rashi position
 - **North Indian**
