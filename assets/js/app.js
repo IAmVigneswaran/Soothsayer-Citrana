@@ -1051,12 +1051,16 @@ class CitranaApp {
             return;
         }
 
+        const pointer = this.stage.getPointerPosition();
+        if (!pointer) {
+            return;
+        }
+
         e.evt.preventDefault();
 
         const scaleBy = 1.1;
         const oldScale = this.stage.scaleX();
 
-        const pointer = this.stage.getPointerPosition();
         const mousePointTo = {
             x: (pointer.x - this.stage.x()) / oldScale,
             y: (pointer.y - this.stage.y()) / oldScale

@@ -694,10 +694,10 @@ class DrawingTools {
     }
 
     clearAll() {
-        // Clear all drawing objects using the same method as updateDrawingObjectsDraggable
-        const drawingObjects = this.layer.find(node =>
-            node.name() && node.name().startsWith('drawing-')
-        );
+        const drawingObjects = this.layer.find(node => {
+            const name = node.name();
+            return name && (name.startsWith('drawing-') || name.startsWith('bounding-box-'));
+        });
 
         drawingObjects.forEach(shape => {
             shape.destroy();

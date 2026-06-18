@@ -2,6 +2,8 @@
   "name": "Citrana",
   "short_name": "Citrana",
   "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [

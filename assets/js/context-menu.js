@@ -8,6 +8,7 @@ class ContextMenu {
     constructor() {
         this.menu = null;
         this.isVisible = false;
+        this._menuTouchBound = false;
     }
 
     init() {
@@ -495,8 +496,7 @@ class ContextMenu {
     }
 
     setupMenuEventListeners() {
-        // Remove any previous event listener to avoid duplicates
-        this.menu.onclick = null;
+        // Desktop: replace onclick each time menu HTML is rebuilt
         this.menu.onclick = (e) => {
             const item = e.target.closest('.context-menu-item');
             citranaDebug('Click event target:', e.target);
@@ -514,20 +514,21 @@ class ContextMenu {
             this.hide();
         };
 
-        // Add touch event handling for mobile
+        // Mobile: bind once — innerHTML changes do not remove listeners on this.menu
+        if (this._menuTouchBound) {
+            return;
+        }
+        this._menuTouchBound = true;
+
         this.menu.addEventListener('touchstart', (e) => {
-            console.log('[CONTEXT MENU] touchstart on menu, target:', e.target);
-            // Prevent touch events from bubbling up to document
             e.stopPropagation();
         }, {
             passive: false
         });
 
         this.menu.addEventListener('touchend', (e) => {
-            console.log('[CONTEXT MENU] touchend on menu, target:', e.target);
             const item = e.target.closest('.context-menu-item');
             if (item) {
-                console.log('[CONTEXT MENU] Menu item found:', item.dataset.action);
                 e.preventDefault();
                 e.stopPropagation();
                 const action = item.dataset.action;
@@ -539,8 +540,6 @@ class ContextMenu {
                 citranaDebug('Menu item touched:', action, houseNumber);
                 this.handleAction(action, houseNumber, context);
                 this.hide();
-            } else {
-                console.log('[CONTEXT MENU] No menu item found');
             }
         }, {
             passive: false
