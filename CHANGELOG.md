@@ -6,7 +6,7 @@
 - TBD
 
 **✨ Features:**
-- Ephemeral browser sessions — chart work lives in this tab while you work; refreshing the page always starts fresh (export PNG to keep a copy).
+- Ephemeral browser sessions — chart work lives in this tab while you work; refreshing the page always starts fresh (export PNG to keep a visual copy).
 - Graha right-click menu with **Edit Graha** and **Delete Graha** (same editing panel as double-click).
 - Chart-type-specific house menus — **South Indian**: **Set as Lagna (Ascendant)**; **North Indian**: **Set as First House**.
 - **Clear House** removes all Grahas from the selected bhava.
@@ -19,6 +19,8 @@
 - Removed **Set as Lagna** from the South Indian chart-level context menu; North Indian **Set Lagna as…** (zodiac) remains on chart right-click.
 - Updated Help modal, Welcome modal, and README for accurate North Indian Lagna instructions and browser-session guidance.
 - Self-hosted pinned vendor bundles for Konva (9.3.20) and Lucide (0.468.0), removing unpinned unpkg CDN dependencies for core scripts.
+- Added `citranaDebug()` for contributor trace logging (enabled by default; opt out via `localStorage.citrana_debug = '0'`).
+- Removed unused legacy code (`setFirstHouse`, Graha library drop-zone scaffolding, localStorage chart auto-save).
 - Removed unused `#canvas` markup and dead `.zoom-control-btn` CSS; added `rel="noopener noreferrer"` to external links.
 
 **🐛 Bug Fixes:**
