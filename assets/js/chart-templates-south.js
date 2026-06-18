@@ -40,7 +40,9 @@ class SouthIndianChartTemplate {
         return Object.keys(this.houseDataSouth);
     }
 
-    createSouthIndianChart() {
+    createSouthIndianChart(options = {}) {
+        const { initialLagna = 1 } = options;
+
         if (!this.stage || !this.layer) {
             console.error('Stage or layer not initialized');
             return;
@@ -48,8 +50,7 @@ class SouthIndianChartTemplate {
 
         this.clearChart();
 
-        // Set Aries (house 1) as default Lagna
-        this.lagnaHouseSouth = 1;
+        this.lagnaHouseSouth = initialLagna;
 
         // Create chart group
         this.chartGroupSouth = new Konva.Group({
@@ -247,6 +248,8 @@ class SouthIndianChartTemplate {
 
         this.layer.add(this.chartGroupSouth);
         this.layer.batchDraw();
+
+        this.renumberHouses();
 
         // Zoom to fit
         this.zoomToFit();
@@ -461,7 +464,7 @@ class SouthIndianChartTemplate {
     }
 
     // --- Robust Planet Management ---
-    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, retrograde = false) {
+    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, retrograde = false, skipSnapshot = false) {
         const house = this.houseDataSouth[houseNumber];
         if (!house) return;
         if (!house.planets) house.planets = [];
@@ -483,7 +486,7 @@ class SouthIndianChartTemplate {
             retrograde: resolvedRetrograde
         });
         this.updatePlanetsInHouse(houseNumber);
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
         console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
     }
 
@@ -868,7 +871,8 @@ class SouthIndianChartTemplate {
         this.layer.batchDraw();
     }
 
-    setLagnaHouse(houseNumber) {
+    setLagnaHouse(houseNumber, options = {}) {
+        const { skipSnapshot = false } = options;
         console.log('[DEBUG] setLagnaHouse called with house number:', houseNumber);
         // Remove old Lagna indicator lines if present
         if (this.houseDataSouth[this.lagnaHouseSouth] && this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth) {
@@ -894,7 +898,7 @@ class SouthIndianChartTemplate {
             this.houseDataSouth[houseNumber].lagnaLinesSouth = [line];
             this.layer.batchDraw();
         }
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
         console.log(`Lagna set to house ${houseNumber}`);
     }
 
@@ -1021,12 +1025,65 @@ class SouthIndianChartTemplate {
         this.stage.batchDraw();
     }
 
+    extractSerializablePlanets(houseData = this.houseDataSouth) {
+        const planetsByHouse = {};
+        for (const houseNum in houseData) {
+            const planets = houseData[houseNum]?.planets;
+            if (!Array.isArray(planets) || planets.length === 0) continue;
+            const serialized = planets
+                .filter((planet) => planet && typeof planet.abbr === 'string')
+                .map((planet) => ({
+                    abbr: planet.abbr,
+                    label: planet.label || planet.abbr,
+                    id: planet.id,
+                    color: planet.color,
+                    retrograde: !!planet.retrograde
+                }));
+            if (serialized.length > 0) {
+                planetsByHouse[houseNum] = serialized;
+            }
+        }
+        return planetsByHouse;
+    }
+
+    parseSavedPlanets(data) {
+        if (data.planetsByHouse) {
+            return data.planetsByHouse;
+        }
+        return this.extractSerializablePlanets(data.houseData || {});
+    }
+
+    restoreSavedPlanets(planetsByHouse, skipSnapshot = true) {
+        for (const houseNum in planetsByHouse) {
+            const houseNumber = parseInt(houseNum, 10);
+            if (!houseNumber) continue;
+            for (const planet of planetsByHouse[houseNum]) {
+                this.addPlanetToHouse(
+                    planet.abbr,
+                    houseNumber,
+                    planet.label,
+                    planet.id,
+                    !!planet.retrograde,
+                    skipSnapshot
+                );
+            }
+        }
+    }
+
     getChartData() {
+        let centerLabel = null;
+        if (this.chartGroupSouth) {
+            const centerText = this.chartGroupSouth.findOne((node) => node.name() === 'center-label-text');
+            if (centerText) {
+                centerLabel = centerText.text();
+            }
+        }
+
         return {
             chartType: 'south-indian',
             lagnaHouse: this.lagnaHouseSouth,
-            firstHouse: this.firstHouseSouth,
-            houseData: this.houseDataSouth
+            planetsByHouse: this.extractSerializablePlanets(),
+            centerLabel
         };
     }
 
@@ -1034,12 +1091,20 @@ class SouthIndianChartTemplate {
         if (!data || data.chartType !== 'south-indian') return;
 
         try {
-            this.lagnaHouseSouth = data.lagnaHouse || 1;
-            this.firstHouseSouth = data.firstHouse || 1;
-            this.houseDataSouth = data.houseData || {};
+            const lagnaHouse = data.lagnaHouse || 1;
+            const planetsByHouse = this.parseSavedPlanets(data);
 
-            // Recreate the chart
-            this.createSouthIndianChart();
+            this.createSouthIndianChart({ initialLagna: lagnaHouse });
+            this.restoreSavedPlanets(planetsByHouse, true);
+            this.setLagnaHouse(lagnaHouse, { skipSnapshot: true });
+
+            if (data.centerLabel && this.chartGroupSouth) {
+                const centerText = this.chartGroupSouth.findOne((node) => node.name() === 'center-label-text');
+                if (centerText) {
+                    centerText.text(data.centerLabel);
+                    this.layer.batchDraw();
+                }
+            }
 
             console.log('South Indian chart data loaded successfully');
         } catch (error) {

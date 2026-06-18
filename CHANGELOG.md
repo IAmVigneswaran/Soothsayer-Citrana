@@ -1,6 +1,6 @@
 # Changelog
 
-### 1.1.0
+### 2.0.0
 
 **🎉 Released:**
 - TBD
@@ -14,6 +14,7 @@
 - Removed **Set as Lagna** from the South Indian chart-level context menu; North Indian **Set Lagna as…** (zodiac) remains on chart right-click.
 - Updated Help modal, Welcome modal, and README for accurate North Indian Lagna instructions and browser-session data guidance.
 - South Indian house menu header now shows **House** numbering from the current Lagna position (fixed Rashi grid, rotating house count).
+- Fixed in-session auto-save so chart Grahas, Lagna, and drawings serialize correctly to local storage during a visit; page refresh still starts a fresh session.
 - **Clear House** now removes all Grahas from the selected bhava.
 
 **🐛 Bug Fixes:**

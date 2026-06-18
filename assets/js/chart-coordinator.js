@@ -242,8 +242,7 @@ class ChartCoordinator {
         return {
             chartType: null,
             lagnaHouse: 1,
-            firstHouse: 1,
-            houseData: {}
+            planetsByHouse: {}
         };
     }
 

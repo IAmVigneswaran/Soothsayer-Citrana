@@ -439,7 +439,7 @@ Technical Implementation:
 
 ### Export & Sharing
 - High-Resolution PNG: Professional quality exports (300 DPI)
-- Auto-Save: Chart data saved to localStorage
+- Auto-Save: In-session backup to `localStorage` every 30 seconds; cleared on page refresh
 - Cross-Platform: Works on all modern browsers
 - GitHub Pages Compatible: No build process required
 
@@ -812,10 +812,10 @@ Edit the planets objects in assets/js/planet-system.js:
 - Ready for immediate deployment on GitHub Pages
 
 ### Data Management
-- All data stored locally in browser localStorage
-- No external API calls or data collection
-- Privacy-first approach with no tracking
-- Auto-save every 30 seconds
+- Chart data auto-saves to browser `localStorage` every 30 seconds during an active visit (plain serializable Graha/Lagna/drawing data)
+- Each page load (including refresh) clears saved chart data — sessions are ephemeral across refresh
+- No server-side chart storage
+- Welcome modal preference stored in `localStorage.citrana_welcome_seen`
 
 ## Support and Documentation
 

@@ -708,6 +708,25 @@ class DrawingTools {
         this.layer.batchDraw();
     }
 
+    restorePersistedDrawings(drawingData) {
+        this.clearAll();
+        if (!Array.isArray(drawingData) || drawingData.length === 0) {
+            return;
+        }
+
+        drawingData.forEach((obj) => {
+            const shape = Konva.Node.create(obj);
+            this.layer.add(shape);
+            shape.on('click tap', (e) => {
+                e.cancelBubble = true;
+                this.showEditUIForShape(shape);
+            });
+            this.makeShapeSelectable(shape);
+        });
+
+        this.layer.batchDraw();
+    }
+
     /**
      * Create control points for arrow or line shapes
      * @param {KonvaObject} shape - The shape to add control points to

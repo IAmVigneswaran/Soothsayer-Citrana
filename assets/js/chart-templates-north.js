@@ -41,13 +41,17 @@ class NorthIndianChartTemplate {
         return Object.keys(this.houseDataNorth);
     }
 
-    createNorthIndianChart() {
+    createNorthIndianChart(options = {}) {
+        const { initialLagna = 1 } = options;
+
         if (!this.stage || !this.layer) {
             console.error('Stage or layer not initialized');
             return;
         }
 
         this.clearChart();
+
+        this.lagnaHouseNorth = initialLagna;
 
         // Create chart group
         this.chartGroupNorth = new Konva.Group({
@@ -636,12 +640,59 @@ class NorthIndianChartTemplate {
         console.log('[DEBUG] North Indian zoomToFit - scale:', newScale, 'position:', newPos, 'extraTopMargin:', extraTopMargin);
     }
 
+    extractSerializablePlanets(houseData = this.houseDataNorth) {
+        const planetsByHouse = {};
+        for (const houseNum in houseData) {
+            const planets = houseData[houseNum]?.planets;
+            if (!Array.isArray(planets) || planets.length === 0) continue;
+            const serialized = planets
+                .filter((planet) => planet && typeof planet.abbr === 'string')
+                .map((planet) => ({
+                    abbr: planet.abbr,
+                    label: planet.label || planet.abbr,
+                    id: planet.id,
+                    color: planet.color,
+                    rashiNumber: planet.rashiNumber,
+                    retrograde: !!planet.retrograde
+                }));
+            if (serialized.length > 0) {
+                planetsByHouse[houseNum] = serialized;
+            }
+        }
+        return planetsByHouse;
+    }
+
+    parseSavedPlanets(data) {
+        if (data.planetsByHouse) {
+            return data.planetsByHouse;
+        }
+        return this.extractSerializablePlanets(data.houseData || {});
+    }
+
+    restoreSavedPlanets(planetsByHouse, skipSnapshot = true) {
+        for (const houseNum in planetsByHouse) {
+            const fallbackHouse = parseInt(houseNum, 10);
+            for (const planet of planetsByHouse[houseNum]) {
+                const rashiNumber = planet.rashiNumber || this.getRashiNumberForHouse(fallbackHouse);
+                const targetHouse = this.getHouseNumberForRashi(rashiNumber);
+                this.addPlanetToHouse(
+                    planet.abbr,
+                    targetHouse,
+                    planet.label,
+                    planet.id,
+                    rashiNumber,
+                    !!planet.retrograde,
+                    skipSnapshot
+                );
+            }
+        }
+    }
+
     getChartData() {
         return {
             chartType: 'north-indian',
             lagnaHouse: this.lagnaHouseNorth,
-            firstHouse: this.firstHouseNorth,
-            houseData: this.houseDataNorth
+            planetsByHouse: this.extractSerializablePlanets()
         };
     }
 
@@ -649,15 +700,11 @@ class NorthIndianChartTemplate {
         if (!data || data.chartType !== 'north-indian') return;
 
         try {
-            this.lagnaHouseNorth = data.lagnaHouse || 1;
-            this.firstHouseNorth = data.firstHouse || 1;
-            this.houseDataNorth = data.houseData || {};
+            const lagnaHouse = data.lagnaHouse || 1;
+            const planetsByHouse = this.parseSavedPlanets(data);
 
-            // Recreate the chart
-            this.createNorthIndianChart();
-
-            // Reposition planets if they have Rashi numbers stored
-            this.repositionPlanetsForNewLagna();
+            this.createNorthIndianChart({ initialLagna: lagnaHouse });
+            this.restoreSavedPlanets(planetsByHouse, true);
 
             console.log('North Indian chart data loaded successfully');
         } catch (error) {
@@ -675,7 +722,7 @@ class NorthIndianChartTemplate {
     }
 
     // --- Robust Planet Management ---
-    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, existingRashiNumber = null, existingRetrograde = null) {
+    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, existingRashiNumber = null, existingRetrograde = null, skipSnapshot = false) {
         const house = this.houseDataNorth[houseNumber];
         if (!house) return;
         if (!house.planets) house.planets = [];
@@ -705,7 +752,7 @@ class NorthIndianChartTemplate {
             retrograde: resolvedRetrograde
         });
         this.updatePlanetsInHouse(houseNumber);
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
         console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber} in Rashi ${rashiNumber}`);
     }
 

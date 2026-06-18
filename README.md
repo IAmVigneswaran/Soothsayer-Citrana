@@ -164,7 +164,7 @@ Single Chart Limitation: Citrana does not and will not support multiple charts i
 
 ### Important Notes
 
-Session Management: Citrana does not upload your chart to a server. Your work exists only in this browser tab; refreshing the page will clear your chart, Grahas, and drawings. Export a PNG to keep a copy.
+Session Management: Citrana auto-saves your chart to browser local storage every 30 seconds while you work (nothing is sent to a server). Refreshing the page starts a new session and clears your chart, Grahas, and drawings. Export a PNG to keep a copy.
 
 ## Credits
 

@@ -114,7 +114,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 - **Display**: Underlined Graha text on canvas.
 - **Storage**: `retrograde: boolean` on planet data.
 - **Editing**: Double-click Graha, right-click → **Edit Graha**, or Edit UI when applicable → retrograde button (↺)
-- **Persistence**: Saved with chart data in `localStorage` via `getChartData()` / `loadChartData()`.
+- **Persistence**: Included in in-session `autoSave()` payload (`planetsByHouse`); not restored after page refresh
 - **Legacy**: Labels containing the old Unicode subscript `ᵣ` are stripped on ingest; `retrograde` is set to `true`.
 
 Key methods:
@@ -177,9 +177,13 @@ House **Clear House** calls `clearHousePlanets()` on the active template.
 1. `app.exportChart()` → optional white background rect → `stage.toDataURL({ pixelRatio: 2 })`
 2. Offscreen canvas adds padding + watermark → download as `citrana-chart-{timestamp}.png`
 
-### Auto-save
+### Auto-save (in-session only)
 
-1. Every 30s and on snapshots → `chartTemplates.getChartData()` → `localStorage['citranaChartData']`
+1. Every 30 seconds and on `beforeunload` → `app.autoSave()` writes to `localStorage['citranaChartData']`
+2. Payload uses plain serializable data (`planetsByHouse`, `lagnaHouse`, `drawingData`) — not live Konva nodes
+3. On every page load → `loadSavedData()` **clears** `citranaChartData` so refresh always starts a blank session
+4. `loadChartData()` / `getChartData()` remain available for undo snapshots and internal restore
+5. `clearChart()` also removes the `localStorage` entry
 
 ## Global State
 
@@ -188,7 +192,7 @@ House **Clear House** calls `clearHousePlanets()` on the active template.
 | `window.app` | `index.html` on `DOMContentLoaded` | Cross-module access to coordinator, tools, menus |
 | `window.selectedBhavaSouth` | South template house click | Drop target for Graha library |
 | `window.selectedBhavaNorth` | North template house click | Drop target for Graha library |
-| `localStorage.citranaChartData` | `app.autoSave()` | Chart persistence |
+| `localStorage.citranaChartData` | `app.autoSave()` during visit; cleared on page load | In-session backup only (not restored on refresh) |
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
 
 ## UI Architecture

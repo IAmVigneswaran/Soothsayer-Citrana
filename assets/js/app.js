@@ -31,7 +31,6 @@ class CitranaApp {
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
         this.loadSavedData();
-        this.autoSave();
 
         // Show welcome modal on first visit
         this.showWelcomeModal();
@@ -457,26 +456,27 @@ class CitranaApp {
     }
 
     loadSavedData() {
-        // Load saved chart data if available
-        const savedData = localStorage.getItem('citranaChartData');
-        if (savedData) {
-            try {
-                const data = JSON.parse(savedData);
-                this.chartTemplates.loadChartData(data);
-                console.log('Saved chart data loaded');
-            } catch (error) {
-                console.error('Error loading saved data:', error);
-            }
-        }
+        // Each page load (including refresh) starts a fresh session — do not restore chart data.
+        localStorage.removeItem('citranaChartData');
 
-        // Auto-save every 30 seconds
         setInterval(() => this.autoSave(), 30000);
+        window.addEventListener('beforeunload', () => this.autoSave());
     }
 
     autoSave() {
         try {
             const chartData = this.chartTemplates.getChartData();
-            localStorage.setItem('citranaChartData', JSON.stringify(chartData));
+            if (!chartData.chartType) {
+                localStorage.removeItem('citranaChartData');
+                return;
+            }
+
+            const payload = {
+                version: 1,
+                chartData,
+                drawingData: this.serializeDrawings()
+            };
+            localStorage.setItem('citranaChartData', JSON.stringify(payload));
             console.log('Chart data auto-saved');
         } catch (error) {
             console.error('Error auto-saving:', error);
@@ -1110,6 +1110,7 @@ class CitranaApp {
         this.layer.destroyChildren();
         this.stage.batchDraw();
         this.chartTemplates.clearChart();
+        localStorage.removeItem('citranaChartData');
         console.log('Chart cleared');
     }
 
@@ -1160,14 +1161,7 @@ class CitranaApp {
     }
 
     restoreDrawings(drawingData) {
-        // Remove all current drawing objects
-        this.drawingTools.clearAll();
-        // Add from snapshot
-        drawingData.forEach(obj => {
-            const shape = Konva.Node.create(obj);
-            this.layer.add(shape);
-        });
-        this.layer.batchDraw();
+        this.drawingTools.restorePersistedDrawings(drawingData);
     }
 
     undo() {
@@ -1183,12 +1177,16 @@ class CitranaApp {
     }
 
     redo() {
-        if (this.redoStack.length > 0) {
-            const drawingData = this.redoStack.pop();
-            this.undoStack.push(this.serializeDrawings());
-            this.restoreDrawings(drawingData);
-            console.log('Redo performed');
-        }
+        if (this.redoStack.length === 0) return;
+        const current = {
+            chartData: this.chartTemplates.getChartData(),
+            drawingData: this.serializeDrawings()
+        };
+        this.undoStack.push(current);
+        const snapshot = this.redoStack.pop();
+        this.chartTemplates.loadChartData(snapshot.chartData);
+        this.restoreDrawings(snapshot.drawingData);
+        console.log('Redo performed');
     }
 
     zoomIn() {
