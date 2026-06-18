@@ -1,10 +1,8 @@
-<p align="center">
-  <p>
+<div align="center">
   <img alt="Citrana Logo" src="https://raw.githubusercontent.com/IAmVigneswaran/Soothsayer-Citrana/main/assets/images/Soothsayer-Citrana-Full-Logo-Black.png#gh-light-mode-only">
   <img alt="Citrana Logo" src="https://raw.githubusercontent.com/IAmVigneswaran/Soothsayer-Citrana/main/assets/images/Soothsayer-Citrana-Full-Logo-White.png#gh-dark-mode-only">
-  </p>
-  <h1 align="center">Citrana</h1>
-</p>
+  <h1>Citrana</h1>
+</div>
 
 <p align="center"><a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="license"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana"><img src="https://img.shields.io/badge/platform-Web-lightgrey.svg?style=flat" alt="platform"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/static.yml"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/static.yml/badge.svg" alt="deploy"/></a>&nbsp;<a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/codeql.yml"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/actions/workflows/codeql.yml/badge.svg" alt="codeql"/></a>&nbsp;<img src="https://img.shields.io/badge/JavaScript-ES6+-yellow.svg?style=flat" alt="JavaScript"/>&nbsp;<img src="https://img.shields.io/badge/HTML5-CSS3-orange.svg?style=flat" alt="HTML5-CSS3"/></p>
 
@@ -59,51 +57,35 @@ This codebase is developed using AI agents.
 ## Tutorials
 
 <details><summary>Creating North Indian Chart (English)</summary>
-<p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-north-indian-chart.gif?raw=true"> </p>
-</p>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-north-indian-chart.gif?raw=true" alt="Creating North Indian Chart in English"></p>
 </details>
 
 <details><summary>Creating South Indian Chart (Tamil)</summary>
-<p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-tamil-south-indian-chart.gif?raw=true"> </p>
-</p>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-tamil-south-indian-chart.gif?raw=true" alt="Creating South Indian Chart in Tamil"></p>
 </details>
 
 <details><summary>Creating North Indian Chart (Hindi)</summary>
-<p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-hindi-north-indian-chart.gif?raw=true"> </p>
-</p>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-hindi-north-indian-chart.gif?raw=true" alt="Creating North Indian Chart in Hindi"></p>
 </details>
 
 <details><summary>Editing Grahas (English)</summary>
-<p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-editing.gif?raw=true"> </p>
-</p>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-editing.gif?raw=true" alt="Editing Grahas in English"></p>
 </details>
 
 <details><summary>Editing Grahas (Tamil)</summary>
-<p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-tamil-editing.gif?raw=true"> </p>
-</p>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-tamil-editing.gif?raw=true" alt="Editing Grahas in Tamil"></p>
 </details>
 
 <details><summary>Creating Arrows</summary>
-<p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-arrows.gif?raw=true"> </p>
-</p>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-arrows.gif?raw=true" alt="Creating arrows"></p>
 </details>
 
 <details><summary>North Indian Chart Rotation & Toggle Transparency</summary>
-<p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-rotation-transparency.gif?raw=true"> </p>
-</p>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-rotation-transparency.gif?raw=true" alt="North Indian chart rotation and transparency"></p>
 </details>
 
 <details><summary>Using Citrana with tldraw for Loading Multiple Charts & Advance Annotation</summary>
-<p>
-<p align="center"> <img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-using-with-tldraw.gif?raw=true"> </p>
-</p>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-using-with-tldraw.gif?raw=true" alt="Using Citrana with tldraw"></p>
 </details>
 
 Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's interpretation and insights.
