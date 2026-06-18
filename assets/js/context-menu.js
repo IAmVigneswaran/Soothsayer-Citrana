@@ -593,10 +593,6 @@ class ContextMenu {
             houseData.planets[planetIndex].color = newColor;
             houseData.planets[planetIndex].retrograde = !!newRetrograde;
             template.updatePlanetsInHouse(house);
-
-            if (window.app.pushSnapshot) {
-                window.app.pushSnapshot();
-            }
         });
     }
 
@@ -620,8 +616,8 @@ class ContextMenu {
         template.updatePlanetsInHouse(house);
         template.getLayer().batchDraw();
 
-        if (window.app.pushSnapshot) {
-            window.app.pushSnapshot();
+        if (window.app?.recordHistory) {
+            window.app.recordHistory('Clear house');
         }
     }
 
@@ -629,10 +625,12 @@ class ContextMenu {
         switch (action) {
             case 'create-south-indian':
                 window.app.chartTemplates.createSouthIndianChart();
+                window.app.recordHistory('Create South Indian chart');
                 break;
 
             case 'create-north-indian':
                 window.app.chartTemplates.createNorthIndianChart();
+                window.app.recordHistory('Create North Indian chart');
                 break;
 
             case 'clear-chart':

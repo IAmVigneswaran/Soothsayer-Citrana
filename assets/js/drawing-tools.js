@@ -11,9 +11,6 @@ class DrawingTools {
         this.isDrawing = false;
         this.currentShape = null;
         this.currentTool = null;
-        this.undoStack = [];
-        this.redoStack = [];
-        this.maxUndoSteps = 50;
         this.lastPoint = null;
         this.isTouchDevice = this.detectTouchDevice();
         this.selectedShape = null;
@@ -22,6 +19,7 @@ class DrawingTools {
         // Track editing state to prevent conflicts
         this.isEditingPlanet = false;
         this.currentlyEditingPlanet = null;
+        this.planetEditSession = null;
 
         // Control points functionality
         this.controlPoints = {
@@ -202,11 +200,6 @@ class DrawingTools {
         // Store the current tool before resetting it
         const completedTool = this.currentTool;
 
-        // Add the completed shape to undo stack
-        if (this.currentShape) {
-            this.addToUndoStack(this.currentShape, 'add');
-        }
-
         this.isDrawing = false;
         this.currentShape = null;
         this.currentTool = null;
@@ -215,9 +208,15 @@ class DrawingTools {
         // Ensure the layer is updated
         this.layer.batchDraw();
 
-        // Trigger snapshot for undo/redo
-        if (window.app && window.app.pushSnapshot) {
-            window.app.pushSnapshot();
+        const drawLabels = {
+            arrow: 'Draw arrow',
+            line: 'Draw line',
+            pen: 'Draw pen stroke',
+            text: 'Add text',
+            heading: 'Add heading'
+        };
+        if (completedTool && window.app?.recordHistory) {
+            window.app.recordHistory(drawLabels[completedTool] || 'Draw');
         }
 
         // Auto-switch to Select Tool for Arrow and Line tools
@@ -253,8 +252,10 @@ class DrawingTools {
             // Add dragend handler to add to undo stack and update control points
             shape.on('dragend', () => {
                 if (this.selectedShape === shape) {
-                    this.addToUndoStack(shape, 'modify');
                     this.updateControlPointsPosition(shape);
+                    if (window.app?.recordHistory) {
+                        window.app.recordHistory('Move drawing');
+                    }
                 }
             });
         }
@@ -613,86 +614,6 @@ class DrawingTools {
         }, 100);
     }
 
-    addToUndoStack(shape, actionType = 'add') {
-        if (this.undoStack.length >= this.maxUndoSteps) {
-            this.undoStack.shift(); // Remove oldest action
-        }
-
-        this.undoStack.push({
-            type: actionType,
-            shape: shape
-        });
-
-        // Clear redo stack when new action is added
-        this.redoStack = [];
-    }
-
-    undo() {
-        if (this.undoStack.length === 0) return;
-
-        const lastAction = this.undoStack.pop();
-        this.redoStack.push(lastAction);
-
-        if (lastAction.type === 'add') {
-            // Remove the shape and its bounding box
-            if (lastAction.shape) {
-                if (lastAction.shape.boundingBox) {
-                    lastAction.shape.boundingBox.destroy();
-                }
-                lastAction.shape.destroy();
-            }
-        } else if (lastAction.type === 'delete') {
-            // Restore the shape and recreate its bounding box
-            if (lastAction.shape) {
-                this.layer.add(lastAction.shape);
-
-                // Recreate bounding box if it's a drawing object
-                if (lastAction.shape.name() && lastAction.shape.name().startsWith('drawing-')) {
-                    const toolType = lastAction.shape.name().replace('drawing-', '');
-                    const boundingBox = this.createBoundingBox(lastAction.shape, toolType);
-                    lastAction.shape.boundingBox = boundingBox;
-                    this.layer.add(boundingBox);
-                }
-            }
-        }
-
-        this.layer.batchDraw();
-        this.clearSelection();
-    }
-
-    redo() {
-        if (this.redoStack.length === 0) return;
-
-        const lastAction = this.redoStack.pop();
-        this.undoStack.push(lastAction);
-
-        if (lastAction.type === 'add') {
-            // Restore the shape and recreate its bounding box
-            if (lastAction.shape) {
-                this.layer.add(lastAction.shape);
-
-                // Recreate bounding box if it's a drawing object
-                if (lastAction.shape.name() && lastAction.shape.name().startsWith('drawing-')) {
-                    const toolType = lastAction.shape.name().replace('drawing-', '');
-                    const boundingBox = this.createBoundingBox(lastAction.shape, toolType);
-                    lastAction.shape.boundingBox = boundingBox;
-                    this.layer.add(boundingBox);
-                }
-            }
-        } else if (lastAction.type === 'delete') {
-            // Remove the shape and its bounding box
-            if (lastAction.shape) {
-                if (lastAction.shape.boundingBox) {
-                    lastAction.shape.boundingBox.destroy();
-                }
-                lastAction.shape.destroy();
-            }
-        }
-
-        this.layer.batchDraw();
-        this.clearSelection();
-    }
-
     clearAll() {
         const drawingObjects = this.layer.find(node => {
             const name = node.name();
@@ -716,7 +637,20 @@ class DrawingTools {
 
         drawingData.forEach((obj) => {
             const shape = Konva.Node.create(obj);
+            const shapeName = shape.name();
+
+            if (shapeName && shapeName.startsWith('bounding-box-')) {
+                return;
+            }
+
             this.layer.add(shape);
+
+            if (shapeName === 'drawing-arrow' || shapeName === 'drawing-line' || shapeName === 'drawing-pen') {
+                const toolType = shapeName.replace('drawing-', '');
+                const boundingBox = this.createBoundingBox(shape, toolType);
+                this.layer.add(boundingBox);
+            }
+
             shape.on('click tap', (e) => {
                 e.cancelBubble = true;
                 this.showEditUIForShape(shape);
@@ -823,8 +757,9 @@ class DrawingTools {
         this.controlPoints.startPoint.on('dragend', () => {
             this.isDraggingControlPoint = false;
             this.draggedControlPoint = null;
-            // Add to undo stack
-            this.addToUndoStack(this.selectedShape, 'modify');
+            if (window.app?.recordHistory) {
+                window.app.recordHistory('Adjust drawing');
+            }
         });
 
         // Add drag event handlers for end point
@@ -884,8 +819,9 @@ class DrawingTools {
         this.controlPoints.endPoint.on('dragend', () => {
             this.isDraggingControlPoint = false;
             this.draggedControlPoint = null;
-            // Add to undo stack
-            this.addToUndoStack(this.selectedShape, 'modify');
+            if (window.app?.recordHistory) {
+                window.app.recordHistory('Adjust drawing');
+            }
         });
 
         // Add control points to layer
@@ -1214,6 +1150,7 @@ class DrawingTools {
 
         // Show Edit UI
         if (this.editUI) {
+            this.editUI.hide();
             // Set up delete callback to properly handle control points
             this.editUI.onDelete = (element) => {
                 // Set the selected shape to the element being deleted
@@ -1255,10 +1192,6 @@ class DrawingTools {
     deleteSelectedShape() {
         if (!this.selectedShape) return;
 
-        // Add to undo stack before deleting
-        this.addToUndoStack(this.selectedShape, 'delete');
-
-        // Clear control points
         this.clearControlPoints();
 
         // Remove bounding box if it exists
@@ -1272,14 +1205,15 @@ class DrawingTools {
 
         // Hide Edit UI
         if (this.editUI) {
+            this.editUI._skipHistoryOnHide = true;
             this.editUI.hide();
         }
 
         this.layer.batchDraw();
 
         // Trigger snapshot for undo/redo
-        if (window.app && window.app.pushSnapshot) {
-            window.app.pushSnapshot();
+        if (window.app?.recordHistory) {
+            window.app.recordHistory('Delete drawing');
         }
     }
 
@@ -1343,37 +1277,12 @@ class DrawingTools {
      * @param {Function} onUpdate - Callback function to update the planet label
      */
     editPlanetText(planetText, onUpdate) {
-        // Check if text edit controls are already visible
         const textEditControls = document.getElementById('text-edit-controls');
         if (textEditControls && textEditControls.style.display === 'flex') {
             citranaDebug('Text edit controls already visible, ignoring edit request');
             return;
         }
 
-        // Set editing state
-        this.isEditingPlanet = true;
-        this.currentlyEditingPlanet = planetText;
-
-        const currentText = planetText.text().replace(/ᵣ/g, '');
-        const currentColor = planetText.fill() || '#000000';
-        const initialRetrograde = planetText.textDecoration() === 'underline' || planetText.text().includes('ᵣ');
-        let retrogradeState = initialRetrograde;
-
-        // Store reference to the specific planet being edited
-        const editingPlanetText = planetText;
-
-        const applyRetrogradePreview = (isRetrograde) => {
-            editingPlanetText.textDecoration(isRetrograde ? 'underline' : '');
-            if (textEditInput) {
-                textEditInput.style.textDecoration = isRetrograde ? 'underline' : 'none';
-            }
-            if (retrogradeButton) {
-                retrogradeButton.classList.toggle('active', isRetrograde);
-            }
-            this.layer.batchDraw();
-        };
-
-        // Get the text edit UI elements
         const textEditInput = document.getElementById('text-edit-input');
         const textEditColor = document.getElementById('text-edit-color');
         const saveButton = document.getElementById('text-edit-save');
@@ -1383,151 +1292,108 @@ class DrawingTools {
 
         if (!textEditControls || !textEditInput || !textEditColor || !saveButton || !cancelButton) {
             console.error('Text edit UI elements not found');
-            this.isEditingPlanet = false;
-            this.currentlyEditingPlanet = null;
             return;
         }
 
-        // Set up retrograde button
-        let handleRetrograde = null;
-        if (retrogradeButton) {
-            applyRetrogradePreview(retrogradeState);
+        const initialText = planetText.text().replace(/ᵣ/g, '');
+        const initialColor = planetText.fill() || '#000000';
+        const initialRetrograde = planetText.textDecoration() === 'underline' || planetText.text().includes('ᵣ');
+        let retrogradeState = initialRetrograde;
+        let sessionDirty = false;
 
-            // Add click event listener
-            handleRetrograde = () => {
-                retrogradeState = !retrogradeState;
-                applyRetrogradePreview(retrogradeState);
-            };
+        const editingPlanetText = planetText;
 
-            retrogradeButton.addEventListener('click', handleRetrograde);
-        }
+        const markSessionDirty = () => {
+            sessionDirty = true;
+        };
 
-        // Always show the Delete button for planet text
-        if (deleteButton) {
-            deleteButton.style.display = 'inline-flex';
-        }
+        const restoreInitialAppearance = () => {
+            editingPlanetText.text(initialText);
+            editingPlanetText.fill(initialColor);
+            editingPlanetText.textDecoration(initialRetrograde ? 'underline' : '');
+            this.layer.batchDraw();
+        };
 
-        // Clear any existing value and set initial value
-        textEditInput.value = '';
-        textEditInput.value = currentText;
-        textEditColor.value = currentColor;
-        if (planetText.text().includes('ᵣ')) {
-            editingPlanetText.text(currentText);
-        }
-
-        // Show the text edit UI
-        textEditControls.style.display = 'flex';
-
-        // Focus the input and place cursor at the end (after a small delay to ensure UI is ready)
-        setTimeout(() => {
-            textEditInput.focus();
-            // Double-check the value is set correctly
-            if (textEditInput.value !== currentText) {
-                textEditInput.value = currentText;
+        const removeSessionListeners = () => {
+            saveButton.removeEventListener('click', handleSave);
+            cancelButton.removeEventListener('click', handleCancel);
+            textEditInput.removeEventListener('keydown', handleKeyDown);
+            textEditInput.removeEventListener('input', handleInput);
+            textEditColor.removeEventListener('change', handleColorChange);
+            textEditColor.removeEventListener('input', handleColorChange);
+            if (deleteButton) {
+                deleteButton.removeEventListener('click', handleDelete);
             }
-            // Set cursor at the end
-            const length = textEditInput.value.length;
-            textEditInput.setSelectionRange(length, length);
-        }, 100);
+            if (retrogradeButton && handleRetrograde) {
+                retrogradeButton.removeEventListener('click', handleRetrograde);
+            }
+        };
 
-        // Disable dragging while editing
-        editingPlanetText.draggable(false);
-
-        const finishEditing = (save = false) => {
-            // Clear editing state
+        const teardownSession = () => {
+            removeSessionListeners();
+            textEditControls.style.display = 'none';
+            if (textEditInput) {
+                textEditInput.style.textDecoration = 'none';
+            }
+            editingPlanetText.draggable(true);
             this.isEditingPlanet = false;
             this.currentlyEditingPlanet = null;
+            this.planetEditSession = null;
+        };
 
-            // Hide the text edit UI
+        const finishEditing = (save = false) => {
+            if (!this.planetEditSession) {
+                return;
+            }
+
+            const wasDirty = sessionDirty;
+            removeSessionListeners();
+            this.planetEditSession = null;
             textEditControls.style.display = 'none';
 
-            if (save) {
+            if (save && wasDirty) {
                 const newText = textEditInput.value.trim();
                 const newColor = textEditColor.value;
                 if (newText && newText.length <= 8) {
-                    // Update the planet label through callback
                     if (onUpdate) {
                         onUpdate(newText, newColor, retrogradeState);
                     }
+                    window.app?.recordHistory('Edit Graha');
                 } else {
-                    // Restore original text, color, and retrograde if invalid
-                    editingPlanetText.text(currentText);
-                    editingPlanetText.fill(currentColor);
-                    editingPlanetText.textDecoration(initialRetrograde ? 'underline' : '');
+                    restoreInitialAppearance();
                 }
-            } else {
-                // Restore original text, color, and retrograde if cancelled
-                editingPlanetText.text(currentText);
-                editingPlanetText.fill(currentColor);
-                editingPlanetText.textDecoration(initialRetrograde ? 'underline' : '');
+            } else if (!save) {
+                restoreInitialAppearance();
             }
 
             if (textEditInput) {
                 textEditInput.style.textDecoration = 'none';
             }
 
-            // Re-enable dragging
             editingPlanetText.draggable(true);
-
-            // Remove event listeners
-            saveButton.removeEventListener('click', handleSave);
-            cancelButton.removeEventListener('click', handleCancel);
-            textEditInput.removeEventListener('keydown', handleKeyDown);
-            textEditInput.removeEventListener('input', handleInput);
-            textEditColor.removeEventListener('change', handleColorChange);
-            textEditColor.removeEventListener('input', handleColorChange);
-            if (deleteButton) {
-                deleteButton.removeEventListener('click', handleDelete);
-            }
-            if (retrogradeButton && handleRetrograde) {
-                retrogradeButton.removeEventListener('click', handleRetrograde);
-            }
-        };
-
-        const handleSave = () => {
-            finishEditing(true);
-        };
-
-        const handleCancel = () => {
-            finishEditing(false);
-        };
-
-        const handleDelete = () => {
-            // Clear editing state
             this.isEditingPlanet = false;
             this.currentlyEditingPlanet = null;
+        };
 
-            // Hide the text edit UI
-            textEditControls.style.display = 'none';
+        const handleSave = () => finishEditing(true);
+        const handleCancel = () => finishEditing(false);
 
-            // Remove the planet from its house
-            if (typeof editingPlanetText._planetHouseNumber !== 'undefined' && typeof editingPlanetText._planetId !== 'undefined') {
-                // Try to remove from South or North chart
-                if (window.app && window.app.chartTemplates) {
-                    const chartType = window.app.chartTemplates.currentChartType;
-                    if (chartType === 'south-indian' && window.app.chartTemplates.southIndianTemplate) {
-                        window.app.chartTemplates.southIndianTemplate.removePlanetFromHouseById(editingPlanetText._planetHouseNumber, editingPlanetText._planetId);
-                    } else if (chartType === 'north-indian' && window.app.chartTemplates.northIndianTemplate) {
-                        window.app.chartTemplates.northIndianTemplate.removePlanetFromHouseById(editingPlanetText._planetHouseNumber, editingPlanetText._planetId);
-                    }
+        const handleDelete = () => {
+            teardownSession();
+
+            if (editingPlanetText._planetHouseNumber !== undefined && editingPlanetText._planetId !== undefined && window.app?.chartTemplates) {
+                const chartType = window.app.chartTemplates.currentChartType;
+                if (chartType === 'south-indian' && window.app.chartTemplates.southIndianTemplate) {
+                    window.app.chartTemplates.southIndianTemplate.removePlanetFromHouseById(
+                        editingPlanetText._planetHouseNumber,
+                        editingPlanetText._planetId
+                    );
+                } else if (chartType === 'north-indian' && window.app.chartTemplates.northIndianTemplate) {
+                    window.app.chartTemplates.northIndianTemplate.removePlanetFromHouseById(
+                        editingPlanetText._planetHouseNumber,
+                        editingPlanetText._planetId
+                    );
                 }
-            }
-
-            // Re-enable dragging
-            editingPlanetText.draggable(true);
-
-            // Remove event listeners
-            saveButton.removeEventListener('click', handleSave);
-            cancelButton.removeEventListener('click', handleCancel);
-            textEditInput.removeEventListener('keydown', handleKeyDown);
-            textEditInput.removeEventListener('input', handleInput);
-            textEditColor.removeEventListener('change', handleColorChange);
-            textEditColor.removeEventListener('input', handleColorChange);
-            if (deleteButton) {
-                deleteButton.removeEventListener('click', handleDelete);
-            }
-            if (retrogradeButton && handleRetrograde) {
-                retrogradeButton.removeEventListener('click', handleRetrograde);
             }
         };
 
@@ -1539,34 +1405,76 @@ class DrawingTools {
                 e.preventDefault();
                 finishEditing(false);
             }
-            // Allow backspace to work normally in the input field
         };
 
         const handleInput = () => {
             let newText = textEditInput.value;
-
             if (newText.length > 8) {
                 newText = newText.substring(0, 8);
                 textEditInput.value = newText;
             }
 
-            // Update ONLY the specific planet text being edited
             editingPlanetText.text(newText);
             editingPlanetText.textDecoration(retrogradeState ? 'underline' : '');
             this.layer.batchDraw();
+            markSessionDirty();
         };
 
         const handleColorChange = (e) => {
-            const newColor = e.target.value;
+            editingPlanetText.fill(e.target.value);
+            this.layer.batchDraw();
+            markSessionDirty();
+        };
 
-            citranaDebug(`Color changed to: ${newColor} for planet text`);
-
-            // Update ONLY the specific planet text being edited
-            editingPlanetText.fill(newColor);
+        let handleRetrograde = null;
+        const applyRetrogradePreview = (isRetrograde) => {
+            editingPlanetText.textDecoration(isRetrograde ? 'underline' : '');
+            textEditInput.style.textDecoration = isRetrograde ? 'underline' : 'none';
+            if (retrogradeButton) {
+                retrogradeButton.classList.toggle('active', isRetrograde);
+            }
             this.layer.batchDraw();
         };
 
-        // Add event listeners
+        this.isEditingPlanet = true;
+        this.currentlyEditingPlanet = planetText;
+        this.planetEditSession = {
+            finish: finishEditing
+        };
+
+        if (retrogradeButton) {
+            applyRetrogradePreview(retrogradeState);
+            handleRetrograde = () => {
+                retrogradeState = !retrogradeState;
+                applyRetrogradePreview(retrogradeState);
+                markSessionDirty();
+            };
+            retrogradeButton.addEventListener('click', handleRetrograde);
+        }
+
+        if (deleteButton) {
+            deleteButton.style.display = 'inline-flex';
+        }
+
+        textEditInput.value = initialText;
+        textEditColor.value = initialColor;
+        if (planetText.text().includes('ᵣ')) {
+            editingPlanetText.text(initialText);
+        }
+
+        textEditControls.style.display = 'flex';
+
+        setTimeout(() => {
+            textEditInput.focus();
+            if (textEditInput.value !== initialText) {
+                textEditInput.value = initialText;
+            }
+            const length = textEditInput.value.length;
+            textEditInput.setSelectionRange(length, length);
+        }, 100);
+
+        editingPlanetText.draggable(false);
+
         saveButton.addEventListener('click', handleSave);
         cancelButton.addEventListener('click', handleCancel);
         textEditInput.addEventListener('keydown', handleKeyDown);
@@ -1577,10 +1485,7 @@ class DrawingTools {
             deleteButton.addEventListener('click', handleDelete);
         }
 
-        // Ensure the input field is properly initialized
         textEditInput.removeAttribute('placeholder');
-        textEditInput.value = currentText;
-        textEditColor.value = currentColor;
     }
 
     /**
@@ -1610,8 +1515,8 @@ class DrawingTools {
         planetText.textDecoration(retrograde ? 'underline' : '');
         planetText.getLayer()?.batchDraw();
 
-        if (window.app.pushSnapshot) {
-            window.app.pushSnapshot();
+        if (window.app?.recordHistory) {
+            window.app.recordHistory('Edit Graha');
         }
     }
 
@@ -1619,21 +1524,9 @@ class DrawingTools {
      * Cancel any existing planet editing session
      */
     cancelPlanetEditing() {
-        if (this.isEditingPlanet && this.currentlyEditingPlanet) {
-            // Hide the text edit UI
-            const textEditControls = document.getElementById('text-edit-controls');
-            if (textEditControls) {
-                textEditControls.style.display = 'none';
-            }
-
-            // Re-enable dragging
-            this.currentlyEditingPlanet.draggable(true);
-
-            // Clear editing state
-            this.isEditingPlanet = false;
-            this.currentlyEditingPlanet = null;
-
-            citranaDebug('Cancelled existing planet editing session');
+        if (this.planetEditSession?.finish) {
+            // Commit label/colour/retrograde changes when the edit bar is dismissed
+            this.planetEditSession.finish(true);
         }
     }
 

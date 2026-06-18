@@ -262,6 +262,12 @@ class ChartCoordinator {
     loadChartData(data) {
         if (!data) return;
 
+        this.clearChart();
+
+        if (!data.chartType) {
+            return;
+        }
+
         try {
             this.currentChartType = data.chartType;
 

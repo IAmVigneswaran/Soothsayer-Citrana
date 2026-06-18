@@ -425,6 +425,7 @@ class NorthIndianChartTemplate {
         citranaDebug(`North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
         citranaDebug('Chart should now display updated Rashi numbers for the new Lagna');
         citranaDebug('All planets have been repositioned to their correct Rashis');
+        if (window.app?.recordHistory) window.app.recordHistory('Set Lagna');
     }
 
     getCurrentRashiNumber(visualPosition) {
@@ -732,18 +733,18 @@ class NorthIndianChartTemplate {
             retrograde: resolvedRetrograde
         });
         this.updatePlanetsInHouse(houseNumber);
-        if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Add Graha');
         citranaDebug(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber} in Rashi ${rashiNumber}`);
     }
 
-    removePlanetFromHouseById(houseNumber, planetId) {
+    removePlanetFromHouseById(houseNumber, planetId, skipSnapshot = false) {
         const house = this.houseDataNorth[houseNumber];
         if (!house || !house.planets) return;
         house.planets = house.planets.filter((planet) => planet.id !== planetId);
         this.updatePlanetsInHouse(houseNumber);
         this.layer.batchDraw();
         this.clearSelectedPlanet && this.clearSelectedPlanet();
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Remove Graha');
     }
 
     updatePlanetsInHouse(houseNumber) {
@@ -830,10 +831,6 @@ class NorthIndianChartTemplate {
 
                         this.layer.batchDraw();
                         citranaDebug(`Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
-                        // Trigger snapshot for undo/redo
-                        if (window.app && window.app.pushSnapshot) {
-                            window.app.pushSnapshot();
-                        }
                     }
                 });
             }
@@ -897,8 +894,8 @@ class NorthIndianChartTemplate {
                 this.layer.batchDraw();
                 if (targetHouse && targetHouse !== houseNumber) {
                     // Move planet to new bhava by ID, preserving its Rashi number and color
-                    this.removePlanetFromHouseById(houseNumber, planetObj.id);
-                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.rashiNumber, planetObj.retrograde);
+                    this.removePlanetFromHouseById(houseNumber, planetObj.id, true);
+                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.rashiNumber, planetObj.retrograde, true);
                     // Update the color of the moved planet
                     const targetHouseData = this.houseDataNorth[targetHouse];
                     if (targetHouseData && targetHouseData.planets) {
@@ -908,7 +905,7 @@ class NorthIndianChartTemplate {
                         }
                     }
                     this.updatePlanetsInHouse(targetHouse);
-                    if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+                    if (window.app?.recordHistory) window.app.recordHistory('Move Graha');
                     citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}, staying in Rashi ${planetObj.rashiNumber}`);
                 } else {
                     // Snap back to original position

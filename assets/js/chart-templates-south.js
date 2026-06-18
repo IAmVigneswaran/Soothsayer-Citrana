@@ -467,18 +467,18 @@ class SouthIndianChartTemplate {
             retrograde: resolvedRetrograde
         });
         this.updatePlanetsInHouse(houseNumber);
-        if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Add Graha');
         citranaDebug(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
     }
 
-    removePlanetFromHouseById(houseNumber, planetId) {
+    removePlanetFromHouseById(houseNumber, planetId, skipSnapshot = false) {
         const house = this.houseDataSouth[houseNumber];
         if (!house || !house.planets) return;
         house.planets = house.planets.filter((planet) => planet.id !== planetId);
         this.updatePlanetsInHouse(houseNumber);
         this.layer.batchDraw();
         this.clearSelectedPlanet();
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Remove Graha');
     }
 
     renamePlanetInHouseById(houseNumber, planetId, newLabel) {
@@ -609,10 +609,6 @@ class SouthIndianChartTemplate {
 
                         this.layer.batchDraw();
                         citranaDebug(`Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
-                        // Trigger snapshot for undo/redo
-                        if (window.app && window.app.pushSnapshot) {
-                            window.app.pushSnapshot();
-                        }
                     }
                 });
             }
@@ -741,8 +737,8 @@ class SouthIndianChartTemplate {
 
                 if (targetHouse && targetHouse !== houseNumber) {
                     // Move planet to new bhava by ID
-                    this.removePlanetFromHouseById(houseNumber, planetObj.id);
-                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.retrograde);
+                    this.removePlanetFromHouseById(houseNumber, planetObj.id, true);
+                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.retrograde, true);
                     // Update the color of the moved planet
                     const targetHouseData = this.houseDataSouth[targetHouse];
                     if (targetHouseData && targetHouseData.planets) {
@@ -752,6 +748,7 @@ class SouthIndianChartTemplate {
                         }
                     }
                     this.updatePlanetsInHouse(targetHouse);
+                    if (window.app?.recordHistory) window.app.recordHistory('Move Graha');
                     citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}`);
                 } else {
                     // Snap back to original position
@@ -832,7 +829,7 @@ class SouthIndianChartTemplate {
             this.houseDataSouth[houseNumber].lagnaLinesSouth = [line];
             this.layer.batchDraw();
         }
-        if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Set Lagna');
         console.log(`Lagna set to house ${houseNumber}`);
     }
 

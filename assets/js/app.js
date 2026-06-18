@@ -15,9 +15,6 @@ class CitranaApp {
         this.currentTool = 'select';
         this.isDrawing = false;
         this.lastPoint = null;
-        this.undoStack = [];
-        this.redoStack = [];
-        this.maxUndoSteps = 100;
         this.exportWithWhiteBg = true; // Default: white background
         this.isExporting = false; // Prevent multiple concurrent exports
         this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
@@ -77,48 +74,27 @@ class CitranaApp {
 
         this.updateZoomLevel();
 
+        this.history = new CitranaHistory({
+            maxSteps: 50,
+            captureState: () => this.captureHistoryState(),
+            restoreState: (state) => this.restoreHistoryState(state)
+        });
+        this.history.record('Start');
+
         console.log('Components setup complete');
     }
 
     setupEventListeners() {
         // Tool selection
-        document.getElementById('select-tool').addEventListener('click', () => {
-            this.setTool('select');
-            this.pushSnapshot();
-        });
-        document.getElementById('arrow-tool').addEventListener('click', () => {
-            this.setTool('arrow');
-            this.pushSnapshot();
-        });
-        document.getElementById('line-tool').addEventListener('click', () => {
-            this.setTool('line');
-            this.pushSnapshot();
-        });
-        document.getElementById('pen-tool').addEventListener('click', () => {
-            this.setTool('pen');
-            this.pushSnapshot();
-        });
-        document.getElementById('text-tool').addEventListener('click', () => {
-            this.setTool('text');
-            this.pushSnapshot();
-        });
-        document.getElementById('hand-tool').addEventListener('click', () => {
-            this.setTool('hand');
-            this.pushSnapshot();
-        });
-        document.getElementById('heading-tool').addEventListener('click', () => {
-            this.setTool('heading');
-            this.pushSnapshot();
-        });
-        // Add for zoom controls bar
-        document.getElementById('zoom-select-tool').addEventListener('click', () => {
-            this.setTool('select');
-            this.pushSnapshot();
-        });
-        document.getElementById('zoom-hand-tool').addEventListener('click', () => {
-            this.setTool('hand');
-            this.pushSnapshot();
-        });
+        document.getElementById('select-tool').addEventListener('click', () => this.setTool('select'));
+        document.getElementById('arrow-tool').addEventListener('click', () => this.setTool('arrow'));
+        document.getElementById('line-tool').addEventListener('click', () => this.setTool('line'));
+        document.getElementById('pen-tool').addEventListener('click', () => this.setTool('pen'));
+        document.getElementById('text-tool').addEventListener('click', () => this.setTool('text'));
+        document.getElementById('hand-tool').addEventListener('click', () => this.setTool('hand'));
+        document.getElementById('heading-tool').addEventListener('click', () => this.setTool('heading'));
+        document.getElementById('zoom-select-tool').addEventListener('click', () => this.setTool('select'));
+        document.getElementById('zoom-hand-tool').addEventListener('click', () => this.setTool('hand'));
 
         // Action buttons
         // Removed undo/redo button event listeners - buttons no longer exist in HTML
@@ -805,39 +781,32 @@ class CitranaApp {
             if (e.key === 'v' || e.key === 'V') {
                 e.preventDefault();
                 this.setTool('select');
-                this.pushSnapshot();
             } else if (e.key === 'a' || e.key === 'A') {
                 e.preventDefault();
                 this.setTool('arrow');
-                this.pushSnapshot();
             } else if (e.key === 'l' || e.key === 'L') {
                 e.preventDefault();
                 this.setTool('line');
-                this.pushSnapshot();
             } else if (e.key === 'p' || e.key === 'P') {
                 e.preventDefault();
                 this.setTool('pen');
-                this.pushSnapshot();
             } else if (e.key === 't' || e.key === 'T') {
                 e.preventDefault();
                 this.setTool('text');
-                this.pushSnapshot();
             } else if (e.key === 'h' || e.key === 'H') {
                 e.preventDefault();
                 this.setTool('hand');
-                this.pushSnapshot();
             }
 
             // Action shortcuts
             if (e.ctrlKey || e.metaKey) {
-                // Temporarily disabled undo/redo keyboard shortcuts
-                // if (e.key === 'z') {
-                //     e.preventDefault();
-                //     this.undo();
-                // } else if (e.key === 'y') {
-                //     e.preventDefault();
-                //     this.redo();
-                // }
+                if (e.key === 'z' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.undo();
+                } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
+                    e.preventDefault();
+                    this.redo();
+                }
             }
 
             // Zoom shortcuts
@@ -1156,6 +1125,7 @@ class CitranaApp {
         localStorage.removeItem('citranaChartData');
         window.selectedBhavaSouth = null;
         window.selectedBhavaNorth = null;
+        this.recordHistory('Clear canvas');
         console.log('Chart cleared');
     }
 
@@ -1167,6 +1137,7 @@ class CitranaApp {
         // Clear bhava selection used as drop fallback
         window.selectedBhavaSouth = null;
         window.selectedBhavaNorth = null;
+        this.recordHistory('Reset chart');
         this.layer.batchDraw();
         console.log('Chart reset: all planets and annotations cleared');
     }
@@ -1183,25 +1154,43 @@ class CitranaApp {
         // Hide edit UI if it's showing
         this.drawingTools.editUI?.hide();
 
+        this.recordHistory('Reset drawings');
         this.layer.batchDraw();
         console.log('Drawings reset: all drawing elements cleared while keeping chart structure and planets');
     }
 
-    // --- GLOBAL UNDO/REDO ---
-    pushSnapshot() {
-        const chartData = this.chartTemplates.getChartData();
-        const drawingData = this.serializeDrawings();
-        this.undoStack.push({
-            chartData,
-            drawingData
-        });
-        if (this.undoStack.length > this.maxUndoSteps) this.undoStack.shift();
-        this.redoStack = [];
+    // --- HISTORY (undo / redo) ---
+    recordHistory(label = 'Edit') {
+        this.history?.record(label);
+    }
+
+    captureHistoryState() {
+        return {
+            chartData: this.chartTemplates.getChartData(),
+            drawingData: this.serializeDrawings()
+        };
+    }
+
+    restoreHistoryState(state) {
+        if (!state) return;
+
+        this.drawingTools?.editUI?.hide();
+        this.drawingTools?.clearSelection?.();
+        this.selectedShape = null;
+
+        this.chartTemplates.loadChartData(state.chartData);
+        this.restoreDrawings(state.drawingData);
+
+        window.selectedBhavaSouth = null;
+        window.selectedBhavaNorth = null;
+        this.layer.batchDraw();
     }
 
     serializeDrawings() {
-        // Only serialize drawing objects (name starts with 'drawing-')
-        return this.layer.getChildren(node => node.name() && node.name().startsWith('drawing-')).map(node => node.toObject());
+        return this.layer.getChildren(node => {
+            const name = node.name();
+            return name && name.startsWith('drawing-');
+        }).map(node => node.toObject());
     }
 
     restoreDrawings(drawingData) {
@@ -1209,28 +1198,16 @@ class CitranaApp {
     }
 
     undo() {
-        if (this.undoStack.length === 0) return;
-        const current = {
-            chartData: this.chartTemplates.getChartData(),
-            drawingData: this.serializeDrawings()
-        };
-        this.redoStack.push(current);
-        const snapshot = this.undoStack.pop();
-        this.chartTemplates.loadChartData(snapshot.chartData);
-        this.restoreDrawings(snapshot.drawingData);
+        this.history?.undo();
     }
 
     redo() {
-        if (this.redoStack.length === 0) return;
-        const current = {
-            chartData: this.chartTemplates.getChartData(),
-            drawingData: this.serializeDrawings()
-        };
-        this.undoStack.push(current);
-        const snapshot = this.redoStack.pop();
-        this.chartTemplates.loadChartData(snapshot.chartData);
-        this.restoreDrawings(snapshot.drawingData);
-        console.log('Redo performed');
+        this.history?.redo();
+    }
+
+    /** @deprecated Use recordHistory(label) */
+    pushSnapshot(label) {
+        this.recordHistory(label || 'Edit');
     }
 
     /**

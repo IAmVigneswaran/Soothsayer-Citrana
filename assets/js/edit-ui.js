@@ -10,6 +10,8 @@ class EditUI {
         this.currentTool = null;
         this.isVisible = false;
         this.onDelete = null; // Callback for delete action
+        this._sessionDirty = false;
+        this._skipHistoryOnHide = false;
 
         // Initialize the Edit UI container
         this.initEditUIContainer();
@@ -69,6 +71,8 @@ class EditUI {
         this.currentElement = element;
         this.currentTool = tool;
         this.isVisible = true;
+        this._sessionDirty = false;
+        this._skipHistoryOnHide = false;
 
         // Note: Text properties will be handled safely in the click handlers
 
@@ -156,9 +160,13 @@ class EditUI {
      * Hide the Edit UI
      */
     hide() {
+        this._commitEditHistoryIfNeeded();
+
         this.isVisible = false;
         this.currentElement = null;
         this.currentTool = null;
+        this._sessionDirty = false;
+        this._skipHistoryOnHide = false;
 
         // Remove touch outside listener
         if (this.touchOutsideHandler) {
@@ -272,6 +280,7 @@ class EditUI {
         deleteBtn.className = 'edit-btn danger';
         deleteBtn.title = 'Delete';
         deleteBtn.addEventListener('click', () => {
+            this._skipHistoryOnHide = true;
             if (this.onDelete) this.onDelete();
         });
         controlsDiv.appendChild(deleteBtn);
@@ -354,6 +363,7 @@ class EditUI {
         // Enhanced delete functionality that works with both click and touch
         const handleDelete = () => {
             citranaDebug('[EDIT UI] Delete button pressed');
+            this._skipHistoryOnHide = true;
 
             // Call the delete callback if it exists (to properly handle control points)
             if (this.onDelete && typeof this.onDelete === 'function') {
@@ -439,6 +449,7 @@ class EditUI {
 
             this.currentElement.getLayer().batchDraw();
             sizeValue.textContent = newSize;
+            this.markEditDirty();
         });
 
         this.addTouchSupport(increaseSize, () => {
@@ -455,6 +466,7 @@ class EditUI {
 
             this.currentElement.getLayer().batchDraw();
             sizeValue.textContent = newSize;
+            this.markEditDirty();
         });
 
         // Font Style Controls
@@ -506,6 +518,7 @@ class EditUI {
 
             this.currentElement.getLayer().batchDraw();
             boldBtn.classList.toggle('active');
+            this.markEditDirty();
         });
 
         italicBtn.addEventListener('click', () => {
@@ -530,6 +543,7 @@ class EditUI {
 
             this.currentElement.getLayer().batchDraw();
             italicBtn.classList.toggle('active');
+            this.markEditDirty();
         });
 
         // Text Color Control
@@ -581,6 +595,7 @@ class EditUI {
             alignLeftBtn.classList.add('active');
             alignCenterBtn.classList.remove('active');
             alignRightBtn.classList.remove('active');
+            this.markEditDirty();
         });
         alignCenterBtn.addEventListener('click', () => {
             this.currentElement.align('center');
@@ -589,6 +604,7 @@ class EditUI {
             alignLeftBtn.classList.remove('active');
             alignCenterBtn.classList.add('active');
             alignRightBtn.classList.remove('active');
+            this.markEditDirty();
         });
         alignRightBtn.addEventListener('click', () => {
             this.currentElement.align('right');
@@ -597,6 +613,7 @@ class EditUI {
             alignLeftBtn.classList.remove('active');
             alignCenterBtn.classList.remove('active');
             alignRightBtn.classList.add('active');
+            this.markEditDirty();
         });
         controlsDiv.appendChild(alignLeftBtn);
         controlsDiv.appendChild(alignCenterBtn);
@@ -644,6 +661,7 @@ class EditUI {
         // Enhanced delete functionality that works with both click and touch
         const handleDelete = () => {
             citranaDebug('[EDIT UI] Delete button pressed');
+            this._skipHistoryOnHide = true;
 
             // Call the delete callback if it exists (to properly handle control points)
             if (this.onDelete && typeof this.onDelete === 'function') {
@@ -701,6 +719,7 @@ class EditUI {
         if (this.currentElement) {
             this.currentElement.strokeWidth(width);
             this.currentElement.getLayer().batchDraw();
+            this.markEditDirty();
         }
     }
 
@@ -718,6 +737,7 @@ class EditUI {
             }
 
             this.currentElement.getLayer().batchDraw();
+            this.markEditDirty();
         }
     }
 
@@ -732,6 +752,7 @@ class EditUI {
             this.currentElement.fontSize(size);
             citranaDebug('[EDIT UI] After update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
             this.currentElement.getLayer().batchDraw();
+            this.markEditDirty();
         }
     }
 
@@ -746,6 +767,7 @@ class EditUI {
             this.currentElement.fontWeight(weight);
             citranaDebug('[EDIT UI] After update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
             this.currentElement.getLayer().batchDraw();
+            this.markEditDirty();
         }
     }
 
@@ -760,6 +782,7 @@ class EditUI {
             this.currentElement.fontStyle(style);
             citranaDebug('[EDIT UI] After update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
             this.currentElement.getLayer().batchDraw();
+            this.markEditDirty();
         }
     }
 
@@ -771,7 +794,28 @@ class EditUI {
         if (this.currentElement) {
             this.currentElement.fill(color);
             this.currentElement.getLayer().batchDraw();
+            this.markEditDirty();
         }
+    }
+
+    markEditDirty() {
+        this._sessionDirty = true;
+    }
+
+    _commitEditHistoryIfNeeded() {
+        if (!this._sessionDirty || this._skipHistoryOnHide) {
+            return;
+        }
+
+        const labels = {
+            pen: 'Edit pen',
+            line: 'Edit line',
+            arrow: 'Edit arrow',
+            text: 'Edit text',
+            heading: 'Edit heading'
+        };
+        const label = labels[this.currentTool] || 'Edit drawing';
+        window.app?.recordHistory(label);
     }
 
     /**
