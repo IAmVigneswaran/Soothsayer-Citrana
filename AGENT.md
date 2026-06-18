@@ -12,7 +12,7 @@ Citrana is a browser-based application that allows users to create both South In
 - Graphics: HTML5 Canvas API with Konva.js (self-hosted, `assets/vendor/konva.min.js` v9.3.20)
 - Styling: Custom CSS only
 - Icons: Lucide Icons (self-hosted, `assets/vendor/lucide.min.js` v0.468.0)
-- Storage: Browser localStorage for data persistence
+- Storage: Browser `localStorage` for preferences only (welcome modal, debug opt-out)
 - Analytics: Google Analytics and Google Tag Manager
 - No build process required - runs entirely in browser
 
@@ -78,7 +78,7 @@ Key Responsibilities:
 - Manages tool selection and drawing state
 - Handles keyboard shortcuts and event listeners
 - Manages undo/redo functionality (currently disabled due to bugs)
-- Handles chart export and auto-save
+- Handles chart export
 - Provides mobile touch support and Safari compatibility
 - Manages zoom controls and canvas transformations
 
@@ -89,8 +89,6 @@ Key Methods:
 - `setupEventListeners()`: Event binding
 - `setupKeyboardShortcuts()`: Keyboard navigation
 - `exportChart()`: High-resolution PNG export
-- `autoSave()`: Automatic data persistence
-- `loadSavedData()`: Clears prior session data on page load; starts in-session auto-save interval
 - `handleMouseDown/Move/Up()`: Mouse interaction handling
 - `handleTouchStart/Move/End()`: Touch interaction handling
 
@@ -443,14 +441,14 @@ Technical Implementation:
 - Keyboard Shortcuts: Power user features for efficiency
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific house actions; Graha edit/delete
 - Status Updates: Real-time feedback and notifications
-- Auto-Save: In-session backup to `localStorage` every 30 seconds and on `beforeunload`; cleared on page refresh (export PNG to keep a copy)
+- Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First-time user experience with getting started guide
 - Mobile Zoom Controls: Select and Hand tools available in bottom zoom controls bar
 
 ### Export & Sharing
 - High-Resolution PNG: Professional quality exports (300 DPI)
-- Auto-Save: In-session backup to `localStorage` every 30 seconds and on `beforeunload`; cleared on page refresh (export PNG to keep a copy)
+- Ephemeral Sessions: Work is not restored after refresh; export PNG to keep a copy
 - Cross-Platform: Works on all modern browsers
 - GitHub Pages Compatible: No build process required
 
@@ -472,7 +470,6 @@ While the codebase might have limited support for mobile or touch, officially it
 - Optimised resize handlers
 - Optimised Planet Placement: Efficient algorithms
 - Minimal DOM Manipulation: Canvas-based rendering
-- Smart Auto-Save: 30-second intervals
 - Touch Event Optimisation: Mobile performance
 
 ## Development Guidelines
@@ -827,10 +824,9 @@ Edit the planets objects in assets/js/planet-system.js:
 - Ready for immediate deployment on GitHub Pages
 
 ### Data Management
-- Chart data auto-saves to browser `localStorage` every 30 seconds during an active visit (plain serializable Graha/Lagna/drawing data)
-- Each page load (including refresh) clears saved chart data — sessions are ephemeral across refresh
-- No server-side chart storage
-- Welcome modal preference stored in `localStorage.citrana_welcome_seen`
+- Chart work lives in the browser tab for the current visit only; refreshing the page starts a fresh session
+- Export PNG to keep a copy; chart data is not uploaded to a server
+- `localStorage` is used only for preferences (e.g. welcome modal seen, optional `citrana_debug` opt-out)
 
 ## Support and Documentation
 

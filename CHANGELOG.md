@@ -6,7 +6,7 @@
 - TBD
 
 **✨ Features:**
-- In-session auto-save — Grahas, Lagna, and drawings persist in local storage while you work; refreshing the page starts a fresh session.
+- Ephemeral browser sessions — chart work lives in this tab while you work; refreshing the page always starts fresh (export PNG to keep a copy).
 - Graha right-click menu with **Edit Graha** and **Delete Graha** (same editing panel as double-click).
 - Chart-type-specific house menus — **South Indian**: **Set as Lagna (Ascendant)**; **North Indian**: **Set as First House**.
 - **Clear House** removes all Grahas from the selected bhava.
@@ -26,7 +26,6 @@
 - Fixed dead context menu code that prevented **Edit Graha** and **Delete Graha** from running.
 - Fixed **Set as First House** on North Indian charts so the Rashi in the clicked house becomes Lagna (e.g. selecting Cancer correctly sets Cancer Ascendant).
 - Fixed Graha library drop targeting so Grahas land in the house under the pointer instead of always defaulting to house 1.
-- Fixed in-session auto-save so chart state serializes correctly to local storage during a visit.
 
 ---
 

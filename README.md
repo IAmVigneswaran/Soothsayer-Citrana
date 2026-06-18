@@ -146,7 +146,7 @@ Single Chart Limitation: Citrana does not and will not support multiple charts i
 
 ### Important Notes
 
-Session Management: Citrana auto-saves your chart to browser local storage every 30 seconds while you work (nothing is sent to a server). Refreshing the page starts a new session and clears your chart, Grahas, and drawings. Export a PNG to keep a copy.
+Session management: Your chart lives in this browser tab while you work (nothing is sent to a server). Refreshing the page always starts a fresh session — chart, Grahas, and drawings are not restored. Export a PNG to keep a copy.
 
 ## Credits
 

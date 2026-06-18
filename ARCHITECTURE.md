@@ -34,7 +34,7 @@ Script order matters: `citrana-debug.js` must load before any module that calls 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        CitranaApp (app.js)                  │
-│  Stage/Layer · Tools · Zoom · Export · Auto-save · Modals   │
+│  Stage/Layer · Tools · Zoom · Export · Modals   │
 └────────────┬───────────────────────────────┬────────────────┘
              │                               │
     ┌────────▼────────┐              ┌───────▼────────┐
@@ -58,7 +58,7 @@ Script order matters: `citrana-debug.js` must load before any module that calls 
 
 | Module | Primary role |
 |--------|----------------|
-| `app.js` | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, export, in-session auto-save, modals |
+| `app.js` | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, export, modals |
 | `chart-coordinator.js` | Unified API over South/North templates; zoom helpers; chart serialisation; pointer-to-bhava hit-test routing |
 | `chart-templates-south.js` | 4×4 grid chart, bhava numbering, Lagna indicator, `getBhavaNumberForHouse()`, `findHouseAtChartPoint()`, Graha placement/drag |
 | `chart-templates-north.js` | Diamond polygon chart, rashi boxes, Lagna-based rashi math, `findHouseAtChartPoint()`, Graha repositioning |
@@ -116,7 +116,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 - **Display**: Underlined Graha text on canvas.
 - **Storage**: `retrograde: boolean` on planet data.
 - **Editing**: Double-click Graha, right-click → **Edit Graha**, or Edit UI when applicable → retrograde button (↺)
-- **Persistence**: Included in in-session `autoSave()` payload (`planetsByHouse`); not restored after page refresh
+- **Persistence**: `retrograde` is included in in-memory chart serialisation (`getChartData()` / undo snapshots); not restored after page refresh
 - **Legacy**: Labels containing the old Unicode subscript `ᵣ` are stripped on ingest; `retrograde` is set to `true`.
 
 Key methods:
@@ -184,13 +184,14 @@ House **Clear House** calls `clearHousePlanets()` on the active template.
 1. `app.exportChart()` → optional white background rect → `stage.toDataURL({ pixelRatio: 2 })`
 2. Offscreen canvas adds padding + watermark → download as `citrana-chart-{timestamp}.png`
 
-### Auto-save (in-session only)
+### Session model (ephemeral)
 
-1. Every 30 seconds and on `beforeunload` → `app.autoSave()` writes to `localStorage['citranaChartData']`
-2. Payload uses plain serializable data (`planetsByHouse`, `lagnaHouse`, `drawingData`) — not live Konva nodes
-3. On every page load → `loadSavedData()` **clears** `citranaChartData` so refresh always starts a blank session
-4. `loadChartData()` / `getChartData()` remain available for undo snapshots and internal restore
-5. `clearChart()` also removes the `localStorage` entry
+1. Chart Grahas, Lagna, and drawings live in memory on the Konva stage for the current tab visit
+2. Refreshing the page always starts a blank session — nothing is restored from `localStorage`
+3. On init, any legacy `citranaChartData` key from older builds is removed
+4. `getChartData()` / `loadChartData()` support undo snapshots and internal restore within the same visit
+5. `clearChart()` also removes legacy `citranaChartData` if present
+6. **Export PNG** is how users keep a copy
 
 ## Global State
 
@@ -199,7 +200,6 @@ House **Clear House** calls `clearHousePlanets()` on the active template.
 | `window.app` | `index.html` on `DOMContentLoaded` | Cross-module access to coordinator, tools, menus |
 | `window.selectedBhavaSouth` | South template house click | Optional drop target for Graha library |
 | `window.selectedBhavaNorth` | North template house click | Optional drop target for Graha library |
-| `localStorage.citranaChartData` | `app.autoSave()` during visit; cleared on page load | In-session backup only (not restored on refresh) |
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
 | `localStorage.citrana_debug` | DevTools / manual | Set to `'0'` to silence `citranaDebug()` logs; omitted or any other value keeps debug on (default) |
 

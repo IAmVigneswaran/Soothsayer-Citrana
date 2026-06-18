@@ -30,7 +30,8 @@ class CitranaApp {
         this.setupComponents();
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
-        this.loadSavedData();
+        // Each visit starts fresh; clear any legacy chart data from older builds.
+        localStorage.removeItem('citranaChartData');
 
         // Show welcome modal on first visit
         this.showWelcomeModal();
@@ -452,34 +453,6 @@ class CitranaApp {
             confirmationMessage.textContent = message;
             this.pendingConfirmationCallback = callback;
             confirmationModal.classList.add('active');
-        }
-    }
-
-    loadSavedData() {
-        // Each page load (including refresh) starts a fresh session — do not restore chart data.
-        localStorage.removeItem('citranaChartData');
-
-        setInterval(() => this.autoSave(), 30000);
-        window.addEventListener('beforeunload', () => this.autoSave());
-    }
-
-    autoSave() {
-        try {
-            const chartData = this.chartTemplates.getChartData();
-            if (!chartData.chartType) {
-                localStorage.removeItem('citranaChartData');
-                return;
-            }
-
-            const payload = {
-                version: 1,
-                chartData,
-                drawingData: this.serializeDrawings()
-            };
-            localStorage.setItem('citranaChartData', JSON.stringify(payload));
-            console.log('Chart data auto-saved');
-        } catch (error) {
-            console.error('Error auto-saving:', error);
         }
     }
 
