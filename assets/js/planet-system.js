@@ -305,7 +305,6 @@ class PlanetSystem {
         this.swipeStartY = 0;
         this.isSwiping = false;
         this.draggedPlanet = null;
-        this.dropZones = [];
     }
 
     init() {
@@ -528,12 +527,6 @@ class PlanetSystem {
         if (canvas) {
             canvas.addEventListener('dragover', (e) => e.preventDefault());
             canvas.addEventListener('drop', (e) => this.handleDrop(e));
-        }
-    }
-    setupDropZones() {
-        if (this.chartTemplates) {
-            this.dropZones = this.chartTemplates.getDropZones();
-            console.log('Drop zones setup complete');
         }
     }
     handleDragStart(e, planetAbbr) {

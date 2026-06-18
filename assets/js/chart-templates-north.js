@@ -37,10 +37,6 @@ class NorthIndianChartTemplate {
         return this.houseDataNorth;
     }
 
-    getDropZones() {
-        return Object.keys(this.houseDataNorth);
-    }
-
     findHouseAtChartPoint(px, py) {
         for (const hNum in this.houseDataNorth) {
             const h = this.houseDataNorth[hNum];

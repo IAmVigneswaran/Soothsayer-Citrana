@@ -45,15 +45,6 @@ class ChartCoordinator {
         return {};
     }
 
-    getDropZones() {
-        if (this.currentChartType === 'south-indian') {
-            return this.southIndianTemplate.getDropZones();
-        } else if (this.currentChartType === 'north-indian') {
-            return this.northIndianTemplate.getDropZones();
-        }
-        return [];
-    }
-
     stagePointerToChartCoords(pointer) {
         if (!this.stage || !pointer) return null;
         const scale = this.stage.scaleX();

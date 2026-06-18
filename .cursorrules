@@ -901,7 +901,6 @@ Edit the planets objects in assets/js/planet-system.js:
         this.currentPage = 1;
         this.totalPages = 5;
         this.draggedPlanet = null;
-        this.dropZones = [];
     }
 ```
 

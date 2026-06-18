@@ -36,10 +36,6 @@ class SouthIndianChartTemplate {
         return this.houseDataSouth;
     }
 
-    getDropZones() {
-        return Object.keys(this.houseDataSouth);
-    }
-
     findHouseAtChartPoint(px, py) {
         for (const hNum in this.houseDataSouth) {
             const h = this.houseDataSouth[hNum];
