@@ -255,6 +255,9 @@ class CitranaApp {
 
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => this.handleResize());
+        }
 
         // Confirmation Dialog
         this.setupConfirmationDialog();
@@ -1068,8 +1071,12 @@ class CitranaApp {
 
     handleResize() {
         const container = document.getElementById('canvas-container');
-        this.stage.width(container.offsetWidth);
-        this.stage.height(container.offsetHeight);
+        if (!container || !this.stage) return;
+
+        const width = window.visualViewport?.width ?? container.offsetWidth;
+        const height = window.visualViewport?.height ?? container.offsetHeight;
+        this.stage.width(width);
+        this.stage.height(height);
         this.stage.batchDraw();
     }
 
