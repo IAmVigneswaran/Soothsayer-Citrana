@@ -22,12 +22,19 @@
 - Added `citranaDebug()` for contributor trace logging (enabled by default; opt out via `localStorage.citrana_debug = '0'`).
 - Removed unused legacy code (`setFirstHouse`, Graha library drop-zone scaffolding, localStorage chart auto-save).
 - Removed unused `#canvas` markup and dead `.zoom-control-btn` CSS; added `rel="noopener noreferrer"` to external links.
+- iOS standalone PWA layout respects safe areas (Dynamic Island, home indicator) with `viewport-fit=cover` and tuned floating UI positioning on mobile and desktop.
+- PWA manifest uses `display: standalone` for home-screen install.
+- Canvas resize uses `visualViewport` on supported browsers for more reliable mobile layout.
 
 **🐛 Bug Fixes:**
 - Fixed Graha and bhava right-click menus being overridden by the main chart context menu.
 - Fixed dead context menu code that prevented **Edit Graha** and **Delete Graha** from running.
 - Fixed **Set as First House** on North Indian charts so the Rashi in the clicked house becomes Lagna (e.g. selecting Cancer correctly sets Cancer Ascendant).
 - Fixed Graha library drop targeting so Grahas land in the house under the pointer instead of always defaulting to house 1.
+- Fixed mobile long-press opening the chart menu instead of the house menu (**Set as Lagna**, **Set as First House**, **Clear House**).
+- Fixed zoom bar percentage not updating on zoom in, zoom out, or reset.
+- Fixed South Indian **Reset Zoom** returning to the wrong scale after manual zoom (fit level now matches the initial chart view).
+- Fixed iOS PWA bottom controls (zoom bar, Help, About, Graha Library) sitting too high above the home indicator.
 
 ---
 
