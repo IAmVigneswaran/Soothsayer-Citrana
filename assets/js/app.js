@@ -1150,6 +1150,8 @@ class CitranaApp {
         this.stage.batchDraw();
         this.chartTemplates.clearChart();
         localStorage.removeItem('citranaChartData');
+        window.selectedBhavaSouth = null;
+        window.selectedBhavaNorth = null;
         console.log('Chart cleared');
     }
 
@@ -1158,8 +1160,9 @@ class CitranaApp {
         this.chartTemplates.clearAllPlanets();
         // Clear all annotations/drawings
         this.drawingTools.clearAll();
-        // Optionally clear selection
-        if (window.selectedBhavaSouth) window.selectedBhavaSouth = null;
+        // Clear bhava selection used as drop fallback
+        window.selectedBhavaSouth = null;
+        window.selectedBhavaNorth = null;
         this.layer.batchDraw();
         console.log('Chart reset: all planets and annotations cleared');
     }
@@ -1174,9 +1177,7 @@ class CitranaApp {
         }
 
         // Hide edit UI if it's showing
-        if (window.editUI) {
-            window.editUI.hide();
-        }
+        this.drawingTools.editUI?.hide();
 
         this.layer.batchDraw();
         console.log('Drawings reset: all drawing elements cleared while keeping chart structure and planets');

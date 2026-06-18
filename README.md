@@ -30,6 +30,7 @@ This codebase is developed using AI agents.
 - Drag & Drop Grahas: Intuitive placement with multiple instances support and dynamic text sizing
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
 - Professional Export: High-resolution PNG exports with optional transparency
+- Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
 - Context Menus: Right-click and long-press support for quick chart management
 - Keyboard Shortcuts: Power user features for efficient workflow
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
@@ -97,7 +98,7 @@ Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's inte
 ## Quick Start
 
 ### Prerequisites
-- Modern desktop web browser (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+)
+- Modern desktop web browser (Brave, Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)
 - No setup required - runs entirely in the desktop web browser
 
 ### Browser and Device Compatibility
@@ -134,7 +135,7 @@ Custom Graha: There is also a "Custom" Graha available in the library. Drag and 
 
 Drawing Tools: Use the toolbar to add arrows, lines, text, and heading. Double-click text elements to edit them. Use the Hand tool to pan around the chart.
 
-Navigation: Use zoom controls or mouse wheel to zoom in/out. The Hand tool allows you to pan around the chart for detailed work.
+Navigation: Use the zoom bar to zoom in or out, or click the lock icon to unlock zoom and use the mouse wheel or `+` / `-` keys. Reset zoom refits the chart. The Hand tool allows you to pan around the chart for detailed work. Press `?` or `/` in the app for the full keyboard shortcut list.
 
 ### Export and Limitations
 
