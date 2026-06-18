@@ -610,8 +610,9 @@ class EditUI {
 
         // Check if this is planet text (has _planetHouseNumber property)
         const isPlanetText = this.currentElement._planetHouseNumber !== undefined;
-        const currentText = this.currentElement.text ? this.currentElement.text() : '';
-        const isRetrograde = currentText.includes('R');
+        const isRetrograde = this.currentElement.textDecoration ?
+            this.currentElement.textDecoration() === 'underline' :
+            false;
 
         // Set initial active state
         if (isRetrograde) {
@@ -621,23 +622,14 @@ class EditUI {
         // Only show retrograde button for planet text
         if (isPlanetText) {
             retrogradeBtn.addEventListener('click', () => {
-                const currentText = this.currentElement.text();
-                let newText;
-
-                if (isRetrograde) {
-                    // Remove retrograde "R" - find and remove the R subscript
-                    newText = currentText.replace(/R/g, '');
-                } else {
-                    // Add retrograde "R" - add R as subscript
-                    newText = currentText + 'R';
-                }
-
-                // Update the text
-                this.currentElement.text(newText);
+                const nextRetrograde = this.currentElement.textDecoration() !== 'underline';
+                this.currentElement.textDecoration(nextRetrograde ? 'underline' : '');
+                retrogradeBtn.classList.toggle('active', nextRetrograde);
                 this.currentElement.getLayer().batchDraw();
 
-                // Toggle active state
-                retrogradeBtn.classList.toggle('active');
+                if (window.app?.drawingTools?.setPlanetRetrogradeState) {
+                    window.app.drawingTools.setPlanetRetrogradeState(this.currentElement, nextRetrograde);
+                }
             });
 
             controlsDiv.appendChild(retrogradeBtn);

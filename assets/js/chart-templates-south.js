@@ -460,7 +460,7 @@ class SouthIndianChartTemplate {
     }
 
     // --- Robust Planet Management ---
-    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null) {
+    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, retrograde = false) {
         const house = this.houseDataSouth[houseNumber];
         if (!house) return;
         if (!house.planets) house.planets = [];
@@ -468,11 +468,18 @@ class SouthIndianChartTemplate {
         const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
         const planet = window.app.planetSystem.getPlanetInfo(planetAbbr);
         const planetColor = planet ? planet.color : '#000000';
+        let resolvedLabel = label || planetAbbr;
+        let resolvedRetrograde = retrograde;
+        if (resolvedLabel.includes('ᵣ')) {
+            resolvedRetrograde = true;
+            resolvedLabel = resolvedLabel.replace(/ᵣ/g, '');
+        }
         house.planets.push({
             abbr: planetAbbr,
-            label: label || planetAbbr,
+            label: resolvedLabel,
             id: planetId,
-            color: planetColor
+            color: planetColor,
+            retrograde: resolvedRetrograde
         });
         this.updatePlanetsInHouse(houseNumber);
         if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
@@ -552,6 +559,7 @@ class SouthIndianChartTemplate {
                 fontFamily: 'Arial Black, Arial, sans-serif',
                 fontWeight: isMobile ? 700 : 'bold',
                 fill: planetObj.color || (planet ? planet.color : '#000'),
+                textDecoration: planetObj.retrograde ? 'underline' : '',
                 name: `planet-${planetObj.abbr}-${houseNumber}-${planetObj.id}`,
                 draggable: true,
                 align: 'left',
@@ -593,15 +601,17 @@ class SouthIndianChartTemplate {
 
             // Make planet text editable with live preview
             if (window.app && window.app.drawingTools) {
-                window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel, newColor) => {
+                window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel, newColor, newRetrograde) => {
                     // Update the planet label in the house data
                     const planetIndex = house.planets.findIndex(p => p.id === planetObj.id);
                     if (planetIndex !== -1) {
                         house.planets[planetIndex].label = newLabel;
                         house.planets[planetIndex].color = newColor;
+                        house.planets[planetIndex].retrograde = !!newRetrograde;
                         // Update the planet text and color
                         planetText.text(newLabel);
                         planetText.fill(newColor);
+                        planetText.textDecoration(newRetrograde ? 'underline' : '');
 
                         // Re-center the text after editing
                         setTimeout(() => {
@@ -693,7 +703,8 @@ class SouthIndianChartTemplate {
                     abbr: planetObj.abbr,
                     id: planetObj.id,
                     label: planetObj.label,
-                    color: planetObj.color
+                    color: planetObj.color,
+                    retrograde: planetObj.retrograde
                 };
                 planetText.opacity(0.5);
                 hitRect.opacity(0.5);
@@ -792,7 +803,7 @@ class SouthIndianChartTemplate {
                 if (targetHouse && targetHouse !== houseNumber) {
                     // Move planet to new bhava by ID
                     this.removePlanetFromHouseById(houseNumber, planetObj.id);
-                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id);
+                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.retrograde);
                     // Update the color of the moved planet
                     const targetHouseData = this.houseDataSouth[targetHouse];
                     if (targetHouseData && targetHouseData.planets) {

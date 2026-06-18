@@ -52,6 +52,7 @@ Soothsayer-Citrana/
 ├── .github/
 │   └── workflows/                # GitHub Actions (if configured)
 ├── AGENT.md                      # This comprehensive documentation
+├── ARCHITECTURE.md               # System architecture and data flows
 ├── .cursorrules                  # Cursor IDE configuration
 ├── CHANGELOG.md                  # Version history and changes
 ├── README.md                     # Project readme
@@ -61,6 +62,8 @@ Soothsayer-Citrana/
 ```
 
 ## Core Components Architecture
+
+For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ### Main Application (app.js - 1303 lines)
 The central coordinator that manages all application components and lifecycle.
@@ -278,7 +281,7 @@ Key Features:
 - Shape selection and editing
 - Colour and stroke customisation
 - Text editing with font controls
-- Planet text editing with retrograde support
+- Planet text editing with retrograde underline support (Konva `textDecoration`)
 - Undo/redo with 50-step history (currently disabled due to bugs)
 - Auto-switch to Select Tool after Arrow and Line creation
 - Control points for precise arrow and line adjustment
@@ -291,6 +294,7 @@ Key Methods:
 - `undo()/redo()`: History management (currently disabled due to bugs)
 - `showEditUIForShape()`: Edit interface integration
 - `makePlanetTextEditable()`: Planet text editing
+- `setPlanetRetrogradeState()`: Persist retrograde underline on Graha text
 - `createControlPoints()`: Create draggable control points for arrows and lines
 - `updateControlPointsPosition()`: Synchronise control points with shape movement
 - `clearControlPoints()`: Remove control points from display
@@ -381,7 +385,9 @@ Key Methods:
 - Dynamic Text Sizing: Planet text scales based on house occupancy
 - Touch Support: Mobile-friendly touch interactions with visual feedback
 - Degree Support: Add degree positions to Grahas (e.g., "Su-20")
-- 8-Character Limit: Extended character limit for Graha names and degree information
+- Retrograde Display: Underlined Graha text via Konva `textDecoration` (stored as `retrograde: boolean` on planet data, not appended to the label)
+- Legacy Migration: Older charts that used the Unicode subscript `ᵣ` are normalised automatically (marker removed, underline applied)
+- 8-Character Limit: Applies to Graha label text only; retrograde does not consume a character slot
 
 ### Drawing Tools
 - Select Tool: Choose and modify existing elements with Edit UI
@@ -604,9 +610,9 @@ Edit the planets objects in assets/js/planet-system.js:
                 fullName: 'KL',
                 color: '#000000'
             },
-            'IL': {
-                name: 'IL',
-                fullName: 'IL',
+            'HL': {
+                name: 'HL',
+                fullName: 'HL',
                 color: '#000000'
             },
             'SL': {
@@ -805,7 +811,9 @@ Edit the planets objects in assets/js/planet-system.js:
 ## Support and Documentation
 
 - AGENT.md: This comprehensive project documentation
+- ARCHITECTURE.md: System architecture, data flows, and extension points
 - README.md: Project overview and quick start
+- CHANGELOG.md: Version history
 
 ## Development Commands
 

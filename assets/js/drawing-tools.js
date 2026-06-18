@@ -1335,11 +1335,24 @@ class DrawingTools {
         this.isEditingPlanet = true;
         this.currentlyEditingPlanet = planetText;
 
-        const currentText = planetText.text();
+        const currentText = planetText.text().replace(/ᵣ/g, '');
         const currentColor = planetText.fill() || '#000000';
+        const initialRetrograde = planetText.textDecoration() === 'underline' || planetText.text().includes('ᵣ');
+        let retrogradeState = initialRetrograde;
 
         // Store reference to the specific planet being edited
         const editingPlanetText = planetText;
+
+        const applyRetrogradePreview = (isRetrograde) => {
+            editingPlanetText.textDecoration(isRetrograde ? 'underline' : '');
+            if (textEditInput) {
+                textEditInput.style.textDecoration = isRetrograde ? 'underline' : 'none';
+            }
+            if (retrogradeButton) {
+                retrogradeButton.classList.toggle('active', isRetrograde);
+            }
+            this.layer.batchDraw();
+        };
 
         // Get the text edit UI elements
         const textEditInput = document.getElementById('text-edit-input');
@@ -1357,33 +1370,14 @@ class DrawingTools {
         }
 
         // Set up retrograde button
-        const isRetrograde = currentText.includes('ᵣ'); // Unicode subscript R
+        let handleRetrograde = null;
         if (retrogradeButton) {
-            // Set initial state
-            if (isRetrograde) {
-                retrogradeButton.classList.add('active');
-            } else {
-                retrogradeButton.classList.remove('active');
-            }
+            applyRetrogradePreview(retrogradeState);
 
             // Add click event listener
-            const handleRetrograde = () => {
-                const currentInputText = textEditInput.value;
-                let newText;
-
-                if (currentInputText.includes('ᵣ')) {
-                    // Remove retrograde "R" subscript
-                    newText = currentInputText.replace(/ᵣ/g, '');
-                    retrogradeButton.classList.remove('active');
-                } else {
-                    // Add retrograde "R" subscript
-                    newText = currentInputText + 'ᵣ';
-                    retrogradeButton.classList.add('active');
-                }
-
-                textEditInput.value = newText;
-                // Trigger input event to update any live preview
-                textEditInput.dispatchEvent(new Event('input'));
+            handleRetrograde = () => {
+                retrogradeState = !retrogradeState;
+                applyRetrogradePreview(retrogradeState);
             };
 
             retrogradeButton.addEventListener('click', handleRetrograde);
@@ -1398,6 +1392,9 @@ class DrawingTools {
         textEditInput.value = '';
         textEditInput.value = currentText;
         textEditColor.value = currentColor;
+        if (planetText.text().includes('ᵣ')) {
+            editingPlanetText.text(currentText);
+        }
 
         // Show the text edit UI
         textEditControls.style.display = 'flex';
@@ -1428,21 +1425,26 @@ class DrawingTools {
             if (save) {
                 const newText = textEditInput.value.trim();
                 const newColor = textEditColor.value;
-                const baseText = newText.replace(/ᵣ/g, ''); // Remove R subscript for length check
-                if (newText && baseText.length <= 8) {
+                if (newText && newText.length <= 8) {
                     // Update the planet label through callback
                     if (onUpdate) {
-                        onUpdate(newText, newColor);
+                        onUpdate(newText, newColor, retrogradeState);
                     }
                 } else {
-                    // Restore original text and color if invalid
+                    // Restore original text, color, and retrograde if invalid
                     editingPlanetText.text(currentText);
                     editingPlanetText.fill(currentColor);
+                    editingPlanetText.textDecoration(initialRetrograde ? 'underline' : '');
                 }
             } else {
-                // Restore original text and color if cancelled
+                // Restore original text, color, and retrograde if cancelled
                 editingPlanetText.text(currentText);
                 editingPlanetText.fill(currentColor);
+                editingPlanetText.textDecoration(initialRetrograde ? 'underline' : '');
+            }
+
+            if (textEditInput) {
+                textEditInput.style.textDecoration = 'none';
             }
 
             // Re-enable dragging
@@ -1458,7 +1460,7 @@ class DrawingTools {
             if (deleteButton) {
                 deleteButton.removeEventListener('click', handleDelete);
             }
-            if (retrogradeButton) {
+            if (retrogradeButton && handleRetrograde) {
                 retrogradeButton.removeEventListener('click', handleRetrograde);
             }
         };
@@ -1505,7 +1507,7 @@ class DrawingTools {
             if (deleteButton) {
                 deleteButton.removeEventListener('click', handleDelete);
             }
-            if (retrogradeButton) {
+            if (retrogradeButton && handleRetrograde) {
                 retrogradeButton.removeEventListener('click', handleRetrograde);
             }
         };
@@ -1524,18 +1526,14 @@ class DrawingTools {
         const handleInput = () => {
             let newText = textEditInput.value;
 
-            // Enforce 8 character limit, but allow "ᵣ" to be added beyond it
-            const baseText = newText.replace(/ᵣ/g, ''); // Remove R subscript for length check
-            if (baseText.length > 8) {
-                // If base text is too long, truncate it but preserve R subscript if it was there
-                const truncatedBase = baseText.substring(0, 8);
-                const hasR = newText.includes('ᵣ');
-                newText = hasR ? truncatedBase + 'ᵣ' : truncatedBase;
+            if (newText.length > 8) {
+                newText = newText.substring(0, 8);
                 textEditInput.value = newText;
             }
 
             // Update ONLY the specific planet text being edited
             editingPlanetText.text(newText);
+            editingPlanetText.textDecoration(retrogradeState ? 'underline' : '');
             this.layer.batchDraw();
         };
 
@@ -1564,6 +1562,38 @@ class DrawingTools {
         textEditInput.removeAttribute('placeholder');
         textEditInput.value = currentText;
         textEditColor.value = currentColor;
+    }
+
+    /**
+     * Persist retrograde underline state for a planet on the chart
+     * @param {KonvaText} planetText - The planet text object
+     * @param {boolean} retrograde - Whether the planet is retrograde
+     */
+    setPlanetRetrogradeState(planetText, retrograde) {
+        if (!planetText || planetText._planetHouseNumber === undefined || !window.app?.chartTemplates) {
+            return;
+        }
+
+        const chartType = window.app.chartTemplates.currentChartType;
+        const template = chartType === 'south-indian' ?
+            window.app.chartTemplates.southIndianTemplate :
+            window.app.chartTemplates.northIndianTemplate;
+        const houseData = chartType === 'south-indian' ?
+            template.houseDataSouth :
+            template.houseDataNorth;
+        const house = houseData[planetText._planetHouseNumber];
+        const planet = house?.planets?.find((p) => p.id === planetText._planetId);
+
+        if (planet) {
+            planet.retrograde = retrograde;
+        }
+
+        planetText.textDecoration(retrograde ? 'underline' : '');
+        planetText.getLayer()?.batchDraw();
+
+        if (window.app.pushSnapshot) {
+            window.app.pushSnapshot();
+        }
     }
 
     /**
