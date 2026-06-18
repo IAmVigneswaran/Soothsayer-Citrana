@@ -657,26 +657,15 @@ class ContextMenu {
                 break;
 
             case 'set-lagna':
-                // Set the right-clicked house as Lagna directly
                 citranaDebug('Context Menu - set-lagna action triggered');
                 citranaDebug('House number from menu:', houseNumber);
-                citranaDebug('Parsed house number:', parseInt(houseNumber));
 
-                if (window.app && window.app.chartTemplates) {
-                    if (houseNumber) {
-                        // If house number is provided (from house-specific menu), set that house as Lagna
-                        citranaDebug('Calling chartTemplates.setLagnaHouse with:', parseInt(houseNumber));
-                        window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber));
-                    } else {
-                        // If no house number (from chart context menu), show a prompt or use default
-                        citranaDebug('No house number provided, using default behavior');
-                        // For North Indian chart, you might want to set a default house or show a prompt
-                        // For now, let's set house 1 as default
-                        window.app.chartTemplates.setLagnaHouse(1);
-                    }
-                } else {
-                    citranaDebug('ERROR: Cannot set Lagna - missing app or chartTemplates');
+                if (!houseNumber || !window.app?.chartTemplates) {
+                    citranaDebug('set-lagna skipped — missing house number or chart');
+                    break;
                 }
+
+                window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber, 10));
                 break;
 
             case 'set-first-house':
