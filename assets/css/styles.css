@@ -234,7 +234,7 @@ body {
 /* Floating Zoom Controls */
 .floating-zoom-controls {
   position: fixed;
-  bottom: calc(var(--ui-bottom-pad) + var(--sab));
+  bottom: calc(var(--ui-inset) + var(--sab));
   left: calc(var(--ui-inset) + var(--sal));
   display: flex;
   align-items: center;
@@ -531,8 +531,8 @@ body {
   display: block;
 }
 
-/* Installed PWA: safe-area already clears home indicator — use minimal extra pad */
-@media (display-mode: standalone) {
+/* Installed PWA on mobile: safe-area already clears home indicator */
+@media (max-width: 768px) and (display-mode: standalone) {
   :root {
     --ui-bottom-pad: 4px;
   }
@@ -643,14 +643,26 @@ body {
     /* Force display */
     display: flex !important;
     visibility: visible !important;
-    /* Safari positioning fixes */
     position: fixed !important;
-    bottom: calc(var(--ui-bottom-pad) + var(--sab)) !important;
-    left: 50% !important;
-    transform: translateX(-50%) translateZ(0) !important;
-    -webkit-transform: translateX(-50%) translateZ(0) !important;
-    /* Ensure it's above other elements */
     z-index: 9999 !important;
+  }
+
+  @media (max-width: 768px) {
+    .floating-zoom-controls {
+      bottom: calc(var(--ui-bottom-pad) + var(--sab)) !important;
+      left: 50% !important;
+      transform: translateX(-50%) translateZ(0) !important;
+      -webkit-transform: translateX(-50%) translateZ(0) !important;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .floating-zoom-controls {
+      bottom: calc(var(--ui-inset) + var(--sab)) !important;
+      left: calc(var(--ui-inset) + var(--sal)) !important;
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
+    }
   }
 
   /* Safari-specific top toolbar fix */
@@ -1136,7 +1148,7 @@ body {
 /* About Button */
 .about-btn {
   position: fixed;
-  bottom: calc(var(--ui-bottom-pad) + var(--sab));
+  bottom: calc(var(--ui-inset) + var(--sab));
   right: calc(var(--ui-inset) + var(--sar));
   width: 40px;
   height: 40px;
