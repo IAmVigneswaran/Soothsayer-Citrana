@@ -38,40 +38,25 @@ class ContextMenu {
             // Desktop: Right-click context menu
             canvas.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-
-                // Graha and bhava menus are handled by Konva shape handlers
-                const stage = window.app?.stage;
-                if (stage) {
-                    const pos = stage.getPointerPosition();
-                    if (pos) {
-                        const shape = stage.getIntersection(pos);
-                        const name = shape?.name?.() || '';
-                        if (name.startsWith('planet-') ||
-                            name.startsWith('planet-hit-') ||
-                            name.startsWith('house-')) {
-                            return;
-                        }
-                    }
-                }
-
-                this.showChartMenu(e.clientX, e.clientY);
+                this.openContextMenuAtClientPoint(e.clientX, e.clientY);
             });
 
-            // Mobile: Long press for context menu
+            // Mobile: Long press for context menu (same hit-test routing as desktop)
             let longPressTimer = null;
             let longPressTriggered = false;
 
             canvas.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) { // Single touch only
+                if (e.touches.length === 1) {
                     longPressTriggered = false;
+                    const clientX = e.touches[0].clientX;
+                    const clientY = e.touches[0].clientY;
                     longPressTimer = setTimeout(() => {
-                        const touch = e.touches[0];
                         e.preventDefault();
                         longPressTriggered = true;
-                        this.showChartMenu(touch.clientX, touch.clientY);
+                        this.openContextMenuAtClientPoint(clientX, clientY);
                     }, 500);
                 }
-            });
+            }, { passive: false });
 
             canvas.addEventListener('touchmove', (e) => {
                 // Cancel long press if user moves finger
@@ -145,6 +130,115 @@ class ContextMenu {
                 this.hide();
             }
         });
+    }
+
+    getShapeAtClientPoint(clientX, clientY) {
+        const stage = window.app?.stage;
+        if (!stage) return null;
+
+        const container = stage.container();
+        if (!container) return null;
+
+        const rect = container.getBoundingClientRect();
+        const pos = {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+
+        return stage.getIntersection(pos);
+    }
+
+    findPlanetContextById(planetId) {
+        const template = this.getActiveChartTemplate();
+        if (!template || !planetId) return null;
+
+        const houseData = template.getHouseData();
+        for (const hNum in houseData) {
+            const planets = houseData[hNum]?.planets;
+            if (!Array.isArray(planets)) continue;
+
+            const planet = planets.find((p) => p.id === planetId);
+            if (planet) {
+                return {
+                    houseNumber: parseInt(hNum, 10),
+                    abbr: planet.abbr,
+                    planetId: planet.id
+                };
+            }
+        }
+        return null;
+    }
+
+    resolveContextTarget(shape) {
+        let node = shape;
+        while (node) {
+            const name = typeof node.name === 'function' ? node.name() : '';
+            if (!name) {
+                node = node.getParent();
+                continue;
+            }
+
+            if (name.startsWith('house-')) {
+                const houseNumber = parseInt(name.slice('house-'.length), 10);
+                if (houseNumber) {
+                    return { kind: 'house', houseNumber };
+                }
+            }
+
+            if (name.startsWith('planet-hit-')) {
+                const planetId = name.slice('planet-hit-'.length);
+                const ctx = this.findPlanetContextById(planetId);
+                if (ctx) {
+                    return { kind: 'planet', ...ctx };
+                }
+            }
+
+            if (name.startsWith('planet-') && !name.startsWith('planet-hit-')) {
+                const match = name.match(/^planet-(.+)-(\d+)-(.+)$/);
+                if (match) {
+                    return {
+                        kind: 'planet',
+                        abbr: match[1],
+                        houseNumber: parseInt(match[2], 10),
+                        planetId: match[3]
+                    };
+                }
+            }
+
+            node = node.getParent();
+        }
+        return null;
+    }
+
+    openContextMenuAtClientPoint(clientX, clientY) {
+        const shape = this.getShapeAtClientPoint(clientX, clientY);
+        const target = this.resolveContextTarget(shape);
+
+        if (target?.kind === 'house') {
+            const template = this.getActiveChartTemplate();
+            if (template?.highlightHouse) {
+                template.highlightHouse(target.houseNumber);
+            }
+            if (window.app?.chartTemplates?.currentChartType === 'south-indian') {
+                window.selectedBhavaSouth = target.houseNumber;
+            } else if (window.app?.chartTemplates?.currentChartType === 'north-indian') {
+                window.selectedBhavaNorth = target.houseNumber;
+            }
+            this.showHouseMenu(clientX, clientY, target.houseNumber);
+            return;
+        }
+
+        if (target?.kind === 'planet') {
+            const template = this.getActiveChartTemplate();
+            const planetText = this.findPlanetTextNode(target.houseNumber, target.planetId);
+            if (template?.selectPlanet && planetText) {
+                template.selectPlanet(planetText, target.houseNumber, target.abbr, target.planetId);
+            }
+            this.showPlanetMenu(clientX, clientY, target.houseNumber, target.abbr, target.planetId);
+            return;
+        }
+
+        this.showChartMenu(clientX, clientY);
     }
 
     showChartMenu(x, y) {
