@@ -31,11 +31,11 @@ This codebase is developed using AI agents.
 - Graha Library: 51 Grahas across 5 pages including, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Grahas
 - Drag & Drop Grahas: Intuitive placement with multiple instances support and dynamic text sizing
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
-- Professional Export: High-resolution PNG exports (300 DPI) with auto-save functionality
+- Professional Export: High-resolution PNG exports with optional transparency
 - Context Menus: Right-click and long-press support for quick chart management
 - Keyboard Shortcuts: Power user features for efficient workflow
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
-- Privacy focused: No data collection, no tracking, no server-side storage
+- Privacy focused: Chart data is not uploaded to our servers; your work stays in this browser session
 
 ## Table of Contents
 
@@ -130,21 +130,21 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 
 ### Creating Your First Chart
 
-1. **Choose Chart Type**: Select between South Indian or North Indian layout
-2. **Set Lagna**: Right-click any Bhava and select "Set as Lagna (Ascendant)"
-3. **Add Grahas**: Drag Graha from Graha Library to selected Bhava
+1. **Choose Chart Type**: Right-click the canvas and select South Indian or North Indian layout
+2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna (Ascendant)**. North Indian — right-click a Bhava and select **Set as First House**, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign
+3. **Add Grahas**: Drag Graha from the Graha Library to a Bhava (click a Bhava first for accurate placement)
 4. **Add Annotations**: Use drawing tools to add notes and aspects
-5. **Export**: Click "Export" to save your chart in `.png`
+5. **Export**: Click the save button to export your chart as a PNG
 
 ### Chart Types
 
-South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any Bhava to set it as Lagna (Ascendant). A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.
+South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any Bhava and select **Set as Lagna (Ascendant)**. A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.
 
-North Indian Chart: Diamond layout with dynamic positioning. Right-click any Bhava to set it as Lagna. All Grahas placed in the Bhavas will automatically rotate and renumbered based on the new Lagna position.
+North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First House** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign. Grahas reposition automatically when Lagna changes.
 
 ### Working with Grahas
 
-Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined).
+Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it.
 
 Custom Graha: There is also a "Custom" Graha available in the library. Drag and drop it into any Bhava, then double-click to edit the name. There is a maximum character limit of 8 characters for all Graha names.
 
@@ -164,7 +164,7 @@ Single Chart Limitation: Citrana does not and will not support multiple charts i
 
 ### Important Notes
 
-Session Management: All sessions are ephemeral. The moment the browser refreshes, all data and progress will be reset and cleared. Citrana is privacy-focused and nothing is stored on the server.
+Session Management: Citrana does not upload your chart to a server. Your work exists only in this browser tab; refreshing the page will clear your chart, Grahas, and drawings. Export a PNG to keep a copy.
 
 ## Credits
 

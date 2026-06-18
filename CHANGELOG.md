@@ -12,6 +12,7 @@
 - Graha right-click menu simplified to **Edit Graha** and **Delete Graha**, opening the same editing panel as double-click or removing the Graha from the chart.
 - House right-click menus are now chart-type specific: **South Indian** shows **Set as Lagna (Ascendant)** only; **North Indian** shows **Set as First House** only.
 - Removed **Set as Lagna** from the South Indian chart-level context menu; North Indian **Set Lagna as…** (zodiac) remains on chart right-click.
+- Updated Help modal, Welcome modal, and README for accurate North Indian Lagna instructions and browser-session data guidance.
 - South Indian house menu header now shows **House** numbering from the current Lagna position (fixed Rashi grid, rotating house count).
 - **Clear House** now removes all Grahas from the selected bhava.
 
