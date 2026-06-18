@@ -38,6 +38,22 @@ class ContextMenu {
             // Desktop: Right-click context menu
             canvas.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
+
+                // Graha and bhava menus are handled by Konva shape handlers
+                const stage = window.app?.stage;
+                if (stage) {
+                    const pos = stage.getPointerPosition();
+                    if (pos) {
+                        const shape = stage.getIntersection(pos);
+                        const name = shape?.name?.() || '';
+                        if (name.startsWith('planet-') ||
+                            name.startsWith('planet-hit-') ||
+                            name.startsWith('house-')) {
+                            return;
+                        }
+                    }
+                }
+
                 this.showChartMenu(e.clientX, e.clientY);
             });
 
@@ -327,20 +343,37 @@ class ContextMenu {
         console.log('[DEBUG] showHouseMenu called for house:', houseNumber);
         const chartType = window.app?.chartTemplates?.currentChartType;
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
+
+        let houseLabel = houseNumber;
+        if (chartType === 'south-indian') {
+            const template = window.app?.chartTemplates?.southIndianTemplate;
+            if (template) {
+                houseLabel = template.getBhavaNumberForHouse(parseInt(houseNumber, 10));
+            }
+        }
+
+        const headerSuffix = `House ${houseLabel}`;
+
+        let lagnaActionHtml = '';
+        if (chartType === 'south-indian') {
+            lagnaActionHtml = `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}"><i data-lucide="target"></i> Set as Lagna (Ascendant)</div>`;
+        } else if (chartType === 'north-indian') {
+            lagnaActionHtml = `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}"><i data-lucide="home"></i> Set as First House</div>`;
+        }
+
         const menuHtml =
-            `<div class="context-menu-header">${chartName} Chart - House ${houseNumber}</div>` +
+            `<div class="context-menu-header">${chartName} Chart - ${headerSuffix}</div>` +
             `<div class="context-menu-separator"></div>` +
-            `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}"><i data-lucide="target"></i> Set as Lagna (Ascendant)</div>` +
-            `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}"><i data-lucide="home"></i> Set as First House</div>` +
+            lagnaActionHtml +
             `<div class="context-menu-separator"></div>` +
             `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}"><i data-lucide="trash-2"></i> Clear House</div>` +
             `<div class="context-menu-separator"></div>` +
             `<div class="context-menu-item" data-action="reset-chart"><i data-lucide="refresh-ccw"></i> Reset Chart</div>` +
             `<div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>`;
-        console.log('[DEBUG] Menu HTML:', menuHtml);
+
         this.menu.innerHTML = menuHtml;
         lucide.createIcons();
-        // Explicitly set data-house attributes after rendering
+
         const lagnaItem = this.menu.querySelector('[data-action="set-lagna"]');
         const firstHouseItem = this.menu.querySelector('[data-action="set-first-house"]');
         const clearHouseItem = this.menu.querySelector('[data-action="clear-house"]');
@@ -361,22 +394,16 @@ class ContextMenu {
     }
 
     showPlanetMenu(x, y, houseNumber, planetAbbr, planetId) {
-        // Custom context menu for planet text
         const menuHtml = `
             <div class="context-menu-header">Planet Options</div>
             <div class="context-menu-separator"></div>
-            <div class="context-menu-item has-submenu" data-action="edit-planet-parent"><i data-lucide="edit"></i> Edit
-                <div class="context-submenu context-menu">
-                    <div class="context-menu-item" data-action="rename-planet" data-house="${houseNumber}" data-abbr="${planetAbbr}" data-planetid="${planetId}"><i data-lucide="type"></i> Rename</div>
-                    <div class="context-menu-item danger" data-action="delete-planet" data-house="${houseNumber}" data-abbr="${planetAbbr}" data-planetid="${planetId}"><i data-lucide="trash-2"></i> Delete</div>
-                </div>
-            </div>
+            <div class="context-menu-item" data-action="rename-planet" data-house="${houseNumber}" data-abbr="${planetAbbr}" data-planetid="${planetId}"><i data-lucide="edit"></i> Edit Graha</div>
+            <div class="context-menu-item danger last-item" data-action="delete-planet" data-house="${houseNumber}" data-abbr="${planetAbbr}" data-planetid="${planetId}"><i data-lucide="trash-2"></i> Delete Graha</div>
         `;
         this.menu.innerHTML = menuHtml;
         lucide.createIcons();
         this.show(x, y);
         this.setupMenuEventListeners();
-        this.setupSubmenuHover();
         this.menu.style.zIndex = '9999';
     }
 
@@ -391,8 +418,12 @@ class ContextMenu {
             e.preventDefault();
             const action = item.dataset.action;
             const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
+            const context = {
+                planetId: item.dataset.planetid,
+                abbr: item.dataset.abbr
+            };
             console.log('[DEBUG] Menu item clicked:', action, houseNumber);
-            this.handleAction(action, houseNumber);
+            this.handleAction(action, houseNumber, context);
             this.hide();
         };
 
@@ -414,8 +445,12 @@ class ContextMenu {
                 e.stopPropagation();
                 const action = item.dataset.action;
                 const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
+                const context = {
+                    planetId: item.dataset.planetid,
+                    abbr: item.dataset.abbr
+                };
                 console.log('[DEBUG] Menu item touched:', action, houseNumber);
-                this.handleAction(action, houseNumber);
+                this.handleAction(action, houseNumber, context);
                 this.hide();
             } else {
                 console.log('[CONTEXT MENU] No menu item found');
@@ -425,7 +460,86 @@ class ContextMenu {
         });
     }
 
-    handleAction(action, houseNumber) {
+    getActiveChartTemplate() {
+        const chartType = window.app?.chartTemplates?.currentChartType;
+        if (chartType === 'south-indian') {
+            return window.app.chartTemplates.southIndianTemplate;
+        }
+        if (chartType === 'north-indian') {
+            return window.app.chartTemplates.northIndianTemplate;
+        }
+        return null;
+    }
+
+    findPlanetTextNode(houseNumber, planetId) {
+        const template = this.getActiveChartTemplate();
+        if (!template || !planetId) return null;
+
+        const chartGroup = template.getChartGroup();
+        if (!chartGroup) return null;
+
+        const house = parseInt(houseNumber, 10);
+        const suffix = `-${house}-${planetId}`;
+
+        return chartGroup.findOne((node) => {
+            const name = node.name();
+            return name &&
+                name.startsWith('planet-') &&
+                !name.startsWith('planet-hit-') &&
+                name.endsWith(suffix);
+        });
+    }
+
+    openPlanetEditor(houseNumber, planetId) {
+        const template = this.getActiveChartTemplate();
+        const planetText = this.findPlanetTextNode(houseNumber, planetId);
+        if (!template || !planetText || !window.app?.drawingTools) return;
+
+        const house = parseInt(houseNumber, 10);
+        const houseData = template.getHouseData()[house];
+        if (!houseData?.planets) return;
+
+        window.app.drawingTools.editPlanetText(planetText, (newLabel, newColor, newRetrograde) => {
+            const planetIndex = houseData.planets.findIndex((p) => p.id === planetId);
+            if (planetIndex === -1) return;
+
+            houseData.planets[planetIndex].label = newLabel;
+            houseData.planets[planetIndex].color = newColor;
+            houseData.planets[planetIndex].retrograde = !!newRetrograde;
+            template.updatePlanetsInHouse(house);
+
+            if (window.app.pushSnapshot) {
+                window.app.pushSnapshot();
+            }
+        });
+    }
+
+    removePlanetFromHouse(houseNumber, planetId) {
+        const template = this.getActiveChartTemplate();
+        if (!template || !planetId) return;
+
+        const house = parseInt(houseNumber, 10);
+        template.removePlanetFromHouseById(house, planetId);
+    }
+
+    clearHousePlanets(houseNumber) {
+        const template = this.getActiveChartTemplate();
+        if (!template) return;
+
+        const house = parseInt(houseNumber, 10);
+        const houseData = template.getHouseData()[house];
+        if (!houseData) return;
+
+        houseData.planets = [];
+        template.updatePlanetsInHouse(house);
+        template.getLayer().batchDraw();
+
+        if (window.app.pushSnapshot) {
+            window.app.pushSnapshot();
+        }
+    }
+
+    handleAction(action, houseNumber, context = {}) {
         switch (action) {
             case 'create-south-indian':
                 window.app.chartTemplates.createSouthIndianChart();
@@ -479,33 +593,31 @@ class ContextMenu {
                 break;
 
             case 'set-first-house':
-                if (houseNumber) {
-                    window.app.chartTemplates.setFirstHouse(parseInt(houseNumber));
+                if (houseNumber && window.app?.chartTemplates?.currentChartType === 'north-indian') {
+                    const template = window.app.chartTemplates.northIndianTemplate;
+                    const visualHouse = parseInt(houseNumber, 10);
+                    const rashiLagna = template.getRashiNumberForHouse(visualHouse);
+                    window.app.chartTemplates.setLagnaHouse(rashiLagna);
                 }
                 break;
 
             case 'clear-house':
                 if (houseNumber) {
-                    // Implement house clearing logic
-                    console.log(`Clear house ${houseNumber}`);
+                    this.clearHousePlanets(houseNumber);
                 }
                 break;
 
-                // Add planet actions
-                if (action === 'rename-planet') {
-                    const abbr = this.menu.querySelector('[data-action="rename-planet"]').dataset.abbr;
-                    const planetId = this.menu.querySelector('[data-action="rename-planet"]').dataset.planetid;
-                    const newLabel = prompt('Enter new label for this planet:');
-                    if (newLabel && window.app.chartTemplates.currentChartType === 'south-indian') {
-                        window.app.chartTemplates.southIndianTemplate.renamePlanetInHouseById(parseInt(houseNumber), planetId, newLabel);
-                    }
-                } else if (action === 'delete-planet') {
-                    const abbr = this.menu.querySelector('[data-action="delete-planet"]').dataset.abbr;
-                    const planetId = this.menu.querySelector('[data-action="delete-planet"]').dataset.planetid;
-                    if (window.app.chartTemplates.currentChartType === 'south-indian') {
-                        window.app.chartTemplates.southIndianTemplate.removePlanetFromHouseById(parseInt(houseNumber), planetId);
-                    }
+            case 'rename-planet':
+                if (houseNumber && context.planetId) {
+                    this.openPlanetEditor(houseNumber, context.planetId);
                 }
+                break;
+
+            case 'delete-planet':
+                if (houseNumber && context.planetId) {
+                    this.removePlanetFromHouse(houseNumber, context.planetId);
+                }
+                break;
         }
     }
 

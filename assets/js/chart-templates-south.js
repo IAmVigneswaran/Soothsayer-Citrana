@@ -379,6 +379,7 @@ class SouthIndianChartTemplate {
         house.on('contextmenu', (e) => {
             console.log('[DEBUG] South Indian Chart House right-clicked:', houseNumber);
             e.evt.preventDefault();
+            e.evt.stopPropagation();
             this.highlightHouse(houseNumber);
             window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
         });
@@ -641,6 +642,7 @@ class SouthIndianChartTemplate {
             // Right-click context menu
             const contextHandler = (e) => {
                 e.evt.preventDefault();
+                e.evt.stopPropagation();
                 this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
                 window.app.contextMenu.showPlanetMenu(e.evt.clientX, e.evt.clientY, houseNumber, planetObj.abbr, planetObj.id);
             };
@@ -900,6 +902,20 @@ class SouthIndianChartTemplate {
         this.firstHouseSouth = houseNumber;
         this.renumberHouses();
         console.log(`First house set to house ${houseNumber}`);
+    }
+
+    /**
+     * Get the bhava number (1–12 from Lagna) for a fixed grid house position.
+     * Rashi signs are fixed per cell in the South Indian layout; bhava counting rotates with Lagna.
+     * @param {number} houseNumber - Fixed grid house number (1–12)
+     * @returns {number} Bhava number relative to current Lagna
+     */
+    getBhavaNumberForHouse(houseNumber) {
+        const visualOrder = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        const lagnaIdx = visualOrder.indexOf(this.lagnaHouseSouth);
+        const houseOrder = visualOrder.slice(lagnaIdx).concat(visualOrder.slice(0, lagnaIdx));
+        const bhavaIdx = houseOrder.indexOf(houseNumber);
+        return bhavaIdx >= 0 ? bhavaIdx + 1 : houseNumber;
     }
 
     renumberHouses() {

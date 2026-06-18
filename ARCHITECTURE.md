@@ -58,12 +58,12 @@ Script order matters: chart template classes must load before `ChartCoordinator`
 |--------|----------------|
 | `app.js` | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, export, auto-save, modals |
 | `chart-coordinator.js` | Unified API over South/North templates; zoom helpers; chart serialisation entry points |
-| `chart-templates-south.js` | 4×4 grid chart, bhava numbering, Lagna indicator, Graha placement/drag |
+| `chart-templates-south.js` | 4×4 grid chart, bhava numbering, Lagna indicator, `getBhavaNumberForHouse()`, Graha placement/drag |
 | `chart-templates-north.js` | Diamond polygon chart, rashi boxes, Lagna-based rashi math, Graha repositioning |
 | `planet-system.js` | Graha library UI (5 pages), drag-and-drop from library to chart |
 | `drawing-tools.js` | Drawing tools, selection, control points, Graha text editing panel |
 | `edit-ui.js` | Floating property editor for drawing shapes (and Graha retrograde toggle when applicable) |
-| `context-menu.js` | Right-click / long-press menus for chart, house, and Graha actions |
+| `context-menu.js` | Right-click / long-press menus; chart-type-specific house menus; Graha edit/delete; menu routing and `handleAction()` |
 | `styles.css` | Light theme, floating UI layout, modals, responsive breakpoints |
 
 ## Canvas Object Naming
@@ -113,7 +113,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 - **Display**: Underlined Graha text on canvas.
 - **Storage**: `retrograde: boolean` on planet data.
-- **Editing**: Double-click Graha → floating edit panel → retrograde button (↺). Also available from Edit UI when editing Graha text.
+- **Editing**: Double-click Graha, right-click → **Edit Graha**, or Edit UI when applicable → retrograde button (↺)
 - **Persistence**: Saved with chart data in `localStorage` via `getChartData()` / `loadChartData()`.
 - **Legacy**: Labels containing the old Unicode subscript `ᵣ` are stripped on ingest; `retrograde` is set to `true`.
 
@@ -139,12 +139,32 @@ Key methods:
 
 ### Set Lagna
 
-- **South**: `setLagnaHouse(n)` → renumber bhava boxes, draw diagonal Lagna indicator
-- **North**: `setLagnaHouse(n)` → renumber rashi boxes, `repositionPlanetsForNewLagna()` using stored `rashiNumber`
+- **South Indian**
+  - Chart menu → **Set as Lagna** (choose house 1–12 from Lagna-relative numbering)
+  - House menu → **Set as Lagna (Ascendant)** on the clicked bhava
+  - `setLagnaHouse(n)` → renumber bhava boxes, draw diagonal Lagna indicator
+  - House menu header uses `getBhavaNumberForHouse()` so **House N** counts from Lagna, not fixed grid Rashi position
+- **North Indian**
+  - Chart menu → **Set Lagna as…** → pick zodiac sign (1–12); submenu on desktop, flat list on mobile
+  - House menu → **Set as First House** → reads `getRashiNumberForHouse(visualHouse)` and calls `setLagnaHouse(rashi)` so the sign in that cell becomes Lagna
+  - `lagnaHouseNorth` stores the **Rashi sign** (1–12), not the visual house index
+  - `setLagnaHouse(n)` → renumber rashi boxes, `repositionPlanetsForNewLagna()` using stored `rashiNumber` on each Graha
+
+### Context menus
+
+Right-click routing:
+
+1. **Graha** (`planet-*` / `planet-hit-*`): Konva handler calls `stopPropagation()` → `showPlanetMenu()` → **Edit Graha** or **Delete Graha**
+2. **Bhava** (`house-*`): Konva handler calls `stopPropagation()` → `showHouseMenu()` with chart-type-specific items
+3. **Empty canvas**: Stage listener skips when pointer intersects house or Graha nodes → `showChartMenu()` (create or existing chart menu)
+
+Graha actions from context menu delegate to `openPlanetEditor()` and `removePlanetFromHouse()`, which use `getActiveChartTemplate()` and `findPlanetTextNode()`.
+
+House **Clear House** calls `clearHousePlanets()` on the active template.
 
 ### Edit Graha
 
-1. Double-click Graha text → `DrawingTools.editPlanetText()`
+1. Double-click Graha text, or right-click → **Edit Graha** → `DrawingTools.editPlanetText()` / `openPlanetEditor()`
 2. On save → template callback updates `label`, `color`, `retrograde` in house data and Konva node
 
 ### Draw annotation
@@ -193,7 +213,9 @@ Breakpoints in `styles.css`: **769px+** desktop, **768px** tablet, **600px** mob
 | Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` |
 | Add drawing tool | `DrawingTools.startDrawing()` switch, toolbar in `index.html`, `app.setTool()` |
 | New chart type | New template class + routes in `ChartCoordinator` |
-| Context menu action | `ContextMenu.handleAction()` |
+| Context menu action | `ContextMenu.handleAction()`; add items in `showHouseMenu()` / `showPlanetMenu()` as needed |
+| South bhava menu header | `SouthIndianChartTemplate.getBhavaNumberForHouse()` |
+| North First House → Lagna | `getRashiNumberForHouse()` then `setLagnaHouse()` in `handleAction('set-first-house')` |
 | Graha visual style | `updatePlanetsInHouse()` in chart template files |
 | Theme / layout | `assets/css/styles.css` |
 | Export behaviour | `app.exportChart()` |

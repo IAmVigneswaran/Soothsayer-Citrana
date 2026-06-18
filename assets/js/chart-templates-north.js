@@ -239,6 +239,7 @@ class NorthIndianChartTemplate {
             // Add right-click event for context menu
             housePolygonNorth.on('contextmenu', (e) => {
                 e.evt.preventDefault();
+                e.evt.stopPropagation();
                 this.highlightHouse(houseNumberNorth);
                 window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumberNorth);
             });
@@ -819,6 +820,7 @@ class NorthIndianChartTemplate {
             // Right-click context menu
             const contextHandler = (e) => {
                 e.evt.preventDefault();
+                e.evt.stopPropagation();
                 this.selectPlanet && this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
                 window.app.contextMenu.showPlanetMenu(e.evt.clientX, e.evt.clientY, houseNumber, planetObj.abbr, planetObj.id);
             };
