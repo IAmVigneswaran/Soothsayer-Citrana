@@ -443,7 +443,7 @@ class ContextMenu {
 
         let lagnaActionHtml = '';
         if (chartType === 'south-indian') {
-            lagnaActionHtml = `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}"><i data-lucide="target"></i> Set as Lagna (Ascendant)</div>`;
+            lagnaActionHtml = `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}"><i data-lucide="target"></i> Set as Lagna</div>`;
         } else if (chartType === 'north-indian') {
             lagnaActionHtml = `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}"><i data-lucide="home"></i> Set as First House</div>`;
         }

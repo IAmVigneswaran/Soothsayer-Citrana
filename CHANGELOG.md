@@ -8,7 +8,7 @@
 **✨ Features:**
 - Ephemeral browser sessions — chart work lives in this tab while you work; refreshing the page always starts fresh (export PNG to keep a visual copy).
 - Graha right-click menu with **Edit Graha** and **Delete Graha** (same editing panel as double-click).
-- Chart-type-specific house menus — **South Indian**: **Set as Lagna (Ascendant)**; **North Indian**: **Set as First House**.
+- Chart-type-specific house menus — **South Indian**: **Set as Lagna**; **North Indian**: **Set as First House**.
 - **Clear House** removes all Grahas from the selected bhava.
 
 **🔧 Improvements:**

@@ -323,7 +323,7 @@ Menu Types:
 - **Chart Creation Menu** (empty canvas): Create North/South Indian chart, Clear Canvas
 - **Existing Chart Menu** (canvas right-click with chart loaded): Reset Chart, Reset Drawings, Clear Canvas; North Indian only: Set Lagna as… (zodiac submenu on desktop, flat rashi list on mobile)
 - **House Menu** (right-click bhava):
-  - **South Indian**: Header shows `House N` counted from current Lagna (fixed Rashi grid); Set as Lagna (Ascendant); Clear House; Reset Chart; Clear Canvas
+  - **South Indian**: Header shows `House N` counted from current Lagna (fixed Rashi grid); Set as Lagna; Clear House; Reset Chart; Clear Canvas
   - **North Indian**: Header shows `House N` (visual diamond position); Set as First House (sets Lagna to the Rashi in that cell); Clear House; Reset Chart; Clear Canvas
 - **Planet Menu** (right-click Graha): Edit Graha (opens floating edit panel), Delete Graha
 
@@ -383,7 +383,7 @@ Key Methods:
 ### Chart Types
 - South Indian Chart: Traditional 4x4 square grid layout with centre empty space; Rashi signs are fixed per grid cell
 - North Indian Chart: Diamond-shaped polygon layout with dynamic Rashi numbering based on Lagna
-- **South Indian Lagna**: Right-click a bhava → **Set as Lagna (Ascendant)** only (no chart-level Set as Lagna). House menu header shows **House N** counted from Lagna (not fixed grid position)
+- **South Indian Lagna**: Right-click a bhava → **Set as Lagna** only (no chart-level Set as Lagna). House menu header shows **House N** counted from Lagna (not fixed grid position)
 - **North Indian Lagna**: Right-click empty canvas → **Set Lagna as…** (choose zodiac sign); or right-click a bhava showing a sign → **Set as First House** (that Rashi becomes Lagna). Grahas reposition by stored `rashiNumber`
 - Dynamic House Numbering: South Indian bhava numbers (yellow boxes) rotate from Lagna; North Indian Rashi boxes recalculate from Lagna
 

@@ -113,14 +113,14 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 ### Creating Your First Chart
 
 1. **Choose Chart Type**: Right-click the canvas and select South Indian or North Indian layout
-2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna (Ascendant)**. North Indian — right-click a Bhava and select **Set as First House**, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign
+2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna**. North Indian — right-click a Bhava and select **Set as First House**, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign
 3. **Add Grahas**: Drag Graha from the Graha Library to a Bhava (click a Bhava first for accurate placement)
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click the save button to export your chart as a PNG
 
 ### Chart Types
 
-South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any Bhava and select **Set as Lagna (Ascendant)**. A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.
+South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any Bhava and select **Set as Lagna**. A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.
 
 North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First House** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign. Grahas reposition automatically when Lagna changes.
 
