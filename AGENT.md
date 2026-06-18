@@ -16,45 +16,62 @@ Citrana is a browser-based application that allows users to create both South In
 - Analytics: Google Analytics and Google Tag Manager
 - No build process required - runs entirely in browser
 
+For system architecture, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md). This file (`AGENT.md`) and [.cursorrules](.cursorrules) should stay in sync with the codebase and each other.
+
+## CSS and Layout (styles.css - ~2208 lines)
+
+Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
+
+**iOS standalone PWA (2.0):**
+- Safe-area CSS vars (`--sat` … `--sal`, `--ui-inset`, `--ui-bottom-pad`, `--ui-bottom-stack`)
+- `body { position: fixed; inset: 0 }` — avoids bottom gap on iOS
+- `viewport-fit=cover`; manifest `display: standalone`
+- Mobile: Graha library bottom stack; Help bottom-left; arrow/line/pen hidden in toolbar
+
 ## Complete Project Structure
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main application entry point
+├── index.html                    # Main entry (402 lines); viewport-fit=cover; PWA meta
+├── robots.txt
+├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (2161 lines)
+│   │   └── styles.css            # Complete styling system (~2208 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (1319 lines)
-│   │   ├── citrana-debug.js      # Contributor debug logging (on by default)
-│   │   ├── chart-coordinator.js  # Chart type management (313 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (1148 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (1068 lines)
-│   │   ├── planet-system.js      # Planet library and drag-drop (861 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1975 lines)
-│   │   ├── context-menu.js       # Context menu system (648 lines)
-│   │   └── edit-ui.js            # Edit interface controls (805 lines)
+│   │   ├── app.js                # Main application coordinator (~1239 lines)
+│   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
+│   │   ├── chart-coordinator.js  # Chart type management (~286 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (~1060 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (~971 lines)
+│   │   ├── planet-system.js      # Graha library and drag-drop (~854 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (~1975 lines)
+│   │   ├── context-menu.js       # Context menu system (~731 lines)
+│   │   └── edit-ui.js            # Edit interface controls (~805 lines)
 │   ├── vendor/
-│   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted)
+│   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
 │   │   └── lucide.min.js         # Lucide 0.468.0 (self-hosted)
-│   ├── images/
-│   │   ├── soothsayer_citrana_social-preview.jpg  # Social media preview image
-│   │   ├── Soothsayer-Citrana-Full-Logo-Black.png  # Full logo in black
-│   │   ├── Soothsayer-Citrana-Full-Logo-White.png  # Full logo in white
-│   │   └── Soothsayer-Logo-Black.png  # Compact logo in black
+│   ├── images/                   # 14 files (logos, demo GIFs, browser screenshot)
+│   │   ├── soothsayer_citrana_social-preview.jpg
+│   │   ├── Soothsayer-Citrana-Full-Logo-Black.png / -White.png
+│   │   ├── Soothsayer-Logo-Black.png / Soothsayer-Logo-White.png
+│   │   ├── citrana-browser-screenshot.png
+│   │   └── demo-*.gif            # English, Tamil, Hindi, tldraw demos
 │   ├── svgs/
-│   │   ├── north-indian.svg      # North Indian chart template
-│   │   └── south-indian.svg      # South Indian chart template
-│   └── favicon/                  # Complete favicon set (32 files)
-│       ├── favicon.ico           # Main favicon
-│       ├── manifest.json         # PWA manifest
-│       ├── browserconfig.xml     # IE browser config
-│       ├── apple-icon-*.png      # Apple touch icons (12 files)
-│       ├── android-icon-*.png    # Android icons (6 files)
-│       ├── favicon-*.png         # Standard favicons (6 files)
-│       └── ms-icon-*.png         # Microsoft icons (4 files)
+│   │   ├── north-indian.svg
+│   │   └── south-indian.svg
+│   └── favicon/                  # 29 files
+│       ├── favicon.ico
+│       ├── manifest.json         # PWA manifest (display: standalone)
+│       ├── browserconfig.xml
+│       ├── apple-icon-*.png      # 12 variants
+│       ├── android-icon-*.png    # 6 variants
+│       ├── favicon-*.png         # 5 variants
+│       └── ms-icon-*.png         # 4 variants
 ├── .github/
-│   └── workflows/                # GitHub Actions (if configured)
+│   └── workflows/
+│       ├── static.yml            # GitHub Pages deploy with minification (push main + PR)
+│       └── codeql.yml            # CodeQL security analysis
 ├── AGENT.md                      # This comprehensive documentation
 ├── ARCHITECTURE.md               # System architecture and data flows
 ├── .cursorrules                  # Cursor IDE configuration
@@ -65,11 +82,13 @@ Soothsayer-Citrana/
 └── .gitignore                    # Git ignore rules
 ```
 
+> Line counts are approximate; run `wc -l` after significant edits. Update About modal version in `index.html` on each release.
+
 ## Core Components Architecture
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - 1319 lines)
+### Main Application (app.js - ~1239 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -77,42 +96,52 @@ Key Responsibilities:
 - Coordinates all component interactions
 - Manages tool selection and drawing state
 - Handles keyboard shortcuts and event listeners
-- Manages undo/redo functionality (currently disabled due to bugs)
+- Manages global undo snapshots (`pushSnapshot()`; keyboard undo/redo disabled)
 - Handles chart export
 - Provides mobile touch support and Safari compatibility
-- Manages zoom controls and canvas transformations
+- Manages zoom controls, zoom level display, and canvas resize (`visualViewport`)
 
 Key Methods:
 - `init()`: Application initialisation
-- `setupCanvas()`: Konva.js stage setup
-- `setupComponents()`: Component initialisation
-- `setupEventListeners()`: Event binding
-- `setupKeyboardShortcuts()`: Keyboard navigation
-- `exportChart()`: High-resolution PNG export
-- `handleMouseDown/Move/Up()`: Mouse interaction handling
-- `handleTouchStart/Move/End()`: Touch interaction handling
+- `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
+- `setupComponents()` / `setupEventListeners()` / `setupKeyboardShortcuts()`
+- `setTool()`: Tool routing to drawing tools and hand mode
+- `zoomIn()` / `zoomOut()` / `zoomToFit()`: Delegate to `ChartCoordinator`
+- `updateZoomLevel()`: Updates `#zoom-level` from `stage.scaleX()`
+- `handleResize()`: Stage size from `visualViewport` or container
+- `handleWheel()`: Desktop wheel zoom about pointer
+- `exportChart()`: PNG export (`pixelRatio: 2`)
+- `pushSnapshot()` / `undo()` / `redo()`: Global snapshot stack (shortcuts disabled)
+- `clearChart()` / `resetChart()` / `resetDrawings()`
+- `showWelcomeModal()` / `showConfirmationDialog()`
+- Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`
 
-### Chart Coordinator (chart-coordinator.js - 313 lines)
+Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `+`/`-` zoom, `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
+
+### Chart Coordinator (chart-coordinator.js - ~286 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
 - Routes operations to appropriate chart template
 - Manages chart type switching
 - Provides unified interface for chart operations
-- Handles chart data persistence and loading
-- Manages zoom operations across chart types
-- Converts stage/client pointer coordinates to chart space for Graha library drop targeting
+- In-session chart serialisation (`getChartData` / `loadChartData` for undo snapshots)
+- Stage zoom (`zoomIn`, `zoomOut`, `zoomToFit`) and zoom level display delegation
+- Pointer-to-bhava hit-test for Graha library drops
 
 Key Methods:
-- `createSouthIndianChart()`: Initialise South Indian layout
-- `createNorthIndianChart()`: Initialise North Indian layout
-- `setLagnaHouse()`: Set ascendant house
-- `getChartData()`: Serialise chart data
-- `loadChartData()`: Restore chart from data
-- `stagePointerToChartCoords()` / `clientToChartCoords()`: Map Konva pointer or viewport coords to chart layer space (accounts for stage scale/position)
-- `findHouseAtChartPoint()` / `findHouseAtPointer()` / `findHouseAtClientPoint()`: Resolve drop target bhava from coordinates
+- `createSouthIndianChart()` / `createNorthIndianChart()`: Initialise layouts
+- `setLagnaHouse()`: Set ascendant (South: visual house; North: rashi 1–12)
+- `getChartData()` / `loadChartData()`: Serialise / restore chart (in-session)
+- `stagePointerToChartCoords()` / `clientToChartCoords()`: Map pointer to chart space
+- `findHouseAtChartPoint()` / `findHouseAtPointer()` / `findHouseAtClientPoint()`: Drop targeting
+- `zoomIn()` / `zoomOut()` / `zoomToFit()` / `updateZoomLevel()`
+- `addPlanetToHouse()`, `clearAllPlanets()`, `highlightHouse()`, `clearHighlight()`, `renumberHouses()`, `clearChart()`
+- `getChartGroup()`, `getHouseData()`, `getStage()`, `getLayer()`
 
-### South Indian Chart Template (chart-templates-south.js - 1148 lines)
+**Removed:** `setFirstHouse()`, `getDropZones()` (legacy).
+
+### South Indian Chart Template (chart-templates-south.js - ~1060 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 Key Responsibilities:
@@ -139,9 +168,10 @@ Key Methods:
 - `renumberHouses()`: Update house numbering
 - `getBhavaNumberForHouse()`: Get house number (1–12 from Lagna) for a fixed grid cell
 - `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-house fallback) for library drops
-- `highlightHouse()`: Visual house selection
+- `highlightHouse()` / `clearHighlight()`: Visual house selection
+- `zoomToFit()`: Fit chart to viewport using **local bounds** (immune to current zoom/pan)
 
-### North Indian Chart Template (chart-templates-north.js - 1068 lines)
+### North Indian Chart Template (chart-templates-north.js - ~971 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 
 Key Responsibilities:
@@ -168,8 +198,9 @@ Key Methods:
 - `isPointInPolygon()`: Hit detection for polygon houses
 - `getRashiNumberForHouse()`: Rashi calculation
 - `findHouseAtChartPoint()`: Polygon hit-test (with nearest-centroid fallback) for library drops
+- `zoomToFit()`: Fit chart to viewport using **local bounds** (desktop `extraTopMargin=-50`)
 
-### Planet System (planet-system.js - 861 lines)
+### Planet System (planet-system.js - ~854 lines)
 Manages the floating planet library and drag-and-drop functionality with paging system.
 
 Key Responsibilities:
@@ -271,7 +302,7 @@ Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
 - Implements all drawing tools (select, arrow, line, pen, text, heading)
-- Manages undo/redo functionality (currently disabled due to bugs)
+- Manages undo/redo stacks locally (implemented; UI/keyboard integration disabled — see Undo/Redo below)
 - Handles shape selection and editing
 - Provides precise positioning and hit detection
 - Manages Edit UI integration
@@ -292,7 +323,7 @@ Key Features:
 - Colour and stroke customisation
 - Text editing with font controls
 - Planet text editing with retrograde underline support (Konva `textDecoration`)
-- Undo/redo with 50-step history (currently disabled due to bugs)
+- Undo/redo with 50-step local history (stacks populated; not wired to UI)
 - Auto-switch to Select Tool after Arrow and Line creation
 - Control points for precise arrow and line adjustment
 
@@ -301,7 +332,7 @@ Key Methods:
 - `draw()`: Continue drawing
 - `stopDrawing()`: Complete drawing
 - `makeShapeSelectable()`: Enable shape interaction
-- `undo()/redo()`: History management (currently disabled due to bugs)
+- `undo()` / `redo()`: Local shape history (not exposed in UI)
 - `showEditUIForShape()`: Edit interface integration
 - `makePlanetTextEditable()`: Planet text editing
 - `setPlanetRetrogradeState()`: Persist retrograde underline on Graha text
@@ -309,41 +340,32 @@ Key Methods:
 - `updateControlPointsPosition()`: Synchronise control points with shape movement
 - `clearControlPoints()`: Remove control points from display
 
-### Context Menu (context-menu.js - 648 lines)
+### Context Menu (context-menu.js - ~731 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:
+- Unified hit-test routing via `openContextMenuAtClientPoint()` (desktop right-click and mobile 500ms long-press)
 - Creates context-sensitive menus with chart-type-specific items
-- Routes right-clicks on empty canvas, houses, and Grahas to the correct menu
-- Prevents the chart-level menu from overriding Graha or bhava menus (`stopPropagation` on Konva handlers; canvas hit-test skip)
-- Provides chart creation and management options
+- Prevents chart menu from overriding Graha or bhava menus
 - Implements mobile-friendly touch interactions
 
 Menu Types:
 - **Chart Creation Menu** (empty canvas): Create North/South Indian chart, Clear Canvas
-- **Existing Chart Menu** (canvas right-click with chart loaded): Reset Chart, Reset Drawings, Clear Canvas; North Indian only: Set Lagna as… (zodiac submenu on desktop, flat rashi list on mobile)
-- **House Menu** (right-click bhava):
-  - **South Indian**: Header shows `House N` counted from current Lagna (fixed Rashi grid); Set as Lagna; Clear House; Reset Chart; Clear Canvas
-  - **North Indian**: Header shows `House N` (visual diamond position); Set as First House (sets Lagna to the Rashi in that cell); Clear House; Reset Chart; Clear Canvas
-- **Planet Menu** (right-click Graha): Edit Graha (opens floating edit panel), Delete Graha
+- **Existing Chart Menu** (canvas, no house/planet hit): Reset Chart, Reset Drawings, Clear Canvas; **North Indian only**: Set Lagna as… (zodiac; submenu desktop, flat list mobile)
+- **House Menu** (bhava hit):
+  - **South Indian**: Header `House N` (Lagna-relative); **Set as Lagna** (`set-lagna`); Clear House; …
+  - **North Indian**: Header `House N` (visual); **Set as First House** (`set-first-house`); Clear House; …
+- **Planet Menu**: Edit Graha, Delete Graha
 
-Key Features:
-- Desktop right-click and mobile long-press support
-- Chart-type-specific house menu actions (no duplicate Lagna/First House items)
-- Flat Graha menu (no nested Edit submenu)
-- Zodiac submenu for North Indian Lagna on chart menu (desktop)
-- Touch-optimised interactions
+Lagna actions (`handleAction`):
+- `set-lagna`: South house menu → `setLagnaHouse(visualHouse)`; North chart menu → `setLagnaHouse(rashi 1–12)`. Skipped if `houseNumber` missing (no default fallback).
+- `set-first-house`: North house menu only → `getRashiNumberForHouse()` → `setLagnaHouse(rashi)`
 
 Key Methods:
-- `init()`: Initialise context menu system
-- `showChartMenu()`: Route to create or existing chart menu
-- `showHouseMenu()`: Display bhava-specific menu
-- `showPlanetMenu()`: Display Graha edit/delete menu
-- `showExistingChartMenu()` / `showCreateChartMenu()`: Chart-level menus
-- `handleAction()`: Process menu selections
-- `openPlanetEditor()`: Open Graha floating edit panel from context menu
-- `removePlanetFromHouse()` / `clearHousePlanets()`: Graha and bhava clearing
-- `findPlanetTextNode()` / `getActiveChartTemplate()`: Menu action helpers
+- `openContextMenuAtClientPoint()`, `resolveContextTarget()`, `getShapeAtClientPoint()`, `findPlanetContextById()`
+- `showChartMenu()`, `showHouseMenu()`, `showPlanetMenu()`, `showExistingChartMenu()`, `showCreateChartMenu()`
+- `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`
+- `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
 ### Edit UI (edit-ui.js - 805 lines)
 Provides context-sensitive editing controls for drawing elements.
@@ -414,7 +436,7 @@ Key Methods:
 - Pen Tool: Freehand drawing for annotations
 - Text Tool: Add editable text boxes anywhere on canvas
 - Heading Tool: Create chart headings and titles
-- Undo/Redo: Full action history with keyboard shortcuts (Ctrl+Z, Ctrl+Y) (currently disabled due to bugs)
+- Undo/Redo: Global (`app.pushSnapshot`, shortcuts disabled) and per-drawing-tool local stacks; not exposed in UI
 - Auto-Switch Behaviour: Arrow and Line tools automatically switch to Select Tool after creation
 - Control Points: Draggable handles for adjusting start and end points of arrows and lines
 
@@ -444,10 +466,12 @@ Technical Implementation:
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First-time user experience with getting started guide
-- Mobile Zoom Controls: Select and Hand tools available in bottom zoom controls bar
+- Mobile Zoom Controls: Select and Hand in bottom zoom bar; `#reset-zoom` fits chart to viewport
+- iOS PWA: Safe-area layout for home-screen install (see CSS section); officially desktop-only
+- Mobile drawing: Arrow, line, and pen tools hidden in CSS on `≤768px`
 
 ### Export & Sharing
-- High-Resolution PNG: Professional quality exports (300 DPI)
+- High-Resolution PNG: Export at `pixelRatio: 2` with padding and watermark
 - Ephemeral Sessions: Work is not restored after refresh; export PNG to keep a copy
 - Cross-Platform: Works on all modern browsers
 - GitHub Pages Compatible: No build process required
@@ -842,12 +866,17 @@ Edit the planets objects in assets/js/planet-system.js:
 - Use browser developer tools for debugging
 - All changes are immediately visible on refresh
 
-## GitHub Actions Workflow Options
+## GitHub Actions Workflow
 
-### Standard Deployment (Current)
-The default workflow deploys files without minification for faster builds and easier debugging.
+### Current deployment (`.github/workflows/static.yml`)
+Production GitHub Pages deploy **with minification** on push to `main` and on pull requests (paths-ignore: `*.md`, `LICENSE`, `.gitignore`, `.cursorrules`). Steps: checkout → Node 18 → `clean-css-cli` + `terser` → minified CSS/JS artifacts → `sed` updates `index.html` references → deploy-pages.
 
-Original static.yml (Standard Deployment):
+Minified assets include `citrana-debug.min.js` and all local JS/CSS. Konva and Lucide vendor bundles are already minified.
+
+### Standard deployment (no minification)
+For local debugging or faster CI, remove the Node/minify/sed steps from `static.yml`:
+
+Original static.yml (reference only):
 ```yaml
 # Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
@@ -1010,7 +1039,8 @@ jobs:
           terser assets/js/chart-templates-north.js -o assets/js/chart-templates-north.min.js --compress --mangle
           terser assets/js/planet-system.js -o assets/js/planet-system.min.js --compress --mangle
           terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
-          terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
+          terser assets/js/citrana-debug.js -o assets/js/citrana-debug.min.js --compress --mangle
+        terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
           terser assets/js/edit-ui.js -o assets/js/edit-ui.min.js --compress --mangle
       
       - name: Update HTML to use minified local files only
@@ -1025,7 +1055,8 @@ jobs:
           sed -i 's|src="assets/js/planet-system.js"|src="assets/js/planet-system.min.js"|g' index.html
           sed -i 's|src="assets/js/drawing-tools.js"|src="assets/js/drawing-tools.min.js"|g' index.html
           sed -i 's|src="assets/js/edit-ui.js"|src="assets/js/edit-ui.min.js"|g' index.html
-          sed -i 's|src="assets/js/context-menu.js"|src="assets/js/context-menu.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-debug.js"|src="assets/js/citrana-debug.min.js"|g' index.html
+        sed -i 's|src="assets/js/context-menu.js"|src="assets/js/context-menu.min.js"|g' index.html
           sed -i 's|src="assets/js/app.js"|src="assets/js/app.min.js"|g' index.html
       
       - name: Setup Pages
