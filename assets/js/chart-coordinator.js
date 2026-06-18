@@ -180,7 +180,6 @@ class ChartCoordinator {
             };
             this.stage.position(newPos);
             this.stage.batchDraw();
-            this.updateZoomLevel();
         }
     }
 
@@ -214,7 +213,6 @@ class ChartCoordinator {
             };
             this.stage.position(newPos);
             this.stage.batchDraw();
-            this.updateZoomLevel();
         }
     }
 
@@ -228,32 +226,24 @@ class ChartCoordinator {
         } else if (this.northIndianTemplate && this.northIndianTemplate.chartGroupNorth) {
             citranaDebug('Using North Indian zoomToFit');
             this.northIndianTemplate.zoomToFit();
-        } else {
+        } else if (this.stage) {
             citranaDebug('No chart groups found, using simple reset');
-            // Fallback to simple reset
-            if (this.stage) {
-                this.stage.scale({
-                    x: 1,
-                    y: 1
-                });
-                this.stage.position({
-                    x: 0,
-                    y: 0
-                });
-                this.stage.batchDraw();
-                this.updateZoomLevel();
-            }
+            this.stage.scale({
+                x: 1,
+                y: 1
+            });
+            this.stage.position({
+                x: 0,
+                y: 0
+            });
+            this.stage.batchDraw();
         }
+
+        this.updateZoomLevel();
     }
 
     updateZoomLevel() {
-        if (!this.stage) return;
-
-        const zoomPercent = Math.round(this.stage.scaleX() * 100);
-        const zoomLevel = document.getElementById('zoom-level');
-        if (zoomLevel) {
-            zoomLevel.textContent = `${zoomPercent}%`;
-        }
+        window.app?.updateZoomLevel();
     }
 
     getChartData() {

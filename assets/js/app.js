@@ -59,6 +59,8 @@ class CitranaApp {
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
 
+        this.stage.on('scaleXChange scaleYChange', () => this.updateZoomLevel());
+
         console.log('Canvas setup complete');
     }
 
@@ -71,6 +73,8 @@ class CitranaApp {
         // Initialize components
         this.planetSystem.init();
         this.contextMenu.init();
+
+        this.updateZoomLevel();
 
         console.log('Components setup complete');
     }
@@ -195,9 +199,9 @@ class CitranaApp {
         }
 
         // Zoom controls
-        document.getElementById('zoom-in').addEventListener('click', () => this.chartTemplates.zoomIn());
-        document.getElementById('zoom-out').addEventListener('click', () => this.chartTemplates.zoomOut());
-        document.getElementById('reset-zoom').addEventListener('click', () => this.chartTemplates.zoomToFit());
+        document.getElementById('zoom-in').addEventListener('click', () => this.zoomIn());
+        document.getElementById('zoom-out').addEventListener('click', () => this.zoomOut());
+        document.getElementById('reset-zoom').addEventListener('click', () => this.zoomToFit());
 
         // Canvas events
         this.stage.on('mousedown', (e) => {
@@ -841,7 +845,7 @@ class CitranaApp {
                 this.zoomOut();
             } else if (e.key === '0') {
                 e.preventDefault();
-                this.chartTemplates.zoomToFit();
+                this.zoomToFit();
             }
 
             // Delete selected shape (only with Delete key, not Backspace)
@@ -1061,8 +1065,6 @@ class CitranaApp {
 
         this.stage.position(newPos);
         this.stage.batchDraw();
-
-        this.updateZoomLevel();
     }
 
     isTouchDevice() {
@@ -1081,9 +1083,26 @@ class CitranaApp {
     }
 
     updateZoomLevel() {
+        if (!this.stage) return;
+
+        const zoomLevel = document.getElementById('zoom-level');
+        if (!zoomLevel) return;
+
         const zoomPercent = Math.round(this.stage.scaleX() * 100);
-        document.getElementById('zoom-level').textContent = `${zoomPercent}%`;
+        zoomLevel.textContent = `${zoomPercent}%`;
         this.zoomLevel = this.stage.scaleX();
+    }
+
+    zoomIn() {
+        this.chartTemplates?.zoomIn();
+    }
+
+    zoomOut() {
+        this.chartTemplates?.zoomOut();
+    }
+
+    zoomToFit() {
+        this.chartTemplates?.zoomToFit();
     }
 
     clearChart() {
@@ -1167,85 +1186,6 @@ class CitranaApp {
         this.chartTemplates.loadChartData(snapshot.chartData);
         this.restoreDrawings(snapshot.drawingData);
         console.log('Redo performed');
-    }
-
-    zoomIn() {
-        const scaleBy = 1.2;
-        const oldScale = this.stage.scaleX();
-        const newScale = oldScale * scaleBy;
-
-        if (newScale <= 5) { // Max zoom limit
-            // Get the center of the stage
-            const stageCenter = {
-                x: this.stage.width() / 2,
-                y: this.stage.height() / 2
-            };
-
-            const mousePointTo = {
-                x: (stageCenter.x - this.stage.x()) / oldScale,
-                y: (stageCenter.y - this.stage.y()) / oldScale
-            };
-
-            this.stage.scale({
-                x: newScale,
-                y: newScale
-            });
-
-            const newPos = {
-                x: stageCenter.x - mousePointTo.x * newScale,
-                y: stageCenter.y - mousePointTo.y * newScale
-            };
-            this.stage.position(newPos);
-            this.stage.batchDraw();
-
-            this.updateZoomLevel();
-        }
-    }
-
-    zoomOut() {
-        const scaleBy = 0.8;
-        const oldScale = this.stage.scaleX();
-        const newScale = oldScale * scaleBy;
-
-        if (newScale >= 0.1) { // Min zoom limit
-            // Get the center of the stage
-            const stageCenter = {
-                x: this.stage.width() / 2,
-                y: this.stage.height() / 2
-            };
-
-            const mousePointTo = {
-                x: (stageCenter.x - this.stage.x()) / oldScale,
-                y: (stageCenter.y - this.stage.y()) / oldScale
-            };
-
-            this.stage.scale({
-                x: newScale,
-                y: newScale
-            });
-
-            const newPos = {
-                x: stageCenter.x - mousePointTo.x * newScale,
-                y: stageCenter.y - mousePointTo.y * newScale
-            };
-            this.stage.position(newPos);
-            this.stage.batchDraw();
-
-            this.updateZoomLevel();
-        }
-    }
-
-    resetZoom() {
-        this.stage.scale({
-            x: 1,
-            y: 1
-        });
-        this.stage.position({
-            x: 0,
-            y: 0
-        });
-        this.stage.batchDraw();
-        this.updateZoomLevel();
     }
 
     /**
