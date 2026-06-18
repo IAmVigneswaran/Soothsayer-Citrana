@@ -9,9 +9,9 @@ Citrana is a browser-based application that allows users to create both South In
 ## Technology Stack
 
 - Frontend: Pure HTML5, CSS3, JavaScript (ES6+)
-- Graphics: HTML5 Canvas API with Konva.js
+- Graphics: HTML5 Canvas API with Konva.js (self-hosted, `assets/vendor/konva.min.js` v9.3.20)
 - Styling: Custom CSS only
-- Icons: Lucide Icons
+- Icons: Lucide Icons (self-hosted, `assets/vendor/lucide.min.js` v0.468.0)
 - Storage: Browser localStorage for data persistence
 - Analytics: Google Analytics and Google Tag Manager
 - No build process required - runs entirely in browser
@@ -33,6 +33,9 @@ Soothsayer-Citrana/
 │   │   ├── drawing-tools.js      # Drawing tools implementation (1957 lines)
 │   │   ├── context-menu.js       # Context menu system (656 lines)
 │   │   └── edit-ui.js            # Edit interface controls (806 lines)
+│   ├── vendor/
+│   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted)
+│   │   └── lucide.min.js         # Lucide 0.468.0 (self-hosted)
 │   ├── images/
 │   │   ├── soothsayer_citrana_social-preview.jpg  # Social media preview image
 │   │   ├── Soothsayer-Citrana-Full-Logo-Black.png  # Full logo in black

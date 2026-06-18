@@ -14,8 +14,8 @@ This document describes how Citrana is structured at a system level: runtime com
 
 ```
 index.html
-  ├── Konva (CDN)
-  ├── Lucide Icons (CDN)
+  ├── assets/vendor/konva.min.js   (Konva 9.3.20)
+  ├── assets/vendor/lucide.min.js  (Lucide 0.468.0)
   ├── chart-templates-south.js   → SouthIndianChartTemplate
   ├── chart-templates-north.js   → NorthIndianChartTemplate
   ├── chart-coordinator.js       → ChartCoordinator

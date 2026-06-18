@@ -31,6 +31,9 @@ Soothsayer-Citrana/
 │   │   ├── drawing-tools.js      # Drawing tools implementation (1957 lines)
 │   │   ├── context-menu.js       # Context menu system (656 lines)
 │   │   └── edit-ui.js            # Edit interface controls (806 lines)
+│   ├── vendor/
+│   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted)
+│   │   └── lucide.min.js         # Lucide 0.468.0 (self-hosted)
 │   ├── images/
 │   │   ├── soothsayer_citrana_social-preview.jpg  # Social media preview image
 │   │   ├── Soothsayer-Citrana-Full-Logo-Black.png  # Full logo in black

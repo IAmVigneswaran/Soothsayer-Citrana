@@ -15,6 +15,7 @@
 - Updated Help modal, Welcome modal, and README for accurate North Indian Lagna instructions and browser-session data guidance.
 - South Indian house menu header now shows **House** numbering from the current Lagna position (fixed Rashi grid, rotating house count).
 - Fixed in-session auto-save so chart Grahas, Lagna, and drawings serialize correctly to local storage during a visit; page refresh still starts a fresh session.
+- Self-hosted pinned vendor bundles for Konva (9.3.20) and Lucide (0.468.0), removing unpinned unpkg CDN dependencies for core scripts.
 - **Clear House** now removes all Grahas from the selected bhava.
 
 **🐛 Bug Fixes:**
