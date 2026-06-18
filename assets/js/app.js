@@ -20,6 +20,7 @@ class CitranaApp {
         this.maxUndoSteps = 100;
         this.exportWithWhiteBg = true; // Default: white background
         this.isExporting = false; // Prevent multiple concurrent exports
+        this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
         this.init();
     }
 
@@ -202,6 +203,9 @@ class CitranaApp {
         document.getElementById('zoom-in').addEventListener('click', () => this.zoomIn());
         document.getElementById('zoom-out').addEventListener('click', () => this.zoomOut());
         document.getElementById('reset-zoom').addEventListener('click', () => this.zoomToFit());
+        document.getElementById('zoom-lock').addEventListener('click', () => this.toggleZoomLock());
+
+        this.updateZoomLockUI();
 
         // Canvas events
         this.stage.on('mousedown', (e) => {
@@ -838,11 +842,15 @@ class CitranaApp {
 
             // Zoom shortcuts
             if (e.key === '+' || e.key === '=') {
-                e.preventDefault();
-                this.zoomIn();
+                if (!this.zoomLocked) {
+                    e.preventDefault();
+                    this.zoomIn();
+                }
             } else if (e.key === '-') {
-                e.preventDefault();
-                this.zoomOut();
+                if (!this.zoomLocked) {
+                    e.preventDefault();
+                    this.zoomOut();
+                }
             } else if (e.key === '0') {
                 e.preventDefault();
                 this.zoomToFit();
@@ -1036,7 +1044,10 @@ class CitranaApp {
     handleWheel(e) {
         // Allow pinch-to-zoom on mobile devices
         if (this.isTouchDevice()) {
-            // Don't prevent default on mobile to allow browser pinch-to-zoom
+            return;
+        }
+
+        if (this.zoomLocked) {
             return;
         }
 
@@ -1094,15 +1105,44 @@ class CitranaApp {
     }
 
     zoomIn() {
+        if (this.zoomLocked) return;
         this.chartTemplates?.zoomIn();
     }
 
     zoomOut() {
+        if (this.zoomLocked) return;
         this.chartTemplates?.zoomOut();
     }
 
     zoomToFit() {
         this.chartTemplates?.zoomToFit();
+    }
+
+    toggleZoomLock() {
+        this.zoomLocked = !this.zoomLocked;
+        this.updateZoomLockUI();
+    }
+
+    updateZoomLockUI() {
+        const lockBtn = document.getElementById('zoom-lock');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        if (!lockBtn) return;
+
+        const locked = this.zoomLocked;
+        const iconName = locked ? 'lock' : 'lock-open';
+
+        lockBtn.innerHTML = `<i data-lucide="${iconName}"></i>`;
+        lockBtn.title = locked ? 'Unlock zoom' : 'Lock zoom';
+        lockBtn.setAttribute('aria-label', lockBtn.title);
+        lockBtn.setAttribute('aria-pressed', locked ? 'true' : 'false');
+
+        if (zoomInBtn) zoomInBtn.disabled = locked;
+        if (zoomOutBtn) zoomOutBtn.disabled = locked;
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     clearChart() {

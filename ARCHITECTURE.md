@@ -58,7 +58,7 @@ Script order matters: `citrana-debug.js` before modules that call `citranaDebug(
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1240 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, zoom display, export, modals |
+| `app.js` | ~1280 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, zoom lock, zoom display, export, modals |
 | `chart-coordinator.js` | ~286 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
 | `chart-templates-south.js` | ~1060 | 4×4 grid chart, bhava numbering, Lagna indicator, `zoomToFit()` with local bounds |
 | `chart-templates-north.js` | ~971 | Diamond polygon chart, rashi boxes, Lagna rashi math, `zoomToFit()` with local bounds |
@@ -67,7 +67,7 @@ Script order matters: `citrana-debug.js` before modules that call `citranaDebug(
 | `edit-ui.js` | ~805 | Floating property editor for drawing shapes |
 | `context-menu.js` | ~731 | Right-click / long-press menus; unified hit-test routing |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging |
-| `styles.css` | ~2208 | Light theme, floating UI, safe areas, iOS PWA layout |
+| `styles.css` | ~2220 | Light theme, floating UI, safe areas, iOS PWA layout, zoom bar disabled states |
 
 ## Canvas Object Naming
 
@@ -176,10 +176,11 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 | Control | Path |
 |---------|------|
-| `#zoom-in` / `#zoom-out` | `app.zoomIn/Out()` → `ChartCoordinator.zoomIn/Out()` (scale 0.1–5, about stage centre) |
-| `#reset-zoom` | `app.zoomToFit()` → template `zoomToFit()` or scale reset |
-| Mouse wheel | `app.handleWheel()` (desktop only; scales about pointer) |
-| Keyboard `+`/`-`/`0` | Same as above |
+| `#zoom-in` / `#zoom-out` | `app.zoomIn/Out()` → `ChartCoordinator.zoomIn/Out()` (scale 0.1–5, about stage centre); disabled when zoom locked |
+| `#reset-zoom` | `app.zoomToFit()` → template `zoomToFit()` or scale reset (always available) |
+| `#zoom-lock` | `app.toggleZoomLock()` — default **locked** (`zoomLocked: true`); `lock` icon when locked, `lock-open` when unlocked |
+| Mouse wheel | `app.handleWheel()` (desktop only; scales about pointer when unlocked; no `preventDefault` when locked) |
+| Keyboard `+`/`-`/`0` | `+`/`-` zoom when unlocked; `0` reset zoom always |
 | Display | `stage.on('scaleXChange scaleYChange')` → `app.updateZoomLevel()` → `#zoom-level` text |
 
 **`zoomToFit()`** in both templates converts `getClientRect()` to **local bounds** (undoes current scale/pan) before computing fit scale. South: desktop `scaleFactor=0.7`, mobile `0.95`. North: desktop `extraTopMargin=-50`, mobile `20`.
@@ -246,7 +247,7 @@ All interactive chrome is **fixed/absolute positioned** over a full-viewport can
 
 - Top centre: drawing/tool toolbar
 - Top left (desktop) / bottom stack (mobile): Graha library
-- Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-level`); mobile adds Select/Hand in zoom bar
+- Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`); mobile adds Select/Hand in zoom bar (288px width)
 - Bottom corners: Help (mobile bottom-left), About (bottom-right)
 - Bottom centre: Graha text edit bar, drawing Edit UI (dynamic)
 

@@ -289,6 +289,17 @@ body {
   color: white;
 }
 
+.floating-zoom-controls button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.floating-zoom-controls button:disabled:hover {
+  background: transparent;
+  color: #000000;
+}
+
 .zoom-divider {
   width: 1px;
   height: 24px;
@@ -614,8 +625,8 @@ body {
     display: flex !important;
     justify-content: center !important;
     bottom: calc(var(--ui-bottom-pad) + var(--sab)) !important;
-    width: 240px !important;
-    max-width: 240px !important;
+    width: 288px !important;
+    max-width: 288px !important;
     z-index: 1000;
     /* Safari-specific fixes */
     -webkit-transform: translateZ(0);

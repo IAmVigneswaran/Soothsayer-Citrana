@@ -6,32 +6,31 @@
 - TBD
 
 **✨ Features:**
-- Ephemeral browser sessions — chart work lives in this tab while you work; refreshing the page always starts fresh (export PNG to keep a visual copy).
-- Graha right-click menu with **Edit Graha** and **Delete Graha** (same editing panel as double-click).
-- Chart-type-specific Lagna workflows:
-  - **South Indian** — house menu: **Set as Lagna**; chart menu: no Lagna option (house-only).
-  - **North Indian** — chart menu: **Set Lagna as…** (zodiac sign); house menu: **Set as First House**.
-- **Clear House** removes all Grahas from the selected bhava.
+- **Fresh start on refresh** — your chart lives in this browser tab while you work. Reloading the page always begins with a blank canvas. Export a PNG when you want to keep a copy.
+- **Edit or delete Grahas from the menu** — right-click any Graha for **Edit Graha** or **Delete Graha** (same editor as double-click).
+- **Clearer Lagna setup** by chart type:
+  - **South Indian** — right-click a house and choose **Set as Lagna**.
+  - **North Indian** — use **Set Lagna as…** on the chart menu (pick the zodiac sign), or **Set as First House** on a house menu.
+- **Clear House** removes every Graha from the house you selected.
+- **Zoom lock** — on by default so scroll-wheel zoom does not catch you by surprise. Click the lock icon to zoom freely; **Reset Zoom** always works.
 
 **🔧 Improvements:**
-- Retrograde Grahas use **underlined text** instead of a Unicode subscript (`ᵣ`); the toggle styles the label only and no longer consumes a character from the 8-character Graha name limit.
-- South Indian house menu header shows **House** numbering from the current Lagna position (fixed Rashi grid, rotating house count).
-- Updated Help modal, Welcome modal, and README for North Indian Lagna instructions and ephemeral-session guidance.
-- Self-hosted pinned vendor bundles for Konva (9.3.20) and Lucide (0.468.0), removing unpinned unpkg CDN dependencies for core scripts.
-- Added `citranaDebug()` for contributor trace logging (enabled by default; opt out via `localStorage.citrana_debug = '0'`).
-- Removed unused legacy code (`setFirstHouse`, Graha library drop-zone scaffolding, localStorage chart auto-save, dead `set-lagna` fallback).
-- Removed unused `#canvas` markup and dead `.zoom-control-btn` CSS; added `rel="noopener noreferrer"` to external links.
-- iOS standalone PWA layout respects safe areas (Dynamic Island, home indicator) with `viewport-fit=cover`, `display: standalone` in the manifest, `visualViewport`-aware canvas resize, and tuned floating UI positioning on mobile and desktop.
+- Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
+- South Indian house menus show **House** numbers based on where Lagna is set.
+- Help, Welcome, and README updated for the new Lagna flows, session behaviour, and zoom lock.
+- Drawing and icon libraries now ship with the app for faster, more reliable loading.
+- Tidied unused code from older versions, including automatic chart restore on refresh.
+- Better layout when Citrana is opened from your iPhone home screen — floating controls sit correctly around the notch and home bar.
 
 **🐛 Bug Fixes:**
-- Fixed Graha and bhava context menus being overridden by the main chart menu, including dead code that blocked **Edit Graha** and **Delete Graha**.
-- Fixed **Set as First House** on North Indian charts so the Rashi in the clicked house becomes Lagna (e.g. selecting Cancer correctly sets Cancer Ascendant).
-- Fixed Graha library drop targeting so Grahas land in the house under the pointer instead of always defaulting to house 1.
-- Fixed mobile long-press opening the chart menu instead of the house menu (**Set as Lagna**, **Set as First House**, **Clear House**).
-- Fixed zoom bar percentage not updating on zoom in, zoom out, or reset.
-- Fixed South Indian **Reset Zoom** returning to the wrong scale after manual zoom (fit level now matches the initial chart view).
-- Fixed iOS PWA bottom controls (zoom bar, Help, About, Graha Library) sitting too high above the home indicator.
-- Fixed desktop zoom bar and About button bottom inset after iOS safe-area layout changes.
+- Fixed Graha and house menus sometimes opening the wrong chart menu, which blocked **Edit Graha** and **Delete Graha**.
+- Fixed **Set as First House** on North Indian charts so the sign in the clicked house becomes Lagna (for example, choosing Cancer correctly sets Cancer Ascendant).
+- Fixed Grahas always landing in house 1 when dragged from the library — they now drop into the house under your pointer.
+- Fixed long-press on mobile opening the chart menu instead of the house menu (**Set as Lagna**, **Set as First House**, **Clear House**).
+- Fixed the zoom percentage not updating when you zoom in, zoom out, or reset.
+- Fixed South Indian **Reset Zoom** jumping to the wrong size after manual zoom — it now returns to the same fit as when the chart first appeared.
+- Fixed bottom controls sitting too high on iPhone when the app is installed to the home screen.
+- Fixed desktop zoom bar and About button sitting too low after the iPhone layout improvements.
 
 ---
 

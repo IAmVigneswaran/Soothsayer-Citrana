@@ -18,14 +18,14 @@ This is Citrana, a web application built with pure HTML5, CSS3, and JavaScript u
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (402 lines); viewport-fit=cover; PWA meta
+├── index.html                    # Main entry (406 lines); viewport-fit=cover; PWA meta
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2208 lines)
+│   │   └── styles.css            # Complete styling system (~2220 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1239 lines)
+│   │   ├── app.js                # Main application coordinator (~1280 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
 │   │   ├── chart-coordinator.js  # Chart type management (~286 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~1060 lines)
@@ -109,7 +109,8 @@ The application uses a floating UI system with absolute positioning for all inte
 
 #### Floating Zoom Controls
 - Desktop: bottom left (`--ui-inset` + safe area)
-- Mobile: bottom centre; includes `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-level`, Select, Hand
+- Mobile: bottom centre (288px width); includes `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`, Select, Hand
+- `#zoom-lock`: default locked; `lock` / `lock-open` Lucide icons; disables zoom in/out when locked
 - White background with black border
 
 #### Floating Edit UI
@@ -126,6 +127,7 @@ The application uses a floating UI system with absolute positioning for all inte
 - Transparent background with black text
 - Hover state: black background with white text
 - Active state: scale transform (0.95)
+- Zoom bar: `:disabled` buttons at reduced opacity; no hover invert
 - Smooth transitions (0.2s ease)
 
 #### Input Fields
@@ -198,7 +200,7 @@ The application uses a mobile-first approach with three main breakpoints:
 
 For system design, module boundaries, data flows, and extension points, see ARCHITECTURE.md.
 
-### Main Application (assets/js/app.js - ~1239 lines)
+### Main Application (assets/js/app.js - ~1280 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -209,24 +211,25 @@ Key Responsibilities:
 - Manages global undo snapshots (`pushSnapshot()`; keyboard undo/redo disabled)
 - Handles chart export
 - Provides mobile touch support and Safari compatibility
-- Manages zoom controls, zoom level display, and canvas resize (`visualViewport`)
+- Manages zoom controls, zoom lock (default locked), zoom level display, and canvas resize (`visualViewport`)
 
 Key Methods:
 - `init()`: Application initialisation
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
 - `setupComponents()` / `setupEventListeners()` / `setupKeyboardShortcuts()`
 - `setTool()`: Tool routing to drawing tools and hand mode
-- `zoomIn()` / `zoomOut()` / `zoomToFit()`: Delegate to `ChartCoordinator`
+- `zoomIn()` / `zoomOut()` / `zoomToFit()`: Delegate to `ChartCoordinator` (`zoomIn`/`zoomOut` no-op when locked; `zoomToFit` always works)
+- `toggleZoomLock()` / `updateZoomLockUI()`: Toggle `zoomLocked`; swap `#zoom-lock` icon (`lock` / `lock-open`); disable `#zoom-in` / `#zoom-out`
 - `updateZoomLevel()`: Updates `#zoom-level` from `stage.scaleX()`
 - `handleResize()`: Stage size from `visualViewport` or container
-- `handleWheel()`: Desktop wheel zoom about pointer
+- `handleWheel()`: Desktop wheel zoom about pointer when unlocked; early return when locked (no `preventDefault`)
 - `exportChart()`: PNG export (`pixelRatio: 2`)
 - `pushSnapshot()` / `undo()` / `redo()`: Global snapshot stack (shortcuts disabled)
 - `clearChart()` / `resetChart()` / `resetDrawings()`
 - `showWelcomeModal()` / `showConfirmationDialog()`
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`
 
-Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `+`/`-` zoom, `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
+Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
 
 ### Chart Coordinator (assets/js/chart-coordinator.js - ~286 lines)
 Manages the relationship between South Indian and North Indian chart templates.
@@ -576,7 +579,8 @@ Technical Implementation:
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First-time user experience with getting started guide
-- Mobile Zoom Controls: Select and Hand tools available in bottom zoom controls bar
+- Zoom Controls: `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock` (default locked), `#zoom-level`; mobile adds Select/Hand in zoom bar
+- Zoom Lock: Prevents accidental scroll-wheel and +/- zoom until user unlocks; reset zoom always available
 
 ### Export & Sharing
 - High-Resolution PNG: Export at `pixelRatio: 2` with padding and watermark

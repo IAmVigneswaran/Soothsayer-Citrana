@@ -18,7 +18,7 @@ Citrana is a browser-based application that allows users to create both South In
 
 For system architecture, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md). This file (`AGENT.md`) and [.cursorrules](.cursorrules) should stay in sync with the codebase and each other.
 
-## CSS and Layout (styles.css - ~2208 lines)
+## CSS and Layout (styles.css - ~2220 lines)
 
 Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
 
@@ -32,14 +32,14 @@ Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px t
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (402 lines); viewport-fit=cover; PWA meta
+├── index.html                    # Main entry (406 lines); viewport-fit=cover; PWA meta
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2208 lines)
+│   │   └── styles.css            # Complete styling system (~2220 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1239 lines)
+│   │   ├── app.js                # Main application coordinator (~1280 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
 │   │   ├── chart-coordinator.js  # Chart type management (~286 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~1060 lines)
@@ -88,7 +88,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1239 lines)
+### Main Application (app.js - ~1280 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -99,24 +99,25 @@ Key Responsibilities:
 - Manages global undo snapshots (`pushSnapshot()`; keyboard undo/redo disabled)
 - Handles chart export
 - Provides mobile touch support and Safari compatibility
-- Manages zoom controls, zoom level display, and canvas resize (`visualViewport`)
+- Manages zoom controls, zoom lock (default locked), zoom level display, and canvas resize (`visualViewport`)
 
 Key Methods:
 - `init()`: Application initialisation
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
 - `setupComponents()` / `setupEventListeners()` / `setupKeyboardShortcuts()`
 - `setTool()`: Tool routing to drawing tools and hand mode
-- `zoomIn()` / `zoomOut()` / `zoomToFit()`: Delegate to `ChartCoordinator`
+- `zoomIn()` / `zoomOut()` / `zoomToFit()`: Delegate to `ChartCoordinator` (`zoomIn`/`zoomOut` no-op when locked; `zoomToFit` always works)
+- `toggleZoomLock()` / `updateZoomLockUI()`: Toggle `zoomLocked`; swap `#zoom-lock` icon (`lock` / `lock-open`); disable `#zoom-in` / `#zoom-out`
 - `updateZoomLevel()`: Updates `#zoom-level` from `stage.scaleX()`
 - `handleResize()`: Stage size from `visualViewport` or container
-- `handleWheel()`: Desktop wheel zoom about pointer
+- `handleWheel()`: Desktop wheel zoom about pointer when unlocked; early return when locked (no `preventDefault`)
 - `exportChart()`: PNG export (`pixelRatio: 2`)
 - `pushSnapshot()` / `undo()` / `redo()`: Global snapshot stack (shortcuts disabled)
 - `clearChart()` / `resetChart()` / `resetDrawings()`
 - `showWelcomeModal()` / `showConfirmationDialog()`
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`
 
-Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `+`/`-` zoom, `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
+Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
 
 ### Chart Coordinator (chart-coordinator.js - ~286 lines)
 Manages the relationship between South Indian and North Indian chart templates.
@@ -466,7 +467,8 @@ Technical Implementation:
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First-time user experience with getting started guide
-- Mobile Zoom Controls: Select and Hand in bottom zoom bar; `#reset-zoom` fits chart to viewport
+- Zoom Controls: `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock` (default locked), `#zoom-level`; mobile adds Select/Hand in zoom bar
+- Zoom Lock: Prevents accidental scroll-wheel and +/- zoom until user unlocks; reset zoom always available
 - iOS PWA: Safe-area layout for home-screen install (see CSS section); officially desktop-only
 - Mobile drawing: Arrow, line, and pen tools hidden in CSS on `≤768px`
 
