@@ -19,9 +19,13 @@
   --sal: env(safe-area-inset-left, 0px);
   --ui-inset: 20px;
   --ui-inset-sm: 10px;
+  /* Bottom chrome: safe-area only + small pad (avoid double-stacking on iOS PWA) */
+  --ui-bottom-pad: 8px;
+  --ui-bottom-stack: 56px; /* zoom bar height (~48px) + gap above Graha library on mobile */
 }
 
 html {
+  height: 100%;
   height: -webkit-fill-available;
 }
 
@@ -30,18 +34,18 @@ body {
   background: white;
   color: #111827; /* equivalent to text-gray-900 */
   overflow: hidden;
-  min-height: 100vh;
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: -webkit-fill-available;
 }
 
 .app-container {
-  position: relative;
-  width: 100vw;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  min-height: -webkit-fill-available;
+  height: 100%;
   background: white;
 }
 
@@ -229,8 +233,8 @@ body {
 
 /* Floating Zoom Controls */
 .floating-zoom-controls {
-  position: absolute;
-  bottom: calc(var(--ui-inset) + var(--sab));
+  position: fixed;
+  bottom: calc(var(--ui-bottom-pad) + var(--sab));
   left: calc(var(--ui-inset) + var(--sal));
   display: flex;
   align-items: center;
@@ -527,7 +531,12 @@ body {
   display: block;
 }
 
-/* Responsive Design */
+/* Installed PWA: safe-area already clears home indicator — use minimal extra pad */
+@media (display-mode: standalone) {
+  :root {
+    --ui-bottom-pad: 4px;
+  }
+}
 @media (max-width: 768px) {
   .floating-top-toolbar {
     top: calc(var(--ui-inset-sm) + var(--sat));
@@ -543,7 +552,8 @@ body {
   }
 
   .floating-planet-library {
-    bottom: calc(80px + var(--sab));
+    position: fixed;
+    bottom: calc(var(--ui-bottom-stack) + var(--ui-bottom-pad) + var(--sab));
     left: 50%;
     transform: translateX(-50%);
     top: auto;
@@ -589,20 +599,21 @@ body {
   }
 
   .floating-zoom-controls {
-    bottom: calc(var(--ui-inset-sm) + var(--sab));
+    bottom: calc(var(--ui-bottom-pad) + var(--sab));
     left: calc(var(--ui-inset-sm) + var(--sal));
   }
 }
 
 @media (max-width: 768px) {
   .floating-zoom-controls {
+    position: fixed !important;
     left: 0 !important;
     right: 0 !important;
     margin-left: auto !important;
     margin-right: auto !important;
     display: flex !important;
     justify-content: center !important;
-    bottom: calc(var(--ui-inset) + var(--sab)) !important;
+    bottom: calc(var(--ui-bottom-pad) + var(--sab)) !important;
     width: 240px !important;
     max-width: 240px !important;
     z-index: 1000;
@@ -634,7 +645,7 @@ body {
     visibility: visible !important;
     /* Safari positioning fixes */
     position: fixed !important;
-    bottom: calc(var(--ui-inset) + var(--sab)) !important;
+    bottom: calc(var(--ui-bottom-pad) + var(--sab)) !important;
     left: 50% !important;
     transform: translateX(-50%) translateZ(0) !important;
     -webkit-transform: translateX(-50%) translateZ(0) !important;
@@ -1125,7 +1136,7 @@ body {
 /* About Button */
 .about-btn {
   position: fixed;
-  bottom: calc(var(--ui-inset) + var(--sab));
+  bottom: calc(var(--ui-bottom-pad) + var(--sab));
   right: calc(var(--ui-inset) + var(--sar));
   width: 40px;
   height: 40px;
@@ -1338,13 +1349,18 @@ body {
 @media (max-width: 768px) {
   .help-btn {
     position: fixed;
-    bottom: calc(var(--ui-inset) + var(--sab));
-    left: calc(var(--ui-inset) + var(--sal));
+    bottom: calc(var(--ui-bottom-pad) + var(--sab));
+    left: calc(var(--ui-inset-sm) + var(--sal));
     top: auto;
     right: auto;
     width: 40px;
     height: 40px;
     z-index: 1001;
+  }
+
+  .about-btn {
+    bottom: calc(var(--ui-bottom-pad) + var(--sab));
+    right: calc(var(--ui-inset-sm) + var(--sar));
   }
 
   /* Temporarily hide buggy drawing tools on mobile */
