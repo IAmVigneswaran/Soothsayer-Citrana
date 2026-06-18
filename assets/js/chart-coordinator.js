@@ -54,6 +54,46 @@ class ChartCoordinator {
         return [];
     }
 
+    stagePointerToChartCoords(pointer) {
+        if (!this.stage || !pointer) return null;
+        const scale = this.stage.scaleX();
+        const stagePos = this.stage.position();
+        return {
+            x: (pointer.x - stagePos.x) / scale,
+            y: (pointer.y - stagePos.y) / scale
+        };
+    }
+
+    clientToChartCoords(clientX, clientY) {
+        if (!this.stage) return null;
+        const stageBox = this.stage.container().getBoundingClientRect();
+        return this.stagePointerToChartCoords({
+            x: clientX - stageBox.left,
+            y: clientY - stageBox.top
+        });
+    }
+
+    findHouseAtChartPoint(px, py) {
+        if (this.currentChartType === 'south-indian') {
+            return this.southIndianTemplate.findHouseAtChartPoint(px, py);
+        } else if (this.currentChartType === 'north-indian') {
+            return this.northIndianTemplate.findHouseAtChartPoint(px, py);
+        }
+        return null;
+    }
+
+    findHouseAtPointer(pointer) {
+        const coords = this.stagePointerToChartCoords(pointer);
+        if (!coords) return null;
+        return this.findHouseAtChartPoint(coords.x, coords.y);
+    }
+
+    findHouseAtClientPoint(clientX, clientY) {
+        const coords = this.clientToChartCoords(clientX, clientY);
+        if (!coords) return null;
+        return this.findHouseAtChartPoint(coords.x, coords.y);
+    }
+
     createSouthIndianChart() {
         this.clearChart();
         this.currentChartType = 'south-indian';

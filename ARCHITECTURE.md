@@ -38,9 +38,10 @@ Script order matters: chart template classes must load before `ChartCoordinator`
              │                               │
     ┌────────▼────────┐              ┌───────▼────────┐
     │ ChartCoordinator │              │  PlanetSystem  │
-    └────────┬─────────┘              └───────┬────────┘
+    │  + hit-test API  │              └───────┬────────┘
+    └────────┬─────────┘                      │ drag/drop
              │                               │
-   ┌─────────┴─────────┐                     │ drag/drop
+   ┌─────────┴─────────┐                     │
    │                   │                     │
 ┌──▼──────────┐  ┌─────▼──────────┐          │
 │ SouthIndian │  │ NorthIndian    │◄─────────┘
@@ -56,11 +57,11 @@ Script order matters: chart template classes must load before `ChartCoordinator`
 
 | Module | Primary role |
 |--------|----------------|
-| `app.js` | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, export, auto-save, modals |
-| `chart-coordinator.js` | Unified API over South/North templates; zoom helpers; chart serialisation entry points |
-| `chart-templates-south.js` | 4×4 grid chart, bhava numbering, Lagna indicator, `getBhavaNumberForHouse()`, Graha placement/drag |
-| `chart-templates-north.js` | Diamond polygon chart, rashi boxes, Lagna-based rashi math, Graha repositioning |
-| `planet-system.js` | Graha library UI (5 pages), drag-and-drop from library to chart |
+| `app.js` | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, export, in-session auto-save, modals |
+| `chart-coordinator.js` | Unified API over South/North templates; zoom helpers; chart serialisation; pointer-to-bhava hit-test routing |
+| `chart-templates-south.js` | 4×4 grid chart, bhava numbering, Lagna indicator, `getBhavaNumberForHouse()`, `findHouseAtChartPoint()`, Graha placement/drag |
+| `chart-templates-north.js` | Diamond polygon chart, rashi boxes, Lagna-based rashi math, `findHouseAtChartPoint()`, Graha repositioning |
+| `planet-system.js` | Graha library UI (5 pages), drag-and-drop from library to chart via coordinator hit-test |
 | `drawing-tools.js` | Drawing tools, selection, control points, Graha text editing panel |
 | `edit-ui.js` | Floating property editor for drawing shapes (and Graha retrograde toggle when applicable) |
 | `context-menu.js` | Right-click / long-press menus; chart-type-specific house menus; Graha edit/delete; menu routing and `handleAction()` |
@@ -131,11 +132,16 @@ Key methods:
 2. User selects chart type → `ChartCoordinator.createSouthIndianChart()` or `createNorthIndianChart()`
 3. Template builds Konva groups, calls `zoomToFit()`
 
-### Place Graha
+### Place Graha (library drag-and-drop)
 
-1. User drags from Graha library → `PlanetSystem.handleDrop()`
-2. Target bhava from selection (`window.selectedBhavaSouth` / `window.selectedBhavaNorth`) or pointer fallback
-3. `ChartCoordinator.addPlanetToHouse()` → template `updatePlanetsInHouse()`
+1. User drags from Graha library → `PlanetSystem.handleDrop()` (desktop) or `handleMobileDrop()` (touch)
+2. Target bhava resolution (first match wins):
+   - **Selected bhava**: `window.selectedBhavaSouth` or `window.selectedBhavaNorth` if the user clicked a house first
+   - **Pointer hit-test**: `ChartCoordinator.findHouseAtPointer()` (Konva stage pointer) or `findHouseAtClientPoint()` (viewport coords when pointer is unavailable)
+3. Coordinator converts coords with `stagePointerToChartCoords()` / `clientToChartCoords()` (stage scale + position), then delegates to template `findHouseAtChartPoint()`:
+   - **South**: axis-aligned rectangle test on `houseDataSouth`; nearest-centre fallback
+   - **North**: `isPointInPolygon()` on `houseDataNorth.points`; nearest-centroid fallback
+4. `ChartCoordinator.addPlanetToHouse()` → template `updatePlanetsInHouse()`
 
 ### Set Lagna
 
@@ -190,8 +196,8 @@ House **Clear House** calls `clearHousePlanets()` on the active template.
 | Symbol | Set by | Used for |
 |--------|--------|----------|
 | `window.app` | `index.html` on `DOMContentLoaded` | Cross-module access to coordinator, tools, menus |
-| `window.selectedBhavaSouth` | South template house click | Drop target for Graha library |
-| `window.selectedBhavaNorth` | North template house click | Drop target for Graha library |
+| `window.selectedBhavaSouth` | South template house click | Optional drop target for Graha library |
+| `window.selectedBhavaNorth` | North template house click | Optional drop target for Graha library |
 | `localStorage.citranaChartData` | `app.autoSave()` during visit; cleared on page load | In-session backup only (not restored on refresh) |
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
 
@@ -200,7 +206,7 @@ House **Clear House** calls `clearHousePlanets()` on the active template.
 All interactive chrome is **absolutely positioned** over a full-viewport canvas:
 
 - Top centre: drawing/tool toolbar
-- Top right: Graha library (draggable header)
+- Top left: Graha library (draggable header)
 - Bottom right: zoom controls (+ duplicate Select/Hand shortcuts)
 - Bottom centre: Graha text edit bar, drawing Edit UI (created dynamically)
 - Corners: Help (desktop), About
@@ -215,10 +221,11 @@ Breakpoints in `styles.css`: **769px+** desktop, **768px** tablet, **600px** mob
 |------|-----------------|
 | Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` |
 | Add drawing tool | `DrawingTools.startDrawing()` switch, toolbar in `index.html`, `app.setTool()` |
-| New chart type | New template class + routes in `ChartCoordinator` |
+| New chart type | New template class + routes in `ChartCoordinator` (include `findHouseAtChartPoint()`) |
 | Context menu action | `ContextMenu.handleAction()`; add items in `showHouseMenu()` / `showPlanetMenu()` as needed |
 | South bhava menu header | `SouthIndianChartTemplate.getBhavaNumberForHouse()` |
 | North First House → Lagna | `getRashiNumberForHouse()` then `setLagnaHouse()` in `handleAction('set-first-house')` |
+| Library drop hit-test | `findHouseAtChartPoint()` in chart template; coordinate routing in `ChartCoordinator` |
 | Graha visual style | `updatePlanetsInHouse()` in chart template files |
 | Theme / layout | `assets/css/styles.css` |
 | Export behaviour | `app.exportChart()` |
@@ -226,7 +233,6 @@ Breakpoints in `styles.css`: **769px+** desktop, **768px** tablet, **600px** mob
 ## Known Limitations
 
 - **Undo/redo**: Snapshot logic exists in `app.js` but keyboard shortcuts are disabled due to bugs.
-- **Drop zone fallback**: `PlanetSystem.findClosestHouse()` is a placeholder; prefer selecting a bhava before dropping.
 - **Single chart**: One chart per canvas by design.
 - **Mobile**: Touch code exists; officially unsupported.
 

@@ -40,6 +40,32 @@ class SouthIndianChartTemplate {
         return Object.keys(this.houseDataSouth);
     }
 
+    findHouseAtChartPoint(px, py) {
+        for (const hNum in this.houseDataSouth) {
+            const h = this.houseDataSouth[hNum];
+            if (!h || h.width == null) continue;
+            if (px >= h.x && px <= h.x + h.width && py >= h.y && py <= h.y + h.height) {
+                return parseInt(hNum, 10);
+            }
+        }
+
+        let closest = null;
+        let closestDist = Infinity;
+        for (const hNum in this.houseDataSouth) {
+            const h = this.houseDataSouth[hNum];
+            if (!h || h.width == null) continue;
+            const centerX = h.x + h.width / 2;
+            const centerY = h.y + h.height / 2;
+            const distance = Math.hypot(px - centerX, py - centerY);
+            const threshold = Math.max(h.width, h.height) / 2;
+            if (distance < threshold && distance < closestDist) {
+                closestDist = distance;
+                closest = parseInt(hNum, 10);
+            }
+        }
+        return closest;
+    }
+
     createSouthIndianChart(options = {}) {
         const { initialLagna = 1 } = options;
 

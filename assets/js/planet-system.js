@@ -697,23 +697,9 @@ class PlanetSystem {
         }
     }
 
-    findHouseAtPosition(x, y) {
-        // This is a simplified implementation
-        // In a real implementation, you'd need to convert screen coordinates to chart coordinates
-        // and check which house polygon contains the point
-
-        const chartType = this.chartTemplates?.currentChartType;
-        if (chartType === 'south-indian') {
-            // For South Indian chart, you'd check the 3x4 grid
-            // This is a placeholder - you'd need to implement proper coordinate conversion
-            return 1; // Default to house 1
-        } else if (chartType === 'north-indian') {
-            // For North Indian chart, you'd check the polygon shapes
-            // This is a placeholder - you'd need to implement proper coordinate conversion
-            return 1; // Default to house 1
-        }
-
-        return null;
+    findHouseAtPosition(clientX, clientY) {
+        if (!this.chartTemplates) return null;
+        return this.chartTemplates.findHouseAtClientPoint(clientX, clientY);
     }
     handleDrop(e) {
         e.preventDefault();
@@ -732,14 +718,13 @@ class PlanetSystem {
                 console.error('Stage not available for drop');
                 return;
             }
-            // Get drop position relative to stage
             const pointer = stage.getPointerPosition();
-            if (!pointer) {
-                console.error('Could not get pointer position');
-                return;
+            if (pointer) {
+                targetHouse = this.findClosestHouse(pointer);
             }
-            // Fallback: Find the closest house to drop position
-            targetHouse = this.findClosestHouse(pointer);
+            if (!targetHouse) {
+                targetHouse = this.findHouseAtPosition(e.clientX, e.clientY);
+            }
         }
         if (targetHouse) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
@@ -750,9 +735,8 @@ class PlanetSystem {
         this.draggedPlanet = null;
     }
     findClosestHouse(pointer) {
-        // This would need to be implemented based on the chart templates
-        // For now, return a default house index
-        return 1; // Place in first house by default
+        if (!this.chartTemplates) return null;
+        return this.chartTemplates.findHouseAtPointer(pointer);
     }
     placePlanetInHouse(planetAbbr, houseIndex, label = null, id = null) {
         if (!this.chartTemplates) {

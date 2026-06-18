@@ -23,16 +23,16 @@ Soothsayer-Citrana/
 ├── index.html                    # Main application entry point
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (2191 lines)
+│   │   └── styles.css            # Complete styling system (2161 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (1322 lines)
-│   │   ├── chart-coordinator.js  # Chart type management (275 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (1058 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (991 lines)
-│   │   ├── planet-system.js      # Planet library and drag-drop (878 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (1957 lines)
-│   │   ├── context-menu.js       # Context menu system (656 lines)
-│   │   └── edit-ui.js            # Edit interface controls (806 lines)
+│   │   ├── app.js                # Main application coordinator (1319 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (313 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (1148 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (1068 lines)
+│   │   ├── planet-system.js      # Planet library and drag-drop (861 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (1975 lines)
+│   │   ├── context-menu.js       # Context menu system (648 lines)
+│   │   └── edit-ui.js            # Edit interface controls (805 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted)
 │   │   └── lucide.min.js         # Lucide 0.468.0 (self-hosted)
@@ -68,7 +68,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - 1303 lines)
+### Main Application (app.js - 1319 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -89,10 +89,11 @@ Key Methods:
 - `setupKeyboardShortcuts()`: Keyboard navigation
 - `exportChart()`: High-resolution PNG export
 - `autoSave()`: Automatic data persistence
+- `loadSavedData()`: Clears prior session data on page load; starts in-session auto-save interval
 - `handleMouseDown/Move/Up()`: Mouse interaction handling
 - `handleTouchStart/Move/End()`: Touch interaction handling
 
-### Chart Coordinator (chart-coordinator.js - 261 lines)
+### Chart Coordinator (chart-coordinator.js - 313 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -101,6 +102,7 @@ Key Responsibilities:
 - Provides unified interface for chart operations
 - Handles chart data persistence and loading
 - Manages zoom operations across chart types
+- Converts stage/client pointer coordinates to chart space for Graha library drop targeting
 
 Key Methods:
 - `createSouthIndianChart()`: Initialise South Indian layout
@@ -109,8 +111,10 @@ Key Methods:
 - `setFirstHouse()`: Legacy API on templates; North Indian house menu **Set as First House** uses `setLagnaHouse(rashi)` via `getRashiNumberForHouse()` instead
 - `getChartData()`: Serialise chart data
 - `loadChartData()`: Restore chart from data
+- `stagePointerToChartCoords()` / `clientToChartCoords()`: Map Konva pointer or viewport coords to chart layer space (accounts for stage scale/position)
+- `findHouseAtChartPoint()` / `findHouseAtPointer()` / `findHouseAtClientPoint()`: Resolve drop target bhava from coordinates
 
-### South Indian Chart Template (chart-templates-south.js - 1058 lines)
+### South Indian Chart Template (chart-templates-south.js - 1148 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 Key Responsibilities:
@@ -136,9 +140,10 @@ Key Methods:
 - `setLagnaHouse()`: Set ascendant with visual indicator
 - `renumberHouses()`: Update house numbering
 - `getBhavaNumberForHouse()`: Get house number (1–12 from Lagna) for a fixed grid cell
+- `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-house fallback) for library drops
 - `highlightHouse()`: Visual house selection
 
-### North Indian Chart Template (chart-templates-north.js - 991 lines)
+### North Indian Chart Template (chart-templates-north.js - 1068 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 
 Key Responsibilities:
@@ -164,8 +169,9 @@ Key Methods:
 - `renumberHouses()`: Update house numbering
 - `isPointInPolygon()`: Hit detection for polygon houses
 - `getRashiNumberForHouse()`: Rashi calculation
+- `findHouseAtChartPoint()`: Polygon hit-test (with nearest-centroid fallback) for library drops
 
-### Planet System (planet-system.js - 876 lines)
+### Planet System (planet-system.js - 861 lines)
 Manages the floating planet library and drag-and-drop functionality with paging system.
 
 Key Responsibilities:
@@ -257,10 +263,12 @@ Key Methods:
 - `setupDragAndDrop()`: Configure drag functionality
 - `handleDragStart/Move/End()`: Drag interaction handling
 - `handleTouchStart/Move/End()`: Touch interaction handling
-- `findHouseAtPosition()`: Drop zone detection
+- `handleDrop()` / `handleMobileDrop()`: Place Graha on chart (selected bhava or pointer hit-test)
+- `findClosestHouse()`: Delegates to `ChartCoordinator.findHouseAtPointer()` (Konva pointer during HTML5 drop)
+- `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
 - `getPlanetInfo()`: Retrieve planet data from paged structure
 
-### Drawing Tools (drawing-tools.js - 1917 lines)
+### Drawing Tools (drawing-tools.js - 1975 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
@@ -303,7 +311,7 @@ Key Methods:
 - `updateControlPointsPosition()`: Synchronise control points with shape movement
 - `clearControlPoints()`: Remove control points from display
 
-### Context Menu (context-menu.js - 656 lines)
+### Context Menu (context-menu.js - 648 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:
@@ -339,7 +347,7 @@ Key Methods:
 - `removePlanetFromHouse()` / `clearHousePlanets()`: Graha and bhava clearing
 - `findPlanetTextNode()` / `getActiveChartTemplate()`: Menu action helpers
 
-### Edit UI (edit-ui.js - 786 lines)
+### Edit UI (edit-ui.js - 805 lines)
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
@@ -390,7 +398,7 @@ Key Methods:
 - 51 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
 - Paging System: Five-page navigation with desktop dots and mobile swipe
 - Text-based Display: Uses abbreviations instead of symbols for better compatibility
-- Drag & Drop: Intuitive planet placement from floating library to chart houses
+- Drag & Drop: Grahas from the floating library land in the bhava under the pointer (or in a previously selected bhava via `window.selectedBhavaSouth` / `window.selectedBhavaNorth`)
 - Multiple Instances: Same planet can be placed multiple times
 - Dynamic Text Sizing: Planet text scales based on house occupancy
 - Touch Support: Mobile-friendly touch interactions with visual feedback
@@ -435,14 +443,14 @@ Technical Implementation:
 - Keyboard Shortcuts: Power user features for efficiency
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific house actions; Graha edit/delete
 - Status Updates: Real-time feedback and notifications
-- Auto-Save: Automatic chart data persistence every 30 seconds
+- Auto-Save: In-session backup to `localStorage` every 30 seconds and on `beforeunload`; cleared on page refresh (export PNG to keep a copy)
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First-time user experience with getting started guide
 - Mobile Zoom Controls: Select and Hand tools available in bottom zoom controls bar
 
 ### Export & Sharing
 - High-Resolution PNG: Professional quality exports (300 DPI)
-- Auto-Save: In-session backup to `localStorage` every 30 seconds; cleared on page refresh
+- Auto-Save: In-session backup to `localStorage` every 30 seconds and on `beforeunload`; cleared on page refresh (export PNG to keep a copy)
 - Cross-Platform: Works on all modern browsers
 - GitHub Pages Compatible: No build process required
 

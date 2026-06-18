@@ -41,6 +41,37 @@ class NorthIndianChartTemplate {
         return Object.keys(this.houseDataNorth);
     }
 
+    findHouseAtChartPoint(px, py) {
+        for (const hNum in this.houseDataNorth) {
+            const h = this.houseDataNorth[hNum];
+            if (h && h.points && NorthIndianChartTemplate.isPointInPolygon(h.points, px, py)) {
+                return parseInt(hNum, 10);
+            }
+        }
+
+        let closest = null;
+        let closestDist = Infinity;
+        for (const hNum in this.houseDataNorth) {
+            const h = this.houseDataNorth[hNum];
+            if (!h || !h.points) continue;
+            const vertexCount = h.points.length / 2;
+            let cx = 0;
+            let cy = 0;
+            for (let i = 0; i < h.points.length; i += 2) {
+                cx += h.points[i];
+                cy += h.points[i + 1];
+            }
+            cx /= vertexCount;
+            cy /= vertexCount;
+            const distance = Math.hypot(px - cx, py - cy);
+            if (distance < closestDist) {
+                closestDist = distance;
+                closest = parseInt(hNum, 10);
+            }
+        }
+        return closest;
+    }
+
     createNorthIndianChart(options = {}) {
         const { initialLagna = 1 } = options;
 
