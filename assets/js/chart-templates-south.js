@@ -401,7 +401,7 @@ class SouthIndianChartTemplate {
 
         // Add right-click event for context menu
         house.on('contextmenu', (e) => {
-            console.log('[DEBUG] South Indian Chart House right-clicked:', houseNumber);
+            citranaDebug('South Indian Chart House right-clicked:', houseNumber);
             e.evt.preventDefault();
             e.evt.stopPropagation();
             this.highlightHouse(houseNumber);
@@ -508,7 +508,7 @@ class SouthIndianChartTemplate {
         });
         this.updatePlanetsInHouse(houseNumber);
         if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
-        console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
+        citranaDebug(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
     }
 
     removePlanetFromHouseById(houseNumber, planetId) {
@@ -563,7 +563,7 @@ class SouthIndianChartTemplate {
             // Safari-specific: Add touch event handling to hit rect
             hitRect.on('touchstart', (e) => {
                 e.evt.preventDefault();
-                console.log(`[DEBUG] Touch start for hit rect of planet ${planetObj.abbr} from house ${houseNumber}`);
+                citranaDebug(`Touch start for hit rect of planet ${planetObj.abbr} from house ${houseNumber}`);
             });
 
             hitRect.on('touchmove', (e) => {
@@ -613,7 +613,7 @@ class SouthIndianChartTemplate {
             // Safari-specific: Add touch event handling
             planetText.on('touchstart', (e) => {
                 e.evt.preventDefault();
-                console.log(`[DEBUG] Touch start for planet ${planetObj.abbr} from house ${houseNumber}`);
+                citranaDebug(`Touch start for planet ${planetObj.abbr} from house ${houseNumber}`);
             });
 
             planetText.on('touchmove', (e) => {
@@ -648,7 +648,7 @@ class SouthIndianChartTemplate {
                         }, 10);
 
                         this.layer.batchDraw();
-                        console.log(`[DEBUG] Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
+                        citranaDebug(`Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
                         // Trigger snapshot for undo/redo
                         if (window.app && window.app.pushSnapshot) {
                             window.app.pushSnapshot();
@@ -722,7 +722,7 @@ class SouthIndianChartTemplate {
 
             // Safari-compatible drag handlers for both hit rect and planet text
             const dragStartHandler = (e) => {
-                console.log(`[DEBUG] Drag start for planet ${planetObj.abbr} from house ${houseNumber}`);
+                citranaDebug(`Drag start for planet ${planetObj.abbr} from house ${houseNumber}`);
 
                 this._dragSource = {
                     houseNumber,
@@ -737,7 +737,7 @@ class SouthIndianChartTemplate {
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
-                console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
+                citranaDebug(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
             };
 
             const dragEndHandler = (e) => {
@@ -796,14 +796,14 @@ class SouthIndianChartTemplate {
                             py >= h.y && py <= h.y + h.height
                         ) {
                             targetHouse = parseInt(hNum);
-                            console.log(`[DEBUG] Drop detected over house ${targetHouse}`);
+                            citranaDebug(`Drop detected over house ${targetHouse}`);
                             break;
                         }
                     }
 
                     // Method 5: If still no target house found, try a broader search
                     if (!targetHouse) {
-                        console.log('[DEBUG] No target house found, trying broader search...');
+                        citranaDebug('No target house found, trying broader search...');
                         for (const hNum in this.houseDataSouth) {
                             const h = this.houseDataSouth[hNum];
                             const centerX = h.x + h.width / 2;
@@ -816,14 +816,14 @@ class SouthIndianChartTemplate {
                             // If planet is within reasonable distance of house center
                             if (distance < Math.max(h.width, h.height) / 2) {
                                 targetHouse = parseInt(hNum);
-                                console.log(`[DEBUG] Drop detected over house ${targetHouse} using distance method`);
+                                citranaDebug(`Drop detected over house ${targetHouse} using distance method`);
                                 break;
                             }
                         }
                     }
 
                 } catch (error) {
-                    console.error('[DEBUG] Error in drop detection:', error);
+                    console.error('Error in drop detection:', error);
                 }
 
                 if (targetHouse && targetHouse !== houseNumber) {
@@ -839,11 +839,11 @@ class SouthIndianChartTemplate {
                         }
                     }
                     this.updatePlanetsInHouse(targetHouse);
-                    console.log(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}`);
+                    citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}`);
                 } else {
                     // Snap back to original position
                     this.updatePlanetsInHouse(houseNumber);
-                    console.log(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id}) - Target house: ${targetHouse}, Original house: ${houseNumber}`);
+                    citranaDebug(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id}) - Target house: ${targetHouse}, Original house: ${houseNumber}`);
                 }
                 this._dragSource = null;
                 this.layer.batchDraw();
@@ -894,7 +894,7 @@ class SouthIndianChartTemplate {
 
     setLagnaHouse(houseNumber, options = {}) {
         const { skipSnapshot = false } = options;
-        console.log('[DEBUG] setLagnaHouse called with house number:', houseNumber);
+        citranaDebug('setLagnaHouse called with house number:', houseNumber);
         // Remove old Lagna indicator lines if present
         if (this.houseDataSouth[this.lagnaHouseSouth] && this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth) {
             this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth.forEach(line => line.destroy());

@@ -333,7 +333,7 @@ class ContextMenu {
 
     showHouseMenu(x, y, houseNumber) {
         this.currentHouseNumber = houseNumber;
-        console.log('[DEBUG] showHouseMenu called for house:', houseNumber);
+        citranaDebug('showHouseMenu called for house:', houseNumber);
         const chartType = window.app?.chartTemplates?.currentChartType;
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
 
@@ -405,8 +405,8 @@ class ContextMenu {
         this.menu.onclick = null;
         this.menu.onclick = (e) => {
             const item = e.target.closest('.context-menu-item');
-            console.log('[DEBUG] Click event target:', e.target);
-            console.log('[DEBUG] Closest .context-menu-item:', item);
+            citranaDebug('Click event target:', e.target);
+            citranaDebug('Closest .context-menu-item:', item);
             if (!item) return;
             e.preventDefault();
             const action = item.dataset.action;
@@ -415,7 +415,7 @@ class ContextMenu {
                 planetId: item.dataset.planetid,
                 abbr: item.dataset.abbr
             };
-            console.log('[DEBUG] Menu item clicked:', action, houseNumber);
+            citranaDebug('Menu item clicked:', action, houseNumber);
             this.handleAction(action, houseNumber, context);
             this.hide();
         };
@@ -442,7 +442,7 @@ class ContextMenu {
                     planetId: item.dataset.planetid,
                     abbr: item.dataset.abbr
                 };
-                console.log('[DEBUG] Menu item touched:', action, houseNumber);
+                citranaDebug('Menu item touched:', action, houseNumber);
                 this.handleAction(action, houseNumber, context);
                 this.hide();
             } else {
@@ -564,24 +564,24 @@ class ContextMenu {
 
             case 'set-lagna':
                 // Set the right-clicked house as Lagna directly
-                console.log('[DEBUG] Context Menu - set-lagna action triggered');
-                console.log('[DEBUG] House number from menu:', houseNumber);
-                console.log('[DEBUG] Parsed house number:', parseInt(houseNumber));
+                citranaDebug('Context Menu - set-lagna action triggered');
+                citranaDebug('House number from menu:', houseNumber);
+                citranaDebug('Parsed house number:', parseInt(houseNumber));
 
                 if (window.app && window.app.chartTemplates) {
                     if (houseNumber) {
                         // If house number is provided (from house-specific menu), set that house as Lagna
-                        console.log('[DEBUG] Calling chartTemplates.setLagnaHouse with:', parseInt(houseNumber));
+                        citranaDebug('Calling chartTemplates.setLagnaHouse with:', parseInt(houseNumber));
                         window.app.chartTemplates.setLagnaHouse(parseInt(houseNumber));
                     } else {
                         // If no house number (from chart context menu), show a prompt or use default
-                        console.log('[DEBUG] No house number provided, using default behavior');
+                        citranaDebug('No house number provided, using default behavior');
                         // For North Indian chart, you might want to set a default house or show a prompt
                         // For now, let's set house 1 as default
                         window.app.chartTemplates.setLagnaHouse(1);
                     }
                 } else {
-                    console.log('[DEBUG] ERROR: Cannot set Lagna - missing app or chartTemplates');
+                    citranaDebug('ERROR: Cannot set Lagna - missing app or chartTemplates');
                 }
                 break;
 

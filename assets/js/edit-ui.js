@@ -64,7 +64,7 @@ class EditUI {
      * @param {string} tool - The tool type ('pen', 'line', 'arrow', 'text')
      */
     show(element, tool) {
-        console.log(`[EDIT UI] show() called with tool: ${tool}, element:`, element);
+        citranaDebug(`[EDIT UI] show() called with tool: ${tool}, element:`, element);
 
         this.currentElement = element;
         this.currentTool = tool;
@@ -82,7 +82,7 @@ class EditUI {
         const container = document.getElementById('edit-ui-container');
         if (container) {
             container.style.display = 'flex';
-            console.log(`[EDIT UI] Container displayed`);
+            citranaDebug(`[EDIT UI] Container displayed`);
         } else {
             console.error(`[EDIT UI] Container not found!`);
         }
@@ -353,7 +353,7 @@ class EditUI {
 
         // Enhanced delete functionality that works with both click and touch
         const handleDelete = () => {
-            console.log('[EDIT UI] Delete button pressed');
+            citranaDebug('[EDIT UI] Delete button pressed');
 
             // Call the delete callback if it exists (to properly handle control points)
             if (this.onDelete && typeof this.onDelete === 'function') {
@@ -363,7 +363,7 @@ class EditUI {
                 if (this.currentElement) {
                     this.currentElement.destroy();
                     this.currentElement.getLayer().batchDraw();
-                    console.log('[EDIT UI] Element deleted (fallback)');
+                    citranaDebug('[EDIT UI] Element deleted (fallback)');
                 }
             }
 
@@ -391,8 +391,8 @@ class EditUI {
      * @param {HTMLElement} container - The container to add controls to
      */
     createTextControls(container, maxLines) {
-        console.log('[EDIT UI] Creating text controls for element:', this.currentElement);
-        console.log('[EDIT UI] Element properties:', {
+        citranaDebug('[EDIT UI] Creating text controls for element:', this.currentElement);
+        citranaDebug('[EDIT UI] Element properties:', {
             fontSize: this.currentElement.fontSize,
             fontWeight: this.currentElement.fontWeight,
             fontStyle: this.currentElement.fontStyle,
@@ -478,7 +478,7 @@ class EditUI {
 
             const isBold = currentWeight === 'bold' || currentWeight === 700 || currentWeight === '700';
             const newWeight = isBold ? 'normal' : 'bold';
-            console.log('[EDIT UI] Bold button clicked - currentWeight:', currentWeight, 'isBold:', isBold, 'newWeight:', newWeight);
+            citranaDebug('[EDIT UI] Bold button clicked - currentWeight:', currentWeight, 'isBold:', isBold, 'newWeight:', newWeight);
 
             // Set font weight and ensure it works
             if (newWeight === 'bold') {
@@ -489,7 +489,7 @@ class EditUI {
                 } else {
                     this.currentElement.attrs.fontWeight = 'bold';
                 }
-                console.log('[EDIT UI] Set to bold with Arial Black');
+                citranaDebug('[EDIT UI] Set to bold with Arial Black');
             } else {
                 // For normal, reset to regular font family
                 this.currentElement.fontFamily('Arial, sans-serif');
@@ -498,7 +498,7 @@ class EditUI {
                 } else {
                     this.currentElement.attrs.fontWeight = 'normal';
                 }
-                console.log('[EDIT UI] Set to normal with Arial');
+                citranaDebug('[EDIT UI] Set to normal with Arial');
             }
 
             // Force a redraw to ensure the change is applied
@@ -516,16 +516,16 @@ class EditUI {
             }
 
             const newStyle = currentStyle === 'italic' ? 'normal' : 'italic';
-            console.log('[EDIT UI] Italic button clicked - currentStyle:', currentStyle, 'newStyle:', newStyle);
+            citranaDebug('[EDIT UI] Italic button clicked - currentStyle:', currentStyle, 'newStyle:', newStyle);
 
             // Set font style safely
             if (typeof this.currentElement.fontStyle === 'function') {
                 this.currentElement.fontStyle(newStyle);
-                console.log('[EDIT UI] Set fontStyle to', newStyle);
+                citranaDebug('[EDIT UI] Set fontStyle to', newStyle);
             } else {
                 // If fontStyle function doesn't exist, try setting it as a property
                 this.currentElement.attrs.fontStyle = newStyle;
-                console.log('[EDIT UI] Set fontStyle as property to', newStyle);
+                citranaDebug('[EDIT UI] Set fontStyle as property to', newStyle);
             }
 
             this.currentElement.getLayer().batchDraw();
@@ -643,7 +643,7 @@ class EditUI {
 
         // Enhanced delete functionality that works with both click and touch
         const handleDelete = () => {
-            console.log('[EDIT UI] Delete button pressed');
+            citranaDebug('[EDIT UI] Delete button pressed');
 
             // Call the delete callback if it exists (to properly handle control points)
             if (this.onDelete && typeof this.onDelete === 'function') {
@@ -653,7 +653,7 @@ class EditUI {
                 if (this.currentElement) {
                     this.currentElement.destroy();
                     this.currentElement.getLayer().batchDraw();
-                    console.log('[EDIT UI] Element deleted (fallback)');
+                    citranaDebug('[EDIT UI] Element deleted (fallback)');
                 }
             }
 
@@ -726,11 +726,11 @@ class EditUI {
      * @param {number} size - New font size
      */
     updateFontSize(size) {
-        console.log('[EDIT UI] updateFontSize called with:', size);
+        citranaDebug('[EDIT UI] updateFontSize called with:', size);
         if (this.currentElement) {
-            console.log('[EDIT UI] Before update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
+            citranaDebug('[EDIT UI] Before update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
             this.currentElement.fontSize(size);
-            console.log('[EDIT UI] After update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
+            citranaDebug('[EDIT UI] After update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
             this.currentElement.getLayer().batchDraw();
         }
     }
@@ -740,11 +740,11 @@ class EditUI {
      * @param {string} weight - New font weight
      */
     updateFontWeight(weight) {
-        console.log('[EDIT UI] updateFontWeight called with:', weight);
+        citranaDebug('[EDIT UI] updateFontWeight called with:', weight);
         if (this.currentElement) {
-            console.log('[EDIT UI] Before update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
+            citranaDebug('[EDIT UI] Before update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
             this.currentElement.fontWeight(weight);
-            console.log('[EDIT UI] After update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
+            citranaDebug('[EDIT UI] After update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
             this.currentElement.getLayer().batchDraw();
         }
     }
@@ -754,11 +754,11 @@ class EditUI {
      * @param {string} style - New font style
      */
     updateFontStyle(style) {
-        console.log('[EDIT UI] updateFontStyle called with:', style);
+        citranaDebug('[EDIT UI] updateFontStyle called with:', style);
         if (this.currentElement) {
-            console.log('[EDIT UI] Before update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
+            citranaDebug('[EDIT UI] Before update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
             this.currentElement.fontStyle(style);
-            console.log('[EDIT UI] After update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
+            citranaDebug('[EDIT UI] After update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
             this.currentElement.getLayer().batchDraw();
         }
     }

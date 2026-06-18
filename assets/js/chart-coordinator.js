@@ -122,17 +122,17 @@ class ChartCoordinator {
     }
 
     setLagnaHouse(houseNumber) {
-        console.log('[DEBUG] ChartCoordinator - setLagnaHouse called with house number:', houseNumber);
-        console.log('[DEBUG] Current chart type:', this.currentChartType);
+        citranaDebug('ChartCoordinator - setLagnaHouse called with house number:', houseNumber);
+        citranaDebug('Current chart type:', this.currentChartType);
 
         if (this.currentChartType === 'south-indian') {
-            console.log('[DEBUG] Delegating to South Indian template');
+            citranaDebug('Delegating to South Indian template');
             this.southIndianTemplate.setLagnaHouse(houseNumber);
         } else if (this.currentChartType === 'north-indian') {
-            console.log('[DEBUG] Delegating to North Indian template');
+            citranaDebug('Delegating to North Indian template');
             this.northIndianTemplate.setLagnaHouse(houseNumber);
         } else {
-            console.log('[DEBUG] ERROR: Unknown chart type:', this.currentChartType);
+            citranaDebug('ERROR: Unknown chart type:', this.currentChartType);
         }
     }
 
@@ -219,17 +219,17 @@ class ChartCoordinator {
     }
 
     zoomToFit() {
-        console.log('[DEBUG] zoomToFit called, currentChartType:', this.currentChartType);
+        citranaDebug('zoomToFit called, currentChartType:', this.currentChartType);
 
         // Check if chart groups exist to determine chart type
         if (this.southIndianTemplate && this.southIndianTemplate.chartGroupSouth) {
-            console.log('[DEBUG] Using South Indian zoomToFit');
+            citranaDebug('Using South Indian zoomToFit');
             this.southIndianTemplate.zoomToFit();
         } else if (this.northIndianTemplate && this.northIndianTemplate.chartGroupNorth) {
-            console.log('[DEBUG] Using North Indian zoomToFit');
+            citranaDebug('Using North Indian zoomToFit');
             this.northIndianTemplate.zoomToFit();
         } else {
-            console.log('[DEBUG] No chart groups found, using simple reset');
+            citranaDebug('No chart groups found, using simple reset');
             // Fallback to simple reset
             if (this.stage) {
                 this.stage.scale({

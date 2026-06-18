@@ -16,6 +16,7 @@ This document describes how Citrana is structured at a system level: runtime com
 index.html
   ├── assets/vendor/konva.min.js   (Konva 9.3.20)
   ├── assets/vendor/lucide.min.js  (Lucide 0.468.0)
+  ├── citrana-debug.js           → window.citranaDebug (on by default)
   ├── chart-templates-south.js   → SouthIndianChartTemplate
   ├── chart-templates-north.js   → NorthIndianChartTemplate
   ├── chart-coordinator.js       → ChartCoordinator
@@ -26,7 +27,7 @@ index.html
   └── app.js                     → CitranaApp (window.app)
 ```
 
-Script order matters: chart template classes must load before `ChartCoordinator`, and all modules must load before `app.js`.
+Script order matters: `citrana-debug.js` must load before any module that calls `citranaDebug()`; chart template classes must load before `ChartCoordinator`, and all modules must load before `app.js`.
 
 ## High-Level Component Diagram
 
@@ -200,6 +201,17 @@ House **Clear House** calls `clearHousePlanets()` on the active template.
 | `window.selectedBhavaNorth` | North template house click | Optional drop target for Graha library |
 | `localStorage.citranaChartData` | `app.autoSave()` during visit; cleared on page load | In-session backup only (not restored on refresh) |
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
+| `localStorage.citrana_debug` | DevTools / manual | Set to `'0'` to silence `citranaDebug()` logs; omitted or any other value keeps debug on (default) |
+
+## Debug logging
+
+Contributor-oriented trace logging uses `citranaDebug()` from `citrana-debug.js` (loaded before chart modules). **Enabled by default** for open-source debugging.
+
+- **Silence:** `localStorage.setItem('citrana_debug', '0')` then refresh
+- **Re-enable:** `localStorage.removeItem('citrana_debug')` or `localStorage.setItem('citrana_debug', '1')`
+- **Runtime:** `window.CITRANA_DEBUG = false` disables without localStorage
+
+`console.error` is unchanged for real failures.
 
 ## UI Architecture
 

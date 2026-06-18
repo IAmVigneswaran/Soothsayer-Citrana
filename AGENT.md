@@ -26,6 +26,7 @@ Soothsayer-Citrana/
 │   │   └── styles.css            # Complete styling system (2161 lines)
 │   ├── js/
 │   │   ├── app.js                # Main application coordinator (1319 lines)
+│   │   ├── citrana-debug.js      # Contributor debug logging (on by default)
 │   │   ├── chart-coordinator.js  # Chart type management (313 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (1148 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (1068 lines)
@@ -482,6 +483,11 @@ While the codebase might have limited support for mobile or touch, officially it
 - Add comprehensive comments for new features
 - Maintain modular architecture
 - Use custom CSS classes for styling
+
+### Debug logging
+- Use `citranaDebug(...)` from `citrana-debug.js` for contributor trace logs (enabled by default)
+- Silence in DevTools: `localStorage.setItem('citrana_debug', '0')` then refresh; remove the key to re-enable
+- Use `console.error` for real failures only
 
 ### File Headers
 All JavaScript and CSS files use a standardised comment header format:

@@ -376,20 +376,20 @@ class NorthIndianChartTemplate {
                 id: uniqueId // Assign unique ID
             });
 
-            console.log(`[DEBUG] Created Rashi text element with name: RashiNumberTextNorth${houseNumNorth}`);
+            citranaDebug(`Created Rashi text element with name: RashiNumberTextNorth${houseNumNorth}`);
 
             // Add click event to rashi number box for debug
             rashiNumberBoxNorth.on('click', (e) => {
                 e.evt.stopPropagation(); // Prevent event bubbling
                 const currentRashiNumber = this.getCurrentRashiNumber(houseNumNorth);
-                console.log(`[DEBUG] Clicked Rashi Box ID: ${uniqueId}, Rashi: ${currentRashiNumber}, Lagna: ${this.lagnaHouseNorth}`);
+                citranaDebug(`Clicked Rashi Box ID: ${uniqueId}, Rashi: ${currentRashiNumber}, Lagna: ${this.lagnaHouseNorth}`);
             });
 
             // Also add click event to text for better coverage
             rashiNumberTextNorth.on('click', (e) => {
                 e.evt.stopPropagation(); // Prevent event bubbling
                 const currentRashiNumber = this.getCurrentRashiNumber(houseNumNorth);
-                console.log(`[DEBUG] Clicked Rashi Box ID: ${uniqueId}, Rashi: ${currentRashiNumber}, Lagna: ${this.lagnaHouseNorth}`);
+                citranaDebug(`Clicked Rashi Box ID: ${uniqueId}, Rashi: ${currentRashiNumber}, Lagna: ${this.lagnaHouseNorth}`);
             });
 
             // Add to rashi number box group
@@ -406,7 +406,7 @@ class NorthIndianChartTemplate {
         this.tinyBoxGroupNorth.moveToTop();
         this.layer.batchDraw();
 
-        console.log('[DEBUG] North Indian chart created with clickable Rashi Number Boxes');
+        citranaDebug('North Indian chart created with clickable Rashi Number Boxes');
 
         // Call renumberHouses to set correct Rashi numbers based on Lagna and First House
         this.renumberHouses();
@@ -441,13 +441,13 @@ class NorthIndianChartTemplate {
     }
 
     setLagnaHouse(houseNumber) {
-        console.log('[DEBUG] North Indian Chart - setLagnaHouse called with house number:', houseNumber);
-        console.log('[DEBUG] Previous Lagna House:', this.lagnaHouseNorth);
+        citranaDebug('North Indian Chart - setLagnaHouse called with house number:', houseNumber);
+        citranaDebug('Previous Lagna House:', this.lagnaHouseNorth);
 
         this.lagnaHouseNorth = houseNumber;
 
-        console.log('[DEBUG] New Lagna House set to:', this.lagnaHouseNorth);
-        console.log('[DEBUG] Calling renumberHouses() to update Rashi numbers...');
+        citranaDebug('New Lagna House set to:', this.lagnaHouseNorth);
+        citranaDebug('Calling renumberHouses() to update Rashi numbers...');
 
         this.renumberHouses();
         this.clearHighlight();
@@ -462,9 +462,9 @@ class NorthIndianChartTemplate {
         ];
         const lagnaSignName = zodiacSigns[houseNumber - 1] || 'Unknown';
 
-        console.log(`[DEBUG] North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
-        console.log('[DEBUG] Chart should now display updated Rashi numbers for the new Lagna');
-        console.log('[DEBUG] All planets have been repositioned to their correct Rashis');
+        citranaDebug(`North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
+        citranaDebug('Chart should now display updated Rashi numbers for the new Lagna');
+        citranaDebug('All planets have been repositioned to their correct Rashis');
     }
 
     getCurrentRashiNumber(visualPosition) {
@@ -498,7 +498,7 @@ class NorthIndianChartTemplate {
      * This is called when the Lagna changes to ensure planets stay in their Rashis
      */
     repositionPlanetsForNewLagna() {
-        console.log('[DEBUG] Repositioning planets for new Lagna...');
+        citranaDebug('Repositioning planets for new Lagna...');
 
         // Collect all planets with their Rashi numbers
         const allPlanets = [];
@@ -516,7 +516,7 @@ class NorthIndianChartTemplate {
             }
         }
 
-        console.log(`[DEBUG] Found ${allPlanets.length} planets to reposition`);
+        citranaDebug(`Found ${allPlanets.length} planets to reposition`);
 
         // Clear all planets from current positions
         for (const houseNum in this.houseDataNorth) {
@@ -526,7 +526,7 @@ class NorthIndianChartTemplate {
         // Reposition each planet to its correct house based on Rashi
         allPlanets.forEach(planet => {
             const newHouseNumber = this.getHouseNumberForRashi(planet.rashiNumber);
-            console.log(`[DEBUG] Planet ${planet.abbr} (Rashi ${planet.rashiNumber}) moving from house ${planet.currentHouse} to house ${newHouseNumber}`);
+            citranaDebug(`Planet ${planet.abbr} (Rashi ${planet.rashiNumber}) moving from house ${planet.currentHouse} to house ${newHouseNumber}`);
 
             // Add planet to new house
             const house = this.houseDataNorth[newHouseNumber];
@@ -549,7 +549,7 @@ class NorthIndianChartTemplate {
         }
 
         this.layer.batchDraw();
-        console.log('[DEBUG] Planet repositioning completed');
+        citranaDebug('Planet repositioning completed');
     }
 
 
@@ -566,7 +566,7 @@ class NorthIndianChartTemplate {
     renumberHouses() {
         for (let house = 1; house <= 12; house++) {
             const rashiNumber = ((house + this.lagnaHouseNorth - 2) % 12) + 1;
-            console.log(`[DEBUG] renumberHouses: house=${house}, lagna=${this.lagnaHouseNorth}, rashi=${rashiNumber}`);
+            citranaDebug(`renumberHouses: house=${house}, lagna=${this.lagnaHouseNorth}, rashi=${rashiNumber}`);
             const rashiText = this.tinyBoxGroupNorth?.findOne(`[name="RashiNumberTextNorth${house}"]`);
             if (rashiText) {
                 rashiText.text(rashiNumber.toString());
@@ -657,7 +657,7 @@ class NorthIndianChartTemplate {
         this.stage.position(newPos);
         this.stage.batchDraw();
 
-        console.log('[DEBUG] North Indian zoomToFit - scale:', newScale, 'position:', newPos, 'extraTopMargin:', extraTopMargin);
+        citranaDebug('North Indian zoomToFit - scale:', newScale, 'position:', newPos, 'extraTopMargin:', extraTopMargin);
     }
 
     extractSerializablePlanets(houseData = this.houseDataNorth) {
@@ -773,7 +773,7 @@ class NorthIndianChartTemplate {
         });
         this.updatePlanetsInHouse(houseNumber);
         if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
-        console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber} in Rashi ${rashiNumber}`);
+        citranaDebug(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber} in Rashi ${rashiNumber}`);
     }
 
     removePlanetFromHouseById(houseNumber, planetId) {
@@ -869,7 +869,7 @@ class NorthIndianChartTemplate {
                         }, 10);
 
                         this.layer.batchDraw();
-                        console.log(`[DEBUG] Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
+                        citranaDebug(`Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
                         // Trigger snapshot for undo/redo
                         if (window.app && window.app.pushSnapshot) {
                             window.app.pushSnapshot();
@@ -955,7 +955,7 @@ class NorthIndianChartTemplate {
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
-                console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber} in Rashi ${planetObj.rashiNumber}`);
+                citranaDebug(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber} in Rashi ${planetObj.rashiNumber}`);
             });
             planetText.on('dragend', (e) => {
                 planetText.opacity(1);
@@ -995,11 +995,11 @@ class NorthIndianChartTemplate {
                     }
                     this.updatePlanetsInHouse(targetHouse);
                     if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
-                    console.log(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}, staying in Rashi ${planetObj.rashiNumber}`);
+                    citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}, staying in Rashi ${planetObj.rashiNumber}`);
                 } else {
                     // Snap back to original position
                     this.updatePlanetsInHouse(houseNumber);
-                    console.log(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id})`);
+                    citranaDebug(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id})`);
                 }
                 this.layer.batchDraw();
             });

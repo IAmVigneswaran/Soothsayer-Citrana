@@ -1293,7 +1293,7 @@ class DrawingTools {
         planetText.on('dblclick', () => {
             // Prevent multiple editing sessions
             if (this.isEditingPlanet) {
-                console.log('[DEBUG] Already editing a planet, ignoring double-click');
+                citranaDebug('Already editing a planet, ignoring double-click');
                 return;
             }
             this.editPlanetText(planetText, onUpdate);
@@ -1317,7 +1317,7 @@ class DrawingTools {
 
                     // Prevent multiple editing sessions
                     if (this.isEditingPlanet) {
-                        console.log('[DEBUG] Already editing a planet, ignoring double-tap');
+                        citranaDebug('Already editing a planet, ignoring double-tap');
                         return;
                     }
 
@@ -1346,7 +1346,7 @@ class DrawingTools {
         // Check if text edit controls are already visible
         const textEditControls = document.getElementById('text-edit-controls');
         if (textEditControls && textEditControls.style.display === 'flex') {
-            console.log('[DEBUG] Text edit controls already visible, ignoring edit request');
+            citranaDebug('Text edit controls already visible, ignoring edit request');
             return;
         }
 
@@ -1559,7 +1559,7 @@ class DrawingTools {
         const handleColorChange = (e) => {
             const newColor = e.target.value;
 
-            console.log(`[DEBUG] Color changed to: ${newColor} for planet text`);
+            citranaDebug(`Color changed to: ${newColor} for planet text`);
 
             // Update ONLY the specific planet text being edited
             editingPlanetText.fill(newColor);
@@ -1633,7 +1633,7 @@ class DrawingTools {
             this.isEditingPlanet = false;
             this.currentlyEditingPlanet = null;
 
-            console.log('[DEBUG] Cancelled existing planet editing session');
+            citranaDebug('Cancelled existing planet editing session');
         }
     }
 
@@ -1643,7 +1643,7 @@ class DrawingTools {
      * @param {string} tool - The tool type
      */
     showEditUI(element, tool) {
-        console.log(`[EDIT UI] Showing Edit UI for ${tool} tool, element:`, element);
+        citranaDebug(`[EDIT UI] Showing Edit UI for ${tool} tool, element:`, element);
 
         // Cancel any existing planet editing
         this.cancelPlanetEditing();
