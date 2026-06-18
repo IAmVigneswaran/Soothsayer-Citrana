@@ -11,7 +11,6 @@ class SouthIndianChartTemplate {
         this.chartGroupSouth = null;
         this.houseDataSouth = {};
         this.lagnaHouseSouth = 1;
-        this.firstHouseSouth = 1;
         this.selectedHouse = null; // Track selected house for highlight
         this.southIndianHouseOrder = null;
 
@@ -922,12 +921,6 @@ class SouthIndianChartTemplate {
         }
         if (!skipSnapshot && window.app && window.app.pushSnapshot) window.app.pushSnapshot();
         console.log(`Lagna set to house ${houseNumber}`);
-    }
-
-    setFirstHouse(houseNumber) {
-        this.firstHouseSouth = houseNumber;
-        this.renumberHouses();
-        console.log(`First house set to house ${houseNumber}`);
     }
 
     /**

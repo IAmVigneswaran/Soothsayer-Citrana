@@ -13,7 +13,6 @@ class NorthIndianChartTemplate {
         this.tinyBoxGroupNorth = null;
         this.houseDataNorth = {};
         this.lagnaHouseNorth = 1;
-        this.firstHouseNorth = 1;
         this.selectedHouse = null; // Track selected house for highlight
 
         if (stage && layer) {
@@ -466,12 +465,6 @@ class NorthIndianChartTemplate {
         console.log(`[DEBUG] North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
         console.log('[DEBUG] Chart should now display updated Rashi numbers for the new Lagna');
         console.log('[DEBUG] All planets have been repositioned to their correct Rashis');
-    }
-
-    setFirstHouse(houseNumber) {
-        this.firstHouseNorth = houseNumber;
-        this.renumberHouses();
-        console.log(`First house set to house ${houseNumber}`);
     }
 
     getCurrentRashiNumber(visualPosition) {

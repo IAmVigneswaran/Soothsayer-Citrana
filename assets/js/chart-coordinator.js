@@ -136,14 +136,6 @@ class ChartCoordinator {
         }
     }
 
-    setFirstHouse(houseNumber) {
-        if (this.currentChartType === 'south-indian') {
-            this.southIndianTemplate.setFirstHouse(houseNumber);
-        } else if (this.currentChartType === 'north-indian') {
-            this.northIndianTemplate.setFirstHouse(houseNumber);
-        }
-    }
-
     renumberHouses() {
         if (this.currentChartType === 'south-indian') {
             this.southIndianTemplate.renumberHouses();

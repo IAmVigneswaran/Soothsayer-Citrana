@@ -223,7 +223,6 @@ Key Methods:
 - `createSouthIndianChart()`: Initialise South Indian layout
 - `createNorthIndianChart()`: Initialise North Indian layout
 - `setLagnaHouse()`: Set ascendant house
-- `setFirstHouse()`: Legacy API on templates; North Indian house menu **Set as First House** uses `setLagnaHouse(rashi)` via `getRashiNumberForHouse()` instead
 - `getChartData()`: Serialise chart data
 - `loadChartData()`: Restore chart from data
 - `stagePointerToChartCoords()` / `clientToChartCoords()`: Map Konva pointer or viewport coords to chart layer space
