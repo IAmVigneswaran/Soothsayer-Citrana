@@ -22,10 +22,10 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2204-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2215-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---1280-lines)
+   - [Main Application (app.js)](#main-application-appjs---1297-lines)
    - [History Engine (history.js)](#history-engine-historyjs---78-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---292-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---1062-lines)
@@ -52,7 +52,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2204 lines)
+## CSS and Layout (styles.css - ~2215 lines)
 
 Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
 
@@ -71,11 +71,11 @@ Soothsayer-Citrana/
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2220 lines)
+│   │   └── styles.css            # Complete styling system (~2215 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1280 lines)
+│   │   ├── app.js                # Main application coordinator (~1297 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
-│   │   ├── chart-coordinator.js  # Chart type management (~286 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (~292 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~1060 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (~971 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~854 lines)
@@ -123,7 +123,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1280 lines)
+### Main Application (app.js - ~1297 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -148,7 +148,7 @@ Key Methods:
 - `handleWheel()`: Desktop wheel zoom about pointer when unlocked; early return when locked (no `preventDefault`)
 - `exportChart()`: PNG export (`pixelRatio: 2`)
 - `recordHistory()` / `captureHistoryState()` / `restoreHistoryState()`: Undo timeline integration
-- `undo()` / `redo()`: Delegate to `this.history`
+- `undo()` / `redo()` / `updateHistoryButtons()`: Delegate to `this.history`; sync `#undo-btn` / `#redo-btn` disabled state
 - `pushSnapshot()`: Deprecated alias for `recordHistory()`
 - `clearChart()` / `resetChart()` / `resetDrawings()`
 - `showWelcomeModal()` / `showConfirmationDialog()`
@@ -451,12 +451,14 @@ Key Methods:
 
 ### Undo / Redo
 
-Unified **50-step** timeline via `CitranaHistory` (`history.js`). Keyboard only — no toolbar buttons.
+Unified **50-step** timeline via `CitranaHistory` (`history.js`). Toolbar **Undo** / **Redo** buttons (`#undo-btn`, `#redo-btn`) and keyboard shortcuts.
 
-| Shortcut | Action |
-|----------|--------|
-| **Ctrl+Z** / **Cmd+Z** | Undo |
-| **Ctrl+Y** / **Cmd+Shift+Z** / **Cmd+Shift+Z** | Redo |
+| Control | Action |
+|---------|--------|
+| **Undo** toolbar button / **Ctrl+Z** / **Cmd+Z** | Undo |
+| **Redo** toolbar button / **Ctrl+Y** / **Ctrl+Shift+Z** / **Cmd+Shift+Z** | Redo |
+
+Toolbar buttons disable when `canUndo()` / `canRedo()` is false (`updateHistoryButtons()` after each record, undo, or redo).
 
 Each step snapshots **chart data** (type, Lagna, Grahas, South centre label) and **drawings** (`drawing-*` Konva nodes).
 
@@ -527,6 +529,7 @@ Technical Implementation:
 - Light Theme: Clean, professional appearance with high contrast
 - Responsive Design: Optimised for desktop, tablet, and mobile devices
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
+- Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific house actions; Graha edit/delete
 - Status Updates: Real-time feedback and notifications
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy

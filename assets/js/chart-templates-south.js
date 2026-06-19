@@ -658,87 +658,12 @@ class SouthIndianChartTemplate {
                 planetText.opacity(1);
                 hitRect.opacity(1);
 
-                // Safari-compatible drop detection
-                let targetHouse = null;
-                let pointer = null;
-
-                // Try multiple methods to get pointer position for Safari compatibility
-                try {
-                    // Method 1: Use stage pointer position
-                    pointer = this.stage.getPointerPosition();
-
-                    // Method 2: If stage pointer fails, try event position
-                    if (!pointer && e.evt) {
-                        const stageBox = this.stage.container().getBoundingClientRect();
-                        const scale = this.stage.scaleX();
-                        const stagePos = this.stage.position();
-
-                        pointer = {
-                            x: (e.evt.clientX - stageBox.left - stagePos.x) / scale,
-                            y: (e.evt.clientY - stageBox.top - stagePos.y) / scale
-                        };
-                    }
-
-                    // Method 3: If still no pointer, use the planet's current position
-                    if (!pointer) {
-                        pointer = {
-                            x: planetText.x(),
-                            y: planetText.y()
-                        };
-                    }
-
-                    // Method 4: Safari fallback - use the planet's final position after drag
-                    if (!pointer) {
-                        const planetPos = planetText.position();
-                        pointer = {
-                            x: planetPos.x,
-                            y: planetPos.y
-                        };
-                    }
-
-                    // --- NEW: Always transform pointer to stage coordinates ---
-                    const scale = this.stage.scaleX();
-                    const stagePos = this.stage.position();
-                    const px = (pointer.x - stagePos.x) / scale;
-                    const py = (pointer.y - stagePos.y) / scale;
-
-                    // Find which bhava the drop is over
-                    for (const hNum in this.houseDataSouth) {
-                        const h = this.houseDataSouth[hNum];
-                        if (
-                            px >= h.x && px <= h.x + h.width &&
-                            py >= h.y && py <= h.y + h.height
-                        ) {
-                            targetHouse = parseInt(hNum);
-                            citranaDebug(`Drop detected over house ${targetHouse}`);
-                            break;
-                        }
-                    }
-
-                    // Method 5: If still no target house found, try a broader search
-                    if (!targetHouse) {
-                        citranaDebug('No target house found, trying broader search...');
-                        for (const hNum in this.houseDataSouth) {
-                            const h = this.houseDataSouth[hNum];
-                            const centerX = h.x + h.width / 2;
-                            const centerY = h.y + h.height / 2;
-                            const distance = Math.sqrt(
-                                Math.pow(px - centerX, 2) +
-                                Math.pow(py - centerY, 2)
-                            );
-
-                            // If planet is within reasonable distance of house center
-                            if (distance < Math.max(h.width, h.height) / 2) {
-                                targetHouse = parseInt(hNum);
-                                citranaDebug(`Drop detected over house ${targetHouse} using distance method`);
-                                break;
-                            }
-                        }
-                    }
-
-                } catch (error) {
-                    console.error('Error in drop detection:', error);
-                }
+                const coordinator = window.app?.chartTemplates;
+                const targetHouse = coordinator?.resolveDropHouse({
+                    event: e,
+                    chartLocalX: planetText.x(),
+                    chartLocalY: planetText.y()
+                }) ?? null;
 
                 if (targetHouse && targetHouse !== houseNumber) {
                     // Move planet to new bhava by ID

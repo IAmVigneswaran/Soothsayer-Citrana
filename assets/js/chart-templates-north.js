@@ -871,23 +871,14 @@ class NorthIndianChartTemplate {
             planetText.on('dragend', (e) => {
                 planetText.opacity(1);
                 this.layer.batchDraw();
-                // Transform pointer to chart coordinates
-                const pointer = this.stage.getPointerPosition();
-                let targetHouse = null;
-                if (pointer) {
-                    // Adjust for stage scale and position
-                    const scale = this.stage.scaleX();
-                    const stagePos = this.stage.position();
-                    const px = (pointer.x - stagePos.x) / scale;
-                    const py = (pointer.y - stagePos.y) / scale;
-                    for (const hNum in this.houseDataNorth) {
-                        const h = this.houseDataNorth[hNum];
-                        if (NorthIndianChartTemplate.isPointInPolygon(h.points, px, py)) {
-                            targetHouse = parseInt(hNum);
-                            break;
-                        }
-                    }
-                }
+
+                const coordinator = window.app?.chartTemplates;
+                const targetHouse = coordinator?.resolveDropHouse({
+                    event: e,
+                    chartLocalX: planetText.x(),
+                    chartLocalY: planetText.y()
+                }) ?? null;
+
                 // Restore z-order: move all planet texts and hitRects to top
                 this.chartGroupNorth.getChildren(node => node.name() && (node.name().startsWith('planet-') || node.name().startsWith('planet-hit-'))).forEach(node => node.moveToTop());
                 this.tinyBoxGroupNorth.moveToTop();

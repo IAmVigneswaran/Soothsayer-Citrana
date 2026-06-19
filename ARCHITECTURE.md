@@ -59,7 +59,7 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1280 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, zoom lock, export, modals, history coordinator |
+| `app.js` | ~1297 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, zoom lock, export, modals, history coordinator, undo/redo toolbar |
 | `history.js` | ~78 | Unified undo/redo timeline (`CitranaHistory`) |
 | `chart-coordinator.js` | ~292 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
 | `chart-templates-south.js` | ~1062 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, `zoomToFit()` with local bounds |
@@ -69,7 +69,7 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 | `edit-ui.js` | ~849 | Floating property editor for drawing shapes (session-based undo on close) |
 | `context-menu.js` | ~728 | Right-click / long-press menus; unified hit-test routing |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging |
-| `styles.css` | ~2204 | Light theme, floating UI, safe areas, iOS PWA layout, zoom bar disabled states |
+| `styles.css` | ~2215 | Light theme, floating UI, safe areas, iOS PWA layout, toolbar/zoom bar disabled states |
 
 ## Canvas Object Naming
 
@@ -206,7 +206,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
    - `chartData` ← `ChartCoordinator.getChartData()` (Grahas, Lagna, centre label)
    - `drawingData` ← `serializeDrawings()` (Konva `drawing-*` nodes; explicit `points`/`x`/`y` for arrows/lines)
 3. State is deep-cloned into the timeline (`maxSteps: 50`, seeded with `Start` on init)
-4. **Ctrl+Z** / **Ctrl+Y** (or **Cmd** on macOS) → `history.undo()` / `history.redo()` → `restoreHistoryState()`
+4. **Toolbar** `#undo-btn` / `#redo-btn` or **Ctrl+Z** / **Ctrl+Y** (or **Cmd** on macOS) → `app.undo()` / `app.redo()` → `history.undo()` / `history.redo()` → `restoreHistoryState()`; `updateHistoryButtons()` syncs disabled state
 5. Restore reloads chart via `loadChartData()`, redraws via `restorePersistedDrawings()`, clears selection and Edit UI
 6. `_restoring` flag suppresses new records during restore
 
@@ -262,7 +262,7 @@ All interactive chrome is **fixed/absolute positioned** over a full-viewport can
 
 ### Floating elements
 
-- Top centre: drawing/tool toolbar
+- Top centre: tool toolbar — Undo/Redo, Select/Hand, drawing tools, export/transparency
 - Top left (desktop) / bottom stack (mobile): Graha library
 - Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`); mobile adds Select/Hand in zoom bar (288px width)
 - Bottom corners: Help (mobile bottom-left), About (bottom-right)
@@ -286,8 +286,8 @@ Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setup
 | Engine | `CitranaHistory` — `entries[]`, `index`, `maxSteps: 50` |
 | Snapshot | `{ chartData, drawingData }` deep-cloned on each `record()` |
 | Keyboard | **Ctrl+Z** / **Cmd+Z** undo; **Ctrl+Y**, **Ctrl+Shift+Z**, **Cmd+Shift+Z** redo |
-| UI | No toolbar undo/redo buttons (removed); keyboard only |
-| API | `app.recordHistory(label)`, `app.undo()`, `app.redo()`; `pushSnapshot()` deprecated alias |
+| Toolbar | `#undo-btn` / `#redo-btn` (first group); Lucide `undo-2` / `redo-2`; disabled via `updateHistoryButtons()` |
+| API | `app.recordHistory(label)`, `app.undo()`, `app.redo()`, `app.updateHistoryButtons()`; `pushSnapshot()` deprecated alias |
 
 ### Tracked actions (representative labels)
 
@@ -325,12 +325,11 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 | Zoom fit behaviour | `zoomToFit()` in chart template |
 | Theme / layout / safe areas | `assets/css/styles.css` |
 | Export behaviour | `app.exportChart()` |
-| Undo/redo | `history.js`, `app.recordHistory()` / `captureHistoryState()` |
+| Undo/redo | `history.js`, `app.recordHistory()` / `captureHistoryState()` / `updateHistoryButtons()` |
 
 ## Known Limitations
 
 - **History panel**: Timeline labels exist in memory; visible panel deferred to 2.1.
-- **Graha drag while zoomed/panned**: Drop/hit-test edge case under investigation.
 - **Single chart**: One chart per canvas by design.
 - **Mobile**: Touch code and PWA layout exist; officially unsupported for drawing complexity.
 - **About version**: `index.html` About modal version string should match `CHANGELOG.md` on each release.

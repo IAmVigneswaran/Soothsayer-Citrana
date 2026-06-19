@@ -85,6 +85,35 @@ class ChartCoordinator {
         return this.findHouseAtChartPoint(coords.x, coords.y);
     }
 
+    /**
+     * Resolve target bhava for Graha library drop or in-chart Graha drag end.
+     * Pointer and client coords are converted for stage zoom/pan; chart-local fallback
+     * uses coordinates already in chart space (e.g. dragged node position).
+     */
+    resolveDropHouse({ event = null, chartLocalX = null, chartLocalY = null } = {}) {
+        if (!this.stage) return null;
+
+        const pointer = this.stage.getPointerPosition();
+        if (pointer) {
+            const house = this.findHouseAtPointer(pointer);
+            if (house) return house;
+        }
+
+        if (event?.evt) {
+            const { clientX, clientY } = event.evt;
+            if (clientX != null && clientY != null) {
+                const house = this.findHouseAtClientPoint(clientX, clientY);
+                if (house) return house;
+            }
+        }
+
+        if (chartLocalX != null && chartLocalY != null) {
+            return this.findHouseAtChartPoint(chartLocalX, chartLocalY);
+        }
+
+        return null;
+    }
+
     createSouthIndianChart() {
         this.clearChart();
         this.currentChartType = 'south-indian';
