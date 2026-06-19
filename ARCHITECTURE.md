@@ -64,12 +64,12 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 | `chart-coordinator.js` | ~360 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `chart-templates-south.js` | ~993 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds |
 | `chart-templates-north.js` | ~949 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds |
-| `planet-system.js` | ~884 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer planets), drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
+| `planet-system.js` | ~884 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer planets), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `drawing-tools.js` | ~1902 | Drawing tools, selection, control points, Graha text editing, `makeShapeSelectable()` on stroke complete, history `recordHistory()` calls |
 | `edit-ui.js` | ~775 | Floating property editor for drawing shapes (session-based undo on close) |
 | `context-menu.js` | ~721 | Right-click / long-press menus; unified hit-test routing |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging |
-| `styles.css` | ~2260 | Light theme, floating UI, safe areas, iOS PWA layout, Help/Options modals, toolbar/zoom bar disabled states |
+| `styles.css` | ~2270 | Light theme, floating UI, safe areas, iOS PWA layout, Graha library grid (no scroll; mobile 6×2), Help/Options modals, toolbar/zoom bar disabled states |
 
 ## Canvas Object Naming
 
@@ -285,6 +285,15 @@ All interactive chrome is **fixed/absolute positioned** over a full-viewport can
 - Bottom chrome: `bottom: calc(var(--ui-bottom-pad) + var(--sab))` on mobile; `var(--ui-inset)` on desktop zoom/About
 - Graha library on mobile: `bottom: calc(var(--ui-bottom-stack) + var(--ui-bottom-pad) + var(--sab))`
 
+### Graha library layout
+
+| Viewport | Grid | Cells | Notes |
+|----------|------|-------|-------|
+| Desktop | `repeat(auto-fit, minmax(80px, 1fr))` | 80×40px | No scroll; grows to fit 12 items per page |
+| Mobile ≤768px | 6 cols × 2 rows | 30px tall, 7px font | Compact header/grid/dots padding; `word-break: break-word` for Page 5 Upagrahas |
+
+Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-grid` + `.page-dots`. Styles in `styles.css` only (no inline header/grid styles in `index.html`). Library cells show `planet.fullName` from `createPlanetLibrary()`.
+
 ### Floating elements
 
 - Top centre: tool toolbar — Undo/Redo, Select/Hand, drawing tools, export/transparency/**Options** (`#options-btn`)
@@ -340,6 +349,7 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 | Goal | Where to change |
 |------|-----------------|
 | Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` (Page 5: Upagrahas before outer planets) |
+| Graha library layout | `.floating-planet-library`, `.planet-library-header`, `.planet-grid`, `.planet-item` in `styles.css`; markup in `index.html` |
 | Add drawing tool | `DrawingTools.startDrawing()` switch, toolbar in `index.html`, `app.setTool()` |
 | New chart type | New template class + routes in `ChartCoordinator` (include `findHouseAtChartPoint()`) |
 | Context menu action | `ContextMenu.handleAction()`; items in `showHouseMenu()` / `showPlanetMenu()` / `showExistingChartMenu()` |

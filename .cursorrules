@@ -18,12 +18,12 @@ This is Citrana, a web application built with pure HTML5, CSS3, and JavaScript u
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~461 lines); viewport-fit=cover; PWA meta; Options modal
+├── index.html                    # Main entry (~461 lines); viewport-fit=cover; PWA meta; Options modal; Graha library markup (CSS-styled)
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2260 lines)
+│   │   └── styles.css            # Complete styling system (~2270 lines)
 │   ├── js/
 │   │   ├── app.js                # Main application coordinator (~1480 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
@@ -59,9 +59,9 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # Comprehensive documentation (~1033 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~369 lines)
-├── .cursorrules                  # This Cursor IDE configuration (~1000 lines)
+├── AGENT.md                      # Comprehensive documentation (~1042 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~379 lines)
+├── .cursorrules                  # This Cursor IDE configuration (~1061 lines)
 ├── CHANGELOG.md                  # Version history and changes (~57 lines)
 ├── README.md                     # Project readme (~177 lines)
 ├── LICENSE                       # MIT License
@@ -105,9 +105,15 @@ The application uses a floating UI system with absolute positioning for all inte
 - Responsive design with smaller buttons on mobile
 
 #### Floating Graha Library
-- Desktop: top left with `--ui-inset` + safe area
-- Mobile: bottom stack above zoom bar (`--ui-bottom-stack` + safe area)
-- White background with black border; paging dots; mobile swipe
+- Desktop: top left with `--ui-inset` + safe area; max-width 280px
+- Mobile: bottom stack above zoom bar (`--ui-bottom-stack` + safe area); 320px width
+- White background with black border (`border-radius: 0.75rem`); paging dots; mobile swipe
+- Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-grid` + `.page-dots` (dots injected by JS)
+- Styles in CSS only — no inline header/grid styles in `index.html`
+- **No scrolling** — `.planet-grid` uses `overflow: visible` (no `max-height` cap)
+- Desktop grid: `repeat(auto-fit, minmax(80px, 1fr))`; Graha cells 80×40px
+- Mobile grid (≤768px): 6 columns × 2 rows; compact header/grid/dots padding; cells 30px tall, 7px font, `word-break: break-word` for long Upagraha names on Page 5
+- Library cells display `planet.fullName` via `createPlanetLibrary()` (abbreviations used on chart placement)
 
 #### Floating Zoom Controls
 - Desktop: bottom left (`--ui-inset` + safe area)
@@ -355,8 +361,7 @@ Key Features:
 - Touch and mouse support
 - Drop zone validation
 - Mobile-optimised interactions
-
-Planet Library - Page 1 (Traditional Grahas):
+- Library cells render `fullName` labels; grid layout has no scroll (desktop auto-fit columns; mobile 6×2)
 - Lg: Lagna (Ascendant)
 - Su: Sun
 - Mo: Moon
@@ -544,7 +549,9 @@ Call `window.app.recordHistory('Label')` after undoable mutations. See [ARCHITEC
 ### Planet Management
 - 60 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 12 Upagrahas and outer planets on Page 5
 - Paging System: Five-page navigation with desktop dots and mobile swipe
-- Text-based Display: Uses abbreviations instead of symbols for better compatibility
+- Library Labels: Graha library cells show `fullName` (e.g. Page 5 Upagrahas); chart placement still uses text abbreviations
+- Library Layout: No grid scrolling — desktop auto-fit columns (80×40px cells); mobile 6×2 grid with 30px cells and word-wrap for long names
+- Text-based Display: Uses abbreviations on the chart instead of symbols for better compatibility
 - Drag & Drop: Grahas from the floating library land in the bhava under the pointer, or in a house you clicked first (`window.selectedBhavaSouth` / `window.selectedBhavaNorth` — one-shot: cleared after the next successful drop or when you click empty canvas)
 - Multiple Instances: Same planet can be placed multiple times
 - Dynamic Text Sizing: Planet text scales based on house occupancy

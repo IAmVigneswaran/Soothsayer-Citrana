@@ -53,9 +53,15 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2260 lines)
+## CSS and Layout (styles.css - ~2270 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome), responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
+
+**Graha library layout:**
+- Header, grid, and page-dots styled in CSS (`.planet-library-header`, `.planet-grid`, `.page-dots`) — no inline styles in `index.html`
+- No grid scrolling (`overflow: visible`; no `max-height` on `.planet-grid`)
+- Desktop: `repeat(auto-fit, minmax(80px, 1fr))`; 80×40px `.planet-item` cells
+- Mobile (≤768px): 6×2 grid, 320px library width, compact vertical padding, 30px cells with 7px font and `word-break: break-word` for Page 5 Upagraha names
 
 **iOS standalone PWA (2.0):**
 - Safe-area CSS vars (`--sat` … `--sal`, `--ui-inset`, `--ui-bottom-pad`, `--ui-bottom-stack`)
@@ -67,12 +73,12 @@ Light theme, floating UI, modals (Help and Options share modal chrome), responsi
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~461 lines); viewport-fit=cover; PWA meta; Options modal
+├── index.html                    # Main entry (~461 lines); viewport-fit=cover; PWA meta; Options modal; Graha library markup (CSS-styled)
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2260 lines)
+│   │   └── styles.css            # Complete styling system (~2270 lines)
 │   ├── js/
 │   │   ├── app.js                # Main application coordinator (~1480 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
@@ -108,9 +114,9 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # This comprehensive documentation (~1033 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~369 lines)
-├── .cursorrules                  # Cursor IDE configuration (~1000 lines)
+├── AGENT.md                      # This comprehensive documentation (~1042 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~379 lines)
+├── .cursorrules                  # Cursor IDE configuration (~1061 lines)
 ├── CHANGELOG.md                  # Version history and changes (~57 lines)
 ├── README.md                     # Project readme (~177 lines)
 ├── LICENSE                       # MIT License
@@ -280,6 +286,7 @@ Key Features:
 - Touch and mouse support
 - Drop zone validation
 - Mobile-optimised interactions
+- Library cells render `fullName` labels; grid layout has no scroll (desktop auto-fit columns; mobile 6×2)
 
 Planet Library - Page 1 (Traditional Grahas):
 - Lg: Lagna (Ascendant)
@@ -511,7 +518,9 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 ### Planet Management
 - 60 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 12 Upagrahas and outer planets on Page 5
 - Paging System: Five-page navigation with desktop dots and mobile swipe
-- Text-based Display: Uses abbreviations instead of symbols for better compatibility
+- Library Labels: Graha library cells show `fullName` (e.g. Page 5 Upagrahas); chart placement still uses text abbreviations
+- Library Layout: No grid scrolling — desktop auto-fit columns (80×40px cells); mobile 6×2 grid with 30px cells and word-wrap for long names
+- Text-based Display: Uses abbreviations on the chart instead of symbols for better compatibility
 - Drag & Drop: Grahas from the floating library land in the bhava under the pointer, or in a house you clicked first (`window.selectedBhavaSouth` / `window.selectedBhavaNorth` — one-shot: cleared after the next successful drop or when you click empty canvas)
 - Multiple Instances: Same planet can be placed multiple times
 - Dynamic Text Sizing: Planet text scales based on house occupancy
