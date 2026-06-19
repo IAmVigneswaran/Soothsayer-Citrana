@@ -379,7 +379,8 @@ class NorthIndianChartTemplate {
         }
     }
 
-    setLagnaHouse(houseNumber) {
+    setLagnaHouse(houseNumber, options = {}) {
+        const { skipSnapshot = false } = options;
         citranaDebug('North Indian Chart - setLagnaHouse called with house number:', houseNumber);
         citranaDebug('Previous Lagna House:', this.lagnaHouseNorth);
 
@@ -404,7 +405,7 @@ class NorthIndianChartTemplate {
         citranaDebug(`North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
         citranaDebug('Chart should now display updated Rashi numbers for the new Lagna');
         citranaDebug('All planets have been repositioned to their correct Rashis');
-        if (window.app?.recordHistory) window.app.recordHistory('Set Lagna');
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Set Lagna');
     }
 
     /**
@@ -660,6 +661,7 @@ class NorthIndianChartTemplate {
 
             this.createNorthIndianChart({ initialLagna: lagnaHouse });
             this.restoreSavedPlanets(planetsByHouse, true);
+            this.setLagnaHouse(lagnaHouse, { skipSnapshot: true });
 
             console.log('North Indian chart data loaded successfully');
         } catch (error) {
@@ -889,6 +891,7 @@ class NorthIndianChartTemplate {
     }
 
     selectPlanet(planetText, houseNumber, abbr, id) {
+        window.app?.chartTemplates?.southIndianTemplate?.clearSelectedPlanet?.();
         this.clearSelectedPlanet();
         this.selectedPlanet = {
             planetText,
@@ -899,14 +902,6 @@ class NorthIndianChartTemplate {
         planetText.stroke('#f59e42');
         planetText.strokeWidth(2);
         this.layer.batchDraw();
-        if (!this._deleteKeyListener) {
-            this._deleteKeyListener = (e) => {
-                if (e.key === 'Delete' && this.selectedPlanet) {
-                    this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
-                }
-            };
-            window.addEventListener('keydown', this._deleteKeyListener);
-        }
     }
     clearSelectedPlanet() {
         if (this.selectedPlanet && this.selectedPlanet.planetText) {

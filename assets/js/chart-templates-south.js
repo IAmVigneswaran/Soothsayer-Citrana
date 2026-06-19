@@ -686,6 +686,7 @@ class SouthIndianChartTemplate {
 
     // --- Selection and Keyboard Delete ---
     selectPlanet(planetText, houseNumber, abbr, id) {
+        window.app?.chartTemplates?.northIndianTemplate?.clearSelectedPlanet?.();
         this.clearSelectedPlanet();
         this.selectedPlanet = {
             planetText,
@@ -696,14 +697,6 @@ class SouthIndianChartTemplate {
         planetText.stroke('#f59e42');
         planetText.strokeWidth(2);
         this.layer.batchDraw();
-        if (!this._deleteKeyListener) {
-            this._deleteKeyListener = (e) => {
-                if (e.key === 'Delete' && this.selectedPlanet) {
-                    this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
-                }
-            };
-            window.addEventListener('keydown', this._deleteKeyListener);
-        }
     }
     clearSelectedPlanet() {
         if (this.selectedPlanet && this.selectedPlanet.planetText) {

@@ -192,6 +192,8 @@ class CitranaApp {
                 } else if (this.chartTemplates.currentChartType === 'north-indian') {
                     this.chartTemplates.northIndianTemplate.clearHighlight();
                 }
+                window.selectedBhavaSouth = null;
+                window.selectedBhavaNorth = null;
             }
 
             // Hide Edit UI if clicking outside of it
@@ -825,8 +827,30 @@ class CitranaApp {
                 this.zoomToFit();
             }
 
-            // Delete selected shape (only with Delete key, not Backspace)
+            // Delete: selected Graha first, else selected drawing (Select tool only)
             if (e.key === 'Delete') {
+                const chartType = this.chartTemplates?.currentChartType;
+                if (chartType === 'south-indian') {
+                    const selected = this.chartTemplates.southIndianTemplate?.selectedPlanet;
+                    if (selected) {
+                        e.preventDefault();
+                        this.chartTemplates.southIndianTemplate.removePlanetFromHouseById(
+                            selected.houseNumber,
+                            selected.id
+                        );
+                        return;
+                    }
+                } else if (chartType === 'north-indian') {
+                    const selected = this.chartTemplates.northIndianTemplate?.selectedPlanet;
+                    if (selected) {
+                        e.preventDefault();
+                        this.chartTemplates.northIndianTemplate.removePlanetFromHouseById(
+                            selected.houseNumber,
+                            selected.id
+                        );
+                        return;
+                    }
+                }
                 if (this.currentTool === 'select') {
                     e.preventDefault();
                     this.drawingTools.deleteSelectedShape();

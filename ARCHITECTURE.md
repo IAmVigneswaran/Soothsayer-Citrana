@@ -196,7 +196,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 1. User selects tool in toolbar → `app.setTool()` → `DrawingTools.setTool()`
 2. Mouse/touch on stage → `startDrawing` / `draw` / `stopDrawing`
-3. Arrow/line auto-switch to Select; control points appear on selection
+3. Arrow, line, text, and heading auto-switch to Select after creation; Pen stays active. Control points appear when arrow/line is selected
 4. Mobile (`≤768px`): arrow, line, and pen toolbar buttons are hidden in CSS
 
 ### Undo / redo

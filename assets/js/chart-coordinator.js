@@ -150,16 +150,16 @@ class ChartCoordinator {
         }
     }
 
-    setLagnaHouse(houseNumber) {
+    setLagnaHouse(houseNumber, options = {}) {
         citranaDebug('ChartCoordinator - setLagnaHouse called with house number:', houseNumber);
         citranaDebug('Current chart type:', this.currentChartType);
 
         if (this.currentChartType === 'south-indian') {
             citranaDebug('Delegating to South Indian template');
-            this.southIndianTemplate.setLagnaHouse(houseNumber);
+            this.southIndianTemplate.setLagnaHouse(houseNumber, options);
         } else if (this.currentChartType === 'north-indian') {
             citranaDebug('Delegating to North Indian template');
-            this.northIndianTemplate.setLagnaHouse(houseNumber);
+            this.northIndianTemplate.setLagnaHouse(houseNumber, options);
         } else {
             citranaDebug('ERROR: Unknown chart type:', this.currentChartType);
         }

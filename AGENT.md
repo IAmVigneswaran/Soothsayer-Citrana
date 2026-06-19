@@ -376,7 +376,7 @@ Key Features:
 - Text editing with font controls
 - Graha text editing with retrograde underline support (Konva `textDecoration`)
 - Graha edit sessions commit on Save / dismiss when dirty (`planetEditSession`)
-- Auto-switch to Select Tool after Arrow and Line creation
+- Auto-switch to Select Tool after Arrow, Line, Text, and Heading creation; Pen stays active for continuous drawing
 - Control points for precise arrow and line adjustment; `Adjust drawing` on handle drag end
 
 Key Methods:
@@ -504,7 +504,7 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - Text Tool: Add editable text boxes anywhere on canvas
 - Heading Tool: Create chart headings and titles
 - Undo/Redo: Unified timeline via `app.recordHistory()` — see [Undo / Redo](#undo--redo)
-- Auto-Switch Behaviour: Arrow and Line tools automatically switch to Select Tool after creation
+- Auto-Switch Behaviour: Arrow, Line, Text, and Heading automatically switch to Select Tool after creation; Pen remains active
 - Control Points: Draggable handles for adjusting start and end points of arrows and lines
 
 ### Control Points Feature
@@ -549,7 +549,7 @@ Technical Implementation:
 
 - Desktop: Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+
 - Note: For Brave browser, disable Brave Shields for optimal functionality
-- Features: Canvas API, localStorage, ES6 modules, Touch Events
+- Features: Canvas API, localStorage, ES6+ JavaScript (classic script tags), Touch Events
 
 Mobile Support:
 - Citrana is not supported on mobile or touch devices
@@ -937,207 +937,23 @@ Edit the planets objects in assets/js/planet-system.js:
 
 ## GitHub Actions Workflow
 
-### Current deployment (`.github/workflows/static.yml`)
-Production GitHub Pages deploy **with minification** on push to **`main`** only (includes merges from `dev` → `main`). Manual redeploy via `workflow_dispatch`. Steps: checkout → Node 18 → `clean-css-cli` + `terser` → minified CSS/JS artifacts → `sed` updates `index.html` references → deploy-pages.
+**Source of truth:** `.github/workflows/static.yml` — edit that file only; do not copy workflow YAML from this doc.
 
-Minified assets include `history.min.js`, `citrana-debug.min.js`, and all local JS/CSS. Konva and Lucide vendor bundles are already minified.
+### Production (current)
 
-### Standard deployment (no minification)
-For local debugging or faster CI, remove the Node/minify/sed steps from `static.yml`:
+- **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
+- **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
+- **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
+- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-debug`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
+- **Not minified in CI:** `assets/vendor/*` (Konva, Lucide — already minified)
 
-Original static.yml (reference only):
-```yaml
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+### Local development
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+- Open `index.html` in the browser — no build; repo `index.html` references source `.js` / `.css`
+- GitHub Pages serves minified assets only in the **deploy artifact** after CI rewrites `index.html` (the committed `main` tree keeps source filenames)
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+### Optional: deploy without minification
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-```
-
-### Minified Deployment (Optional)
-To enable minification for production builds, add these steps to `.github/workflows/static.yml` between "Checkout" and "Setup Pages":
-
-```yaml
-- name: Setup Node.js
-  uses: actions/setup-node@v4
-  with:
-    node-version: '18'
-
-- name: Install minification tools
-  run: |
-    npm install -g clean-css-cli terser
-
-- name: Minify CSS
-  run: |
-    cleancss -o assets/css/styles.min.css assets/css/styles.css
-
-- name: Minify local JavaScript files
-  run: |
-    terser assets/js/app.js -o assets/js/app.min.js --compress --mangle
-    terser assets/js/chart-coordinator.js -o assets/js/chart-coordinator.min.js --compress --mangle
-    terser assets/js/chart-templates-south.js -o assets/js/chart-templates-south.min.js --compress --mangle
-    terser assets/js/chart-templates-north.js -o assets/js/chart-templates-north.min.js --compress --mangle
-    terser assets/js/planet-system.js -o assets/js/planet-system.min.js --compress --mangle
-    terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
-    terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
-    terser assets/js/edit-ui.js -o assets/js/edit-ui.min.js --compress --mangle
-
-- name: Update HTML to use minified local files only
-  run: |
-    # Update CSS reference
-    sed -i 's|href="assets/css/styles.css"|href="assets/css/styles.min.css"|g' index.html
-    
-    # Update only local JS files (not CDN files)
-    sed -i 's|src="assets/js/chart-templates-south.js"|src="assets/js/chart-templates-south.min.js"|g' index.html
-    sed -i 's|src="assets/js/chart-templates-north.js"|src="assets/js/chart-templates-north.min.js"|g' index.html
-    sed -i 's|src="assets/js/chart-coordinator.js"|src="assets/js/chart-coordinator.min.js"|g' index.html
-    sed -i 's|src="assets/js/planet-system.js"|src="assets/js/planet-system.min.js"|g' index.html
-    sed -i 's|src="assets/js/drawing-tools.js"|src="assets/js/drawing-tools.min.js"|g' index.html
-    sed -i 's|src="assets/js/edit-ui.js"|src="assets/js/edit-ui.min.js"|g' index.html
-    sed -i 's|src="assets/js/context-menu.js"|src="assets/js/context-menu.min.js"|g' index.html
-    sed -i 's|src="assets/js/app.js"|src="assets/js/app.min.js"|g' index.html
-```
-
-Benefits of Minification:
-- Reduced file sizes (30-70% smaller)
-- Faster loading times
-- Better performance for mobile users
-- Reduced bandwidth usage
-
-Files Affected:
-- CSS: `styles.css` → `styles.min.css`
-- JavaScript: All local `.js` files → `.min.js` versions
-- HTML: Updated to reference minified files
-- External CDN files remain untouched
-
-To Disable Minification:
-Remove all the above steps from the workflow file to return to standard deployment.
-
-Complete Minified static.yml:
-```yaml
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
-
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      
-      - name: Install minification tools
-        run: |
-          npm install -g clean-css-cli terser
-      
-      - name: Minify CSS
-        run: |
-          cleancss -o assets/css/styles.min.css assets/css/styles.css
-      
-      - name: Minify local JavaScript files
-        run: |
-          terser assets/js/app.js -o assets/js/app.min.js --compress --mangle
-          terser assets/js/chart-coordinator.js -o assets/js/chart-coordinator.min.js --compress --mangle
-          terser assets/js/chart-templates-south.js -o assets/js/chart-templates-south.min.js --compress --mangle
-          terser assets/js/chart-templates-north.js -o assets/js/chart-templates-north.min.js --compress --mangle
-          terser assets/js/planet-system.js -o assets/js/planet-system.min.js --compress --mangle
-          terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
-          terser assets/js/citrana-debug.js -o assets/js/citrana-debug.min.js --compress --mangle
-        terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
-          terser assets/js/edit-ui.js -o assets/js/edit-ui.min.js --compress --mangle
-      
-      - name: Update HTML to use minified local files only
-        run: |
-          # Update CSS reference
-          sed -i 's|href="assets/css/styles.css"|href="assets/css/styles.min.css"|g' index.html
-          
-          # Update only local JS files (not CDN files)
-          sed -i 's|src="assets/js/chart-templates-south.js"|src="assets/js/chart-templates-south.min.js"|g' index.html
-          sed -i 's|src="assets/js/chart-templates-north.js"|src="assets/js/chart-templates-north.min.js"|g' index.html
-          sed -i 's|src="assets/js/chart-coordinator.js"|src="assets/js/chart-coordinator.min.js"|g' index.html
-          sed -i 's|src="assets/js/planet-system.js"|src="assets/js/planet-system.min.js"|g' index.html
-          sed -i 's|src="assets/js/drawing-tools.js"|src="assets/js/drawing-tools.min.js"|g' index.html
-          sed -i 's|src="assets/js/edit-ui.js"|src="assets/js/edit-ui.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-debug.js"|src="assets/js/citrana-debug.min.js"|g' index.html
-        sed -i 's|src="assets/js/context-menu.js"|src="assets/js/context-menu.min.js"|g' index.html
-          sed -i 's|src="assets/js/app.js"|src="assets/js/app.min.js"|g' index.html
-      
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-```
+In `static.yml`, remove the Setup Node, Install minification tools, Minify CSS, Minify local JavaScript files, and Update HTML steps. Keep checkout → Setup Pages → Upload artifact → Deploy.
 
 Built with love for the Vedanga Jyotisha community. 

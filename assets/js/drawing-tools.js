@@ -163,13 +163,19 @@ class DrawingTools {
     stopDrawing() {
         if (!this.isDrawing) return;
 
-        // Store the current tool before resetting it
+        // Store the current tool and shape before resetting state
         const completedTool = this.currentTool;
+        const completedShape = this.currentShape;
 
         this.isDrawing = false;
         this.currentShape = null;
         this.currentTool = null;
         this.lastPoint = null;
+
+        // Bind selection/drag handlers once when the stroke is complete (not per mousemove)
+        if (completedShape && (completedTool === 'arrow' || completedTool === 'line' || completedTool === 'pen')) {
+            this.makeShapeSelectable(completedShape, completedTool);
+        }
 
         // Ensure the layer is updated
         this.layer.batchDraw();
@@ -196,8 +202,9 @@ class DrawingTools {
     /**
      * Ensure drawing objects are properly selectable after creation
      * @param {KonvaShape} shape - The shape to make selectable
+     * @param {string} [toolForTap] - Tool type for touch double-tap (when currentTool is already cleared)
      */
-    makeShapeSelectable(shape) {
+    makeShapeSelectable(shape, toolForTap = null) {
         if (!shape) return;
 
         // Ensure the shape is listening for events
@@ -232,13 +239,15 @@ class DrawingTools {
 
         this.bindMoveDragHistory(shape);
 
-        // Add a small delay to ensure the shape is fully rendered
-        setTimeout(() => {
-            // Re-add double-tap support if it's a touch device
-            if (this.isTouchDevice) {
-                this.addDoubleTapSupport(shape, this.currentTool);
-            }
-        }, 150);
+        // Touch double-tap for Edit UI — bind once per shape
+        if (this.isTouchDevice && !shape._editUiDoubleTapBound) {
+            const tapTool = toolForTap ?? this.currentTool;
+            setTimeout(() => {
+                if (shape.getLayer()) {
+                    this.addDoubleTapSupport(shape, tapTool);
+                }
+            }, 150);
+        }
     }
 
     /**
@@ -289,13 +298,10 @@ class DrawingTools {
         // Create invisible bounding box for easier selection
         const boundingBox = this.createBoundingBox(arrow, 'arrow');
 
-        // Add click handler for Edit UI
+        // Desktop click opens Edit UI; touch double-tap is bound in makeShapeSelectable when drawing completes
         arrow.on('click', () => {
             this.showEditUI(arrow, 'arrow');
         });
-
-        // Add double-tap support for mobile
-        this.addDoubleTapSupport(arrow, 'arrow');
 
         this.currentShape = arrow;
         this.layer.add(arrow);
@@ -317,9 +323,6 @@ class DrawingTools {
         }
 
         this.layer.batchDraw();
-
-        // Make the shape selectable after drawing
-        this.makeShapeSelectable(this.currentShape);
     }
 
     startLine(pos) {
@@ -337,13 +340,9 @@ class DrawingTools {
         const boundingBox = this.createBoundingBox(line, 'line');
         line.boundingBox = boundingBox;
 
-        // Add click handler for Edit UI
         line.on('click', () => {
             this.showEditUI(line, 'line');
         });
-
-        // Add double-tap support for mobile
-        this.addDoubleTapSupport(line, 'line');
 
         this.currentShape = line;
         this.layer.add(line);
@@ -365,9 +364,6 @@ class DrawingTools {
         }
 
         this.layer.batchDraw();
-
-        // Make the shape selectable after drawing
-        this.makeShapeSelectable(this.currentShape);
     }
 
     startPen(pos) {
@@ -388,14 +384,10 @@ class DrawingTools {
         const boundingBox = this.createBoundingBox(line, 'pen');
         line.boundingBox = boundingBox;
 
-        // Add click handler for Edit UI
         line.on('click', (e) => {
             e.cancelBubble = true;
             this.showEditUI(line, 'pen');
         });
-
-        // Add double-tap support for mobile
-        this.addDoubleTapSupport(line, 'pen');
 
         this.currentShape = line;
         this.layer.add(line);
@@ -416,9 +408,6 @@ class DrawingTools {
         }
 
         this.layer.batchDraw();
-
-        // Make the shape selectable after drawing
-        this.makeShapeSelectable(this.currentShape);
     }
 
     startText(pos) {
@@ -1110,6 +1099,9 @@ class DrawingTools {
      * @param {KonvaObject} shape - The shape to monitor
      */
     setupDoubleTapForEditUI(shape) {
+        if (shape._editUiDoubleTapBound) return;
+        shape._editUiDoubleTapBound = true;
+
         let lastTap = 0;
         let tapCount = 0;
         let tapTimer = null;
@@ -1580,6 +1572,8 @@ class DrawingTools {
      */
     addDoubleTapSupport(shape, tool) {
         if (!this.isTouchDevice) return;
+        if (shape._editUiDoubleTapBound) return;
+        shape._editUiDoubleTapBound = true;
 
         let lastTap = 0;
         let tapCount = 0;

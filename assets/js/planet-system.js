@@ -654,6 +654,15 @@ class PlanetSystem {
         }
     }
 
+    clearSelectedBhavaDropTarget() {
+        const chartType = this.chartTemplates?.currentChartType;
+        if (chartType === 'south-indian') {
+            window.selectedBhavaSouth = null;
+        } else if (chartType === 'north-indian') {
+            window.selectedBhavaNorth = null;
+        }
+    }
+
     handleMobileDrop(x, y) {
         // Check for selected bhava first
         let targetHouse = null;
@@ -671,6 +680,7 @@ class PlanetSystem {
 
         if (targetHouse && this.draggedPlanet) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
+            this.clearSelectedBhavaDropTarget();
             console.log(`Mobile drop: Planet ${this.draggedPlanet} placed in house ${targetHouse}`);
         }
     }
@@ -706,6 +716,7 @@ class PlanetSystem {
         }
         if (targetHouse) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
+            this.clearSelectedBhavaDropTarget();
             console.log(`Planet ${this.draggedPlanet} placed in house ${targetHouse}`);
         } else {
             console.log('No suitable house found for planet placement');
