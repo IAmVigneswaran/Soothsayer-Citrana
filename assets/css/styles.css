@@ -148,7 +148,8 @@ body {
   max-width: 280px;
   cursor: move;
   user-select: none;
-  border-radius: 8px;
+  border-radius: 0.75rem;
+  overflow: visible;
 }
 
 .planet-library-header {
@@ -156,8 +157,14 @@ body {
   border-bottom: 1px solid #000000;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   cursor: move;
+  background: #fff;
+  color: #000;
+  font-weight: bold;
+  text-align: center;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
 }
 
 .planet-grid {
@@ -165,8 +172,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   gap: 8px;
-  max-height: 300px;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .planet-item {
@@ -209,7 +215,7 @@ body {
   padding: 8px;
   background: rgba(255, 255, 255, 0.95);
   border-top: 1px solid #000000;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 0.75rem 0.75rem;
 }
 
 .page-dot {
@@ -581,28 +587,32 @@ body {
   }
 
   .planet-library-header {
-    padding: 2px 6px;
-    min-height: 1.1rem;
+    padding: 4px 8px;
+    min-height: 0;
     font-size: 11px;
+    line-height: 1.2;
   }
 
   .planet-grid {
-    padding: 6px;
+    padding: 4px 6px;
     gap: 4px;
-    max-height: 120px;
+    overflow: visible;
     grid-template-columns: repeat(6, 1fr);
   }
 
   .planet-item {
-    width: 45px;
-    height: 24px;
-    font-size: 8px;
-    padding: 2px;
+    width: 100%;
+    min-width: 0;
+    height: 30px;
+    font-size: 7px;
+    line-height: 1.15;
+    padding: 2px 1px;
+    word-break: break-word;
   }
 
   /* Mobile page dots adjustments */
   .page-dots {
-    padding: 6px;
+    padding: 4px 6px;
     gap: 6px;
   }
 
@@ -796,23 +806,6 @@ body {
     -webkit-user-select: none;
     user-select: none;
   }
-}
-
-/* Scrollbar styling for planet library */
-.planet-grid::-webkit-scrollbar {
-  width: 6px;
-}
-
-.planet-grid::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-.planet-grid::-webkit-scrollbar-thumb {
-  background: #000000;
-}
-
-.planet-grid::-webkit-scrollbar-thumb:hover {
-  background: #333333;
 }
 
 .zodiac-symbol {
