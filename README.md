@@ -27,13 +27,13 @@ This codebase is developed using AI agents.
 
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
 - Graha Library: 51 Grahas across 5 pages including, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Grahas
-- Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that house on the next drop
+- Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that house on the **next** drop only (then the pointer takes over again)
 - Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (zoom and pan are not tracked)
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
 - Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear House**, **Edit Graha**, **Delete Graha**, and more)
-- Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, and help — press `?` or `/` in the app for the full list
+- Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; your work stays in this browser session
 
@@ -116,7 +116,7 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 
 1. **Choose Chart Type**: Right-click the canvas and select South Indian or North Indian layout
 2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna**. North Indian — right-click a Bhava and select **Set as First House**, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign
-3. **Add Grahas**: Drag Grahas from the Graha Library onto the Bhava under your pointer. Click a Bhava first if you want the next drop to go to that house specifically
+3. **Add Grahas**: Drag Grahas from the Graha Library onto the Bhava under your pointer. Click a Bhava first if you want the **next** drop to go to that house specifically (subsequent drops follow the pointer again)
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click the save button to export your chart as a PNG
 
@@ -128,7 +128,7 @@ North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a B
 
 ### Working with Grahas
 
-Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it.
+Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it, or press **Delete** when a Graha is selected.
 
 Clear House: Right-click a Bhava and choose **Clear House** to remove every Graha from that house.
 
@@ -136,7 +136,7 @@ Custom Graha: There is also a "Custom" Graha available in the library. Drag and 
 
 ### Drawing and Navigation
 
-Drawing Tools: Use the toolbar to add arrows, lines, text, and heading. Double-click text elements to edit them. Use the Hand tool to pan around the chart.
+Drawing Tools: Use the toolbar to add arrows, lines, pen strokes, text, and headings. After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool stays active for continuous drawing. Double-click text and heading elements to edit them. Use the Hand tool to pan around the chart.
 
 Undo and Redo: Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Ctrl+Y** to step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Zoom, pan, and tool selection are not tracked.
 

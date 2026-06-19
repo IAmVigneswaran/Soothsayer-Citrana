@@ -23,28 +23,6 @@ class ChartCoordinator {
         return this.stage;
     }
 
-    getLayer() {
-        return this.layer;
-    }
-
-    getChartGroup() {
-        if (this.currentChartType === 'south-indian') {
-            return this.southIndianTemplate.getChartGroup();
-        } else if (this.currentChartType === 'north-indian') {
-            return this.northIndianTemplate.getChartGroup();
-        }
-        return null;
-    }
-
-    getHouseData() {
-        if (this.currentChartType === 'south-indian') {
-            return this.southIndianTemplate.getHouseData();
-        } else if (this.currentChartType === 'north-indian') {
-            return this.northIndianTemplate.getHouseData();
-        }
-        return {};
-    }
-
     stagePointerToChartCoords(pointer) {
         if (!this.stage || !pointer) return null;
         const scale = this.stage.scaleX();

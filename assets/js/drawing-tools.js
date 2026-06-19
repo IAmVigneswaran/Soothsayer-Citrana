@@ -1174,14 +1174,6 @@ class DrawingTools {
     }
 
     /**
-     * Get the EditUI instance
-     * @returns {EditUI} The EditUI instance
-     */
-    getEditUI() {
-        return this.editUI;
-    }
-
-    /**
      * Handle mouse move for select tool
      * @param {Object} pos - Mouse position
      */

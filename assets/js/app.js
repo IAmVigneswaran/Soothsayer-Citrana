@@ -1177,11 +1177,6 @@ class CitranaApp {
         // Clear only the drawings (arrows, lines, pen strokes, text, headings)
         this.drawingTools.clearAll();
 
-        // Clear any selected shapes
-        if (this.selectedShape) {
-            this.selectedShape = null;
-        }
-
         // Hide edit UI if it's showing
         this.drawingTools.editUI?.hide();
 
@@ -1208,7 +1203,6 @@ class CitranaApp {
 
         this.drawingTools?.editUI?.hide();
         this.drawingTools?.clearSelection?.();
-        this.selectedShape = null;
 
         this.chartTemplates.loadChartData(state.chartData);
         this.restoreDrawings(state.drawingData);

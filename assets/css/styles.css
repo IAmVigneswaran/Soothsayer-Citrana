@@ -1664,13 +1664,6 @@ body {
   margin: 0 0 8px 0;
 }
 
-.welcome-getting-started {
-  font-size: 18px;
-  font-weight: 600;
-  color: #000000;
-  margin: 16px 0 12px 0;
-}
-
 .welcome-instructions {
   text-align: left;
   margin: 16px 0;
@@ -1817,11 +1810,6 @@ body {
 
   .welcome-app-name {
     font-size: 18px;
-  }
-
-  .welcome-getting-started {
-    font-size: 16px;
-    margin: 12px 0 8px 0;
   }
 
   .welcome-instructions-title {
@@ -2025,11 +2013,6 @@ body {
 
   .confirmation-modal-body {
     padding: 20px;
-  }
-
-  .confirmation-icon i {
-    width: 28px;
-    height: 28px;
   }
 
   #confirmation-message {

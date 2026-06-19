@@ -265,7 +265,7 @@ Key Methods:
 - `findHouseAtChartPoint()` / `findHouseAtPointer()` / `findHouseAtClientPoint()`: Drop targeting
 - `zoomIn()` / `zoomOut()` / `zoomToFit()` / `updateZoomLevel()`
 - `addPlanetToHouse()`, `clearAllPlanets()`, `highlightHouse()`, `clearHighlight()`, `renumberHouses()`, `clearChart()`
-- `getChartGroup()`, `getHouseData()`, `getStage()`, `getLayer()`
+- `getStage()`: Konva stage (used by Graha library drop coords)
 
 **Removed:** `setFirstHouse()`, `getDropZones()` (legacy).
 

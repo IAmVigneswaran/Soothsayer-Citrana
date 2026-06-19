@@ -7,7 +7,6 @@
 class ContextMenu {
     constructor() {
         this.menu = null;
-        this.isVisible = false;
         this._menuTouchBound = false;
     }
 
@@ -715,15 +714,9 @@ class ContextMenu {
         }
 
         this.menu.classList.remove('hidden');
-        this.isVisible = true;
     }
 
     hide() {
         this.menu.classList.add('hidden');
-        this.isVisible = false;
-    }
-
-    isMenuVisible() {
-        return this.isVisible;
     }
 }
