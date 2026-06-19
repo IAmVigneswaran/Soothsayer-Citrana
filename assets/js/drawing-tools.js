@@ -44,7 +44,9 @@ class DrawingTools {
         this.stopControlPointSyncLoop();
         const sync = () => {
             if (this.selectedShape === shape && this.controlPoints.startPoint && this.controlPoints.endPoint) {
-                this.updateControlPointsPosition(shape);
+                if (!this.isDraggingControlPoint) {
+                    this.updateControlPointsPosition(shape);
+                }
                 this.controlPointAnimationFrame = requestAnimationFrame(sync);
             }
         };
@@ -242,23 +244,29 @@ class DrawingTools {
 
         // Add drag event handlers for shapes that support control points
         if (this.supportsControlPoints(shape)) {
-            // Add dragmove handler to update control points when shape is dragged
-            shape.on('dragmove', () => {
-                if (this.selectedShape === shape && this.controlPoints.startPoint && this.controlPoints.endPoint) {
-                    this.updateControlPointsPosition(shape);
-                }
-            });
+            if (!shape._shapeDragHistoryBound) {
+                shape._shapeDragHistoryBound = true;
 
-            // Add dragend handler to add to undo stack and update control points
-            shape.on('dragend', () => {
-                if (this.selectedShape === shape) {
-                    this.updateControlPointsPosition(shape);
-                    if (window.app?.recordHistory) {
-                        window.app.recordHistory('Move drawing');
+                // Add dragmove handler to update control points when shape is dragged
+                shape.on('dragmove', () => {
+                    if (this.selectedShape === shape && this.controlPoints.startPoint && this.controlPoints.endPoint) {
+                        this.updateControlPointsPosition(shape);
                     }
-                }
-            });
+                });
+
+                // Add dragend handler to add to undo stack and update control points
+                shape.on('dragend', () => {
+                    if (this.selectedShape === shape) {
+                        this.updateControlPointsPosition(shape);
+                        if (window.app?.recordHistory) {
+                            window.app.recordHistory('Move drawing');
+                        }
+                    }
+                });
+            }
         }
+
+        this.bindMoveDragHistory(shape);
 
         // Add a small delay to ensure the shape is fully rendered
         setTimeout(() => {
@@ -267,6 +275,31 @@ class DrawingTools {
                 this.addDoubleTapSupport(shape, this.currentTool);
             }
         }, 150);
+    }
+
+    /**
+     * Record undo step when pen strokes, text, or headings are repositioned by drag
+     * @param {KonvaShape} shape - The shape being dragged
+     */
+    bindMoveDragHistory(shape) {
+        if (!shape || shape._moveDragHistoryBound || this.supportsControlPoints(shape)) {
+            return;
+        }
+
+        const name = shape.name() || '';
+        const supportsMoveHistory = name.includes('drawing-pen') ||
+            name === 'drawing-text' ||
+            name === 'drawing-heading';
+        if (!supportsMoveHistory) {
+            return;
+        }
+
+        shape._moveDragHistoryBound = true;
+        shape.on('dragend', () => {
+            if (this.selectedShape === shape && window.app?.recordHistory) {
+                window.app.recordHistory('Move drawing');
+            }
+        });
     }
 
     getDistance(pos1, pos2) {
@@ -446,6 +479,7 @@ class DrawingTools {
 
         // Make text editable immediately and on double-click
         this.makeTextEditable(text);
+        this.makeShapeSelectable(text);
 
         // Add click handler for Edit UI
         text.on('click', (e) => {
@@ -527,7 +561,8 @@ class DrawingTools {
         document.body.appendChild(textarea);
 
         // Set initial value
-        textarea.value = text.text() === 'Double-click to edit' ? '' : text.text();
+        const initialText = text.text();
+        textarea.value = initialText === 'Double-click to edit' ? '' : initialText;
 
         // Style the textarea
         textarea.style.position = 'absolute';
@@ -567,22 +602,31 @@ class DrawingTools {
             visible: false // Hide the original text while editing
         });
 
-        const finishEditing = () => {
-            const newText = textarea.value.trim();
-            if (newText) {
-                text.text(newText);
-            } else {
-                text.text('Double-click to edit');
+        let finished = false;
+
+        const finishEditing = (save = true) => {
+            if (finished) {
+                return;
             }
+            finished = true;
+
+            const committedText = save ?
+                (textarea.value.trim() || 'Double-click to edit') :
+                initialText;
+            text.text(committedText);
 
             textarea.remove();
             text.setAttrs({
                 draggable: true,
-                visible: true // Show the text again after editing
+                visible: true
             });
             this.layer.batchDraw();
 
-            // Remove event listeners
+            if (save && committedText !== initialText) {
+                window.app?.recordHistory('Edit text');
+            }
+
+            textarea.removeEventListener('blur', handleBlur);
             document.removeEventListener('click', handleOutsideClick);
             document.removeEventListener('keydown', handleKeyDown);
         };
@@ -590,25 +634,24 @@ class DrawingTools {
         const handleKeyDown = (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                finishEditing();
+                finishEditing(true);
             } else if (e.key === 'Escape') {
                 e.preventDefault();
-                textarea.value = text.text();
-                finishEditing();
+                finishEditing(false);
             }
         };
 
         const handleOutsideClick = (e) => {
             if (e.target !== textarea) {
-                finishEditing();
+                finishEditing(true);
             }
         };
 
-        // Add event listeners
-        textarea.addEventListener('blur', finishEditing);
+        const handleBlur = () => finishEditing(true);
+
+        textarea.addEventListener('blur', handleBlur);
         document.addEventListener('keydown', handleKeyDown);
 
-        // Delay outside click handler to prevent immediate closure
         setTimeout(() => {
             document.addEventListener('click', handleOutsideClick);
         }, 100);
@@ -641,6 +684,19 @@ class DrawingTools {
 
             if (shapeName && shapeName.startsWith('bounding-box-')) {
                 return;
+            }
+
+            if (obj.attrs?.points && typeof shape.points === 'function') {
+                shape.points(obj.attrs.points.slice());
+            }
+            if (obj.attrs?.x !== undefined && typeof shape.x === 'function') {
+                shape.x(obj.attrs.x);
+            }
+            if (obj.attrs?.y !== undefined && typeof shape.y === 'function') {
+                shape.y(obj.attrs.y);
+            }
+            if (obj.attrs?.text !== undefined && typeof shape.text === 'function') {
+                shape.text(obj.attrs.text);
             }
 
             this.layer.add(shape);
@@ -704,6 +760,7 @@ class DrawingTools {
         this.controlPoints.startPoint.on('dragstart', () => {
             this.isDraggingControlPoint = true;
             this.draggedControlPoint = 'start';
+            shape._cpDragStartPoints = shape.points().slice();
         });
 
         this.controlPoints.startPoint.on('dragmove', () => {
@@ -755,17 +812,14 @@ class DrawingTools {
         });
 
         this.controlPoints.startPoint.on('dragend', () => {
-            this.isDraggingControlPoint = false;
-            this.draggedControlPoint = null;
-            if (window.app?.recordHistory) {
-                window.app.recordHistory('Adjust drawing');
-            }
+            this.commitControlPointAdjust(shape);
         });
 
         // Add drag event handlers for end point
         this.controlPoints.endPoint.on('dragstart', () => {
             this.isDraggingControlPoint = true;
             this.draggedControlPoint = 'end';
+            shape._cpDragStartPoints = shape.points().slice();
         });
 
         this.controlPoints.endPoint.on('dragmove', () => {
@@ -817,14 +871,11 @@ class DrawingTools {
         });
 
         this.controlPoints.endPoint.on('dragend', () => {
-            this.isDraggingControlPoint = false;
-            this.draggedControlPoint = null;
-            if (window.app?.recordHistory) {
-                window.app.recordHistory('Adjust drawing');
-            }
+            this.commitControlPointAdjust(shape);
         });
 
         // Add control points to layer
+        this.updateControlPointsPosition(shape);
         this.layer.add(this.controlPoints.startPoint);
         this.layer.add(this.controlPoints.endPoint);
         this.layer.batchDraw();
@@ -914,6 +965,26 @@ class DrawingTools {
         return shape.name().includes('drawing-arrow') || shape.name().includes('drawing-line');
     }
 
+    pointsChanged(before, after) {
+        if (!before || !after || before.length !== after.length) {
+            return true;
+        }
+        return before.some((value, index) => value !== after[index]);
+    }
+
+    commitControlPointAdjust(shape) {
+        this.isDraggingControlPoint = false;
+        this.draggedControlPoint = null;
+
+        const startPoints = shape?._cpDragStartPoints;
+        const endPoints = shape?.points?.() ? shape.points().slice() : null;
+        shape._cpDragStartPoints = null;
+
+        if (startPoints && endPoints && this.pointsChanged(startPoints, endPoints)) {
+            window.app?.recordHistory('Adjust drawing');
+        }
+    }
+
     getDrawingStats() {
         const arrows = this.layer.find(node => node.name() === 'drawing-arrow').length;
         const lines = this.layer.find(node => node.name() === 'drawing-line').length;
@@ -953,10 +1024,7 @@ class DrawingTools {
         );
 
         drawingObjects.forEach(obj => {
-            if (obj.name() !== 'drawing-text') {
-                // Text objects handle their own dragging
-                obj.draggable(draggable);
-            }
+            obj.draggable(draggable);
         });
 
         console.log(`Updated ${drawingObjects.length} drawing objects to draggable: ${draggable}`);
@@ -1645,6 +1713,7 @@ class DrawingTools {
         this.layer.batchDraw();
         // Make heading editable on click/double-tap
         this.makeHeadingEditable(heading);
+        this.makeShapeSelectable(heading);
         // Auto-switch to select tool after creating heading
         setTimeout(() => {
             if (window.app) {
@@ -1706,8 +1775,8 @@ class DrawingTools {
         const textarea = document.createElement('textarea');
         textarea.className = 'konva-textarea';
         document.body.appendChild(textarea);
-        // Set initial value
-        textarea.value = heading.text();
+        const initialText = heading.text();
+        textarea.value = initialText;
         // Style the textarea
         textarea.style.position = 'absolute';
         textarea.style.top = areaPosition.y + 'px';
@@ -1753,43 +1822,63 @@ class DrawingTools {
             draggable: false,
             visible: false
         });
-        const finishEditing = () => {
-            const newText = textarea.value.trim();
-            heading.text(newText);
+        let finished = false;
+
+        const finishEditing = (save = true) => {
+            if (finished) {
+                return;
+            }
+            finished = true;
+
+            const committedText = save ? textarea.value.trim() : initialText;
+            heading.text(committedText);
+
             textarea.remove();
             heading.setAttrs({
                 draggable: true,
                 visible: true
             });
             this.layer.batchDraw();
+
+            if (save && committedText !== initialText) {
+                window.app?.recordHistory('Edit heading');
+            }
+
+            textarea.removeEventListener('blur', handleBlur);
+            textarea.removeEventListener('input', handleLivePreview);
             document.removeEventListener('click', handleOutsideClick);
             document.removeEventListener('keydown', handleKeyDown);
         };
+
         const handleKeyDown = (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                finishEditing();
+                finishEditing(true);
             } else if (e.key === 'Escape') {
                 e.preventDefault();
-                textarea.value = heading.text();
-                finishEditing();
+                finishEditing(false);
             }
         };
+
         const handleOutsideClick = (e) => {
             if (e.target !== textarea) {
-                finishEditing();
+                finishEditing(true);
             }
         };
-        textarea.addEventListener('blur', finishEditing);
+
+        const handleBlur = () => finishEditing(true);
+
+        const handleLivePreview = () => {
+            heading.text(textarea.value);
+            this.layer.batchDraw();
+        };
+
+        textarea.addEventListener('blur', handleBlur);
         document.addEventListener('keydown', handleKeyDown);
         setTimeout(() => {
             document.addEventListener('click', handleOutsideClick);
         }, 100);
-        // Live update preview
-        textarea.addEventListener('input', () => {
-            heading.text(textarea.value);
-            this.layer.batchDraw();
-        });
+        textarea.addEventListener('input', handleLivePreview);
     }
 
     /**

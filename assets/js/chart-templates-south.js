@@ -206,6 +206,7 @@ class SouthIndianChartTemplate {
             textarea.className = 'konva-textarea';
             document.body.appendChild(textarea);
             textarea.value = centerText.text();
+            const initialCenterText = centerText.text();
             // Style textarea to match the text bounding box
             textarea.style.position = 'absolute';
             textarea.style.top = areaPosition.y + 'px';
@@ -240,9 +241,13 @@ class SouthIndianChartTemplate {
             });
             // Save on blur or Enter
             const finishEditing = () => {
-                centerText.text(textarea.value);
+                const newText = textarea.value;
+                centerText.text(newText);
                 textarea.remove();
                 this.layer.batchDraw();
+                if (newText !== initialCenterText && window.app?.recordHistory) {
+                    window.app.recordHistory('Edit centre label');
+                }
             };
             textarea.addEventListener('blur', finishEditing);
             textarea.addEventListener('keydown', (e) => {

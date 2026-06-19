@@ -1187,10 +1187,31 @@ class CitranaApp {
     }
 
     serializeDrawings() {
-        return this.layer.getChildren(node => {
+        return this.layer.find((node) => {
             const name = node.name();
             return name && name.startsWith('drawing-');
-        }).map(node => node.toObject());
+        }).map((node) => {
+            const obj = node.toObject();
+            const className = node.getClassName?.();
+
+            if (className === 'Arrow' || className === 'Line') {
+                obj.attrs = {
+                    ...obj.attrs,
+                    points: node.points().slice(),
+                    x: node.x(),
+                    y: node.y()
+                };
+            } else if (className === 'Text') {
+                obj.attrs = {
+                    ...obj.attrs,
+                    x: node.x(),
+                    y: node.y(),
+                    text: node.text()
+                };
+            }
+
+            return obj;
+        });
     }
 
     restoreDrawings(drawingData) {

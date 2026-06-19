@@ -28,7 +28,7 @@ class CitranaHistory {
 
         this.entries.push({
             label,
-            state,
+            state: JSON.parse(JSON.stringify(state)),
             timestamp: Date.now()
         });
         this.index = this.entries.length - 1;
