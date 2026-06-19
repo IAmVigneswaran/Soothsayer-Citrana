@@ -32,6 +32,7 @@ This codebase is developed using AI agents.
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
+- Chart Display Options: Hide North or South chart indicators from the toolbar **Options** modal; preferences persist in this browser
 - Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear House**, **Edit Graha**, **Delete Graha**, and more)
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
@@ -125,6 +126,8 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any Bhava and select **Set as Lagna**. A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.
 
 North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First House** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign. Grahas reposition automatically when Lagna changes.
+
+Chart Display Options: Click the gear icon in the toolbar (after Save) to open **Options**. Toggle **Hide North Indian Chart Indicators** to hide bhava numbers (black corner boxes). Toggle **Hide South Indian Chart Indicators** to hide the lagna diagonal line, yellow bhava numbers, and black rashi numbers. Preferences are saved in this browser and apply immediately; they are not included in undo/redo.
 
 ### Working with Grahas
 

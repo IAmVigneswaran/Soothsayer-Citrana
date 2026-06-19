@@ -59,17 +59,17 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1314 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (centralised **Delete** for Grahas and drawings), zoom lock, export, modals, history coordinator, undo/redo toolbar |
+| `app.js` | ~1394 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (centralised **Delete** for Grahas and drawings), zoom lock, export, modals (including Options), chart display preferences, history coordinator, undo/redo toolbar |
 | `history.js` | ~77 | Unified undo/redo timeline (`CitranaHistory`) |
 | `chart-coordinator.js` | ~299 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
-| `chart-templates-south.js` | ~962 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, `zoomToFit()` with local bounds |
-| `chart-templates-north.js` | ~928 | Diamond polygon chart, rashi boxes, Lagna rashi math, `zoomToFit()` with local bounds |
+| `chart-templates-south.js` | ~993 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds |
+| `chart-templates-north.js` | ~949 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds |
 | `planet-system.js` | ~839 | Graha library UI (5 pages), drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `drawing-tools.js` | ~1902 | Drawing tools, selection, control points, Graha text editing, `makeShapeSelectable()` on stroke complete, history `recordHistory()` calls |
 | `edit-ui.js` | ~775 | Floating property editor for drawing shapes (session-based undo on close) |
 | `context-menu.js` | ~721 | Right-click / long-press menus; unified hit-test routing |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging |
-| `styles.css` | ~2195 | Light theme, floating UI, safe areas, iOS PWA layout, toolbar/zoom bar disabled states |
+| `styles.css` | ~2260 | Light theme, floating UI, safe areas, iOS PWA layout, Help/Options modals, toolbar/zoom bar disabled states |
 
 ## Canvas Object Naming
 
@@ -212,7 +212,17 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 **Edit sessions** (one step on commit, not per click): drawing Edit UI (`hide()`), Graha text bar (`finish(true)`), inline text/heading double-click editors.
 
-**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals. **Deferred 2.1:** visible History panel.
+**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals, chart indicator visibility preferences. **Deferred 2.1:** visible History panel.
+
+### Chart display options
+
+1. User opens `#options-btn` (gear, toolbar export group) → `#options-modal`
+2. Toggle **Hide North Indian Chart Indicators** or **Hide South Indian Chart Indicators**
+3. `app.setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)` updates `app.options` and `localStorage` (`citrana_north_hide_indicators` / `citrana_south_hide_indicators`, value `'1'` when hidden)
+4. Active chart template applies immediately via `applyNorthIndicatorsPreference()` or `applySouthIndicatorsPreference()`:
+   - **North**: `tinyBoxGroupNorth.visible(!hide)`
+   - **South**: lagna diagonal lines, yellow bhava boxes, black rashi boxes via `setSouthIndicatorsVisible()`
+5. Templates call `apply*IndicatorsPreference()` on chart create and Lagna changes; preference survives refresh but is **not** in undo snapshots
 
 ### Export
 
@@ -235,6 +245,8 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | `window.selectedBhavaSouth` | South template house click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
 | `window.selectedBhavaNorth` | North template house click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
+| `localStorage.citrana_north_hide_indicators` | Options modal (North toggle) | `'1'` hides North bhava corner boxes; key removed when shown |
+| `localStorage.citrana_south_hide_indicators` | Options modal (South toggle) | `'1'` hides South lagna line and bhava/rashi boxes; key removed when shown |
 | `localStorage.citrana_debug` | DevTools / manual | `'0'` silences `citranaDebug()`; default is on |
 
 ## Debug logging
@@ -262,13 +274,13 @@ All interactive chrome is **fixed/absolute positioned** over a full-viewport can
 
 ### Floating elements
 
-- Top centre: tool toolbar — Undo/Redo, Select/Hand, drawing tools, export/transparency
+- Top centre: tool toolbar — Undo/Redo, Select/Hand, drawing tools, export/transparency/**Options** (`#options-btn`)
 - Top left (desktop) / bottom stack (mobile): Graha library
 - Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`); mobile adds Select/Hand in zoom bar (288px width)
 - Bottom corners: Help (mobile bottom-left), About (bottom-right)
 - Bottom centre: Graha text edit bar, drawing Edit UI (dynamic)
 
-Modals: Welcome, Help, About, Confirmation, Export Progress.
+Modals: Welcome, Help, **Options**, About, Confirmation, Export Progress.
 
 Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit factor. Official support is desktop-only; iOS standalone PWA layout is tuned but not officially supported.
 
@@ -300,7 +312,7 @@ Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setup
 
 ### Not tracked
 
-Zoom level, pan position, active tool, bhava selection highlight, Graha library page, modal/UI state.
+Zoom level, pan position, active tool, bhava selection highlight, Graha library page, modal/UI state, chart indicator visibility preferences.
 
 ### Extension
 
@@ -325,6 +337,7 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 | Zoom fit behaviour | `zoomToFit()` in chart template |
 | Theme / layout / safe areas | `assets/css/styles.css` |
 | Export behaviour | `app.exportChart()` |
+| Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
 | Undo/redo | `history.js`, `app.recordHistory()` / `captureHistoryState()` / `updateHistoryButtons()` |
 
 ## Known Limitations

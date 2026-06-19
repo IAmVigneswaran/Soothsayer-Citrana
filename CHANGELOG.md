@@ -14,11 +14,12 @@
   - **North Indian** — use **Set Lagna as…** on the chart menu (pick the zodiac sign), or **Set as First House** on a house menu.
 - **Clear House** removes every Graha from the house you selected.
 - **Zoom lock** — on by default so scroll-wheel zoom does not catch you by surprise. Click the lock icon to zoom freely; **Reset Zoom** always works.
+- **Chart display options** — open **Options** (gear icon in the toolbar) to hide chart indicators per layout: North Indian bhava numbers (black corner boxes); South Indian lagna line, bhava numbers (yellow), and rashi numbers (black). Preferences are saved in this browser and apply immediately; they are not tracked by undo/redo.
 
 **🔧 Improvements:**
 - Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
 - South Indian house menus show **House** numbers based on where Lagna is set.
-- Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, and undo/redo.
+- Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, undo/redo, and chart display options.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied unused code from older versions, including automatic chart restore on refresh and deprecated history helpers.
 - Further removed dead code — unused accessors, duplicate app-level selection state, orphan modal CSS, and unused chart-coordinator wrappers (no change to how the app behaves).

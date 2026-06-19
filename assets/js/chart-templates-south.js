@@ -11,6 +11,7 @@ class SouthIndianChartTemplate {
         this.chartGroupSouth = null;
         this.houseDataSouth = {};
         this.lagnaHouseSouth = 1;
+        this._southIndicatorsVisible = true;
         this.selectedHouse = null; // Track selected house for highlight
 
         if (stage && layer) {
@@ -272,6 +273,7 @@ class SouthIndianChartTemplate {
         this.layer.batchDraw();
 
         this.renumberHouses();
+        this.applySouthIndicatorsPreference();
 
         // Zoom to fit
         this.zoomToFit();
@@ -347,6 +349,8 @@ class SouthIndianChartTemplate {
             height: height,
             planets: [],
             houseRectSouth: house,
+            rashiNumberSouthBox: rashiNumberSouthBox,
+            rashiNumberSouthText: rashiNumberSouthText,
             bhavaNumberSouthBox: null, // Initialize bhavaNumberSouthBox to null
             bhavaNumberSouthText: null, // Initialize bhavaNumberSouthText to null
             lagnaLinesSouth: null // Store Lagna indicator lines
@@ -734,6 +738,7 @@ class SouthIndianChartTemplate {
             this.houseDataSouth[houseNumber].lagnaLinesSouth = [line];
             this.layer.batchDraw();
         }
+        this.applySouthIndicatorsPreference();
         if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Set Lagna');
         console.log(`Lagna set to house ${houseNumber}`);
     }
@@ -791,6 +796,32 @@ class SouthIndianChartTemplate {
         this.layer.batchDraw();
         console.log('Bhava mapping:', debugBhavas);
         console.log('Houses renumbered');
+    }
+
+    /**
+     * Show or hide Lagna line, bhava number boxes, and rashi number boxes on all houses.
+     * @param {boolean} visible
+     */
+    setSouthIndicatorsVisible(visible) {
+        this._southIndicatorsVisible = visible;
+        for (let houseNum = 1; houseNum <= 12; houseNum++) {
+            const data = this.houseDataSouth[houseNum];
+            if (!data) continue;
+            if (data.rashiNumberSouthBox) data.rashiNumberSouthBox.visible(visible);
+            if (data.rashiNumberSouthText) data.rashiNumberSouthText.visible(visible);
+            if (data.bhavaNumberSouthBox) data.bhavaNumberSouthBox.visible(visible);
+            if (data.bhavaNumberSouthText) data.bhavaNumberSouthText.visible(visible);
+            if (data.lagnaLinesSouth) {
+                data.lagnaLinesSouth.forEach((line) => line.visible(visible));
+            }
+        }
+        this.layer?.batchDraw();
+    }
+
+    /** Apply user preference from app.options (default: indicators visible). */
+    applySouthIndicatorsPreference() {
+        const hide = window.app?.options?.southHideIndicators === true;
+        this.setSouthIndicatorsVisible(!hide);
     }
 
     clearChart() {

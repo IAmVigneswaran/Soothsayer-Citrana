@@ -13,6 +13,7 @@ class NorthIndianChartTemplate {
         this.tinyBoxGroupNorth = null;
         this.houseDataNorth = {};
         this.lagnaHouseNorth = 1;
+        this._northIndicatorsVisible = true;
         this.selectedHouse = null; // Track selected house for highlight
 
         if (stage && layer) {
@@ -349,6 +350,7 @@ class NorthIndianChartTemplate {
 
         // Call renumberHouses to set correct Rashi numbers based on Lagna and First House
         this.renumberHouses();
+        this.applyNorthIndicatorsPreference();
 
         // Zoom to fit
         this.zoomToFit();
@@ -405,7 +407,26 @@ class NorthIndianChartTemplate {
         citranaDebug(`North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
         citranaDebug('Chart should now display updated Rashi numbers for the new Lagna');
         citranaDebug('All planets have been repositioned to their correct Rashis');
+        this.applyNorthIndicatorsPreference();
         if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Set Lagna');
+    }
+
+    /**
+     * Show or hide rashi/bhava number boxes (tiny black boxes) on the North Indian chart.
+     * @param {boolean} visible
+     */
+    setNorthIndicatorsVisible(visible) {
+        this._northIndicatorsVisible = visible;
+        if (this.tinyBoxGroupNorth) {
+            this.tinyBoxGroupNorth.visible(visible);
+            this.layer?.batchDraw();
+        }
+    }
+
+    /** Apply user preference from app.options (default: indicators visible). */
+    applyNorthIndicatorsPreference() {
+        const hide = window.app?.options?.northHideIndicators === true;
+        this.setNorthIndicatorsVisible(!hide);
     }
 
     /**

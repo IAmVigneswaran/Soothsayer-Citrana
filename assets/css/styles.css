@@ -1198,8 +1198,9 @@ body {
   display: block;
 }
 
-/* Help Modal */
-.help-modal {
+/* Help & Options Modals */
+.help-modal,
+.options-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -1212,30 +1213,32 @@ body {
   z-index: 10000;
 }
 
-.help-modal.active {
+.help-modal.active,
+.options-modal.active {
   display: flex;
 }
 
-.help-modal-content {
+.help-modal-content,
+.options-modal-content {
   background: white;
   border: 1px solid #000000;
   border-radius: 8px;
   padding: 32px;
+  width: min(600px, 90vw);
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   position: relative;
-  /* Fix scrollbar issue - ensure padding accounts for scrollbar */
   padding-right: 40px;
-  /* Extra padding for scrollbar */
   margin-right: 8px;
-  /* Margin to prevent scrollbar from touching edge */
 }
 
-/* Mobile: Smaller help modal */
+/* Mobile: Smaller help/options modal */
 @media (max-width: 768px) {
-  .help-modal-content {
+  .help-modal-content,
+  .options-modal-content {
+    width: 90%;
     max-width: 90%;
     max-height: 70vh;
     padding: 20px;
@@ -1244,27 +1247,32 @@ body {
   }
 }
 
-/* Custom scrollbar styling for help modal */
-.help-modal-content::-webkit-scrollbar {
+/* Custom scrollbar styling for help/options modal */
+.help-modal-content::-webkit-scrollbar,
+.options-modal-content::-webkit-scrollbar {
   width: 8px;
 }
 
-.help-modal-content::-webkit-scrollbar-track {
+.help-modal-content::-webkit-scrollbar-track,
+.options-modal-content::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 4px;
 }
 
-.help-modal-content::-webkit-scrollbar-thumb {
+.help-modal-content::-webkit-scrollbar-thumb,
+.options-modal-content::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 4px;
   border: 1px solid #a8a8a8;
 }
 
-.help-modal-content::-webkit-scrollbar-thumb:hover {
+.help-modal-content::-webkit-scrollbar-thumb:hover,
+.options-modal-content::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
 
-.help-modal-header {
+.help-modal-header,
+.options-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1272,14 +1280,16 @@ body {
   padding-bottom: 16px;
 }
 
-.help-modal-title {
+.help-modal-title,
+.options-modal-title {
   font-size: 20px;
   font-weight: 600;
   color: #000000;
   margin: 0;
 }
 
-.help-modal-close {
+.help-modal-close,
+.options-modal-close {
   width: 32px;
   height: 32px;
   border: none;
@@ -1293,14 +1303,69 @@ body {
   transition: all 0.2s ease;
 }
 
-.help-modal-close:hover {
+.help-modal-close:hover,
+.options-modal-close:hover {
   background: #000000;
   color: white;
 }
 
-.help-modal-close i {
+.help-modal-close i,
+.options-modal-close i {
   width: 16px;
   height: 16px;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.options-toggle-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+  cursor: pointer;
+}
+
+.options-list .options-toggle-row:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.options-list .options-toggle-row:last-child {
+  padding-bottom: 0;
+}
+
+.options-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.options-toggle-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.options-toggle-hint {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.options-toggle-input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: #000000;
+  cursor: pointer;
 }
 
 .help-section {

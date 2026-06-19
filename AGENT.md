@@ -12,7 +12,7 @@ Citrana is a browser-based application that allows users to create both South In
 - Graphics: HTML5 Canvas API with Konva.js (self-hosted, `assets/vendor/konva.min.js` v9.3.20)
 - Styling: Custom CSS only
 - Icons: Lucide Icons (self-hosted, `assets/vendor/lucide.min.js` v0.468.0)
-- Storage: Browser `localStorage` for preferences only (welcome modal, debug opt-out)
+- Storage: Browser `localStorage` for preferences (welcome modal, chart indicator toggles, debug opt-out)
 - Analytics: Google Analytics and Google Tag Manager
 - No build process required - runs entirely in browser
 
@@ -22,14 +22,14 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2195-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2260-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---1314-lines)
+   - [Main Application (app.js)](#main-application-appjs---1394-lines)
    - [History Engine (history.js)](#history-engine-historyjs---77-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---299-lines)
-   - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---962-lines)
-   - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---928-lines)
+   - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---993-lines)
+   - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---949-lines)
    - [Planet System](#planet-system-planet-systemjs---839-lines)
    - [Drawing Tools](#drawing-tools-drawing-toolsjs---1902-lines)
    - [Context Menu](#context-menu-context-menujs---721-lines)
@@ -37,6 +37,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 6. [Core Features](#core-features)
    - [Undo / Redo](#undo--redo)
    - [Chart Types](#chart-types)
+   - [Chart Display Options](#chart-display-options)
    - [Chart Management](#chart-management-actions)
    - [Planet Management](#planet-management)
    - [Drawing Tool Summary](#drawing-tool-summary)
@@ -52,9 +53,9 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2195 lines)
+## CSS and Layout (styles.css - ~2260 lines)
 
-Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
+Light theme, floating UI, modals (Help and Options share modal chrome), responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
 
 **iOS standalone PWA (2.0):**
 - Safe-area CSS vars (`--sat` … `--sal`, `--ui-inset`, `--ui-bottom-pad`, `--ui-bottom-stack`)
@@ -66,18 +67,18 @@ Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px t
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~423 lines); viewport-fit=cover; PWA meta
+├── index.html                    # Main entry (~454 lines); viewport-fit=cover; PWA meta; Options modal
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2195 lines)
+│   │   └── styles.css            # Complete styling system (~2260 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1314 lines)
+│   │   ├── app.js                # Main application coordinator (~1394 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
 │   │   ├── chart-coordinator.js  # Chart type management (~299 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (~962 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (~928 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (~993 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (~949 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~839 lines)
 │   │   ├── drawing-tools.js      # Drawing tools implementation (~1902 lines)
 │   │   ├── context-menu.js       # Context menu system (~721 lines)
@@ -107,11 +108,11 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # This comprehensive documentation (~960 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~342 lines)
-├── .cursorrules                  # Cursor IDE configuration (~983 lines)
-├── CHANGELOG.md                  # Version history and changes (~53 lines)
-├── README.md                     # Project readme (~173 lines)
+├── AGENT.md                      # This comprehensive documentation (~974 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~355 lines)
+├── .cursorrules                  # Cursor IDE configuration (~995 lines)
+├── CHANGELOG.md                  # Version history and changes (~57 lines)
+├── README.md                     # Project readme (~177 lines)
 ├── LICENSE                       # MIT License
 ├── SECURITY.md                   # Security policy
 └── .gitignore                    # Git ignore rules
@@ -123,7 +124,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1314 lines)
+### Main Application (app.js - ~1394 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -133,11 +134,12 @@ Key Responsibilities:
 - Handles keyboard shortcuts and event listeners
 - Manages unified undo/redo via `CitranaHistory` (`history.js`)
 - Handles chart export
+- Manages chart display options modal and `localStorage` indicator preferences
 - Provides mobile touch support and Safari compatibility
 - Manages zoom controls, zoom lock (default locked), zoom level display, and canvas resize (`visualViewport`)
 
 Key Methods:
-- `init()`: Application initialisation
+- `init()`: Application initialisation; loads `this.options` from `localStorage`
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
 - `setupComponents()` / `setupEventListeners()` / `setupKeyboardShortcuts()`
 - `setTool()`: Tool routing to drawing tools and hand mode
@@ -147,6 +149,7 @@ Key Methods:
 - `handleResize()`: Stage size from `visualViewport` or container
 - `handleWheel()`: Desktop wheel zoom about pointer when unlocked; early return when locked (no `preventDefault`)
 - `exportChart()`: PNG export (`pixelRatio: 2`)
+- `setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)`: Persist indicator toggles; apply to active chart template
 - `recordHistory()` / `captureHistoryState()` / `restoreHistoryState()`: Undo timeline integration
 - `undo()` / `redo()` / `updateHistoryButtons()`: Delegate to `this.history`; sync `#undo-btn` / `#redo-btn` disabled state
 - `clearChart()` / `resetChart()` / `resetDrawings()`
@@ -193,7 +196,7 @@ Key Methods:
 
 **Removed:** `setFirstHouse()`, `getDropZones()` (legacy).
 
-### South Indian Chart Template (chart-templates-south.js - ~962 lines)
+### South Indian Chart Template (chart-templates-south.js - ~993 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 Key Responsibilities:
@@ -221,9 +224,10 @@ Key Methods:
 - `getBhavaNumberForHouse()`: Get house number (1–12 from Lagna) for a fixed grid cell
 - `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-house fallback) for library drops
 - `highlightHouse()` / `clearHighlight()`: Visual house selection
+- `setSouthIndicatorsVisible(visible)` / `applySouthIndicatorsPreference()`: Show or hide lagna line and bhava/rashi boxes per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (immune to current zoom/pan)
 
-### North Indian Chart Template (chart-templates-north.js - ~928 lines)
+### North Indian Chart Template (chart-templates-north.js - ~949 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 
 Key Responsibilities:
@@ -250,6 +254,7 @@ Key Methods:
 - `isPointInPolygon()`: Hit detection for polygon houses
 - `getRashiNumberForHouse()`: Rashi calculation
 - `findHouseAtChartPoint()`: Polygon hit-test (with nearest-centroid fallback) for library drops
+- `setNorthIndicatorsVisible(visible)` / `applyNorthIndicatorsPreference()`: Show or hide `tinyBoxGroupNorth` (bhava numbers in black corner boxes) per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (desktop `extraTopMargin=-50`)
 
 ### Planet System (planet-system.js - ~839 lines)
@@ -465,7 +470,7 @@ Each step snapshots **chart data** (type, Lagna, Grahas, South centre label) and
 
 **Tracked:** create/reset/clear chart; add/move/remove/edit Grahas; set Lagna; clear house; draw/move/adjust/delete annotations; Edit UI style sessions; inline text/heading edits; centre label edit.
 
-**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals.
+**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals, chart indicator visibility preferences.
 
 **Deferred 2.1:** visible History panel listing `entries[].label`.
 
@@ -477,6 +482,14 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - **South Indian Lagna**: Right-click a bhava → **Set as Lagna** only (no chart-level Set as Lagna). House menu header shows **House N** counted from Lagna (not fixed grid position)
 - **North Indian Lagna**: Right-click empty canvas → **Set Lagna as…** (choose zodiac sign); or right-click a bhava showing a sign → **Set as First House** (that Rashi becomes Lagna). Grahas reposition by stored `rashiNumber`
 - Dynamic House Numbering: South Indian bhava numbers (yellow boxes) rotate from Lagna; North Indian Rashi boxes recalculate from Lagna
+
+### Chart Display Options
+- **Options modal**: `#options-btn` (gear icon in toolbar export group, after Save) opens `#options-modal`
+- **Hide North Indian Chart Indicators**: Hides bhava numbers in black corner boxes (`tinyBoxGroupNorth`)
+- **Hide South Indian Chart Indicators**: Hides lagna diagonal line, yellow bhava boxes, and black rashi boxes
+- **Persistence**: `localStorage.citrana_north_hide_indicators` and `citrana_south_hide_indicators` (`'1'` when hidden; key removed when shown again); default is visible
+- **Application**: `app.setNorthHideIndicators()` / `setSouthHideIndicators()` update preference and call `applyNorthIndicatorsPreference()` / `applySouthIndicatorsPreference()` on the active chart; templates reapply on chart create and Lagna changes
+- **Undo**: Indicator visibility is not tracked in the undo timeline
 
 ### Chart Management Actions
 - Clear Canvas: Removes everything (charts, planets, drawings) and returns to blank canvas
@@ -536,6 +549,7 @@ Technical Implementation:
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First-time user experience with getting started guide
+- Options Modal: Chart indicator visibility toggles (North/South); shared modal width with Help (`width: min(600px, 90vw)`)
 - Zoom Controls: `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock` (default locked), `#zoom-level`; mobile adds Select/Hand in zoom bar
 - Zoom Lock: Prevents accidental scroll-wheel and +/- zoom until user unlocks; reset zoom always available
 - iOS PWA: Safe-area layout for home-screen install (see CSS section); officially desktop-only
@@ -921,7 +935,7 @@ Edit the planets objects in assets/js/planet-system.js:
 ### Data Management
 - Chart work lives in the browser tab for the current visit only; refreshing the page starts a fresh session
 - Export PNG to keep a copy; chart data is not uploaded to a server
-- `localStorage` is used only for preferences (e.g. welcome modal seen, optional `citrana_debug` opt-out)
+- `localStorage` is used for preferences: welcome modal seen (`citrana_welcome_seen`), chart indicator toggles (`citrana_north_hide_indicators`, `citrana_south_hide_indicators`), optional `citrana_debug` opt-out
 
 ## Support and Documentation
 

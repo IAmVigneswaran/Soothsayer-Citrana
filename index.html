@@ -138,6 +138,9 @@
                <button id="export-btn" class="toolbar-btn" title="Export">
                <i data-lucide="save"></i>
                </button>
+               <button id="options-btn" class="toolbar-btn" title="Options">
+               <i data-lucide="settings"></i>
+               </button>
             </div>
          </div>
          <!-- Floating Graha Library -->
@@ -188,6 +191,33 @@
             <button id="text-edit-delete" title="Delete" class="text-edit-delete">
             <i data-lucide="trash-2"></i>
             </button>
+         </div>
+      </div>
+      <!-- Options Modal -->
+      <div id="options-modal" class="options-modal">
+         <div class="options-modal-content">
+            <div class="options-modal-header">
+               <h2 class="options-modal-title">Options</h2>
+               <button class="options-modal-close" id="options-modal-close" type="button" aria-label="Close options">
+               <i data-lucide="x"></i>
+               </button>
+            </div>
+            <div class="options-list">
+               <label class="options-toggle-row" for="north-hide-indicators-toggle">
+                  <span class="options-toggle-text">
+                     <span class="options-toggle-label">Hide North Indian Chart Indicators</span>
+                     <span class="options-toggle-hint">Bhava Numbers (Black)</span>
+                  </span>
+                  <input type="checkbox" id="north-hide-indicators-toggle" class="options-toggle-input">
+               </label>
+               <label class="options-toggle-row" for="south-hide-indicators-toggle">
+                  <span class="options-toggle-text">
+                     <span class="options-toggle-label">Hide South Indian Chart Indicators</span>
+                     <span class="options-toggle-hint">Lagna Line, Bhava (Yellow), Rashi (Black)</span>
+                  </span>
+                  <input type="checkbox" id="south-hide-indicators-toggle" class="options-toggle-input">
+               </label>
+            </div>
          </div>
       </div>
       <!-- Help Modal -->
@@ -268,6 +298,7 @@
                   <p><strong>Chart Types:</strong> Citrana supports both South Indian and North Indian chart layouts.</p>
                   <p><strong>South Indian Chart:</strong> Traditional 4x4 grid layout with centre empty. Right-click any Bhava and select <strong>Set as Lagna</strong>. A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.</p>
                   <p><strong>North Indian Chart:</strong> Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select <strong>Set as First House</strong> to set the Rashi in that cell as Lagna, or right-click the chart and choose <strong>Set Lagna as…</strong> to pick a zodiac sign. Grahas reposition automatically when Lagna changes.</p>
+                  <p><strong>Chart Display Options:</strong> Click the gear icon in the toolbar (after Save) to open <strong>Options</strong>. Toggle <strong>Hide North Indian Chart Indicators</strong> to hide bhava numbers (black corner boxes). Toggle <strong>Hide South Indian Chart Indicators</strong> to hide the lagna diagonal line, yellow bhava numbers, and black rashi numbers. Preferences are saved in this browser and apply immediately; they are not included in undo/redo.</p>
                   <p><strong>Adding Grahas:</strong> Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha, or right-click and choose <strong>Edit Graha</strong>, to open a floating editing panel where you can modify text or set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose <strong>Delete Graha</strong> to remove it.</p>
                   <p><strong>Graha Library:</strong> Use the page dots in the Graha Library to access Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Grahas.</p>
                   <p><strong>Adding Degrees:</strong> To include degree positions for Grahas, double-click any placed Graha to access the editing panel. Enter the degree value in the text field using the format "Graha-Degree" (e.g., "Su-20" for Sun at 20 degrees).</p>
@@ -387,7 +418,7 @@
                      <p class="welcome-help-note">Please click on the Help button to learn more.</p>
                      <p class="welcome-browser-note">System Requirements: Citrana is optimised for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+) and is not supported on mobile or touch devices.</p>
                   </div>
-                  <p class="welcome-copyright">© 2025 Soothsayer. All Rights Reserved</p>
+                  <p class="welcome-copyright">© 2026 Soothsayer. All Rights Reserved</p>
                   <div class="welcome-loading-container">
                      <div class="welcome-loading-bar">
                         <div class="welcome-loading-fill"></div>

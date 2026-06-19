@@ -18,6 +18,10 @@ class CitranaApp {
         this.exportWithWhiteBg = true; // Default: white background
         this.isExporting = false; // Prevent multiple concurrent exports
         this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
+        this.options = {
+            northHideIndicators: localStorage.getItem('citrana_north_hide_indicators') === '1',
+            southHideIndicators: localStorage.getItem('citrana_south_hide_indicators') === '1'
+        };
         this.init();
     }
 
@@ -129,6 +133,49 @@ class CitranaApp {
             helpModal.addEventListener('click', (e) => {
                 if (e.target === helpModal) {
                     helpModal.classList.remove('active');
+                }
+            });
+        }
+
+        // Options Button
+        const optionsBtn = document.getElementById('options-btn');
+        const optionsModal = document.getElementById('options-modal');
+        const optionsModalClose = document.getElementById('options-modal-close');
+        const southHideIndicatorsToggle = document.getElementById('south-hide-indicators-toggle');
+        const northHideIndicatorsToggle = document.getElementById('north-hide-indicators-toggle');
+
+        if (northHideIndicatorsToggle) {
+            northHideIndicatorsToggle.checked = this.options.northHideIndicators;
+            northHideIndicatorsToggle.addEventListener('change', (e) => {
+                this.setNorthHideIndicators(e.target.checked);
+            });
+        }
+
+        if (southHideIndicatorsToggle) {
+            southHideIndicatorsToggle.checked = this.options.southHideIndicators;
+            southHideIndicatorsToggle.addEventListener('change', (e) => {
+                this.setSouthHideIndicators(e.target.checked);
+            });
+        }
+
+        if (optionsBtn && optionsModal && optionsModalClose) {
+            optionsBtn.addEventListener('click', () => {
+                if (northHideIndicatorsToggle) {
+                    northHideIndicatorsToggle.checked = this.options.northHideIndicators;
+                }
+                if (southHideIndicatorsToggle) {
+                    southHideIndicatorsToggle.checked = this.options.southHideIndicators;
+                }
+                optionsModal.classList.add('active');
+            });
+
+            optionsModalClose.addEventListener('click', () => {
+                optionsModal.classList.remove('active');
+            });
+
+            optionsModal.addEventListener('click', (e) => {
+                if (e.target === optionsModal) {
+                    optionsModal.classList.remove('active');
                 }
             });
         }
@@ -1125,6 +1172,38 @@ class CitranaApp {
     toggleZoomLock() {
         this.zoomLocked = !this.zoomLocked;
         this.updateZoomLockUI();
+    }
+
+    /**
+     * Toggle South Indian Lagna line and bhava/rashi number boxes (saved in localStorage).
+     * @param {boolean} hide - When true, indicators are hidden
+     */
+    setSouthHideIndicators(hide) {
+        this.options.southHideIndicators = hide;
+        if (hide) {
+            localStorage.setItem('citrana_south_hide_indicators', '1');
+        } else {
+            localStorage.removeItem('citrana_south_hide_indicators');
+        }
+        if (this.chartTemplates?.currentChartType === 'south-indian') {
+            this.chartTemplates.southIndianTemplate.applySouthIndicatorsPreference();
+        }
+    }
+
+    /**
+     * Toggle North Indian bhava/rashi number boxes in tiny black corners (saved in localStorage).
+     * @param {boolean} hide - When true, indicators are hidden
+     */
+    setNorthHideIndicators(hide) {
+        this.options.northHideIndicators = hide;
+        if (hide) {
+            localStorage.setItem('citrana_north_hide_indicators', '1');
+        } else {
+            localStorage.removeItem('citrana_north_hide_indicators');
+        }
+        if (this.chartTemplates?.currentChartType === 'north-indian') {
+            this.chartTemplates.northIndianTemplate.applyNorthIndicatorsPreference();
+        }
     }
 
     updateZoomLockUI() {
