@@ -80,6 +80,7 @@ class CitranaApp {
             restoreState: (state) => this.restoreHistoryState(state)
         });
         this.history.record('Start');
+        this.updateHistoryButtons();
 
         console.log('Components setup complete');
     }
@@ -97,7 +98,8 @@ class CitranaApp {
         document.getElementById('zoom-hand-tool').addEventListener('click', () => this.setTool('hand'));
 
         // Action buttons
-        // Removed undo/redo button event listeners - buttons no longer exist in HTML
+        document.getElementById('undo-btn').addEventListener('click', () => this.undo());
+        document.getElementById('redo-btn').addEventListener('click', () => this.redo());
         document.getElementById('export-btn').addEventListener('click', () => this.exportChart());
 
         // Toggle Transparency Button
@@ -1162,6 +1164,7 @@ class CitranaApp {
     // --- HISTORY (undo / redo) ---
     recordHistory(label = 'Edit') {
         this.history?.record(label);
+        this.updateHistoryButtons();
     }
 
     captureHistoryState() {
@@ -1220,10 +1223,21 @@ class CitranaApp {
 
     undo() {
         this.history?.undo();
+        this.updateHistoryButtons();
     }
 
     redo() {
         this.history?.redo();
+        this.updateHistoryButtons();
+    }
+
+    updateHistoryButtons() {
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        if (!undoBtn || !redoBtn) return;
+
+        undoBtn.disabled = !this.history?.canUndo();
+        redoBtn.disabled = !this.history?.canRedo();
     }
 
     /** @deprecated Use recordHistory(label) */
