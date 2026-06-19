@@ -149,7 +149,6 @@ Key Methods:
 - `exportChart()`: PNG export (`pixelRatio: 2`)
 - `recordHistory()` / `captureHistoryState()` / `restoreHistoryState()`: Undo timeline integration
 - `undo()` / `redo()` / `updateHistoryButtons()`: Delegate to `this.history`; sync `#undo-btn` / `#redo-btn` disabled state
-- `pushSnapshot()`: Deprecated alias for `recordHistory()`
 - `clearChart()` / `resetChart()` / `resetDrawings()`
 - `showWelcomeModal()` / `showConfirmationDialog()`
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`
@@ -444,7 +443,7 @@ Key Features:
 Key Methods:
 - `show()` / `hide()`: Display/hide; commit history on hide when dirty
 - `createToolControls()`: Build tool-specific controls
-- `updateStrokeWidth()` / `updateStrokeColor()` / `updateFontSize()`: Property updates
+- `updateStrokeWidth()` / `updateStrokeColor()` / `updateTextColor()`: Property updates (font size/weight/style are applied inline in `createTextControls()`)
 - `markEditDirty()` / `_commitEditHistoryIfNeeded()`: Session undo integration
 
 ## Core Features

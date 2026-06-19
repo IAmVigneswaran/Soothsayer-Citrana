@@ -202,10 +202,8 @@ class EditUI {
                 this.createArrowControls(content);
                 break;
             case 'text':
-                this.createTextControls(content);
-                break;
             case 'heading':
-                this.createTextControls(content, 2); // 2-line limit
+                this.createTextControls(content);
                 break;
         }
     }
@@ -400,7 +398,7 @@ class EditUI {
      * Create text controls
      * @param {HTMLElement} container - The container to add controls to
      */
-    createTextControls(container, maxLines) {
+    createTextControls(container) {
         citranaDebug('[EDIT UI] Creating text controls for element:', this.currentElement);
         citranaDebug('[EDIT UI] Element properties:', {
             fontSize: this.currentElement.fontSize,
@@ -686,17 +684,6 @@ class EditUI {
 
         // Initialize Lucide icons
         lucide.createIcons();
-
-        // Find the input element (textarea or input)
-        const input = container.querySelector('.text-edit-input') || container.querySelector('input[type="text"]');
-        if (input && maxLines) {
-            input.addEventListener('input', function enforceLineLimit(e) {
-                const lines = input.value.split('\n');
-                if (lines.length > maxLines) {
-                    input.value = lines.slice(0, maxLines).join('\n');
-                }
-            });
-        }
     }
 
     /**
@@ -742,51 +729,6 @@ class EditUI {
     }
 
     /**
-     * Update font size for the current element
-     * @param {number} size - New font size
-     */
-    updateFontSize(size) {
-        citranaDebug('[EDIT UI] updateFontSize called with:', size);
-        if (this.currentElement) {
-            citranaDebug('[EDIT UI] Before update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
-            this.currentElement.fontSize(size);
-            citranaDebug('[EDIT UI] After update - fontSize:', this.currentElement.fontSize ? this.currentElement.fontSize() : 'undefined');
-            this.currentElement.getLayer().batchDraw();
-            this.markEditDirty();
-        }
-    }
-
-    /**
-     * Update font weight for the current element
-     * @param {string} weight - New font weight
-     */
-    updateFontWeight(weight) {
-        citranaDebug('[EDIT UI] updateFontWeight called with:', weight);
-        if (this.currentElement) {
-            citranaDebug('[EDIT UI] Before update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
-            this.currentElement.fontWeight(weight);
-            citranaDebug('[EDIT UI] After update - fontWeight:', this.currentElement.fontWeight ? this.currentElement.fontWeight() : 'undefined');
-            this.currentElement.getLayer().batchDraw();
-            this.markEditDirty();
-        }
-    }
-
-    /**
-     * Update font style for the current element
-     * @param {string} style - New font style
-     */
-    updateFontStyle(style) {
-        citranaDebug('[EDIT UI] updateFontStyle called with:', style);
-        if (this.currentElement) {
-            citranaDebug('[EDIT UI] Before update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
-            this.currentElement.fontStyle(style);
-            citranaDebug('[EDIT UI] After update - fontStyle:', this.currentElement.fontStyle ? this.currentElement.fontStyle() : 'undefined');
-            this.currentElement.getLayer().batchDraw();
-            this.markEditDirty();
-        }
-    }
-
-    /**
      * Update text color for the current element
      * @param {string} color - New text color
      */
@@ -824,22 +766,6 @@ class EditUI {
      */
     isEditUIVisible() {
         return this.isVisible;
-    }
-
-    /**
-     * Get the current element being edited
-     * @returns {Object|null} Current element or null
-     */
-    getCurrentElement() {
-        return this.currentElement;
-    }
-
-    /**
-     * Get the current tool type
-     * @returns {string|null} Current tool type or null
-     */
-    getCurrentTool() {
-        return this.currentTool;
     }
 
     setDeleteCallback(callback) {

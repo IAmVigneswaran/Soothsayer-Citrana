@@ -1245,11 +1245,6 @@ class CitranaApp {
         redoBtn.disabled = !this.history?.canRedo();
     }
 
-    /** @deprecated Use recordHistory(label) */
-    pushSnapshot(label) {
-        this.recordHistory(label || 'Edit');
-    }
-
     /**
      * Show welcome modal on first visit
      */

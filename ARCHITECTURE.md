@@ -287,7 +287,7 @@ Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setup
 | Snapshot | `{ chartData, drawingData }` deep-cloned on each `record()` |
 | Keyboard | **Ctrl+Z** / **Cmd+Z** undo; **Ctrl+Y**, **Ctrl+Shift+Z**, **Cmd+Shift+Z** redo |
 | Toolbar | `#undo-btn` / `#redo-btn` (first group); Lucide `undo-2` / `redo-2`; disabled via `updateHistoryButtons()` |
-| API | `app.recordHistory(label)`, `app.undo()`, `app.redo()`, `app.updateHistoryButtons()`; `pushSnapshot()` deprecated alias |
+| API | `app.recordHistory(label)`, `app.undo()`, `app.redo()`, `app.updateHistoryButtons()` |
 
 ### Tracked actions (representative labels)
 
