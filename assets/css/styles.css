@@ -853,12 +853,6 @@ body {
   gap: 8px;
 }
 
-.edit-control-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .edit-btn {
   display: flex;
   align-items: center;
@@ -883,6 +877,15 @@ body {
 }
 
 .edit-btn.active {
+  background: #000000;
+  color: white;
+}
+
+.edit-btn.danger {
+  color: #000000;
+}
+
+.edit-btn.danger:hover {
   background: #000000;
   color: white;
 }
