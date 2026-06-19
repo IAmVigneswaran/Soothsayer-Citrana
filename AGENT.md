@@ -548,7 +548,7 @@ Technical Implementation:
 
 ## Browser Compatibility
 
-- Desktop: Brave, Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- Desktop: Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+
 - Note: For Brave browser, disable Brave Shields for optimal functionality
 - Features: Canvas API, localStorage, ES6 modules, Touch Events
 

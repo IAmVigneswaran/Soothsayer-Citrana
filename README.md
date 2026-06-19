@@ -27,12 +27,13 @@ This codebase is developed using AI agents.
 
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
 - Graha Library: 51 Grahas across 5 pages including, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Grahas
-- Drag & Drop Grahas: Intuitive placement with multiple instances support and dynamic text sizing
+- Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that house on the next drop
+- Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (zoom and pan are not tracked)
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
-- Context Menus: Right-click and long-press support for quick chart management
-- Keyboard Shortcuts: Power user features for efficient workflow
+- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear House**, **Edit Graha**, **Delete Graha**, and more)
+- Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; your work stays in this browser session
 
@@ -98,12 +99,12 @@ Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's inte
 ## Quick Start
 
 ### Prerequisites
-- Modern desktop web browser (Brave, Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)
+- Modern desktop web browser (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+)
 - No setup required - runs entirely in the desktop web browser
 
 ### Browser and Device Compatibility
 
-Citrana is designed exclusively for desktop browsers only (Brave, Chrome, Firefox, Safari, Edge) and is not supported on mobile or touch devices. For optimal performance and full feature access, use a desktop environment. Note: Brave users must disable Brave Shields for full functionality.
+Citrana is designed exclusively for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+) and is not supported on mobile or touch devices. For optimal performance and full feature access, use a desktop environment. Note: Brave users must disable Brave Shields for full functionality.
 
 Screen Size: If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.
 
@@ -115,7 +116,7 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 
 1. **Choose Chart Type**: Right-click the canvas and select South Indian or North Indian layout
 2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna**. North Indian — right-click a Bhava and select **Set as First House**, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign
-3. **Add Grahas**: Drag Graha from the Graha Library to a Bhava (click a Bhava first for accurate placement)
+3. **Add Grahas**: Drag Grahas from the Graha Library onto the Bhava under your pointer. Click a Bhava first if you want the next drop to go to that house specifically
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click the save button to export your chart as a PNG
 
@@ -129,13 +130,17 @@ North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a B
 
 Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it.
 
+Clear House: Right-click a Bhava and choose **Clear House** to remove every Graha from that house.
+
 Custom Graha: There is also a "Custom" Graha available in the library. Drag and drop it into any Bhava, then double-click to edit the name. There is a maximum character limit of 8 characters for all Graha names.
 
 ### Drawing and Navigation
 
 Drawing Tools: Use the toolbar to add arrows, lines, text, and heading. Double-click text elements to edit them. Use the Hand tool to pan around the chart.
 
-Navigation: Use the zoom bar to zoom in or out, or click the lock icon to unlock zoom and use the mouse wheel or `+` / `-` keys. Reset zoom refits the chart. The Hand tool allows you to pan around the chart for detailed work. Press `?` or `/` in the app for the full keyboard shortcut list.
+Undo and Redo: Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Ctrl+Y** to step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Zoom, pan, and tool selection are not tracked.
+
+Navigation: Zoom is locked by default. Use the zoom bar to zoom in or out, or click the lock icon to unlock zoom and use the mouse wheel or `+` / `-` keys. Reset zoom refits the chart. The Hand tool allows you to pan around the canvas for detailed work. Press `?` or `/` in the app for the full keyboard shortcut list.
 
 ### Export and Limitations
 

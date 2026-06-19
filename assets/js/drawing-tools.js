@@ -73,42 +73,6 @@ class DrawingTools {
     }
 
     /**
-     * Get precise mouse/touch position accounting for stage transformations
-     * @param {Event|Touch} event - Mouse or touch event
-     * @returns {Object} Precise position {x, y}
-     */
-    getPrecisePosition(event) {
-        // Get the stage container's bounding rect
-        const stageBox = this.stage.container().getBoundingClientRect();
-
-        // Get client coordinates
-        let clientX, clientY;
-        if (event.clientX !== undefined) {
-            // Mouse event
-            clientX = event.clientX;
-            clientY = event.clientY;
-        } else {
-            // Touch event
-            clientX = event.clientX || event.pageX;
-            clientY = event.clientY || event.pageY;
-        }
-
-        // Calculate position relative to stage container
-        const x = (clientX - stageBox.left) / this.stage.scaleX();
-        const y = (clientY - stageBox.top) / this.stage.scaleY();
-
-        // Account for stage position
-        const finalX = x - this.stage.x() / this.stage.scaleX();
-        const finalY = y - this.stage.y() / this.stage.scaleY();
-
-        // Ensure pixel-perfect positioning
-        return {
-            x: Math.round(finalX * 100) / 100,
-            y: Math.round(finalY * 100) / 100
-        };
-    }
-
-    /**
      * Get precise position from Konva event
      * @param {KonvaEvent} e - Konva event
      * @returns {Object} Precise position {x, y}
@@ -983,21 +947,6 @@ class DrawingTools {
         if (startPoints && endPoints && this.pointsChanged(startPoints, endPoints)) {
             window.app?.recordHistory('Adjust drawing');
         }
-    }
-
-    getDrawingStats() {
-        const arrows = this.layer.find(node => node.name() === 'drawing-arrow').length;
-        const lines = this.layer.find(node => node.name() === 'drawing-line').length;
-        const penStrokes = this.layer.find(node => node.name() === 'drawing-pen').length;
-        const texts = this.layer.find(node => node.name() === 'drawing-text').length;
-
-        return {
-            arrows,
-            lines,
-            penStrokes,
-            texts,
-            total: arrows + lines + penStrokes + texts
-        };
     }
 
     /**
@@ -1882,6 +1831,15 @@ class DrawingTools {
     }
 
     /**
+     * Shape bounds in layer space (immune to stage zoom/pan).
+     * @param {Konva.Node} shape
+     * @returns {{ x: number, y: number, width: number, height: number }}
+     */
+    getShapeBoundsInLayer(shape) {
+        return shape.getClientRect({ relativeTo: this.layer });
+    }
+
+    /**
      * Create an invisible bounding box around a drawing object for easier selection
      * @param {KonvaShape} shape - The shape to create a bounding box for
      * @param {string} toolType - The type of drawing tool
@@ -1893,7 +1851,7 @@ class DrawingTools {
         if (this.isMobile()) {
             padding = 40; // Much larger for mobile
         }
-        const bounds = shape.getClientRect();
+        const bounds = this.getShapeBoundsInLayer(shape);
 
         const boundingBox = new Konva.Rect({
             x: bounds.x - padding,
@@ -1944,7 +1902,7 @@ class DrawingTools {
         if (this.isMobile()) {
             padding = 40;
         }
-        const bounds = shape.getClientRect();
+        const bounds = this.getShapeBoundsInLayer(shape);
 
         boundingBox.setAttrs({
             x: bounds.x - padding,

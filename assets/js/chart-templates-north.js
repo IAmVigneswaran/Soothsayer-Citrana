@@ -59,7 +59,8 @@ class NorthIndianChartTemplate {
             cx /= vertexCount;
             cy /= vertexCount;
             const distance = Math.hypot(px - cx, py - cy);
-            if (distance < closestDist) {
+            const threshold = Math.max(h.width, h.height) / 2;
+            if (distance < threshold && distance < closestDist) {
                 closestDist = distance;
                 closest = parseInt(hNum, 10);
             }
@@ -86,7 +87,8 @@ class NorthIndianChartTemplate {
 
         // Create separate group for rashi number boxes to ensure they render on top
         this.tinyBoxGroupNorth = new Konva.Group({
-            name: 'rashi-number-boxes-group-north'
+            name: 'rashi-number-boxes-group-north',
+            listening: false
         });
 
         // House definitions based on SVG polygon coordinates
@@ -293,18 +295,9 @@ class NorthIndianChartTemplate {
 
         // Create rashi number boxes as individual elements with exact positions
         const rashiNumberBoxSizeNorth = 17; // Match the reference SVG size (16.95)
-        const rashis = [
-            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
-        ];
-
-        // For now, just use empty Rashi numbers - will be filled manually
-        const calculateRashiNumberNorth = (houseNumberNorth) => {
-            return ''; // Empty for now
-        };
 
         Object.entries(tinyBoxPositionsNorth).forEach(([houseNumberNorth, positionNorth]) => {
             const houseNumNorth = parseInt(houseNumberNorth);
-            const rashiNameNorth = calculateRashiNumberNorth(houseNumNorth);
             const uniqueId = `${houseNumNorth}NRB`;
 
             // Create rashi number box
@@ -316,7 +309,8 @@ class NorthIndianChartTemplate {
                 fill: '#000000',
                 cornerRadius: 4,
                 name: `RashiNumberBoxNorth${houseNumNorth}`,
-                id: uniqueId // Assign unique ID
+                id: uniqueId,
+                listening: false
             });
 
             // Create Rashi text
@@ -325,7 +319,7 @@ class NorthIndianChartTemplate {
                 y: positionNorth.y - rashiNumberBoxSizeNorth / 2,
                 width: rashiNumberBoxSizeNorth,
                 height: rashiNumberBoxSizeNorth,
-                text: rashiNameNorth,
+                text: '',
                 fontSize: 10,
                 fontFamily: 'Arial',
                 fontWeight: 'bold',
@@ -333,40 +327,25 @@ class NorthIndianChartTemplate {
                 align: 'center',
                 verticalAlign: 'middle',
                 name: `RashiNumberTextNorth${houseNumNorth}`,
-                id: uniqueId // Assign unique ID
+                id: uniqueId,
+                listening: false
             });
 
             citranaDebug(`Created Rashi text element with name: RashiNumberTextNorth${houseNumNorth}`);
-
-            // Add click event to rashi number box for debug
-            rashiNumberBoxNorth.on('click', (e) => {
-                e.evt.stopPropagation(); // Prevent event bubbling
-                const currentRashiNumber = this.getCurrentRashiNumber(houseNumNorth);
-                citranaDebug(`Clicked Rashi Box ID: ${uniqueId}, Rashi: ${currentRashiNumber}, Lagna: ${this.lagnaHouseNorth}`);
-            });
-
-            // Also add click event to text for better coverage
-            rashiNumberTextNorth.on('click', (e) => {
-                e.evt.stopPropagation(); // Prevent event bubbling
-                const currentRashiNumber = this.getCurrentRashiNumber(houseNumNorth);
-                citranaDebug(`Clicked Rashi Box ID: ${uniqueId}, Rashi: ${currentRashiNumber}, Lagna: ${this.lagnaHouseNorth}`);
-            });
 
             // Add to rashi number box group
             this.tinyBoxGroupNorth.add(rashiNumberBoxNorth);
             this.tinyBoxGroupNorth.add(rashiNumberTextNorth);
         });
 
-        // Add both groups to layer - rashi number boxes on top
+        // Rashi boxes render above the chart; listening is off so clicks reach houses and Grahas below
         this.layer.add(this.chartGroupNorth);
         this.layer.add(this.tinyBoxGroupNorth);
-
-        // Ensure house polygons are always on top for hit detection
         this.chartGroupNorth.moveToTop();
         this.tinyBoxGroupNorth.moveToTop();
         this.layer.batchDraw();
 
-        citranaDebug('North Indian chart created with clickable Rashi Number Boxes');
+        citranaDebug('North Indian chart created with rashi number boxes (display only)');
 
         // Call renumberHouses to set correct Rashi numbers based on Lagna and First House
         this.renumberHouses();
@@ -426,11 +405,6 @@ class NorthIndianChartTemplate {
         citranaDebug('Chart should now display updated Rashi numbers for the new Lagna');
         citranaDebug('All planets have been repositioned to their correct Rashis');
         if (window.app?.recordHistory) window.app.recordHistory('Set Lagna');
-    }
-
-    getCurrentRashiNumber(visualPosition) {
-        // For now, return empty - will be filled manually
-        return '';
     }
 
     /**

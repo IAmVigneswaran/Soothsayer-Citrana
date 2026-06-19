@@ -12,7 +12,6 @@ class SouthIndianChartTemplate {
         this.houseDataSouth = {};
         this.lagnaHouseSouth = 1;
         this.selectedHouse = null; // Track selected house for highlight
-        this.southIndianHouseOrder = null;
 
         if (stage && layer) {
             console.log('South Indian Chart Template initialized with stage and layer');
@@ -151,9 +150,6 @@ class SouthIndianChartTemplate {
                 house: 6
             }
         ];
-
-        // Store the visual order for renumbering
-        this.southIndianHouseOrder = positions.map(pos => pos.house);
 
         positions.forEach(pos => {
             this.createHouse(pos.x, pos.y, houseSize, houseSize, pos.house);
@@ -486,15 +482,6 @@ class SouthIndianChartTemplate {
         if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Remove Graha');
     }
 
-    renamePlanetInHouseById(houseNumber, planetId, newLabel) {
-        const house = this.houseDataSouth[houseNumber];
-        if (!house || !house.planets) return;
-        const planet = house.planets.find((p) => p.id === planetId);
-        if (planet) planet.label = newLabel;
-        this.updatePlanetsInHouse(houseNumber);
-        this.layer.batchDraw();
-    }
-
     updatePlanetsInHouse(houseNumber) {
         const house = this.houseDataSouth[houseNumber];
         if (!house) return;
@@ -513,7 +500,7 @@ class SouthIndianChartTemplate {
             const planet = window.app.planetSystem.getPlanetInfo(planetObj.abbr);
             const planetY = startY + i * (fontSize + 4);
 
-            // Add a transparent rectangle for easier hit area
+            // Transparent hit area for easier click/right-click (not draggable)
             const hitRect = new Konva.Rect({
                 x: house.x + house.width / 2 - fontSize,
                 y: planetY - fontSize / 2,
@@ -522,7 +509,7 @@ class SouthIndianChartTemplate {
                 fill: 'rgba(0,0,0,0)',
                 name: `planet-hit-${planetObj.id}`,
                 listening: true,
-                draggable: true // Make hit rect draggable too for Safari
+                draggable: false
             });
 
             // Safari-specific: Add touch event handling to hit rect
@@ -634,7 +621,7 @@ class SouthIndianChartTemplate {
             hitRect.on('contextmenu', contextHandler);
             planetText.on('contextmenu', contextHandler);
 
-            // Safari-compatible drag handlers for both hit rect and planet text
+            // Drag-and-drop between bhavas (label only; hit rect is for selection)
             const dragStartHandler = (e) => {
                 citranaDebug(`Drag start for planet ${planetObj.abbr} from house ${houseNumber}`);
 
@@ -647,7 +634,6 @@ class SouthIndianChartTemplate {
                     retrograde: planetObj.retrograde
                 };
                 planetText.opacity(0.5);
-                hitRect.opacity(0.5);
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
@@ -656,7 +642,6 @@ class SouthIndianChartTemplate {
 
             const dragEndHandler = (e) => {
                 planetText.opacity(1);
-                hitRect.opacity(1);
 
                 const coordinator = window.app?.chartTemplates;
                 const targetHouse = coordinator?.resolveDropHouse({
@@ -689,10 +674,7 @@ class SouthIndianChartTemplate {
                 this.layer.batchDraw();
             };
 
-            // Add drag handlers to both hit rect and planet text
-            hitRect.on('dragstart', dragStartHandler);
             planetText.on('dragstart', dragStartHandler);
-            hitRect.on('dragend', dragEndHandler);
             planetText.on('dragend', dragEndHandler);
             this.chartGroupSouth.add(hitRect);
             this.chartGroupSouth.add(planetText);

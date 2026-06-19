@@ -139,8 +139,6 @@ class CitranaApp {
         const aboutModalClose = document.getElementById('about-modal-close');
         const welcomeModal = document.getElementById('welcome-modal');
         const welcomeModalClose = document.getElementById('welcome-modal-close');
-        const welcomeLoadingFill = document.querySelector('.welcome-loading-fill');
-        const welcomeLoadingText = document.querySelector('.welcome-loading-text');
 
         if (aboutBtn && aboutModal && aboutModalClose) {
             aboutBtn.addEventListener('click', () => {
@@ -1031,13 +1029,20 @@ class CitranaApp {
 
         const scaleBy = 1.1;
         const oldScale = this.stage.scaleX();
+        const MIN_ZOOM = 0.1;
+        const MAX_ZOOM = 5;
+
+        let newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
+        newScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newScale));
+
+        if (newScale === oldScale) {
+            return;
+        }
 
         const mousePointTo = {
             x: (pointer.x - this.stage.x()) / oldScale,
             y: (pointer.y - this.stage.y()) / oldScale
         };
-
-        const newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
 
         this.stage.scale({
             x: newScale,

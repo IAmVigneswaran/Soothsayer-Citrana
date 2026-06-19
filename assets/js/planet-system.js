@@ -454,21 +454,6 @@ class PlanetSystem {
             document.body.style.cursor = '';
         }
     }
-    getLibraryPosition() {
-        const rect = this.grahaLibrary.getBoundingClientRect();
-        return {
-            x: rect.left,
-            y: rect.top
-        };
-    }
-    setLibraryPosition(x, y) {
-        const maxX = window.innerWidth - this.grahaLibrary.offsetWidth;
-        const maxY = window.innerHeight - this.grahaLibrary.offsetHeight;
-        const clampedX = Math.max(0, Math.min(x, maxX));
-        const clampedY = Math.max(0, Math.min(y, maxY));
-        this.grahaLibrary.style.left = clampedX + 'px';
-        this.grahaLibrary.style.top = clampedY + 'px';
-    }
 
     // --- Planet Library and Drag-and-Drop ---
     createPlanetLibrary() {
@@ -742,17 +727,6 @@ class PlanetSystem {
     getPlanetInfo(abbr) {
         // Check all five pages for planet info
         return this.planetsPage1[abbr] || this.planetsPage2[abbr] || this.planetsPage3[abbr] || this.planetsPage4[abbr] || this.planetsPage5[abbr] || null;
-    }
-
-    getAllPlanets() {
-        // Return all planets from all five pages
-        return {
-            ...this.planetsPage1,
-            ...this.planetsPage2,
-            ...this.planetsPage3,
-            ...this.planetsPage4,
-            ...this.planetsPage5
-        };
     }
 
     // Paging methods
