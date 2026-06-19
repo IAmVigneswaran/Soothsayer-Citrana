@@ -21,9 +21,11 @@
 - Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, and undo/redo.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied unused code from older versions, including automatic chart restore on refresh and deprecated history helpers.
+- Further removed dead code — unused accessors, duplicate app-level selection state, orphan modal CSS, and unused chart-coordinator wrappers (no change to how the app behaves).
+- README aligned with in-app Help for **Delete** key routing (Graha first, then drawing), auto-switch to Select after arrow/line/text/heading, and one-shot bhava drop targeting.
 - Better layout when Citrana is opened from your iPhone home screen — floating controls sit correctly around the notch and home bar.
 - Browser chrome (`theme-color`, tile colour) aligned to the white UI theme.
-- Contributor docs (`AGENT.md`, `ARCHITECTURE.md`, `.cursorrules`) refreshed to match current behaviour and line counts; deploy workflow documented via `.github/workflows/static.yml` only.
+- Agent & AI Docs (`AGENT.md`, `ARCHITECTURE.md`, `.cursorrules`) refreshed to match current behaviour, module line counts, and deploy workflow (`.github/workflows/static.yml` only).
 
 **🐛 Bug Fixes:**
 - Fixed undo not covering some edits — centre label text, text and heading content, element drags, and arrow/line control-point adjustments now step correctly.

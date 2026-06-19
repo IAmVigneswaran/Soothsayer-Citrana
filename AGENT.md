@@ -22,17 +22,17 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2212-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2195-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---1320-lines)
+   - [Main Application (app.js)](#main-application-appjs---1314-lines)
    - [History Engine (history.js)](#history-engine-historyjs---77-lines)
-   - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---321-lines)
+   - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---299-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---962-lines)
    - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---928-lines)
    - [Planet System](#planet-system-planet-systemjs---839-lines)
-   - [Drawing Tools](#drawing-tools-drawing-toolsjs---1910-lines)
-   - [Context Menu](#context-menu-context-menujs---728-lines)
+   - [Drawing Tools](#drawing-tools-drawing-toolsjs---1902-lines)
+   - [Context Menu](#context-menu-context-menujs---721-lines)
    - [Edit UI](#edit-ui-edit-uijs---775-lines)
 6. [Core Features](#core-features)
    - [Undo / Redo](#undo--redo)
@@ -52,7 +52,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2212 lines)
+## CSS and Layout (styles.css - ~2195 lines)
 
 Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
 
@@ -66,21 +66,21 @@ Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px t
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~424 lines); viewport-fit=cover; PWA meta
+├── index.html                    # Main entry (~423 lines); viewport-fit=cover; PWA meta
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2212 lines)
+│   │   └── styles.css            # Complete styling system (~2195 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1320 lines)
+│   │   ├── app.js                # Main application coordinator (~1314 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
-│   │   ├── chart-coordinator.js  # Chart type management (~321 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (~299 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~962 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (~928 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~839 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (~1910 lines)
-│   │   ├── context-menu.js       # Context menu system (~728 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (~1902 lines)
+│   │   ├── context-menu.js       # Context menu system (~721 lines)
 │   │   ├── edit-ui.js            # Edit interface controls (~775 lines)
 │   │   └── history.js            # Unified undo/redo timeline (~77 lines)
 │   ├── vendor/
@@ -107,11 +107,11 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # This comprehensive documentation
-├── ARCHITECTURE.md               # System architecture and data flows
-├── .cursorrules                  # Cursor IDE configuration
-├── CHANGELOG.md                  # Version history and changes
-├── README.md                     # Project readme
+├── AGENT.md                      # This comprehensive documentation (~960 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~342 lines)
+├── .cursorrules                  # Cursor IDE configuration (~983 lines)
+├── CHANGELOG.md                  # Version history and changes (~53 lines)
+├── README.md                     # Project readme (~173 lines)
 ├── LICENSE                       # MIT License
 ├── SECURITY.md                   # Security policy
 └── .gitignore                    # Git ignore rules
@@ -123,7 +123,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1320 lines)
+### Main Application (app.js - ~1314 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -170,7 +170,7 @@ Key Methods:
 
 Wired in `app.setupComponents()` with `captureState` → `captureHistoryState()` and `restoreState` → `restoreHistoryState()`.
 
-### Chart Coordinator (chart-coordinator.js - ~321 lines)
+### Chart Coordinator (chart-coordinator.js - ~299 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -350,7 +350,7 @@ Key Methods:
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
 - `getPlanetInfo()`: Retrieve planet data from paged structure
 
-### Drawing Tools (drawing-tools.js - ~1910 lines)
+### Drawing Tools (drawing-tools.js - ~1902 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
@@ -392,7 +392,7 @@ Key Methods:
 - `updateControlPointsPosition()` / `clearControlPoints()`: Control point sync
 - `restorePersistedDrawings()`: Rebuild drawings from history snapshots
 
-### Context Menu (context-menu.js - ~728 lines)
+### Context Menu (context-menu.js - ~721 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:

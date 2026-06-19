@@ -59,17 +59,17 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1320 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (centralised **Delete** for Grahas and drawings), zoom lock, export, modals, history coordinator, undo/redo toolbar |
-| `history.js` | ~78 | Unified undo/redo timeline (`CitranaHistory`) |
-| `chart-coordinator.js` | ~321 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
+| `app.js` | ~1314 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (centralised **Delete** for Grahas and drawings), zoom lock, export, modals, history coordinator, undo/redo toolbar |
+| `history.js` | ~77 | Unified undo/redo timeline (`CitranaHistory`) |
+| `chart-coordinator.js` | ~299 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
 | `chart-templates-south.js` | ~962 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, `zoomToFit()` with local bounds |
 | `chart-templates-north.js` | ~928 | Diamond polygon chart, rashi boxes, Lagna rashi math, `zoomToFit()` with local bounds |
 | `planet-system.js` | ~839 | Graha library UI (5 pages), drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
-| `drawing-tools.js` | ~1910 | Drawing tools, selection, control points, Graha text editing, `makeShapeSelectable()` on stroke complete, history `recordHistory()` calls |
+| `drawing-tools.js` | ~1902 | Drawing tools, selection, control points, Graha text editing, `makeShapeSelectable()` on stroke complete, history `recordHistory()` calls |
 | `edit-ui.js` | ~775 | Floating property editor for drawing shapes (session-based undo on close) |
-| `context-menu.js` | ~728 | Right-click / long-press menus; unified hit-test routing |
+| `context-menu.js` | ~721 | Right-click / long-press menus; unified hit-test routing |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging |
-| `styles.css` | ~2212 | Light theme, floating UI, safe areas, iOS PWA layout, toolbar/zoom bar disabled states |
+| `styles.css` | ~2195 | Light theme, floating UI, safe areas, iOS PWA layout, toolbar/zoom bar disabled states |
 
 ## Canvas Object Naming
 
