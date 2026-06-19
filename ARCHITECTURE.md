@@ -59,17 +59,17 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1297 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, zoom lock, export, modals, history coordinator, undo/redo toolbar |
+| `app.js` | ~1320 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (centralised **Delete** for Grahas and drawings), zoom lock, export, modals, history coordinator, undo/redo toolbar |
 | `history.js` | ~78 | Unified undo/redo timeline (`CitranaHistory`) |
-| `chart-coordinator.js` | ~292 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
-| `chart-templates-south.js` | ~1062 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, `zoomToFit()` with local bounds |
-| `chart-templates-north.js` | ~968 | Diamond polygon chart, rashi boxes, Lagna rashi math, `zoomToFit()` with local bounds |
-| `planet-system.js` | ~854 | Graha library UI (5 pages), drag-and-drop via coordinator hit-test |
-| `drawing-tools.js` | ~1958 | Drawing tools, selection, control points, Graha text editing, history `recordHistory()` calls |
-| `edit-ui.js` | ~849 | Floating property editor for drawing shapes (session-based undo on close) |
+| `chart-coordinator.js` | ~321 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
+| `chart-templates-south.js` | ~962 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, `zoomToFit()` with local bounds |
+| `chart-templates-north.js` | ~928 | Diamond polygon chart, rashi boxes, Lagna rashi math, `zoomToFit()` with local bounds |
+| `planet-system.js` | ~839 | Graha library UI (5 pages), drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
+| `drawing-tools.js` | ~1910 | Drawing tools, selection, control points, Graha text editing, `makeShapeSelectable()` on stroke complete, history `recordHistory()` calls |
+| `edit-ui.js` | ~775 | Floating property editor for drawing shapes (session-based undo on close) |
 | `context-menu.js` | ~728 | Right-click / long-press menus; unified hit-test routing |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging |
-| `styles.css` | ~2215 | Light theme, floating UI, safe areas, iOS PWA layout, toolbar/zoom bar disabled states |
+| `styles.css` | ~2212 | Light theme, floating UI, safe areas, iOS PWA layout, toolbar/zoom bar disabled states |
 
 ## Canvas Object Naming
 
@@ -134,7 +134,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 1. User drags from Graha library → `PlanetSystem.handleDrop()` (desktop) or `handleMobileDrop()` (touch)
 2. Target bhava resolution (first match wins):
-   - **Selected bhava**: `window.selectedBhavaSouth` or `window.selectedBhavaNorth` if the user clicked a house first
+   - **Selected bhava** (one-shot): `window.selectedBhavaSouth` or `window.selectedBhavaNorth` if the user clicked a house first — cleared after the next successful drop (`PlanetSystem.clearSelectedBhavaDropTarget()`) or when clicking empty canvas (`app.js`)
    - **Pointer hit-test**: `ChartCoordinator.findHouseAtPointer()` or `findHouseAtClientPoint()`
 3. Coordinator converts coords with `stagePointerToChartCoords()` / `clientToChartCoords()`, then delegates to template `findHouseAtChartPoint()`:
    - **South**: axis-aligned rectangle test; nearest-centre fallback
@@ -145,13 +145,13 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 - **South Indian**
   - House menu only → **Set as Lagna** on the clicked bhava (no chart-level Lagna menu)
-  - `set-lagna` action → `setLagnaHouse(visualHouseNumber)`
+  - `set-lagna` action → `setLagnaHouse(visualHouseNumber)`; `loadChartData()` restores with `{ skipSnapshot: true }`
   - House menu header uses `getBhavaNumberForHouse()` — **House N** counts from Lagna
 - **North Indian**
   - Chart menu → **Set Lagna as…** → pick zodiac sign (`set-lagna` with `data-house` 1–12 = Rashi sign)
   - House menu → **Set as First House** → `set-first-house` → `getRashiNumberForHouse(visualHouse)` → `setLagnaHouse(rashi)`
   - `lagnaHouseNorth` stores **Rashi sign** (1–12), not visual house index
-  - `setLagnaHouse(n)` → renumber rashi boxes, `repositionPlanetsForNewLagna()`
+  - `setLagnaHouse(n, options?)` → renumber rashi boxes, `repositionPlanetsForNewLagna()`; `options.skipSnapshot` on undo restore
 
 `set-lagna` requires a `houseNumber`; if missing, the action is skipped (no default fallback).
 
@@ -196,7 +196,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 1. User selects tool in toolbar → `app.setTool()` → `DrawingTools.setTool()`
 2. Mouse/touch on stage → `startDrawing` / `draw` / `stopDrawing`
-3. Arrow, line, text, and heading auto-switch to Select after creation; Pen stays active. Control points appear when arrow/line is selected
+3. Arrow, line, text, and heading auto-switch to Select after creation; Pen stays active. `makeShapeSelectable()` runs once in `stopDrawing()` (not per mousemove). Control points appear when arrow/line is selected
 4. Mobile (`≤768px`): arrow, line, and pen toolbar buttons are hidden in CSS
 
 ### Undo / redo
@@ -232,8 +232,8 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | Symbol | Set by | Used for |
 |--------|--------|----------|
 | `window.app` | `index.html` on `DOMContentLoaded` | Cross-module access |
-| `window.selectedBhavaSouth` | South template house click | Optional drop target |
-| `window.selectedBhavaNorth` | North template house click | Optional drop target |
+| `window.selectedBhavaSouth` | South template house click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
+| `window.selectedBhavaNorth` | North template house click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
 | `localStorage.citrana_debug` | DevTools / manual | `'0'` silences `citranaDebug()`; default is on |
 
@@ -285,7 +285,7 @@ Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setup
 |--------|--------|
 | Engine | `CitranaHistory` — `entries[]`, `index`, `maxSteps: 50` |
 | Snapshot | `{ chartData, drawingData }` deep-cloned on each `record()` |
-| Keyboard | **Ctrl+Z** / **Cmd+Z** undo; **Ctrl+Y**, **Ctrl+Shift+Z**, **Cmd+Shift+Z** redo |
+| Keyboard | **Ctrl+Z** / **Cmd+Z** undo; **Ctrl+Y**, **Ctrl+Shift+Z**, **Cmd+Shift+Z** redo; **Delete** removes selected Graha first, else deletes selected drawing when Select tool is active |
 | Toolbar | `#undo-btn` / `#redo-btn` (first group); Lucide `undo-2` / `redo-2`; disabled via `updateHistoryButtons()` |
 | API | `app.recordHistory(label)`, `app.undo()`, `app.redo()`, `app.updateHistoryButtons()` |
 

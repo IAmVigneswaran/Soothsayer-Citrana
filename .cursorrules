@@ -18,23 +18,23 @@ This is Citrana, a web application built with pure HTML5, CSS3, and JavaScript u
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (406 lines); viewport-fit=cover; PWA meta
+├── index.html                    # Main entry (~424 lines); viewport-fit=cover; PWA meta
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2215 lines)
+│   │   └── styles.css            # Complete styling system (~2212 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1297 lines)
+│   │   ├── app.js                # Main application coordinator (~1320 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
-│   │   ├── chart-coordinator.js  # Chart type management (~292 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (~1060 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (~971 lines)
-│   │   ├── planet-system.js      # Graha library and drag-drop (~854 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (~1958 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (~321 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (~962 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (~928 lines)
+│   │   ├── planet-system.js      # Graha library and drag-drop (~839 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (~1910 lines)
 │   │   ├── context-menu.js       # Context menu system (~728 lines)
-│   │   ├── edit-ui.js            # Edit interface controls (~849 lines)
-│   │   └── history.js            # Unified undo/redo timeline (~78 lines)
+│   │   ├── edit-ui.js            # Edit interface controls (~775 lines)
+│   │   └── history.js            # Unified undo/redo timeline (~77 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
 │   │   └── lucide.min.js         # Lucide 0.468.0 (self-hosted)
@@ -202,7 +202,7 @@ The application uses a mobile-first approach with three main breakpoints:
 
 For system design, module boundaries, data flows, and extension points, see ARCHITECTURE.md.
 
-### Main Application (assets/js/app.js - ~1297 lines)
+### Main Application (assets/js/app.js - ~1320 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -232,9 +232,9 @@ Key Methods:
 - `showWelcomeModal()` / `showConfirmationDialog()`
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`
 
-Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
+Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` remove selected Graha or delete selected drawing (Select tool), `?`/`/` Help. No Heading shortcut.
 
-### History Engine (assets/js/history.js - ~78 lines)
+### History Engine (assets/js/history.js - ~77 lines)
 Unified undo/redo timeline for the entire session.
 
 Key Responsibilities:
@@ -246,7 +246,7 @@ Key Methods:
 
 Wired in `app.setupComponents()` with `captureHistoryState()` / `restoreHistoryState()`.
 
-### Chart Coordinator (assets/js/chart-coordinator.js - ~292 lines)
+### Chart Coordinator (assets/js/chart-coordinator.js - ~321 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -259,7 +259,7 @@ Key Responsibilities:
 
 Key Methods:
 - `createSouthIndianChart()` / `createNorthIndianChart()`: Initialise layouts
-- `setLagnaHouse()`: Set ascendant (South: visual house; North: rashi 1–12)
+- `setLagnaHouse(houseNumber, options?)`: Set ascendant; `options.skipSnapshot` suppresses undo step during `loadChartData()` restore (both templates)
 - `getChartData()` / `loadChartData()`: Serialise / restore chart (in-session)
 - `stagePointerToChartCoords()` / `clientToChartCoords()`: Map pointer to chart space
 - `findHouseAtChartPoint()` / `findHouseAtPointer()` / `findHouseAtClientPoint()`: Drop targeting
@@ -269,7 +269,7 @@ Key Methods:
 
 **Removed:** `setFirstHouse()`, `getDropZones()` (legacy).
 
-### South Indian Chart Template (assets/js/chart-templates-south.js - ~1060 lines)
+### South Indian Chart Template (assets/js/chart-templates-south.js - ~962 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 Key Responsibilities:
@@ -292,14 +292,14 @@ Key Methods:
 - `createSouthIndianChart()`: Build chart layout
 - `createHouse()`: Create individual house elements
 - `addPlanetToHouse()`: Place planets in houses
-- `setLagnaHouse()`: Set ascendant with visual indicator
+- `setLagnaHouse(houseNumber, options?)`: Set ascendant with visual indicator; `skipSnapshot` for undo restore
 - `renumberHouses()`: Update house numbering
 - `getBhavaNumberForHouse()`: Get house number (1–12 from Lagna) for a fixed grid cell
 - `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-house fallback) for library drops
 - `highlightHouse()` / `clearHighlight()`: Visual house selection
 - `zoomToFit()`: Fit chart using **local bounds**
 
-### North Indian Chart Template (assets/js/chart-templates-north.js - ~968 lines)
+### North Indian Chart Template (assets/js/chart-templates-north.js - ~928 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 
 Key Responsibilities:
@@ -321,14 +321,14 @@ Key Features:
 Key Methods:
 - `createNorthIndianChart()`: Build diamond layout
 - `addPlanetToHouse()`: Place planets in polygon houses
-- `setLagnaHouse()`: Set ascendant house
+- `setLagnaHouse(houseNumber, options?)`: Set Lagna rashi; renumber and `repositionPlanetsForNewLagna()`; `skipSnapshot` for undo restore
 - `renumberHouses()`: Update house numbering
 - `isPointInPolygon()`: Hit detection for polygon houses
 - `getRashiNumberForHouse()`: Rashi calculation
 - `findHouseAtChartPoint()`: Polygon hit-test (with nearest-centroid fallback)
 - `zoomToFit()`: Fit chart using **local bounds** (desktop `extraTopMargin=-50`)
 
-### Planet System (assets/js/planet-system.js - ~854 lines)
+### Planet System (assets/js/planet-system.js - ~839 lines)
 Manages the floating planet library and drag-and-drop functionality with paging system.
 
 Key Responsibilities:
@@ -420,12 +420,13 @@ Key Methods:
 - `setupDragAndDrop()`: Configure drag functionality
 - `handleDragStart/Move/End()`: Drag interaction handling
 - `handleTouchStart/Move/End()`: Touch interaction handling
-- `handleDrop()` / `handleMobileDrop()`: Place Graha on chart (selected bhava or pointer hit-test)
+- `handleDrop()` / `handleMobileDrop()`: Place Graha on chart (one-shot selected bhava or pointer hit-test)
+- `clearSelectedBhavaDropTarget()`: Clear `window.selectedBhavaSouth` / `window.selectedBhavaNorth` after a successful library drop
 - `findClosestHouse()`: Delegates to `ChartCoordinator.findHouseAtPointer()`
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()`
 - `getPlanetInfo()`: Retrieve planet data from paged structure
 
-### Drawing Tools (assets/js/drawing-tools.js - ~1958 lines)
+### Drawing Tools (assets/js/drawing-tools.js - ~1910 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
@@ -441,6 +442,7 @@ Key Features:
 - Control points for arrow/line; `Adjust drawing` on handle drag end
 - `bindMoveDragHistory()` for pen/text/heading reposition undo
 - Auto-switch to Select Tool after Arrow, Line, Text, and Heading creation; Pen stays active for continuous drawing
+- `makeShapeSelectable()` binds drag/selection once when a stroke completes (`stopDrawing`), not on every mousemove; touch double-tap guarded by `_editUiDoubleTapBound`
 
 Key Methods:
 - `startDrawing()` / `draw()` / `stopDrawing()`
@@ -476,7 +478,7 @@ Key Methods:
 - `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`
 - `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
-### Edit UI (assets/js/edit-ui.js - ~849 lines)
+### Edit UI (assets/js/edit-ui.js - ~775 lines)
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
@@ -520,13 +522,13 @@ Call `window.app.recordHistory('Label')` after undoable mutations. See [ARCHITEC
 - 51 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
 - Paging System: Five-page navigation with desktop dots and mobile swipe
 - Text-based Display: Uses abbreviations instead of symbols for better compatibility
-- Drag & Drop: Grahas from the floating library land in the bhava under the pointer (or in a previously selected bhava via `window.selectedBhavaSouth` / `window.selectedBhavaNorth`)
+- Drag & Drop: Grahas from the floating library land in the bhava under the pointer, or in a house you clicked first (`window.selectedBhavaSouth` / `window.selectedBhavaNorth` — one-shot: cleared after the next successful drop or when you click empty canvas)
 - Multiple Instances: Same planet can be placed multiple times
 - Dynamic Text Sizing: Planet text scales based on house occupancy
 - Touch Support: Mobile-friendly touch interactions with visual feedback
 - Degree Support: Add degree positions to Grahas (e.g., "Su-20")
 - Graha Editing: Double-click a Graha, or right-click → **Edit Graha**, to open the floating edit panel (label, colour, retrograde)
-- Graha Deletion: Right-click → **Delete Graha**, or delete from the edit panel
+- Graha Deletion: Right-click → **Delete Graha**, delete from the edit panel, or press **Delete** when a Graha is selected
 - Retrograde Display: Underlined Graha text via Konva `textDecoration` (stored as `retrograde: boolean` on planet data, not appended to the label)
 - Legacy Migration: Older charts that used the Unicode subscript `ᵣ` are normalised automatically (marker removed, underline applied)
 - 8-Character Limit: Applies to Graha label text only; retrograde does not consume a character slot

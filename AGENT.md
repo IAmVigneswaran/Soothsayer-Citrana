@@ -22,18 +22,18 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2215-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2212-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---1297-lines)
-   - [History Engine (history.js)](#history-engine-historyjs---78-lines)
-   - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---292-lines)
-   - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---1062-lines)
-   - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---968-lines)
-   - [Planet System](#planet-system-planet-systemjs---854-lines)
-   - [Drawing Tools](#drawing-tools-drawing-toolsjs---1958-lines)
+   - [Main Application (app.js)](#main-application-appjs---1320-lines)
+   - [History Engine (history.js)](#history-engine-historyjs---77-lines)
+   - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---321-lines)
+   - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---962-lines)
+   - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---928-lines)
+   - [Planet System](#planet-system-planet-systemjs---839-lines)
+   - [Drawing Tools](#drawing-tools-drawing-toolsjs---1910-lines)
    - [Context Menu](#context-menu-context-menujs---728-lines)
-   - [Edit UI](#edit-ui-edit-uijs---849-lines)
+   - [Edit UI](#edit-ui-edit-uijs---775-lines)
 6. [Core Features](#core-features)
    - [Undo / Redo](#undo--redo)
    - [Chart Types](#chart-types)
@@ -52,7 +52,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2215 lines)
+## CSS and Layout (styles.css - ~2212 lines)
 
 Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
 
@@ -66,23 +66,23 @@ Light theme, floating UI, modals, responsive breakpoints (769px desktop, 768px t
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (406 lines); viewport-fit=cover; PWA meta
+├── index.html                    # Main entry (~424 lines); viewport-fit=cover; PWA meta
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2215 lines)
+│   │   └── styles.css            # Complete styling system (~2212 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1297 lines)
+│   │   ├── app.js                # Main application coordinator (~1320 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
-│   │   ├── chart-coordinator.js  # Chart type management (~292 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (~1060 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (~971 lines)
-│   │   ├── planet-system.js      # Graha library and drag-drop (~854 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (~1958 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (~321 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (~962 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (~928 lines)
+│   │   ├── planet-system.js      # Graha library and drag-drop (~839 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (~1910 lines)
 │   │   ├── context-menu.js       # Context menu system (~728 lines)
-│   │   ├── edit-ui.js            # Edit interface controls (~849 lines)
-│   │   └── history.js            # Unified undo/redo timeline (~78 lines)
+│   │   ├── edit-ui.js            # Edit interface controls (~775 lines)
+│   │   └── history.js            # Unified undo/redo timeline (~77 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
 │   │   └── lucide.min.js         # Lucide 0.468.0 (self-hosted)
@@ -123,7 +123,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1297 lines)
+### Main Application (app.js - ~1320 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -153,9 +153,9 @@ Key Methods:
 - `showWelcomeModal()` / `showConfirmationDialog()`
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`
 
-Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
+Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` remove selected Graha or delete selected drawing (Select tool), `?`/`/` Help. No Heading shortcut.
 
-### History Engine (history.js - ~78 lines)
+### History Engine (history.js - ~77 lines)
 Unified undo/redo timeline for the entire session.
 
 Key Responsibilities:
@@ -170,7 +170,7 @@ Key Methods:
 
 Wired in `app.setupComponents()` with `captureState` → `captureHistoryState()` and `restoreState` → `restoreHistoryState()`.
 
-### Chart Coordinator (chart-coordinator.js - ~292 lines)
+### Chart Coordinator (chart-coordinator.js - ~321 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -183,7 +183,7 @@ Key Responsibilities:
 
 Key Methods:
 - `createSouthIndianChart()` / `createNorthIndianChart()`: Initialise layouts
-- `setLagnaHouse()`: Set ascendant (South: visual house; North: rashi 1–12)
+- `setLagnaHouse(houseNumber, options?)`: Set ascendant; `options.skipSnapshot` suppresses undo step during `loadChartData()` restore (both templates)
 - `getChartData()` / `loadChartData()`: Serialise / restore chart (in-session)
 - `stagePointerToChartCoords()` / `clientToChartCoords()`: Map pointer to chart space
 - `findHouseAtChartPoint()` / `findHouseAtPointer()` / `findHouseAtClientPoint()`: Drop targeting
@@ -193,7 +193,7 @@ Key Methods:
 
 **Removed:** `setFirstHouse()`, `getDropZones()` (legacy).
 
-### South Indian Chart Template (chart-templates-south.js - ~1060 lines)
+### South Indian Chart Template (chart-templates-south.js - ~962 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 Key Responsibilities:
@@ -216,14 +216,14 @@ Key Methods:
 - `createSouthIndianChart()`: Build chart layout
 - `createHouse()`: Create individual house elements
 - `addPlanetToHouse()`: Place planets in houses
-- `setLagnaHouse()`: Set ascendant with visual indicator
+- `setLagnaHouse(houseNumber, options?)`: Set ascendant with visual indicator; `skipSnapshot` for undo restore
 - `renumberHouses()`: Update house numbering
 - `getBhavaNumberForHouse()`: Get house number (1–12 from Lagna) for a fixed grid cell
 - `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-house fallback) for library drops
 - `highlightHouse()` / `clearHighlight()`: Visual house selection
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (immune to current zoom/pan)
 
-### North Indian Chart Template (chart-templates-north.js - ~968 lines)
+### North Indian Chart Template (chart-templates-north.js - ~928 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 
 Key Responsibilities:
@@ -245,14 +245,14 @@ Key Features:
 Key Methods:
 - `createNorthIndianChart()`: Build diamond layout
 - `addPlanetToHouse()`: Place planets in polygon houses
-- `setLagnaHouse()`: Set ascendant house
+- `setLagnaHouse(houseNumber, options?)`: Set Lagna rashi; renumber and `repositionPlanetsForNewLagna()`; `skipSnapshot` for undo restore
 - `renumberHouses()`: Update house numbering
 - `isPointInPolygon()`: Hit detection for polygon houses
 - `getRashiNumberForHouse()`: Rashi calculation
 - `findHouseAtChartPoint()`: Polygon hit-test (with nearest-centroid fallback) for library drops
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (desktop `extraTopMargin=-50`)
 
-### Planet System (planet-system.js - ~854 lines)
+### Planet System (planet-system.js - ~839 lines)
 Manages the floating planet library and drag-and-drop functionality with paging system.
 
 Key Responsibilities:
@@ -344,12 +344,13 @@ Key Methods:
 - `setupDragAndDrop()`: Configure drag functionality
 - `handleDragStart/Move/End()`: Drag interaction handling
 - `handleTouchStart/Move/End()`: Touch interaction handling
-- `handleDrop()` / `handleMobileDrop()`: Place Graha on chart (selected bhava or pointer hit-test)
+- `handleDrop()` / `handleMobileDrop()`: Place Graha on chart (one-shot selected bhava or pointer hit-test)
+- `clearSelectedBhavaDropTarget()`: Clear `window.selectedBhavaSouth` / `window.selectedBhavaNorth` after a successful library drop
 - `findClosestHouse()`: Delegates to `ChartCoordinator.findHouseAtPointer()` (Konva pointer during HTML5 drop)
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
 - `getPlanetInfo()`: Retrieve planet data from paged structure
 
-### Drawing Tools (drawing-tools.js - ~1958 lines)
+### Drawing Tools (drawing-tools.js - ~1910 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
@@ -377,6 +378,7 @@ Key Features:
 - Graha text editing with retrograde underline support (Konva `textDecoration`)
 - Graha edit sessions commit on Save / dismiss when dirty (`planetEditSession`)
 - Auto-switch to Select Tool after Arrow, Line, Text, and Heading creation; Pen stays active for continuous drawing
+- `makeShapeSelectable()` binds drag/selection once when a stroke completes (`stopDrawing`), not on every mousemove; touch double-tap guarded by `_editUiDoubleTapBound`
 - Control points for precise arrow and line adjustment; `Adjust drawing` on handle drag end
 
 Key Methods:
@@ -417,7 +419,7 @@ Key Methods:
 - `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`
 - `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
-### Edit UI (edit-ui.js - ~849 lines)
+### Edit UI (edit-ui.js - ~775 lines)
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
@@ -485,13 +487,13 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - 51 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
 - Paging System: Five-page navigation with desktop dots and mobile swipe
 - Text-based Display: Uses abbreviations instead of symbols for better compatibility
-- Drag & Drop: Grahas from the floating library land in the bhava under the pointer (or in a previously selected bhava via `window.selectedBhavaSouth` / `window.selectedBhavaNorth`)
+- Drag & Drop: Grahas from the floating library land in the bhava under the pointer, or in a house you clicked first (`window.selectedBhavaSouth` / `window.selectedBhavaNorth` — one-shot: cleared after the next successful drop or when you click empty canvas)
 - Multiple Instances: Same planet can be placed multiple times
 - Dynamic Text Sizing: Planet text scales based on house occupancy
 - Touch Support: Mobile-friendly touch interactions with visual feedback
 - Degree Support: Add degree positions to Grahas (e.g., "Su-20")
 - Graha Editing: Double-click a Graha, or right-click → **Edit Graha**, to open the floating edit panel (label, colour, retrograde)
-- Graha Deletion: Right-click → **Delete Graha**, or delete from the edit panel
+- Graha Deletion: Right-click → **Delete Graha**, delete from the edit panel, or press **Delete** when a Graha is selected
 - Retrograde Display: Underlined Graha text via Konva `textDecoration` (stored as `retrograde: boolean` on planet data, not appended to the label)
 - Legacy Migration: Older charts that used the Unicode subscript `ᵣ` are normalised automatically (marker removed, underline applied)
 - 8-Character Limit: Applies to Graha label text only; retrograde does not consume a character slot

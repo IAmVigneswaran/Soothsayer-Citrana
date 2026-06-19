@@ -20,8 +20,10 @@
 - South Indian house menus show **House** numbers based on where Lagna is set.
 - Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, and undo/redo.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
-- Tidied unused code from older versions, including automatic chart restore on refresh.
+- Tidied unused code from older versions, including automatic chart restore on refresh and deprecated history helpers.
 - Better layout when Citrana is opened from your iPhone home screen — floating controls sit correctly around the notch and home bar.
+- Browser chrome (`theme-color`, tile colour) aligned to the white UI theme.
+- Contributor docs (`AGENT.md`, `ARCHITECTURE.md`, `.cursorrules`) refreshed to match current behaviour and line counts; deploy workflow documented via `.github/workflows/static.yml` only.
 
 **🐛 Bug Fixes:**
 - Fixed undo not covering some edits — centre label text, text and heading content, element drags, and arrow/line control-point adjustments now step correctly.
@@ -35,6 +37,11 @@
 - Fixed South Indian **Reset Zoom** jumping to the wrong size after manual zoom — it now returns to the same fit as when the chart first appeared.
 - Fixed bottom controls sitting too high on iPhone when the app is installed to the home screen.
 - Fixed desktop zoom bar and About button sitting too low after the iPhone layout improvements.
+- Fixed heading annotations not showing the correct Edit UI when selected with the Select tool.
+- Fixed touch drawing stacking duplicate tap handlers while drawing arrows, lines, or pen strokes.
+- Fixed **Delete** key — removes the selected Graha first, then the selected drawing when the Select tool is active (no duplicate per-chart listeners).
+- Fixed library drops still targeting a previously clicked house after that drop — selected bhava is now one-shot (cleared after drop or when you click empty canvas).
+- Fixed North Indian undo restore adding an extra **Set Lagna** step or leaving Grahas misaligned after Lagna restore.
 
 ---
 
