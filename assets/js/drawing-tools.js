@@ -1161,6 +1161,8 @@ class DrawingTools {
             toolType = 'line';
         } else if (shape.name().includes('drawing-pen')) {
             toolType = 'pen';
+        } else if (shape.name().includes('drawing-heading')) {
+            toolType = 'heading';
         } else if (shape.name().includes('drawing-text')) {
             toolType = 'text';
         }
@@ -1548,7 +1550,8 @@ class DrawingTools {
     }
 
     /**
-     * Show Edit UI for a specific element
+     * Show floating Edit UI for style controls (stroke, font, colour, delete).
+     * Content edits use inline editors; heading line count is limited in editHeading().
      * @param {Object} element - The Konva element to edit
      * @param {string} tool - The tool type
      */
@@ -1567,12 +1570,7 @@ class DrawingTools {
         });
 
         // Show Edit UI for the clicked element
-        if (tool === 'heading') {
-            // Show Edit UI with 2-line limit
-            this.editUI.show(element, 'heading');
-        } else {
-            this.editUI.show(element, tool);
-        }
+        this.editUI.show(element, tool);
     }
 
     /**
@@ -1706,6 +1704,10 @@ class DrawingTools {
         });
     }
 
+    /**
+     * Inline heading editor (double-click / double-tap). Enforces a 2-line limit.
+     * @param {Konva.Text} heading
+     */
     editHeading(heading) {
         // Prevent multiple textareas
         const existingTextarea = document.querySelector('.konva-textarea');
@@ -1756,7 +1758,6 @@ class DrawingTools {
         textarea.style.WebkitTouchAction = 'manipulation';
         textarea.rows = 2;
         textarea.maxLength = 200;
-        // Enforce 2-line limit
         textarea.addEventListener('input', function() {
             const lines = textarea.value.split('\n');
             if (lines.length > 2) {
