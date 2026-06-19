@@ -32,7 +32,7 @@ This codebase is developed using AI agents.
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
-- Chart Display Options: Hide North or South chart indicators from the toolbar **Options** modal; preferences persist in this browser
+- Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark), from the toolbar **Options** modal; preferences persist in this browser
 - Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear House**, **Edit Graha**, **Delete Graha**, and more)
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
@@ -127,7 +127,7 @@ South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click a
 
 North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First House** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign. Grahas reposition automatically when Lagna changes.
 
-Chart Display Options: Click the gear icon in the toolbar (after Save) to open **Options**. Toggle **Hide North Indian Chart Indicators** to hide bhava numbers (black corner boxes). Toggle **Hide South Indian Chart Indicators** to hide the lagna diagonal line, yellow bhava numbers, and black rashi numbers. Preferences are saved in this browser and apply immediately; they are not included in undo/redo.
+Chart Display Options: Click the gear icon in the toolbar (after Save) to open **Options**. Toggle **Hide North Indian Chart Indicators** to hide bhava numbers (black corner boxes). Toggle **Hide South Indian Chart Indicators** to hide the lagna diagonal line, yellow bhava numbers, and black rashi numbers. Toggle **Save Chart Only** to export only the chart area when you click Save — Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out of the image. The export uses a transparent background and omits the watermark (Toggle Transparency is turned on automatically). Preferences are saved in this browser; they are not included in undo/redo.
 
 ### Working with Grahas
 
@@ -147,9 +147,9 @@ Navigation: Zoom is locked by default. Use the zoom bar to zoom in or out, or cl
 
 ### Export and Limitations
 
-Export Options: Click the save button to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image.
+Export Options: Click the save button to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image. With **Save Chart Only** enabled in **Options**, Save exports only the chart area (transparent, no watermark) instead of the full canvas.
 
-Export Viewpoint: Exported images will always follow and inherit the browser's current viewpoint. If you resize the browser window, the exported image will reflect the visible area accordingly. Adjust your browser window size and zoom level before exporting to achieve the desired output.
+Export Viewpoint: By default, exported images follow the browser's current viewpoint — window size and zoom/pan affect the output. With **Save Chart Only** enabled, Save fits the chart and ignores your current zoom and pan; only the chart area is exported, and anything outside the chart boundary is left out of the image.
 
 Single Chart Limitation: Citrana does not and will not support multiple charts in a single canvas. To create another chart, open a new browser window or tab. This ensures optimal performance and prevents conflicts between different chart configurations. Additionally, images can be saved with transparency enabled (Toggle Transparency Button) and imported into other canvas applications such as tldraw for advanced annotation and note-taking workflows.
 

@@ -59,9 +59,9 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1394 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (centralised **Delete** for Grahas and drawings), zoom lock, export, modals (including Options), chart display preferences, history coordinator, undo/redo toolbar |
+| `app.js` | ~1480 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (centralised **Delete** for Grahas and drawings), zoom lock, export (full viewport or chart-only crop), modals (including Options), chart display preferences, history coordinator, undo/redo toolbar |
 | `history.js` | ~77 | Unified undo/redo timeline (`CitranaHistory`) |
-| `chart-coordinator.js` | ~299 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
+| `chart-coordinator.js` | ~360 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `chart-templates-south.js` | ~993 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds |
 | `chart-templates-north.js` | ~949 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds |
 | `planet-system.js` | ~839 | Graha library UI (5 pages), drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
@@ -212,22 +212,34 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 **Edit sessions** (one step on commit, not per click): drawing Edit UI (`hide()`), Graha text bar (`finish(true)`), inline text/heading double-click editors.
 
-**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals, chart indicator visibility preferences. **Deferred 2.1:** visible History panel.
+**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference. **Deferred 2.1:** visible History panel.
 
 ### Chart display options
 
 1. User opens `#options-btn` (gear, toolbar export group) → `#options-modal`
-2. Toggle **Hide North Indian Chart Indicators** or **Hide South Indian Chart Indicators**
-3. `app.setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)` updates `app.options` and `localStorage` (`citrana_north_hide_indicators` / `citrana_south_hide_indicators`, value `'1'` when hidden)
-4. Active chart template applies immediately via `applyNorthIndicatorsPreference()` or `applySouthIndicatorsPreference()`:
+2. Toggle **Hide North Indian Chart Indicators**, **Hide South Indian Chart Indicators**, and/or **Save Chart Only**
+3. Indicator toggles → `app.setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)` → `localStorage` (`citrana_north_hide_indicators` / `citrana_south_hide_indicators`, `'1'` when hidden)
+4. Active chart template applies indicators via `applyNorthIndicatorsPreference()` or `applySouthIndicatorsPreference()`:
    - **North**: `tinyBoxGroupNorth.visible(!hide)`
    - **South**: lagna diagonal lines, yellow bhava boxes, black rashi boxes via `setSouthIndicatorsVisible()`
-5. Templates call `apply*IndicatorsPreference()` on chart create and Lagna changes; preference survives refresh but is **not** in undo snapshots
+5. **Save Chart Only** → `app.setSaveChartOnly(enabled)` → `localStorage.citrana_save_chart_only`; forces `exportWithWhiteBg = false` and locks `#toggle-transparency-btn` via `applySaveChartOnlyTransparency()`
+6. Indicator prefs reapply on chart create and Lagna changes; all option prefs survive refresh but are **not** in undo snapshots
 
 ### Export
 
-1. `app.exportChart()` → optional white background rect → `stage.toDataURL({ pixelRatio: 2 })`
-2. Offscreen canvas adds padding + watermark → download as `citrana-chart-{timestamp}.png`
+**Full viewport** (default, or Save Chart Only with no chart loaded):
+
+1. `app.exportChart()` → optional full-stage white background rect → `stage.toDataURL({ pixelRatio: 2 })`
+2. `finalizeExportImage()` adds 100px padding + watermark → download as `citrana-chart-{timestamp}.png`
+3. Follows current zoom/pan and `#toggle-transparency-btn`
+
+**Save Chart Only** (`options.saveChartOnly` and `hasActiveChart()`):
+
+1. Save stage scale/position; `drawingTools.clearControlPoints()` if needed
+2. `chartTemplates.zoomToFit()` then `getExportCropRect()` (chart group bounds; North unions visible `tinyBoxGroupNorth`)
+3. `stage.toDataURL({ x, y, width, height, pixelRatio: 2 })` — Grahas and layer annotations inside the crop are included; anything outside is clipped
+4. Restore zoom/pan and control points
+5. `finalizeExportImage({ chartOnly: true })` — transparent background, no padding, no watermark
 
 ### Session model (ephemeral)
 
@@ -247,6 +259,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
 | `localStorage.citrana_north_hide_indicators` | Options modal (North toggle) | `'1'` hides North bhava corner boxes; key removed when shown |
 | `localStorage.citrana_south_hide_indicators` | Options modal (South toggle) | `'1'` hides South lagna line and bhava/rashi boxes; key removed when shown |
+| `localStorage.citrana_save_chart_only` | Options modal (Save Chart Only) | `'1'` enables chart-area export (transparent, no watermark); key removed when off |
 | `localStorage.citrana_debug` | DevTools / manual | `'0'` silences `citranaDebug()`; default is on |
 
 ## Debug logging
@@ -312,7 +325,7 @@ Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setup
 
 ### Not tracked
 
-Zoom level, pan position, active tool, bhava selection highlight, Graha library page, modal/UI state, chart indicator visibility preferences.
+Zoom level, pan position, active tool, bhava selection highlight, Graha library page, modal/UI state, chart indicator visibility preferences, Save Chart Only export preference.
 
 ### Extension
 
@@ -336,8 +349,9 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 | Library drop hit-test | `findHouseAtChartPoint()` in template; coords in `ChartCoordinator` |
 | Zoom fit behaviour | `zoomToFit()` in chart template |
 | Theme / layout / safe areas | `assets/css/styles.css` |
-| Export behaviour | `app.exportChart()` |
+| Export behaviour | `app.exportChart()` / `finalizeExportImage()`; crop bounds in `ChartCoordinator.getExportCropRect()` |
 | Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
+| Save Chart Only export | `app.setSaveChartOnly()`, `applySaveChartOnlyTransparency()`, `#save-chart-only-toggle` in `index.html` |
 | Undo/redo | `history.js`, `app.recordHistory()` / `captureHistoryState()` / `updateHistoryButtons()` |
 
 ## Known Limitations

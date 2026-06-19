@@ -297,4 +297,64 @@ class ChartCoordinator {
             this.northIndianTemplate.clearAllPlanets();
         }
     }
+
+    hasActiveChart() {
+        return !!(this.southIndianTemplate?.chartGroupSouth || this.northIndianTemplate?.chartGroupNorth);
+    }
+
+    /**
+     * Stage-pixel crop rectangle for chart-only PNG export (after zoomToFit).
+     * @returns {{ x: number, y: number, width: number, height: number } | null}
+     */
+    getExportCropRect() {
+        const rects = [];
+
+        if (this.southIndianTemplate?.chartGroupSouth) {
+            rects.push(this.southIndianTemplate.chartGroupSouth.getClientRect());
+        } else if (this.northIndianTemplate?.chartGroupNorth) {
+            rects.push(this.northIndianTemplate.chartGroupNorth.getClientRect());
+            const tinyBoxes = this.northIndianTemplate.tinyBoxGroupNorth;
+            if (tinyBoxes && tinyBoxes.visible()) {
+                rects.push(tinyBoxes.getClientRect());
+            }
+        } else {
+            return null;
+        }
+
+        return this.unionClientRects(rects);
+    }
+
+    unionClientRects(rects) {
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+
+        for (const rect of rects) {
+            if (!rect || rect.width <= 0 || rect.height <= 0) {
+                continue;
+            }
+            minX = Math.min(minX, rect.x);
+            minY = Math.min(minY, rect.y);
+            maxX = Math.max(maxX, rect.x + rect.width);
+            maxY = Math.max(maxY, rect.y + rect.height);
+        }
+
+        if (!isFinite(minX) || !this.stage) {
+            return null;
+        }
+
+        const stageWidth = this.stage.width();
+        const stageHeight = this.stage.height();
+        const x = Math.max(0, minX);
+        const y = Math.max(0, minY);
+        const width = Math.min(stageWidth, maxX) - x;
+        const height = Math.min(stageHeight, maxY) - y;
+
+        if (width <= 0 || height <= 0) {
+            return null;
+        }
+
+        return { x, y, width, height };
+    }
 }

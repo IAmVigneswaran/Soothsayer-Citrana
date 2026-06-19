@@ -10,7 +10,7 @@ This is Citrana, a web application built with pure HTML5, CSS3, and JavaScript u
 - Graphics: HTML5 Canvas API with Konva.js (self-hosted, `assets/vendor/konva.min.js` v9.3.20)
 - Styling: Custom CSS only
 - Icons: Lucide Icons (self-hosted, `assets/vendor/lucide.min.js` v0.468.0)
-- Storage: Browser `localStorage` for preferences (welcome modal, chart indicator toggles, debug opt-out)
+- Storage: Browser `localStorage` for preferences (welcome modal, chart indicator toggles, Save Chart Only export, debug opt-out)
 - Analytics: Google Analytics and Google Tag Manager
 - No build process required - runs entirely in browser
 
@@ -18,16 +18,16 @@ This is Citrana, a web application built with pure HTML5, CSS3, and JavaScript u
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~454 lines); viewport-fit=cover; PWA meta; Options modal
+├── index.html                    # Main entry (~461 lines); viewport-fit=cover; PWA meta; Options modal
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
 │   │   └── styles.css            # Complete styling system (~2260 lines)
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1394 lines)
+│   │   ├── app.js                # Main application coordinator (~1480 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
-│   │   ├── chart-coordinator.js  # Chart type management (~299 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (~360 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~993 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (~949 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~839 lines)
@@ -59,9 +59,9 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # Comprehensive documentation (~974 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~355 lines)
-├── .cursorrules                  # This Cursor IDE configuration (~995 lines)
+├── AGENT.md                      # Comprehensive documentation (~979 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~369 lines)
+├── .cursorrules                  # This Cursor IDE configuration (~1000 lines)
 ├── CHANGELOG.md                  # Version history and changes (~57 lines)
 ├── README.md                     # Project readme (~177 lines)
 ├── LICENSE                       # MIT License
@@ -202,7 +202,7 @@ The application uses a mobile-first approach with three main breakpoints:
 
 For system design, module boundaries, data flows, and extension points, see ARCHITECTURE.md.
 
-### Main Application (assets/js/app.js - ~1394 lines)
+### Main Application (assets/js/app.js - ~1480 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -211,8 +211,8 @@ Key Responsibilities:
 - Manages tool selection and drawing state
 - Handles keyboard shortcuts and event listeners
 - Manages unified undo/redo via `CitranaHistory` (`history.js`)
-- Handles chart export
-- Manages chart display options modal and `localStorage` indicator preferences
+- Handles chart export (full viewport or chart-only crop via Options)
+- Manages chart display options modal and `localStorage` preferences (indicators, Save Chart Only)
 - Provides mobile touch support and Safari compatibility
 - Manages zoom controls, zoom lock (default locked), zoom level display, and canvas resize (`visualViewport`)
 
@@ -226,8 +226,9 @@ Key Methods:
 - `updateZoomLevel()`: Updates `#zoom-level` from `stage.scaleX()`
 - `handleResize()`: Stage size from `visualViewport` or container
 - `handleWheel()`: Desktop wheel zoom about pointer when unlocked; early return when locked (no `preventDefault`)
-- `exportChart()`: PNG export (`pixelRatio: 2`)
+- `exportChart()` / `finalizeExportImage()`: PNG export (`pixelRatio: 2`); full stage or chart-only crop when `options.saveChartOnly`
 - `setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)`: Persist indicator toggles; apply to active chart template
+- `setSaveChartOnly(enabled)` / `applySaveChartOnlyTransparency()` / `updateTransparencyToggleUI()`: Chart-only export; forces transparent export and locks `#toggle-transparency-btn`
 - `recordHistory()` / `captureHistoryState()` / `restoreHistoryState()`: Undo timeline integration
 - `undo()` / `redo()` / `updateHistoryButtons()`: Delegate to `this.history`; sync `#undo-btn` / `#redo-btn` disabled state
 - `clearChart()` / `resetChart()` / `resetDrawings()`
@@ -248,7 +249,7 @@ Key Methods:
 
 Wired in `app.setupComponents()` with `captureHistoryState()` / `restoreHistoryState()`.
 
-### Chart Coordinator (assets/js/chart-coordinator.js - ~299 lines)
+### Chart Coordinator (assets/js/chart-coordinator.js - ~360 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -266,6 +267,7 @@ Key Methods:
 - `stagePointerToChartCoords()` / `clientToChartCoords()`: Map pointer to chart space
 - `findHouseAtChartPoint()` / `findHouseAtPointer()` / `findHouseAtClientPoint()`: Drop targeting
 - `zoomIn()` / `zoomOut()` / `zoomToFit()` / `updateZoomLevel()`
+- `hasActiveChart()` / `getExportCropRect()` / `unionClientRects()`: Chart-only PNG crop bounds in stage pixels
 - `addPlanetToHouse()`, `clearAllPlanets()`, `highlightHouse()`, `clearHighlight()`, `renumberHouses()`, `clearChart()`
 - `getStage()`: Konva stage (used by Graha library drop coords)
 
@@ -506,7 +508,7 @@ Key Methods:
 ### Undo / Redo
 Unified **50-step** timeline via `CitranaHistory` (`history.js`). Toolbar **Undo** / **Redo** buttons (`#undo-btn`, `#redo-btn`, Lucide `undo-2` / `redo-2`) plus **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Ctrl+Shift+Z** / **Cmd+Shift+Z** redo. Buttons disable when `canUndo()` / `canRedo()` is false.
 
-Snapshots chart data + `drawing-*` nodes. **Not tracked:** zoom, pan, tool selection, bhava highlight, UI state, chart indicator visibility preferences. **Deferred 2.1:** visible History panel.
+Snapshots chart data + `drawing-*` nodes. **Not tracked:** zoom, pan, tool selection, bhava highlight, UI state, chart indicator visibility preferences, Save Chart Only export preference. **Deferred 2.1:** visible History panel.
 
 Call `window.app.recordHistory('Label')` after undoable mutations. See [ARCHITECTURE.md](ARCHITECTURE.md#undo--redo).
 
@@ -521,8 +523,9 @@ Call `window.app.recordHistory('Label')` after undoable mutations. See [ARCHITEC
 - **Options modal**: `#options-btn` (gear icon in toolbar export group, after Save) opens `#options-modal`
 - **Hide North Indian Chart Indicators**: Hides bhava numbers in black corner boxes (`tinyBoxGroupNorth`)
 - **Hide South Indian Chart Indicators**: Hides lagna diagonal line, yellow bhava boxes, and black rashi boxes
-- **Persistence**: `localStorage.citrana_north_hide_indicators` and `citrana_south_hide_indicators` (`'1'` when hidden); default is visible
-- **Undo**: Indicator visibility is not tracked in the undo timeline
+- **Save Chart Only**: Same `#export-btn` exports only the chart area — fits chart, ignores zoom/pan, crops to chart bounds, transparent background, no watermark; locks `#toggle-transparency-btn`. Falls back to full viewport when no chart
+- **Persistence**: `localStorage.citrana_north_hide_indicators`, `citrana_south_hide_indicators`, `citrana_save_chart_only` (`'1'` when enabled)
+- **Undo**: Options preferences are not tracked in the undo timeline
 
 ### Chart Management Actions
 - Clear Canvas: Removes everything (charts, planets, drawings) and returns to blank canvas
@@ -582,12 +585,14 @@ Technical Implementation:
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First-time user experience with getting started guide
-- Options Modal: Chart indicator visibility toggles (North/South); shared modal width with Help
+- Options Modal: Chart indicator toggles and **Save Chart Only** export; shared modal width with Help
 - Zoom Controls: `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock` (default locked), `#zoom-level`; mobile adds Select/Hand in zoom bar
 - Zoom Lock: Prevents accidental scroll-wheel and +/- zoom until user unlocks; reset zoom always available
 
 ### Export & Sharing
-- High-Resolution PNG: Export at `pixelRatio: 2` with padding and watermark
+- **Full viewport export** (default): entire stage capture; 100px padding and watermark; respects zoom/pan and transparency toggle
+- **Save Chart Only**: chart-area crop via `getExportCropRect()` after temporary `zoomToFit()`; transparent, no padding or watermark; restores zoom/pan after capture
+- High-Resolution PNG: `pixelRatio: 2` for both modes
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
 - Cross-Platform: Works on all modern browsers
 - GitHub Pages Compatible: No build process required
@@ -958,7 +963,7 @@ Edit the planets objects in assets/js/planet-system.js:
 ### Data Management
 - Chart work lives in the browser tab for the current visit only; refreshing the page starts a fresh session
 - Export PNG to keep a copy; chart data is not uploaded to a server
-- `localStorage` is used for preferences: welcome modal seen (`citrana_welcome_seen`), chart indicator toggles (`citrana_north_hide_indicators`, `citrana_south_hide_indicators`), optional `citrana_debug` opt-out
+- `localStorage` is used for preferences: welcome modal seen (`citrana_welcome_seen`), chart indicator toggles (`citrana_north_hide_indicators`, `citrana_south_hide_indicators`), Save Chart Only export (`citrana_save_chart_only`), optional `citrana_debug` opt-out
 
 ## Support and Documentation
 

@@ -20,7 +20,8 @@ class CitranaApp {
         this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
         this.options = {
             northHideIndicators: localStorage.getItem('citrana_north_hide_indicators') === '1',
-            southHideIndicators: localStorage.getItem('citrana_south_hide_indicators') === '1'
+            southHideIndicators: localStorage.getItem('citrana_south_hide_indicators') === '1',
+            saveChartOnly: localStorage.getItem('citrana_save_chart_only') === '1'
         };
         this.init();
     }
@@ -110,10 +111,14 @@ class CitranaApp {
         const toggleBtn = document.getElementById('toggle-transparency-btn');
         if (toggleBtn) {
             toggleBtn.addEventListener('click', () => {
+                if (this.options.saveChartOnly) {
+                    return;
+                }
                 this.exportWithWhiteBg = !this.exportWithWhiteBg;
-                toggleBtn.classList.toggle('active', !this.exportWithWhiteBg);
+                this.updateTransparencyToggleUI();
             });
         }
+        this.applySaveChartOnlyTransparency();
 
         // Help Button
         const helpBtn = document.getElementById('help-btn');
@@ -143,6 +148,7 @@ class CitranaApp {
         const optionsModalClose = document.getElementById('options-modal-close');
         const southHideIndicatorsToggle = document.getElementById('south-hide-indicators-toggle');
         const northHideIndicatorsToggle = document.getElementById('north-hide-indicators-toggle');
+        const saveChartOnlyToggle = document.getElementById('save-chart-only-toggle');
 
         if (northHideIndicatorsToggle) {
             northHideIndicatorsToggle.checked = this.options.northHideIndicators;
@@ -158,6 +164,13 @@ class CitranaApp {
             });
         }
 
+        if (saveChartOnlyToggle) {
+            saveChartOnlyToggle.checked = this.options.saveChartOnly;
+            saveChartOnlyToggle.addEventListener('change', (e) => {
+                this.setSaveChartOnly(e.target.checked);
+            });
+        }
+
         if (optionsBtn && optionsModal && optionsModalClose) {
             optionsBtn.addEventListener('click', () => {
                 if (northHideIndicatorsToggle) {
@@ -165,6 +178,9 @@ class CitranaApp {
                 }
                 if (southHideIndicatorsToggle) {
                     southHideIndicatorsToggle.checked = this.options.southHideIndicators;
+                }
+                if (saveChartOnlyToggle) {
+                    saveChartOnlyToggle.checked = this.options.saveChartOnly;
                 }
                 optionsModal.classList.add('active');
             });
@@ -391,6 +407,28 @@ class CitranaApp {
     }
 
     /**
+     * iOS zooms focused text fields with font-size below 16px; checkboxes and other controls should not be intercepted.
+     * @param {EventTarget|null} target
+     * @returns {boolean}
+     */
+    shouldPreventMobileInputZoom(target) {
+        if (!target || !(target instanceof HTMLElement)) {
+            return false;
+        }
+
+        if (target.tagName === 'TEXTAREA') {
+            return true;
+        }
+
+        if (target.tagName !== 'INPUT') {
+            return false;
+        }
+
+        const type = (target.getAttribute('type') || 'text').toLowerCase();
+        return ['text', 'number', 'email', 'password', 'search', 'tel', 'url', 'color'].includes(type);
+    }
+
+    /**
      * Setup mobile input zoom prevention
      */
     setupMobileInputZoomPrevention() {
@@ -401,43 +439,46 @@ class CitranaApp {
         const preventZoomOnFocus = (e) => {
             const target = e.target;
 
-            // Check if it's an input field
-            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-                // Force minimum font size to prevent zoom
-                target.style.fontSize = '16px';
-
-                // Prevent zoom by ensuring proper viewport
-                const viewport = document.querySelector('meta[name="viewport"]');
-                if (viewport) {
-                    // Temporarily set viewport to prevent zoom
-                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=no');
-
-                    // Restore viewport after a short delay
-                    setTimeout(() => {
-                        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0, minimum-scale=0.1, viewport-fit=cover');
-                    }, 100);
-                }
-
-                console.log('[MOBILE] Prevented zoom on input focus');
+            if (!this.shouldPreventMobileInputZoom(target)) {
+                return;
             }
+
+            // Force minimum font size to prevent zoom
+            target.style.fontSize = '16px';
+
+            // Prevent zoom by ensuring proper viewport
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                // Temporarily set viewport to prevent zoom
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=no');
+
+                // Restore viewport after a short delay
+                setTimeout(() => {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0, minimum-scale=0.1, viewport-fit=cover');
+                }, 100);
+            }
+
+            console.log('[MOBILE] Prevented zoom on input focus');
         };
 
         // Listen for focus events on input fields
         document.addEventListener('focusin', preventZoomOnFocus);
 
-        // Also prevent zoom on touch events for inputs
+        // Also prevent zoom on touch events for text-entry inputs
         const preventZoomOnTouch = (e) => {
             const target = e.target;
 
-            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-                // Prevent default zoom behavior
-                e.preventDefault();
-
-                // Force focus without zoom
-                target.focus();
-
-                console.log('[MOBILE] Prevented zoom on input touch');
+            if (!this.shouldPreventMobileInputZoom(target)) {
+                return;
             }
+
+            // Prevent default zoom behavior
+            e.preventDefault();
+
+            // Force focus without zoom
+            target.focus();
+
+            console.log('[MOBILE] Prevented zoom on input touch');
         };
 
         // Listen for touch events on input fields
@@ -503,22 +544,43 @@ class CitranaApp {
         this.isExporting = true;
         this.showExportProgress();
 
-        // Use requestAnimationFrame to ensure the canvas is fully rendered
         const performExport = () => {
+            const chartOnly = this.options.saveChartOnly === true && this.chartTemplates?.hasActiveChart();
+            let savedView = null;
+            let selectedShape = null;
+
             try {
-                // Step 1: Prepare chart and generate PNG (50%)
-                this.updateExportProgress(50, 'Generating high-resolution image...');
+                this.updateExportProgress(50, chartOnly
+                    ? 'Generating chart image...'
+                    : 'Generating high-resolution image...');
 
-                const width = this.stage.width();
-                const height = this.stage.height();
+                if (chartOnly) {
+                    savedView = {
+                        scaleX: this.stage.scaleX(),
+                        scaleY: this.stage.scaleY(),
+                        x: this.stage.x(),
+                        y: this.stage.y()
+                    };
+                    selectedShape = this.drawingTools?.selectedShape ?? null;
+                    this.drawingTools?.clearControlPoints();
+                    this.chartTemplates.zoomToFit();
+                }
 
+                const crop = chartOnly ? this.chartTemplates.getExportCropRect() : null;
+                if (chartOnly && !crop) {
+                    throw new Error('Could not determine chart bounds for export');
+                }
+
+                const stageWidth = this.stage.width();
+                const stageHeight = this.stage.height();
                 let bgRect = null;
-                if (this.exportWithWhiteBg) {
+
+                if (!chartOnly && this.exportWithWhiteBg) {
                     bgRect = new Konva.Rect({
                         x: 0,
                         y: 0,
-                        width: width,
-                        height: height,
+                        width: stageWidth,
+                        height: stageHeight,
                         fill: 'white',
                         listening: false,
                         name: 'export-bg-rect'
@@ -528,129 +590,142 @@ class CitranaApp {
                     this.layer.batchDraw();
                 }
 
-                // Force a complete render cycle
                 this.stage.batchDraw();
 
-                // Take the screenshot immediately (optimized)
-                const dataURL = this.stage.toDataURL({
+                const exportConfig = {
                     pixelRatio: 2,
                     mimeType: 'image/png'
-                });
+                };
+                if (chartOnly && crop) {
+                    exportConfig.x = Math.floor(crop.x);
+                    exportConfig.y = Math.floor(crop.y);
+                    exportConfig.width = Math.ceil(crop.width);
+                    exportConfig.height = Math.ceil(crop.height);
+                }
 
-                // Step 3: Clean up background rectangle
+                const dataURL = this.stage.toDataURL(exportConfig);
+
                 if (bgRect) {
                     bgRect.destroy();
                     this.layer.batchDraw();
                 }
 
-                // Step 2: Process image with padding and watermark (80%)
-                this.updateExportProgress(80, 'Adding padding and watermark...');
-
-                // Optimized processing: Get dimensions directly from dataURL
-                console.log('Processing dataURL directly...');
-                try {
-                    // Step 3: Create final image (90%)
-                    this.updateExportProgress(90, 'Creating final image...');
-
-                    // Get dimensions from the original dataURL without loading image
-                    const img = new window.Image();
-                    img.onload = () => {
-                        const width = img.width;
-                        const height = img.height;
-
-                        // Create the padded canvas directly
-                        const paddedWidth = width + 200;
-                        const paddedHeight = height + 200;
-                        const offscreen = document.createElement('canvas');
-                        offscreen.width = paddedWidth;
-                        offscreen.height = paddedHeight;
-                        const ctx = offscreen.getContext('2d');
-
-                        // Fill background
-                        if (this.exportWithWhiteBg) {
-                            ctx.fillStyle = 'white';
-                            ctx.fillRect(0, 0, paddedWidth, paddedHeight);
-                        } else {
-                            ctx.clearRect(0, 0, paddedWidth, paddedHeight);
-                        }
-
-                        // Draw the chart
-                        ctx.drawImage(img, 100, 100);
-
-                        // Add watermark
-                        ctx.font = '24px sans-serif';
-                        ctx.fillStyle = '#888';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'bottom';
-                        const watermark = 'Generated using Citrana - https://citrana.soothsayer.life/';
-                        ctx.fillText(watermark, paddedWidth / 2, paddedHeight - 30);
-
-                        // Step 4: Download file (95%)
-                        this.updateExportProgress(95, 'Preparing download...');
-
-                        const paddedDataURL = offscreen.toDataURL('image/png');
-                        const now = new Date();
-                        const year = now.getFullYear();
-                        const month = String(now.getMonth() + 1).padStart(2, '0');
-                        const day = String(now.getDate()).padStart(2, '0');
-                        const hours = String(now.getHours()).padStart(2, '0');
-                        const minutes = String(now.getMinutes()).padStart(2, '0');
-                        const seconds = String(now.getSeconds()).padStart(2, '0');
-                        const timestamp = `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
-                        const filename = `citrana-chart-${timestamp}.png`;
-
-                        // Use a more reliable download method
-                        console.log('Calling downloadFile with filename:', filename);
-                        this.downloadFile(paddedDataURL, filename);
-
-                        // Step 7: Complete (100%)
-                        this.updateExportProgress(100, 'Export completed successfully!');
-
-                        // Reduced delay for completion
-                        setTimeout(() => {
-                            this.hideExportProgress();
-                            this.isExporting = false;
-                            this._lastDownloadedFile = null; // Reset download tracking
-                            console.log(`Chart exported successfully as: ${filename}`);
-                        }, 300); // Reduced from 1000ms to 300ms
-                    };
-
-                    img.onerror = () => {
-                        console.error('Error loading image for dimensions');
-                        this.updateExportProgress(0, 'Export failed. Please try again.');
-                        setTimeout(() => {
-                            this.hideExportProgress();
-                            this.isExporting = false;
-                            this._lastDownloadedFile = null;
-                        }, 1000); // Reduced from 2000ms to 1000ms
-                    };
-
-                    // Load the image to get dimensions
-                    img.src = dataURL;
-
-                } catch (error) {
-                    console.error('Error processing export:', error);
-                    this.updateExportProgress(0, 'Export failed. Please try again.');
-                    setTimeout(() => {
-                        this.hideExportProgress();
-                        this.isExporting = false;
-                        this._lastDownloadedFile = null; // Reset download tracking
-                    }, 1000); // Reduced from 2000ms to 1000ms
+                if (savedView) {
+                    this.stage.scale({ x: savedView.scaleX, y: savedView.scaleY });
+                    this.stage.position({ x: savedView.x, y: savedView.y });
+                    this.stage.batchDraw();
+                    this.updateZoomLevel();
+                    if (selectedShape && this.drawingTools?.supportsControlPoints(selectedShape)) {
+                        this.drawingTools.createControlPoints(selectedShape);
+                    }
                 }
 
+                this.updateExportProgress(chartOnly ? 85 : 80, chartOnly
+                    ? 'Preparing download...'
+                    : 'Adding padding and watermark...');
+
+                this.finalizeExportImage(dataURL, { chartOnly });
             } catch (error) {
                 console.error('Error exporting chart:', error);
+                if (savedView) {
+                    this.stage.scale({ x: savedView.scaleX, y: savedView.scaleY });
+                    this.stage.position({ x: savedView.x, y: savedView.y });
+                    this.stage.batchDraw();
+                    this.updateZoomLevel();
+                    if (selectedShape && this.drawingTools?.supportsControlPoints(selectedShape)) {
+                        this.drawingTools.createControlPoints(selectedShape);
+                    }
+                }
                 this.updateExportProgress(0, 'Export failed. Please try again.');
                 setTimeout(() => {
                     this.hideExportProgress();
                     this.isExporting = false;
-                    this._lastDownloadedFile = null; // Reset download tracking
-                }, 2000);
+                    this._lastDownloadedFile = null;
+                }, 1000);
             }
         };
 
-        // Start the export process on the next frame
         requestAnimationFrame(performExport);
+    }
+
+    finalizeExportImage(dataURL, { chartOnly = false } = {}) {
+        const img = new window.Image();
+        img.onload = () => {
+            try {
+                this.updateExportProgress(90, 'Creating final image...');
+
+                const padding = chartOnly ? 0 : 100;
+                const paddedWidth = img.width + padding * 2;
+                const paddedHeight = img.height + padding * 2;
+                const offscreen = document.createElement('canvas');
+                offscreen.width = paddedWidth;
+                offscreen.height = paddedHeight;
+                const ctx = offscreen.getContext('2d');
+
+                const useWhiteBg = chartOnly ? false : this.exportWithWhiteBg;
+
+                if (useWhiteBg) {
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, paddedWidth, paddedHeight);
+                } else {
+                    ctx.clearRect(0, 0, paddedWidth, paddedHeight);
+                }
+
+                ctx.drawImage(img, padding, padding);
+
+                if (!chartOnly) {
+                    ctx.font = '24px sans-serif';
+                    ctx.fillStyle = '#888';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    const watermark = 'Generated using Citrana - https://citrana.soothsayer.life/';
+                    ctx.fillText(watermark, paddedWidth / 2, paddedHeight - 30);
+                }
+
+                this.updateExportProgress(95, 'Preparing download...');
+
+                const finalDataURL = offscreen.toDataURL('image/png');
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                const timestamp = `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
+                const filename = `citrana-chart-${timestamp}.png`;
+
+                this.downloadFile(finalDataURL, filename);
+                this.updateExportProgress(100, 'Export completed successfully!');
+
+                setTimeout(() => {
+                    this.hideExportProgress();
+                    this.isExporting = false;
+                    this._lastDownloadedFile = null;
+                    console.log(`Chart exported successfully as: ${filename}`);
+                }, 300);
+            } catch (error) {
+                console.error('Error processing export:', error);
+                this.updateExportProgress(0, 'Export failed. Please try again.');
+                setTimeout(() => {
+                    this.hideExportProgress();
+                    this.isExporting = false;
+                    this._lastDownloadedFile = null;
+                }, 1000);
+            }
+        };
+
+        img.onerror = () => {
+            console.error('Error loading image for export');
+            this.updateExportProgress(0, 'Export failed. Please try again.');
+            setTimeout(() => {
+                this.hideExportProgress();
+                this.isExporting = false;
+                this._lastDownloadedFile = null;
+            }, 1000);
+        };
+
+        img.src = dataURL;
     }
 
     showExportProgress() {
@@ -1204,6 +1279,42 @@ class CitranaApp {
         if (this.chartTemplates?.currentChartType === 'north-indian') {
             this.chartTemplates.northIndianTemplate.applyNorthIndicatorsPreference();
         }
+    }
+
+    /**
+     * When enabled, Save exports the chart bounds only (fits chart, ignores zoom/pan, no watermark).
+     * @param {boolean} enabled
+     */
+    setSaveChartOnly(enabled) {
+        this.options.saveChartOnly = enabled;
+        if (enabled) {
+            localStorage.setItem('citrana_save_chart_only', '1');
+        } else {
+            localStorage.removeItem('citrana_save_chart_only');
+        }
+        this.applySaveChartOnlyTransparency();
+    }
+
+    applySaveChartOnlyTransparency() {
+        if (this.options.saveChartOnly) {
+            this.exportWithWhiteBg = false;
+        }
+        this.updateTransparencyToggleUI();
+    }
+
+    updateTransparencyToggleUI() {
+        const toggleBtn = document.getElementById('toggle-transparency-btn');
+        if (!toggleBtn) {
+            return;
+        }
+
+        const transparent = !this.exportWithWhiteBg;
+        toggleBtn.classList.toggle('active', transparent);
+        const locked = this.options.saveChartOnly === true;
+        toggleBtn.disabled = locked;
+        toggleBtn.title = locked
+            ? 'Transparency is on while Save Chart Only is enabled'
+            : 'Toggle Transparency';
     }
 
     updateZoomLockUI() {
