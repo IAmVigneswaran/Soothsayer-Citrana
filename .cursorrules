@@ -30,7 +30,7 @@ Soothsayer-Citrana/
 │   │   ├── chart-coordinator.js  # Chart type management (~360 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~993 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (~949 lines)
-│   │   ├── planet-system.js      # Graha library and drag-drop (~839 lines)
+│   │   ├── planet-system.js      # Graha library and drag-drop (~884 lines)
 │   │   ├── drawing-tools.js      # Drawing tools implementation (~1902 lines)
 │   │   ├── context-menu.js       # Context menu system (~721 lines)
 │   │   ├── edit-ui.js            # Edit interface controls (~775 lines)
@@ -59,7 +59,7 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # Comprehensive documentation (~979 lines)
+├── AGENT.md                      # Comprehensive documentation (~1033 lines)
 ├── ARCHITECTURE.md               # System architecture and data flows (~369 lines)
 ├── .cursorrules                  # This Cursor IDE configuration (~1000 lines)
 ├── CHANGELOG.md                  # Version history and changes (~57 lines)
@@ -334,7 +334,7 @@ Key Methods:
 - `setNorthIndicatorsVisible(visible)` / `applyNorthIndicatorsPreference()`: Show or hide `tinyBoxGroupNorth` per `app.options`
 - `zoomToFit()`: Fit chart using **local bounds** (desktop `extraTopMargin=-50`)
 
-### Planet System (assets/js/planet-system.js - ~839 lines)
+### Planet System (assets/js/planet-system.js - ~884 lines)
 Manages the floating planet library and drag-and-drop functionality with paging system.
 
 Key Responsibilities:
@@ -348,7 +348,7 @@ Key Responsibilities:
 
 Key Features:
 - Floating, draggable planet library with paging
-- 51 planets across five pages with varying counts per page
+- 60 Grahas across five pages (12 per page)
 - Desktop navigation with clickable page dots
 - Mobile swipe navigation (left/right)
 - Drag preview with visual feedback
@@ -412,7 +412,16 @@ Planet Library - Page 4 (Hindi Grahas):
 - मांदी: मांदी (Maandi)
 - कस: कस्टम (Custom)
 
-Planet Library - Page 5 (Outer Planets):
+Planet Library - Page 5 (Upagrahas & Outer Planets):
+- Dh: Dhuma
+- Vy: Vyatipata
+- Pv: Parivesha
+- Ic: Indra Chapa
+- Uk: Upaketu
+- Kl: Kala
+- Mr: Mrityu
+- Ap: Ardha Prahara
+- Yg: Yama Ghantaka
 - Ur: Uranus
 - Ne: Neptune
 - Pl: Pluto
@@ -533,7 +542,7 @@ Call `window.app.recordHistory('Label')` after undoable mutations. See [ARCHITEC
 - Reset Drawings: Removes only drawings, keeps planets and chart structure
 
 ### Planet Management
-- 51 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 3 Outer Planets on Page 5
+- 60 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 12 Upagrahas and outer planets on Page 5
 - Paging System: Five-page navigation with desktop dots and mobile swipe
 - Text-based Display: Uses abbreviations instead of symbols for better compatibility
 - Drag & Drop: Grahas from the floating library land in the bhava under the pointer, or in a house you clicked first (`window.selectedBhavaSouth` / `window.selectedBhavaNorth` — one-shot: cleared after the next successful drop or when you click empty canvas)
@@ -909,8 +918,53 @@ Edit the planets objects in assets/js/planet-system.js:
             }
         };
 
-        // Planet data - Page 5 (Outer Planets)
+        // Planet data - Page 5 (Upagrahas & Outer Planets)
         this.planetsPage5 = {
+            'Dh': {
+                name: 'Dhuma',
+                fullName: 'Dhuma',
+                color: '#000000'
+            },
+            'Vy': {
+                name: 'Vyatipata',
+                fullName: 'Vyatipata',
+                color: '#000000'
+            },
+            'Pv': {
+                name: 'Parivesha',
+                fullName: 'Parivesha',
+                color: '#000000'
+            },
+            'Ic': {
+                name: 'Indra Chapa',
+                fullName: 'Indra Chapa',
+                color: '#000000'
+            },
+            'Uk': {
+                name: 'Upaketu',
+                fullName: 'Upaketu',
+                color: '#000000'
+            },
+            'Kl': {
+                name: 'Kala',
+                fullName: 'Kala',
+                color: '#000000'
+            },
+            'Mr': {
+                name: 'Mrityu',
+                fullName: 'Mrityu',
+                color: '#000000'
+            },
+            'Ap': {
+                name: 'Ardha Prahara',
+                fullName: 'Ardha Prahara',
+                color: '#000000'
+            },
+            'Yg': {
+                name: 'Yama Ghantaka',
+                fullName: 'Yama Ghantaka',
+                color: '#000000'
+            },
             'Ur': {
                 name: 'Uranus',
                 fullName: 'Uranus',

@@ -64,7 +64,7 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 | `chart-coordinator.js` | ~360 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `chart-templates-south.js` | ~993 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds |
 | `chart-templates-north.js` | ~949 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds |
-| `planet-system.js` | ~839 | Graha library UI (5 pages), drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
+| `planet-system.js` | ~884 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer planets), drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `drawing-tools.js` | ~1902 | Drawing tools, selection, control points, Graha text editing, `makeShapeSelectable()` on stroke complete, history `recordHistory()` calls |
 | `edit-ui.js` | ~775 | Floating property editor for drawing shapes (session-based undo on close) |
 | `context-menu.js` | ~721 | Right-click / long-press menus; unified hit-test routing |
@@ -339,7 +339,7 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 
 | Goal | Where to change |
 |------|-----------------|
-| Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` |
+| Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` (Page 5: Upagrahas before outer planets) |
 | Add drawing tool | `DrawingTools.startDrawing()` switch, toolbar in `index.html`, `app.setTool()` |
 | New chart type | New template class + routes in `ChartCoordinator` (include `findHouseAtChartPoint()`) |
 | Context menu action | `ContextMenu.handleAction()`; items in `showHouseMenu()` / `showPlanetMenu()` / `showExistingChartMenu()` |

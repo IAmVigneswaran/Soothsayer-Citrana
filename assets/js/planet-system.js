@@ -279,8 +279,53 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 5 (Outer Planets)
+        // Planet data - Page 5 (Upagrahas & Outer Planets)
         this.planetsPage5 = {
+            'Dh': {
+                name: 'Dhuma',
+                fullName: 'Dhuma',
+                color: '#000000'
+            },
+            'Vy': {
+                name: 'Vyatipata',
+                fullName: 'Vyatipata',
+                color: '#000000'
+            },
+            'Pv': {
+                name: 'Parivesha',
+                fullName: 'Parivesha',
+                color: '#000000'
+            },
+            'Ic': {
+                name: 'Indra Chapa',
+                fullName: 'Indra Chapa',
+                color: '#000000'
+            },
+            'Uk': {
+                name: 'Upaketu',
+                fullName: 'Upaketu',
+                color: '#000000'
+            },
+            'Kl': {
+                name: 'Kala',
+                fullName: 'Kala',
+                color: '#000000'
+            },
+            'Mr': {
+                name: 'Mrityu',
+                fullName: 'Mrityu',
+                color: '#000000'
+            },
+            'Ap': {
+                name: 'Ardha Prahara',
+                fullName: 'Ardha Prahara',
+                color: '#000000'
+            },
+            'Yg': {
+                name: 'Yama Ghantaka',
+                fullName: 'Yama Ghantaka',
+                color: '#000000'
+            },
             'Ur': {
                 name: 'Uranus',
                 fullName: 'Uranus',

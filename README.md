@@ -26,7 +26,7 @@ This codebase is developed using AI agents.
 ## Core Features
 
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
-- Graha Library: 51 Grahas across 5 pages including, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Grahas
+- Graha Library: 60 Grahas across 5 pages — traditional Grahas, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Upagrahas with outer planets
 - Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that house on the **next** drop only (then the pointer takes over again)
 - Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (zoom and pan are not tracked)
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools

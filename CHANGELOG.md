@@ -15,11 +15,12 @@
 - **Clear House** removes every Graha from the house you selected.
 - **Zoom lock** — on by default so scroll-wheel zoom does not catch you by surprise. Click the lock icon to zoom freely; **Reset Zoom** always works.
 - **Chart display options** — open **Options** (gear icon in the toolbar) to hide chart indicators per layout (North: bhava numbers in black corner boxes; South: lagna line, yellow bhava numbers, black rashi numbers), or enable **Save Chart Only** so the same Save button exports only the chart area — fits the chart, ignores zoom/pan, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, uses a transparent background, and omits the watermark. Preferences are saved in this browser and apply immediately; they are not tracked by undo/redo.
+- **Upagrahas in Graha Library** — Page 5 adds nine Upagrahas (Dhuma, Vyatipata, Parivesha, Indra Chapa, Upaketu, Kala, Mrityu, Ardha Prahara, Yama Ghantaka) before Uranus, Neptune, and Pluto — **60 Grahas** in total across five pages (12 per page).
 
 **🔧 Improvements:**
 - Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
 - South Indian house menus show **House** numbers based on where Lagna is set.
-- Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, undo/redo, and chart display options.
+- Help, Welcome, README, and Agent docs updated for the new Lagna flows, session behaviour, zoom lock, undo/redo, chart display options, and Upagrahas on Page 5.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied unused code from older versions, including automatic chart restore on refresh and deprecated history helpers.
 - Further removed dead code — unused accessors, duplicate app-level selection state, orphan modal CSS, and unused chart-coordinator wrappers (no change to how the app behaves).
