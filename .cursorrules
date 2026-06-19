@@ -31,9 +31,10 @@ Soothsayer-Citrana/
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~1060 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (~971 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~854 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (~1975 lines)
-│   │   ├── context-menu.js       # Context menu system (~731 lines)
-│   │   └── edit-ui.js            # Edit interface controls (~805 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (~1958 lines)
+│   │   ├── context-menu.js       # Context menu system (~728 lines)
+│   │   ├── edit-ui.js            # Edit interface controls (~849 lines)
+│   │   └── history.js            # Unified undo/redo timeline (~78 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
 │   │   └── lucide.min.js         # Lucide 0.468.0 (self-hosted)
@@ -56,7 +57,7 @@ Soothsayer-Citrana/
 │       └── ms-icon-*.png         # 4 variants
 ├── .github/
 │   └── workflows/
-│       ├── static.yml            # GitHub Pages deploy with minification (push main + PR)
+│       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
 ├── AGENT.md                      # Comprehensive documentation
 ├── ARCHITECTURE.md               # System architecture and data flows
@@ -208,7 +209,7 @@ Key Responsibilities:
 - Coordinates all component interactions
 - Manages tool selection and drawing state
 - Handles keyboard shortcuts and event listeners
-- Manages global undo snapshots (`pushSnapshot()`; keyboard undo/redo disabled)
+- Manages unified undo/redo via `CitranaHistory` (`history.js`)
 - Handles chart export
 - Provides mobile touch support and Safari compatibility
 - Manages zoom controls, zoom lock (default locked), zoom level display, and canvas resize (`visualViewport`)
@@ -224,14 +225,28 @@ Key Methods:
 - `handleResize()`: Stage size from `visualViewport` or container
 - `handleWheel()`: Desktop wheel zoom about pointer when unlocked; early return when locked (no `preventDefault`)
 - `exportChart()`: PNG export (`pixelRatio: 2`)
-- `pushSnapshot()` / `undo()` / `redo()`: Global snapshot stack (shortcuts disabled)
+- `recordHistory()` / `captureHistoryState()` / `restoreHistoryState()`: Undo timeline integration
+- `undo()` / `redo()`: Delegate to `this.history`
+- `pushSnapshot()`: Deprecated alias for `recordHistory()`
 - `clearChart()` / `resetChart()` / `resetDrawings()`
 - `showWelcomeModal()` / `showConfirmationDialog()`
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`
 
-Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
+Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `T` Text, `H` Hand, `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` delete shape, `?`/`/` Help. No Heading shortcut.
 
-### Chart Coordinator (assets/js/chart-coordinator.js - ~286 lines)
+### History Engine (assets/js/history.js - ~78 lines)
+Unified undo/redo timeline for the entire session.
+
+Key Responsibilities:
+- Stores labelled snapshots (`entries[]`, `index`, `maxSteps: 50`)
+- Deep-clones state on `record()`; suppresses recording during restore (`_restoring`)
+
+Key Methods:
+- `record(label)`, `undo()`, `redo()`, `canUndo()`, `canRedo()`
+
+Wired in `app.setupComponents()` with `captureHistoryState()` / `restoreHistoryState()`.
+
+### Chart Coordinator (assets/js/chart-coordinator.js - ~292 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -284,7 +299,7 @@ Key Methods:
 - `highlightHouse()` / `clearHighlight()`: Visual house selection
 - `zoomToFit()`: Fit chart using **local bounds**
 
-### North Indian Chart Template (assets/js/chart-templates-north.js - ~971 lines)
+### North Indian Chart Template (assets/js/chart-templates-north.js - ~968 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based houses.
 
 Key Responsibilities:
@@ -410,50 +425,31 @@ Key Methods:
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()`
 - `getPlanetInfo()`: Retrieve planet data from paged structure
 
-### Drawing Tools (assets/js/drawing-tools.js - 1975 lines)
+### Drawing Tools (assets/js/drawing-tools.js - ~1958 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
 - Implements all drawing tools (select, arrow, line, pen, text, heading)
-- Manages local undo/redo stacks (implemented; UI/keyboard integration disabled)
+- Calls `window.app.recordHistory()` for drawing and Graha edit actions
 - Handles shape selection and editing
 - Provides precise positioning and hit detection
 - Manages Edit UI integration
-- Implements planet text editing
-
-Available Tools:
-- Select Tool: Choose and modify existing elements
-- Arrow Tool: Create directional indicators with arrowheads and control points
-- Line Tool: Draw straight lines and connections with control points
-- Pen Tool: Freehand drawing for annotations
-- Text Tool: Add editable text boxes
-- Heading Tool: Create chart headings and titles
+- Implements Graha text editing (`#text-edit-controls` bar)
 
 Key Features:
-- Pixel-perfect positioning
-- Touch and mouse support
-- Shape selection and editing
-- Colour and stroke customisation
-- Text editing with font controls
-- Planet text editing with retrograde underline support (Konva `textDecoration`)
-- Undo/redo with 50-step local history (stacks populated; not wired to UI)
+- Graha edit sessions commit on Save / dismiss when dirty (`planetEditSession`)
+- Control points for arrow/line; `Adjust drawing` on handle drag end
+- `bindMoveDragHistory()` for pen/text/heading reposition undo
 - Auto-switch to Select Tool after Arrow and Line creation
-- Control points for precise arrow and line adjustment
 
 Key Methods:
-- `startDrawing()`: Begin drawing operation
-- `draw()`: Continue drawing
-- `stopDrawing()`: Complete drawing
-- `makeShapeSelectable()`: Enable shape interaction
-- `undo()` / `redo()`: Local shape history (not exposed in UI)
-- `showEditUIForShape()`: Edit interface integration
-- `makePlanetTextEditable()`: Planet text editing
-- `setPlanetRetrogradeState()`: Persist retrograde underline on Graha text
-- `createControlPoints()`: Create draggable control points for arrows and lines
-- `updateControlPointsPosition()`: Synchronise control points with shape movement
-- `clearControlPoints()`: Remove control points from display
+- `startDrawing()` / `draw()` / `stopDrawing()`
+- `editPlanetText()` / `editText()` / `editHeading()`
+- `createControlPoints()` / `commitControlPointAdjust()`
+- `restorePersistedDrawings()`
+- `showEditUIForShape()` / `setPlanetRetrogradeState()`
 
-### Context Menu (assets/js/context-menu.js - ~731 lines)
+### Context Menu (assets/js/context-menu.js - ~728 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:
@@ -480,40 +476,33 @@ Key Methods:
 - `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`
 - `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
-### Edit UI (assets/js/edit-ui.js - 805 lines)
+### Edit UI (assets/js/edit-ui.js - ~849 lines)
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
 - Creates floating edit interface
 - Provides tool-specific controls
 - Manages shape property editing
-- Handles colour and stroke customisation
-- Implements text editing controls
-- Provides mobile-optimised interface
-
-Edit Controls:
-- Stroke width and colour controls
-- Font size, weight, and style controls
-- Text colour customisation
-- Delete functionality
-- Mobile touch support
+- Records one undo step per edit session on `hide()` when properties changed
 
 Key Features:
-- Floating, draggable interface
-- Tool-specific controls
-- Real-time property updates
-- Mobile-optimised design
-- Touch-friendly controls
+- Session-based undo: `markEditDirty()` on changes; `_commitEditHistoryIfNeeded()` on `hide()`
+- Delete sets `_skipHistoryOnHide` to avoid double steps with `Delete drawing`
+- Graha retrograde button records via `setPlanetRetrogradeState()` (not session close)
 
 Key Methods:
-- `show()`: Display edit interface
-- `hide()`: Hide edit interface
-- `createToolControls()`: Build tool-specific controls
-- `updateStrokeWidth()`: Modify stroke properties
-- `updateFontSize()`: Modify text properties
-- `positionEditUI()`: Position interface
+- `show()` / `hide()`: Display/hide; commit history on hide when dirty
+- `createToolControls()`, `updateStrokeWidth()`, `updateStrokeColor()`, `updateFontSize()`
+- `markEditDirty()` / `_commitEditHistoryIfNeeded()`
 
 ## Core Features
+
+### Undo / Redo
+Unified **50-step** timeline via `CitranaHistory` (`history.js`). **Ctrl+Z** / **Cmd+Z** undo; **Ctrl+Y** / **Ctrl+Shift+Z** / **Cmd+Shift+Z** redo. No toolbar buttons.
+
+Snapshots chart data + `drawing-*` nodes. **Not tracked:** zoom, pan, tool selection, bhava highlight, UI state. **Deferred 2.1:** visible History panel.
+
+Call `window.app.recordHistory('Label')` after undoable mutations. See [ARCHITECTURE.md](ARCHITECTURE.md#undo--redo).
 
 ### Chart Types
 - South Indian Chart: Traditional 4x4 square grid layout with centre empty space; Rashi signs are fixed per grid cell
@@ -549,7 +538,7 @@ Key Methods:
 - Pen Tool: Freehand drawing for annotations
 - Text Tool: Add editable text boxes anywhere on canvas
 - Heading Tool: Create chart headings and titles
-- Undo/Redo: Global (`app.pushSnapshot`, shortcuts disabled) and per-drawing-tool local stacks; not exposed in UI
+- Undo/Redo: Unified timeline via `app.recordHistory()` — see Undo / Redo above
 - Auto-Switch Behaviour: Arrow and Line tools automatically switch to Select Tool after creation
 - Control Points: Draggable handles for adjusting start and end points of arrows and lines
 
@@ -573,7 +562,7 @@ Technical Implementation:
 ### User Experience
 - Light Theme: Clean, professional appearance with high contrast
 - Responsive Design: Optimised for desktop, tablet, and mobile devices
-- Keyboard Shortcuts: Power user features for efficiency
+- Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific house actions; Graha edit/delete
 - Status Updates: Real-time feedback and notifications
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
@@ -973,9 +962,9 @@ Edit the planets objects in assets/js/planet-system.js:
 ## GitHub Actions Workflow
 
 ### Current deployment (`.github/workflows/static.yml`)
-Production GitHub Pages deploy **with minification** on push to `main` and on pull requests (paths-ignore: `*.md`, `LICENSE`, `.gitignore`, `.cursorrules`). Steps: checkout → Node 18 → `clean-css-cli` + `terser` → minified CSS/JS artifacts → `sed` updates `index.html` references → deploy-pages.
+Production GitHub Pages deploy **with minification** on push to **`main`** only (includes merges from `dev` → `main`). Manual redeploy via `workflow_dispatch`. Steps: checkout → Node 18 → `clean-css-cli` + `terser` → minified CSS/JS artifacts → `sed` updates `index.html` references → deploy-pages.
 
-Minified assets include `citrana-debug.min.js` and all local JS/CSS. Konva and Lucide vendor bundles are already minified.
+Minified assets include `history.min.js`, `citrana-debug.min.js`, and all local JS/CSS. Konva and Lucide vendor bundles are already minified.
 
 ### Standard deployment (no minification)
 For local debugging or faster CI, remove the Node/minify/sed steps from `static.yml`:

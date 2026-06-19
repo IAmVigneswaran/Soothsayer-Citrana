@@ -24,17 +24,18 @@ index.html  (viewport-fit=cover; Konva in <head>)
   ├── drawing-tools.js             → DrawingTools (+ EditUI instance)
   ├── edit-ui.js                   → EditUI
   ├── context-menu.js              → ContextMenu
+  ├── history.js                   → CitranaHistory (undo/redo timeline)
   └── app.js                       → CitranaApp (window.app on DOMContentLoaded)
 ```
 
-Script order matters: `citrana-debug.js` before modules that call `citranaDebug()`; chart template classes before `ChartCoordinator`; all modules before `app.js`.
+Script order matters: `citrana-debug.js` first; chart template classes before `ChartCoordinator`; `history.js` immediately before `app.js`.
 
 ## High-Level Component Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        CitranaApp (app.js)                  │
-│  Stage/Layer · Tools · Zoom · Export · Modals               │
+│  Stage/Layer · Tools · Zoom · Export · Modals · Undo/Redo   │
 └────────────┬───────────────────────────────┬────────────────┘
              │                               │
     ┌────────▼─────────┐             ┌───────▼────────┐
@@ -58,16 +59,17 @@ Script order matters: `citrana-debug.js` before modules that call `citranaDebug(
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1280 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, zoom lock, zoom display, export, modals |
-| `chart-coordinator.js` | ~286 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
-| `chart-templates-south.js` | ~1060 | 4×4 grid chart, bhava numbering, Lagna indicator, `zoomToFit()` with local bounds |
-| `chart-templates-north.js` | ~971 | Diamond polygon chart, rashi boxes, Lagna rashi math, `zoomToFit()` with local bounds |
+| `app.js` | ~1280 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts, zoom lock, export, modals, history coordinator |
+| `history.js` | ~78 | Unified undo/redo timeline (`CitranaHistory`) |
+| `chart-coordinator.js` | ~292 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test |
+| `chart-templates-south.js` | ~1062 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, `zoomToFit()` with local bounds |
+| `chart-templates-north.js` | ~968 | Diamond polygon chart, rashi boxes, Lagna rashi math, `zoomToFit()` with local bounds |
 | `planet-system.js` | ~854 | Graha library UI (5 pages), drag-and-drop via coordinator hit-test |
-| `drawing-tools.js` | ~1975 | Drawing tools, selection, control points, Graha text editing |
-| `edit-ui.js` | ~805 | Floating property editor for drawing shapes |
-| `context-menu.js` | ~731 | Right-click / long-press menus; unified hit-test routing |
+| `drawing-tools.js` | ~1958 | Drawing tools, selection, control points, Graha text editing, history `recordHistory()` calls |
+| `edit-ui.js` | ~849 | Floating property editor for drawing shapes (session-based undo on close) |
+| `context-menu.js` | ~728 | Right-click / long-press menus; unified hit-test routing |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging |
-| `styles.css` | ~2220 | Light theme, floating UI, safe areas, iOS PWA layout, zoom bar disabled states |
+| `styles.css` | ~2204 | Light theme, floating UI, safe areas, iOS PWA layout, zoom bar disabled states |
 
 ## Canvas Object Naming
 
@@ -197,6 +199,21 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 3. Arrow/line auto-switch to Select; control points appear on selection
 4. Mobile (`≤768px`): arrow, line, and pen toolbar buttons are hidden in CSS
 
+### Undo / redo
+
+1. User action calls `window.app.recordHistory(label)` (or `CitranaHistory.record` via `app.history`)
+2. `captureHistoryState()` snapshots `{ chartData, drawingData }`:
+   - `chartData` ← `ChartCoordinator.getChartData()` (Grahas, Lagna, centre label)
+   - `drawingData` ← `serializeDrawings()` (Konva `drawing-*` nodes; explicit `points`/`x`/`y` for arrows/lines)
+3. State is deep-cloned into the timeline (`maxSteps: 50`, seeded with `Start` on init)
+4. **Ctrl+Z** / **Ctrl+Y** (or **Cmd** on macOS) → `history.undo()` / `history.redo()` → `restoreHistoryState()`
+5. Restore reloads chart via `loadChartData()`, redraws via `restorePersistedDrawings()`, clears selection and Edit UI
+6. `_restoring` flag suppresses new records during restore
+
+**Edit sessions** (one step on commit, not per click): drawing Edit UI (`hide()`), Graha text bar (`finish(true)`), inline text/heading double-click editors.
+
+**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals. **Deferred 2.1:** visible History panel.
+
 ### Export
 
 1. `app.exportChart()` → optional white background rect → `stage.toDataURL({ pixelRatio: 2 })`
@@ -262,12 +279,36 @@ Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit fa
 
 ## Undo / redo
 
-Two parallel snapshot systems exist; **UI and keyboard shortcuts are disabled**:
+Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setupComponents()`.
 
-| Layer | Stack | Limit | Status |
-|-------|-------|-------|--------|
-| `app.js` | `undoStack` / `redoStack` (chart + drawings) | 100 | `pushSnapshot()` still called; `Ctrl+Z`/`Ctrl+Y` commented out |
-| `drawing-tools.js` | Local undo stack | 50 | `undo()`/`redo()` implemented but not wired to UI |
+| Aspect | Detail |
+|--------|--------|
+| Engine | `CitranaHistory` — `entries[]`, `index`, `maxSteps: 50` |
+| Snapshot | `{ chartData, drawingData }` deep-cloned on each `record()` |
+| Keyboard | **Ctrl+Z** / **Cmd+Z** undo; **Ctrl+Y**, **Ctrl+Shift+Z**, **Cmd+Shift+Z** redo |
+| UI | No toolbar undo/redo buttons (removed); keyboard only |
+| API | `app.recordHistory(label)`, `app.undo()`, `app.redo()`; `pushSnapshot()` deprecated alias |
+
+### Tracked actions (representative labels)
+
+| Area | Labels |
+|------|--------|
+| Chart | `Start`, `Create South Indian chart`, `Create North Indian chart`, `Set Lagna`, `Clear house`, `Clear canvas`, `Reset chart`, `Reset drawings` |
+| Grahas | `Add Graha`, `Remove Graha`, `Move Graha`, `Edit Graha` |
+| Drawings | `Draw arrow`, `Draw line`, `Draw pen stroke`, `Add text`, `Add heading`, `Move drawing`, `Adjust drawing`, `Delete drawing` |
+| Edits | `Edit arrow`, `Edit line`, `Edit pen`, `Edit text`, `Edit heading`, `Edit centre label` |
+
+### Not tracked
+
+Zoom level, pan position, active tool, bhava selection highlight, Graha library page, modal/UI state.
+
+### Extension
+
+| Goal | Where to change |
+|------|-----------------|
+| New undoable action | Call `window.app.recordHistory('Label')` after the mutation; ensure data is in `getChartData()` or `drawing-*` nodes |
+| History depth | `maxSteps` in `app.setupComponents()` |
+| History panel (2.1) | UI over `app.history.entries`; no engine changes required |
 
 ## Extension Points
 
@@ -284,10 +325,12 @@ Two parallel snapshot systems exist; **UI and keyboard shortcuts are disabled**:
 | Zoom fit behaviour | `zoomToFit()` in chart template |
 | Theme / layout / safe areas | `assets/css/styles.css` |
 | Export behaviour | `app.exportChart()` |
+| Undo/redo | `history.js`, `app.recordHistory()` / `captureHistoryState()` |
 
 ## Known Limitations
 
-- **Undo/redo**: Snapshot logic exists but shortcuts and toolbar buttons are disabled due to bugs.
+- **History panel**: Timeline labels exist in memory; visible panel deferred to 2.1.
+- **Graha drag while zoomed/panned**: Drop/hit-test edge case under investigation.
 - **Single chart**: One chart per canvas by design.
 - **Mobile**: Touch code and PWA layout exist; officially unsupported for drawing complexity.
 - **About version**: `index.html` About modal version string should match `CHANGELOG.md` on each release.
