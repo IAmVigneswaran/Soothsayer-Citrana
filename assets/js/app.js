@@ -273,9 +273,9 @@ class CitranaApp {
                 this.drawingTools.editUI.hide();
             }
 
-            // Cancel Graha editing if clicking outside of editing areas
+            // Dismiss Graha edit bar when clicking outside (commits changes if edited)
             if (this.drawingTools.isEditingPlanet) {
-                this.drawingTools.cancelPlanetEditing();
+                this.drawingTools.dismissPlanetEditing();
             }
 
             this.handleMouseDown(e);
@@ -400,25 +400,11 @@ class CitranaApp {
         // Listen for scroll events (Safari sometimes hides elements during scroll)
         window.addEventListener('scroll', fixUIElementsVisibility);
 
-        // Periodic check to ensure UI elements are visible
-        setInterval(() => {
-            if (window.app?.presentationView) return;
-
-            // Check top toolbar - always should be visible
-            if (toolbar && (toolbar.style.visibility === 'hidden' || toolbar.style.display === 'none')) {
-                fixUIElementsVisibility();
-            }
-
-            // Check floating edit UI - only if it should be visible
-            if (editUI && editUI.style.display !== 'none' && (editUI.style.visibility === 'hidden' || editUI.style.opacity === '0')) {
-                fixUIElementsVisibility();
-            }
-
-            // Check floating text edit controls - only if it should be visible
-            if (textEditControls && textEditControls.style.display !== 'none' && (textEditControls.style.visibility === 'hidden' || textEditControls.style.opacity === '0')) {
-                fixUIElementsVisibility();
-            }
-        }, 2000);
+        // iOS keyboard open/close — visualViewport changes more reliably than window resize
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', fixUIElementsVisibility);
+            window.visualViewport.addEventListener('scroll', fixUIElementsVisibility);
+        }
     }
 
     /**
@@ -1263,7 +1249,7 @@ class CitranaApp {
             this.drawingTools?.editUI?.hide();
             this.drawingTools?.clearSelection?.();
             if (this.drawingTools?.isEditingPlanet) {
-                this.drawingTools.cancelPlanetEditing();
+                this.drawingTools.dismissPlanetEditing();
             }
         }
         citranaDebug('Presentation view:', this.presentationView);

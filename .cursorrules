@@ -489,7 +489,7 @@ Key Responsibilities:
 Key Features:
 - Default stroke widths: Pen **3px**, Line and Arrow **4px**
 - Pen smoothing: spline tension + minimum point spacing (`PEN_TENSION`, `PEN_MIN_POINT_DISTANCE`)
-- Graha edit sessions commit on Save / dismiss when dirty (`planetEditSession`)
+- Graha edit sessions: **Save** / click-away / Enter → `dismissPlanetEditing()` (commits if dirty); **Cancel** / Escape → `cancelPlanetEditing()` (discards)
 - Control points for arrow/line; `Adjust drawing` on handle drag end
 - `bindMoveDragHistory()` for pen/text/heading reposition undo
 - Auto-switch to Select Tool after Arrow, Line, Text, and Heading creation; Pen and Laser stay active for continuous drawing

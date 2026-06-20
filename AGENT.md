@@ -440,7 +440,7 @@ Key Features:
 - Default stroke widths: Pen **3px**, Line and Arrow **4px** (`edit-ui.js` defaults + tool `start*` methods)
 - Text editing with font controls
 - Graha text editing with retrograde underline support (Konva `textDecoration`)
-- Graha edit sessions commit on Save / dismiss when dirty (`planetEditSession`)
+- Graha edit sessions: **Save** / click-away / Enter → `dismissPlanetEditing()` (commits if dirty); **Cancel** / Escape → `cancelPlanetEditing()` (discards)
 - Auto-switch to Select Tool after Arrow, Line, Text, and Heading creation; Pen and Laser stay active for continuous drawing
 - `makeShapeSelectable()` binds drag/selection once when a stroke completes (`stopDrawing`), not on every mousemove; touch double-tap guarded by `_editUiDoubleTapBound`
 - Control points for precise arrow and line adjustment; `Adjust drawing` on handle drag end
@@ -448,7 +448,7 @@ Key Features:
 Key Methods:
 - `startDrawing()` / `draw()` / `stopDrawing()`: Drawing lifecycle
 - `makeShapeSelectable()` / `bindMoveDragHistory()`: Selection and move undo
-- `editPlanetText()` / `cancelPlanetEditing()`: Graha label/colour/retrograde bar
+- `editPlanetText()` / `dismissPlanetEditing()` / `cancelPlanetEditing()`: Graha label/colour/retrograde bar — dismiss commits if edited (click outside); cancel discards (Cancel / Escape)
 - `editText()` / `editHeading()`: Inline content editors with undo on commit
 - `showEditUIForShape()`: Edit interface integration
 - `setPlanetRetrogradeState()`: Persist retrograde underline on Graha text

@@ -832,23 +832,10 @@ class DrawingTools {
                 const shapeY = this.selectedShape.y();
                 const scaleX = this.selectedShape.scaleX();
                 const scaleY = this.selectedShape.scaleY();
-                const rotation = this.selectedShape.rotation();
 
                 // Remove shape's position offset
                 let localX = controlX - shapeX;
                 let localY = controlY - shapeY;
-
-                // Apply inverse rotation if any
-                if (rotation !== 0) {
-                    const cos = Math.cos(-rotation * Math.PI / 180);
-                    const sin = Math.sin(-rotation * Math.PI / 180);
-
-                    const rotatedX = localX * cos - localY * sin;
-                    const rotatedY = localX * sin + localY * cos;
-
-                    localX = rotatedX;
-                    localY = rotatedY;
-                }
 
                 // Apply inverse scale
                 localX = localX / scaleX;
@@ -897,23 +884,10 @@ class DrawingTools {
                 const shapeY = this.selectedShape.y();
                 const scaleX = this.selectedShape.scaleX();
                 const scaleY = this.selectedShape.scaleY();
-                const rotation = this.selectedShape.rotation();
 
                 // Remove shape's position offset
                 let localX = controlX - shapeX;
                 let localY = controlY - shapeY;
-
-                // Apply inverse rotation if any
-                if (rotation !== 0) {
-                    const cos = Math.cos(-rotation * Math.PI / 180);
-                    const sin = Math.sin(-rotation * Math.PI / 180);
-
-                    const rotatedX = localX * cos - localY * sin;
-                    const rotatedY = localX * sin + localY * cos;
-
-                    localX = rotatedX;
-                    localY = rotatedY;
-                }
 
                 // Apply inverse scale
                 localX = localX / scaleX;
@@ -977,17 +951,11 @@ class DrawingTools {
             : shape.points();
         if (points.length < 4) return;
 
-        // Get the shape's transformation matrix
-        const transform = shape.getTransform();
-
-        // Calculate the actual position of the shape
         const shapeX = shape.x();
         const shapeY = shape.y();
         const scaleX = shape.scaleX();
         const scaleY = shape.scaleY();
-        const rotation = shape.rotation();
 
-        // Apply transformation to the points
         const startPoint = {
             x: points[0] * scaleX,
             y: points[1] * scaleY
@@ -998,23 +966,6 @@ class DrawingTools {
             y: points[3] * scaleY
         };
 
-        // Apply rotation if any
-        if (rotation !== 0) {
-            const cos = Math.cos(rotation * Math.PI / 180);
-            const sin = Math.sin(rotation * Math.PI / 180);
-
-            const rotatedStartX = startPoint.x * cos - startPoint.y * sin;
-            const rotatedStartY = startPoint.x * sin + startPoint.y * cos;
-            const rotatedEndX = endPoint.x * cos - endPoint.y * sin;
-            const rotatedEndY = endPoint.x * sin + endPoint.y * cos;
-
-            startPoint.x = rotatedStartX;
-            startPoint.y = rotatedStartY;
-            endPoint.x = rotatedEndX;
-            endPoint.y = rotatedEndY;
-        }
-
-        // Add the shape's position offset
         this.controlPoints.startPoint.x(shapeX + startPoint.x);
         this.controlPoints.startPoint.y(shapeY + startPoint.y);
         this.controlPoints.endPoint.x(shapeX + endPoint.x);
@@ -1485,8 +1436,8 @@ class DrawingTools {
             this.isEditingPlanet = false;
         };
 
-        const handleSave = () => finishEditing(true);
-        const handleCancel = () => finishEditing(false);
+        const handleSave = () => this.dismissPlanetEditing();
+        const handleCancel = () => this.cancelPlanetEditing();
 
         const handleDelete = () => {
             teardownSession();
@@ -1510,10 +1461,10 @@ class DrawingTools {
         const handleKeyDown = (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                finishEditing(true);
+                this.dismissPlanetEditing();
             } else if (e.key === 'Escape') {
                 e.preventDefault();
-                finishEditing(false);
+                this.cancelPlanetEditing();
             }
         };
 
@@ -1630,12 +1581,21 @@ class DrawingTools {
     }
 
     /**
-     * Cancel any existing Graha editing session
+     * Dismiss the Graha edit bar (e.g. click outside, open drawing Edit UI, Presentation View).
+     * Commits label, colour, and retrograde if the session was edited — same as Save.
+     */
+    dismissPlanetEditing() {
+        if (this.planetEditSession?.finish) {
+            this.planetEditSession.finish(true);
+        }
+    }
+
+    /**
+     * Discard in-progress Graha edits and close the edit bar (Cancel button / Escape).
      */
     cancelPlanetEditing() {
         if (this.planetEditSession?.finish) {
-            // Commit label/colour/retrograde changes when the edit bar is dismissed
-            this.planetEditSession.finish(true);
+            this.planetEditSession.finish(false);
         }
     }
 
@@ -1648,8 +1608,8 @@ class DrawingTools {
     showEditUI(element, tool) {
         citranaDebug(`[EDIT UI] Showing Edit UI for ${tool} tool, element:`, element);
 
-        // Cancel any existing Graha editing
-        this.cancelPlanetEditing();
+        // Dismiss any open Graha edit bar before showing drawing Edit UI (commits if edited)
+        this.dismissPlanetEditing();
 
         // Hide any existing Edit UI first
         this.editUI.hide();

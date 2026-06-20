@@ -152,7 +152,6 @@ const CitranaArrow = (() => {
 
         arrow.x(node.x());
         arrow.y(node.y());
-        arrow.rotation(node.rotation());
         arrow.scaleX(node.scaleX());
         arrow.scaleY(node.scaleY());
         arrow.visible(node.visible());
