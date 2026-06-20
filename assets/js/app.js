@@ -18,6 +18,7 @@ class CitranaApp {
         this.exportWithWhiteBg = true; // Default: white background
         this.isExporting = false; // Prevent multiple concurrent exports
         this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
+        this.presentationView = false;
         this.options = {
             northHideIndicators: localStorage.getItem('citrana_north_hide_indicators') === '1',
             southHideIndicators: localStorage.getItem('citrana_south_hide_indicators') === '1',
@@ -330,6 +331,8 @@ class CitranaApp {
 
         // Fix UI elements visibility after focus events (keyboard dismissal)
         const fixUIElementsVisibility = () => {
+            if (window.app?.presentationView) return;
+
             setTimeout(() => {
                 // Fix top toolbar - always visible
                 if (toolbar) {
@@ -394,6 +397,8 @@ class CitranaApp {
 
         // Periodic check to ensure UI elements are visible
         setInterval(() => {
+            if (window.app?.presentationView) return;
+
             // Check top toolbar - always should be visible
             if (toolbar && (toolbar.style.visibility === 'hidden' || toolbar.style.display === 'none')) {
                 fixUIElementsVisibility();
@@ -1218,6 +1223,16 @@ class CitranaApp {
 
     isTouchDevice() {
         return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+
+    isPresentationView() {
+        return this.presentationView;
+    }
+
+    togglePresentationView() {
+        this.presentationView = !this.presentationView;
+        document.body.classList.toggle('presentation-view', this.presentationView);
+        citranaDebug('Presentation view:', this.presentationView);
     }
 
     handleResize() {

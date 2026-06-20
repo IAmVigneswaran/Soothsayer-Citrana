@@ -241,6 +241,15 @@ class ContextMenu {
         this.showChartMenu(clientX, clientY);
     }
 
+    getPresentationViewMenuHtml(isLast = false) {
+        const active = window.app?.isPresentationView?.() ?? false;
+        const label = active ? 'Exit Presentation View' : 'Presentation View';
+        const icon = 'presentation';
+        const lastClass = isLast ? ' last-item' : '';
+
+        return `<div class="context-menu-item${lastClass}" data-action="toggle-presentation-view"><i data-lucide="${icon}"></i> ${label}</div>`;
+    }
+
     showChartMenu(x, y) {
         const chartType = window.app?.chartTemplates?.currentChartType;
 
@@ -259,6 +268,8 @@ class ContextMenu {
             <div class="context-menu-separator"></div>
             <div class="context-menu-item" data-action="create-north-indian"><i data-lucide="plus-circle"></i> North Indian Chart</div>
             <div class="context-menu-item" data-action="create-south-indian"><i data-lucide="plus-circle"></i> South Indian Chart</div>
+            <div class="context-menu-separator"></div>
+            ${this.getPresentationViewMenuHtml()}
             <div class="context-menu-separator"></div>
             <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>
         `;
@@ -396,6 +407,8 @@ class ContextMenu {
         }
         // Add 'Reset Chart', 'Reset Drawings', and 'Clear Canvas' (renamed from 'Clear Chart')
         menuHtml += `
+            ${this.getPresentationViewMenuHtml()}
+            <div class="context-menu-separator"></div>
             <div class="context-menu-item" data-action="reset-chart"><i data-lucide="trash-2"></i> Reset Chart</div>
             <div class="context-menu-item" data-action="reset-drawings"><i data-lucide="trash-2"></i> Reset Drawings</div>
             <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>
@@ -454,6 +467,8 @@ class ContextMenu {
             lagnaActionHtml +
             `<div class="context-menu-separator"></div>` +
             `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}"><i data-lucide="trash-2"></i> Clear Bhava</div>` +
+            `<div class="context-menu-separator"></div>` +
+            `${this.getPresentationViewMenuHtml()}` +
             `<div class="context-menu-separator"></div>` +
             `<div class="context-menu-item" data-action="reset-chart"><i data-lucide="refresh-ccw"></i> Reset Chart</div>` +
             `<div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>`;
@@ -689,6 +704,10 @@ class ContextMenu {
                 if (houseNumber && context.planetId) {
                     this.removePlanetFromHouse(houseNumber, context.planetId);
                 }
+                break;
+
+            case 'toggle-presentation-view':
+                window.app?.togglePresentationView();
                 break;
         }
     }

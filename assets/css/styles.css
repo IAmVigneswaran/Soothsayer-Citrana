@@ -87,6 +87,15 @@ body {
   z-index: 2;
 }
 
+/* Presentation View — hide chrome via context menu toggle */
+body.presentation-view .floating-top-toolbar,
+body.presentation-view .floating-zoom-controls,
+body.presentation-view .floating-planet-library,
+body.presentation-view .help-btn,
+body.presentation-view .about-btn {
+  display: none !important;
+}
+
 /* Floating Top Toolbar */
 .floating-top-toolbar {
   position: absolute;

@@ -29,12 +29,14 @@ This codebase is developed using AI agents.
 - Graha Library: 60 Grahas across 5 pages — traditional Grahas, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Upagrahas with outer Grahas
 - Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that Bhava on the **next** drop only (then the pointer takes over again)
 - Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (zoom and pan are not tracked)
-- Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
+- Comprehensive Drawing Tools: Select, arrow, line, pen, laser pointer, text, and heading tools
+- Laser Pointer: Temporary fading highlight for presentations; not saved or undoable
+- Presentation View: Right-click the canvas to hide toolbar, zoom bar, Graha library, Help, and About; choose **Exit Presentation View** to restore
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
 - Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark), from the toolbar **Options** modal; preferences persist in this browser
-- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, and more)
-- Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
+- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more)
+- Keyboard Shortcuts: Tools (including **K** for Laser Pointer), undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; your work stays in this browser session
 
@@ -139,9 +141,11 @@ Custom Graha: There is also a "Custom" Graha available in the library. Drag and 
 
 ### Drawing and Navigation
 
-Drawing Tools: Use the toolbar to add arrows, lines, pen strokes, text, and headings. After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool stays active for continuous drawing. Double-click text and heading elements to edit them. Use the Hand tool to pan around the chart.
+Drawing Tools: Use the toolbar to add arrows, lines, pen strokes, text, and headings. After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool and Laser Pointer stay active for continuous drawing. The Laser Pointer (**K**) draws a temporary highlight that fades away — it is not saved to the chart or included in undo/redo. Double-click text and heading elements to edit them. Use the Hand tool to pan around the chart.
 
-Undo and Redo: Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Ctrl+Y** to step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Zoom, pan, and tool selection are not tracked.
+Presentation View: Right-click the canvas (or a Bhava) and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again and choose **Exit Presentation View** to restore the interface.
+
+Undo and Redo: Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Ctrl+Y** to step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Zoom, pan, tool selection, laser pointer strokes, and Presentation View are not tracked.
 
 Navigation: Zoom is locked by default. Use the zoom bar to zoom in or out, or click the lock icon to unlock zoom and use the mouse wheel or `+` / `-` keys. Reset zoom refits the chart. The Hand tool allows you to pan around the canvas for detailed work. Press `?` or `/` in the app for the full keyboard shortcut list.
 
