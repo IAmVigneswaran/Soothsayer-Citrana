@@ -23,6 +23,7 @@ Internal code identifiers (e.g. `planet-system.js`, `addPlanetToHouse()`, Konva 
 
 - Frontend: Pure HTML5, CSS3, JavaScript (ES6+)
 - Graphics: HTML5 Canvas API with Konva.js (self-hosted, `assets/vendor/konva.min.js` v9.3.20)
+- Colour picker: JSColorPicker (self-hosted, `assets/vendor/colorpicker.iife.min.js` v1.1.0; theme in `citrana-colorpicker.js`)
 - Styling: Custom CSS only
 - Icons: Lucide Icons (self-hosted, `assets/vendor/lucide.min.js` v0.468.0)
 - Storage: Browser `localStorage` for preferences (welcome modal, chart indicator toggles, Save Chart Only export, debug opt-out)
@@ -35,18 +36,20 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2260-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2330-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---1480-lines)
+   - [Main Application (app.js)](#main-application-appjs---1515-lines)
    - [History Engine (history.js)](#history-engine-historyjs---77-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---360-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---993-lines)
    - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---949-lines)
    - [Graha System](#planet-system-planet-systemjs---884-lines)
-   - [Drawing Tools](#drawing-tools-drawing-toolsjs---1902-lines)
+   - [Citrana Arrow](#citrana-arrow-citrana-arrowjs---187-lines)
+   - [Citrana Color Picker](#citrana-color-picker-citrana-colorpickerjs---378-lines)
+   - [Drawing Tools](#drawing-tools-drawing-toolsjs---1930-lines)
    - [Context Menu](#context-menu-context-menujs---721-lines)
-   - [Edit UI](#edit-ui-edit-uijs---775-lines)
+   - [Edit UI](#edit-ui-edit-uijs---776-lines)
 6. [Core Features](#core-features)
    - [Undo / Redo](#undo--redo)
    - [Chart Types](#chart-types)
@@ -66,7 +69,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2270 lines)
+## CSS and Layout (styles.css - ~2330 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome), responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
 
@@ -75,6 +78,8 @@ Light theme, floating UI, modals (Help and Options share modal chrome), responsi
 - No grid scrolling (`overflow: visible`; no `max-height` on `.planet-grid`)
 - Desktop: `repeat(auto-fit, minmax(80px, 1fr))`; 80×40px `.planet-item` cells
 - Mobile (≤768px): 6×2 grid, 320px library width, compact vertical padding, 30px cells with 7px font and `word-break: break-word` for Page 5 Upagraha names
+
+**JSColorPicker theme (`--cp-*` in `:root`):** chip size, borders, swatch width, shadows — aligned to Citrana light theme. Compact toolbars hide hex input, format tabs, and dropdown caret (`.cp_input`, `.cp_formats`, `.cp_caret`).
 
 **iOS standalone PWA (2.0):**
 - Safe-area CSS vars (`--sat` … `--sal`, `--ui-inset`, `--ui-bottom-pad`, `--ui-bottom-stack`)
@@ -86,26 +91,30 @@ Light theme, floating UI, modals (Help and Options share modal chrome), responsi
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~461 lines); viewport-fit=cover; PWA meta; Options modal; Graha library markup (CSS-styled)
+├── index.html                    # Main entry (~465 lines); viewport-fit=cover; PWA meta; JSColorPicker CSS; Options modal
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2270 lines)
+│   │   └── styles.css            # Complete styling system (~2330 lines); JSColorPicker `--cp-*` theme
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1480 lines)
+│   │   ├── app.js                # Main application coordinator (~1515 lines)
+│   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~187 lines)
+│   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~378 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
 │   │   ├── chart-coordinator.js  # Chart type management (~360 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~993 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (~949 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~884 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (~1902 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (~1930 lines)
 │   │   ├── context-menu.js       # Context menu system (~721 lines)
-│   │   ├── edit-ui.js            # Edit interface controls (~775 lines)
+│   │   ├── edit-ui.js            # Edit interface controls (~776 lines)
 │   │   └── history.js            # Unified undo/redo timeline (~77 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
-│   │   └── lucide.min.js         # Lucide 0.468.0 (self-hosted)
+│   │   ├── lucide.min.js         # Lucide 0.468.0 (self-hosted)
+│   │   ├── colorpicker.iife.min.js  # JSColorPicker 1.1.0 (self-hosted)
+│   │   └── colorpicker.min.css   # JSColorPicker 1.1.0 stylesheet
 │   ├── images/                   # 14 files (logos, demo GIFs, browser screenshot)
 │   │   ├── soothsayer_citrana_social-preview.jpg
 │   │   ├── Soothsayer-Citrana-Full-Logo-Black.png / -White.png
@@ -127,10 +136,10 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # This comprehensive documentation (~1042 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~379 lines)
-├── .cursorrules                  # Cursor IDE configuration (~1061 lines)
-├── CHANGELOG.md                  # Version history and changes (~57 lines)
+├── AGENT.md                      # This comprehensive documentation (~1085 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~400 lines)
+├── .cursorrules                  # Cursor IDE configuration (~1095 lines)
+├── CHANGELOG.md                  # Version history and changes (~62 lines)
 ├── README.md                     # Project readme (~177 lines)
 ├── LICENSE                       # MIT License
 ├── SECURITY.md                   # Security policy
@@ -143,7 +152,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1480 lines)
+### Main Application (app.js - ~1515 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -386,16 +395,17 @@ Key Methods:
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
 - `getPlanetInfo()`: Retrieve Graha data from paged structure
 
-### Drawing Tools (drawing-tools.js - ~1902 lines)
+### Drawing Tools (drawing-tools.js - ~1930 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
 - Implements all drawing tools (select, arrow, line, pen, text, heading)
+- Creates arrows via `CitranaArrow.create()` (filled `Konva.Line`, not `Konva.Arrow`)
 - Calls `window.app.recordHistory()` for drawing and Graha edit actions
 - Handles shape selection and editing
 - Provides precise positioning and hit detection
 - Manages Edit UI integration
-- Implements Graha text editing (`#text-edit-controls` bar)
+- Implements Graha text editing (`#text-edit-controls` bar; colour via `#text-edit-color` + `CitranaColorPicker`)
 
 Available Tools:
 - Select Tool: Choose and modify existing elements
@@ -426,7 +436,32 @@ Key Methods:
 - `setPlanetRetrogradeState()`: Persist retrograde underline on Graha text
 - `createControlPoints()` / `commitControlPointAdjust()`: Arrow/line endpoint handles
 - `updateControlPointsPosition()` / `clearControlPoints()`: Control point sync
-- `restorePersistedDrawings()`: Rebuild drawings from history snapshots
+- `restorePersistedDrawings()`: Rebuild drawings from history snapshots; migrates legacy `Konva.Arrow` via `CitranaArrow.fromLegacyNode()`
+
+### Citrana Arrow (citrana-arrow.js - ~187 lines)
+Unified filled-arrow geometry — shaft and head are one `Konva.Line` polygon so semi-transparent colours render correctly.
+
+Key Responsibilities:
+- `buildOutlinePoints()` — constant-width shaft + prominent triangular head (no taper)
+- Stores tail/tip in `arrowAnchors`; serialises `arrowStrokeWidth`, `arrowPointerLength`, `arrowPointerWidth`
+- `fromLegacyNode()` converts saved `Konva.Arrow` instances on restore
+
+Key Methods:
+- `create()`, `rebuild()`, `setAnchor()`, `setStrokeWidth()`, `isArrow()`, `getAnchors()`
+
+### Citrana Color Picker (citrana-colorpicker.js - ~378 lines)
+Centralised [JSColorPicker](https://www.jscolorpicker.com/) v1.1.0 integration.
+
+Key Responsibilities:
+- `SWATCHES` — 16 Apple-style rainbow colours (shared by Graha bar and drawing Edit UI; 2 rows × 8 in dialog)
+- Chip toggles in toolbars; alpha slider; format tabs hidden (`formats: false`)
+- `applyToKonvaArrow()` / `fromKonvaShape()` — opaque paint + `shape.opacity()` for arrows and picker round-trip
+
+Key Methods:
+- `attach()`, `destroy()`, `getValue()`, `setValue()`, `createInput()`, `initGrahaBar()`, `setGrahaPickCallback()`
+- `parseColorString()`, `toHex()`, `toRgbaString()`
+
+Vendor: `assets/vendor/colorpicker.iife.min.js`, `colorpicker.min.css`. Theme overrides: `--cp-*` in `styles.css`.
 
 ### Context Menu (context-menu.js - ~721 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
@@ -455,7 +490,7 @@ Key Methods:
 - `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`
 - `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
-### Edit UI (edit-ui.js - ~775 lines)
+### Edit UI (edit-ui.js - ~776 lines)
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
@@ -467,7 +502,7 @@ Key Responsibilities:
 - Records one undo step per edit session on `hide()` when properties changed
 
 Edit Controls:
-- Stroke width and colour controls (pen, line, arrow)
+- Stroke width and colour controls (pen, line, arrow) — colour via `CitranaColorPicker.createInput()` chips
 - Font size, weight, style, alignment, and colour (text, heading)
 - Retrograde toggle (Graha text only — records via `setPlanetRetrogradeState`, not session close)
 - Delete functionality
@@ -547,7 +582,7 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 
 ### Drawing Tool Summary
 - Select Tool: Choose and modify existing elements with Edit UI
-- Arrow Tool: Create directional indicators with customisable arrowheads and control points
+- Arrow Tool: Unified filled arrow (`CitranaArrow`) with constant-width shaft, prominent head, and control points
 - Line Tool: Draw straight lines and connections with control points
 - Pen Tool: Freehand drawing for annotations
 - Text Tool: Add editable text boxes anywhere on canvas
@@ -1041,8 +1076,8 @@ Edit the Graha data objects in assets/js/planet-system.js:
 - **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
 - **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
 - **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
-- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-debug`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
-- **Not minified in CI:** `assets/vendor/*` (Konva, Lucide — already minified)
+- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
+- **Not minified in CI:** `assets/vendor/*` (Konva, Lucide, JSColorPicker — already minified)
 
 ### Local development
 
