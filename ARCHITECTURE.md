@@ -96,7 +96,7 @@ Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-devic
 | `edit-ui.js` | ~776 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close) |
 | `context-menu.js` | ~644 | Right-click / long-press menus; unified hit-test routing; **Presentation View** toggle; North **Set Lagna as…** from `CitranaRashis.RASHIS` |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
-| `styles.css` | ~2335 | Light theme, floating UI, safe areas, iOS PWA layout, consolidated `@media (max-width: 768px)`, Graha library grid, JSColorPicker `--cp-*` theme, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px) |
+| `styles.css` | ~2400 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid, JSColorPicker `--cp-*` theme, `.help-modal-description`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
 
 ## Canvas Object Naming
 
@@ -328,7 +328,7 @@ All interactive chrome is **fixed/absolute positioned** over a full-viewport can
 ### CSS layout (2.0)
 
 - `:root` safe-area vars: `--sat`, `--sar`, `--sab`, `--sal`; `--ui-inset` (20px desktop), `--ui-inset-sm` (10px mobile), `--ui-bottom-pad` (8px mobile / 4px standalone PWA)
-- Layout tokens: `--ui-bottom-stack` (60px — 48px zoom bar + 12px gap above Graha library on mobile), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px — Help and About match zoom bar height)
+- Layout tokens: `--ui-bottom-stack` (60px desktop token), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px); **mobile `≤768px`:** 50px chrome height, `--ui-bottom-stack: 62px`
 - `body { position: fixed; inset: 0 }` — fills viewport on iOS (avoids `100dvh` gap)
 - `.app-container { position: absolute; inset: 0 }`
 - Top chrome: `top: calc(var(--ui-inset) + var(--sat))`
@@ -348,8 +348,8 @@ Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-gr
 
 - Top centre: tool toolbar — Undo/Redo, Select/Hand, drawing tools, export/transparency/**Options** (`#options-btn`)
 - Top left (desktop) / bottom stack (mobile): Graha library
-- Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`); mobile adds Select/Hand in zoom bar (288px width, 48px block height)
-- Bottom corners: Help (mobile bottom-left; desktop top-right), About (bottom-right) — `--corner-btn-size` 48px; hidden in Presentation View along with Graha bar and drawing Edit UI
+- Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`); mobile adds Select/Hand in zoom bar (288px width; 48px block height desktop, **50px mobile** including border)
+- Bottom corners: Help (mobile bottom-left; desktop top-right), About (bottom-right) — `--corner-btn-size` 48px desktop / 50px mobile; hidden in Presentation View along with Graha bar and drawing Edit UI
 - Bottom centre: Graha text edit bar, drawing Edit UI (dynamic)
 
 Modals: Welcome, Help, **Options**, About, Confirmation, Export Progress.
@@ -362,6 +362,10 @@ Modals: Welcome, Help, **Options**, About, Confirmation, Export Progress.
 - `openModal()` / `showExportProgress()` push prior focus onto `_modalFocusStack` and focus close button (or modal root if no focusables)
 - `closeModal()` / `hideExportProgress()` pop stack and restore focus
 - Export progress: `aria-busy="true"` during export; status text id referenced by `aria-describedby`
+- Help intro: `#help-modal-description` with `.help-modal-description` (spacing before **Keyboard Shortcuts** section)
+- Mobile About/Welcome: compact typography, `overflow: hidden`; `@media` blocks after base modal CSS (cascade-safe)
+
+**CSS responsive cascade:** Additional `@media (max-width: 768px)` blocks after base `.help-btn`, `.about-btn`, and modal selectors override desktop rules that appear later in the file.
 
 Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit factor. Official support is desktop-only; iOS standalone PWA layout is tuned but not officially supported.
 
@@ -424,7 +428,7 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | North chart Lagna by Rashi | `handleAction('set-lagna')` with rashi 1–12 |
 | Library drop hit-test | `findHouseAtChartPoint()` in template; coords in `ChartCoordinator` |
 | Zoom fit behaviour | `zoomToFit()` in chart template |
-| Theme / layout / safe areas | `assets/css/styles.css` |
+| Theme / layout / safe areas | `assets/css/styles.css` — keep post-base mobile `@media` blocks after component base rules when overrides must win |
 | Export behaviour | `app.exportChart()` / `finalizeExportImage()`; crop bounds in `ChartCoordinator.getExportCropRect()` |
 | Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
 | Save Chart Only export | `app.setSaveChartOnly()`, `applySaveChartOnlyTransparency()`, `#save-chart-only-toggle` in `index.html` |

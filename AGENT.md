@@ -36,7 +36,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2335-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2400-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
    - [Main Application (app.js)](#main-application-appjs---1754-lines)
@@ -72,11 +72,11 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2335 lines)
+## CSS and Layout (styles.css - ~2400 lines)
 
-Light theme, floating UI, modals (Help and Options share modal chrome; `role="dialog"` + `aria-*`), responsive breakpoints (769px desktop, 768px tablet, 600px mobile). Tablet/mobile rules consolidated into a single `@media (max-width: 768px)` block.
+Light theme, floating UI, modals (Help and Options share modal chrome; `role="dialog"` + `aria-*`), responsive breakpoints (769px desktop, 768px tablet, 600px mobile). Most tablet/mobile rules live in one `@media (max-width: 768px)` block; **post-base mobile overrides** (Help/About position, modal compact sizing) use separate `@media` blocks **after** base component selectors so cascade order is correct.
 
-**Layout tokens (`:root`):** `--ui-bottom-stack` (60px — 48px zoom bar + 12px gap above Graha library on mobile), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px for Help and About — matches zoom bar block height). Help icon at 50% of button; About logo at 62.5%.
+**Layout tokens (`:root`):** Desktop — `--ui-bottom-stack` (60px), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px). Mobile `≤768px` overrides in the main mobile block — 50px chrome height (zoom bar border included), `--ui-bottom-stack: 62px`. Help icon at 50% of button; About logo at 62.5%.
 
 **Presentation View:** `body.presentation-view` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, `.about-btn`, `.floating-text-edit-controls`, and `.floating-edit-ui` via CSS. Toggled from context menu (`app.togglePresentationView()`); dismisses active edit sessions on enter.
 
@@ -103,7 +103,7 @@ Soothsayer-Citrana/
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2335 lines); consolidated `@media (max-width: 768px)`; JSColorPicker `--cp-*` theme; `.citrana-laser-canvas`; `body.presentation-view`
+│   │   └── styles.css            # Complete styling system (~2400 lines); primary mobile block + post-base mobile overrides; JSColorPicker `--cp-*` theme; `.citrana-laser-canvas`; `body.presentation-view`
 │   ├── js/
 │   │   ├── app.js                # Main application coordinator (~1754 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~186 lines)
@@ -146,9 +146,9 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # This comprehensive documentation (~1150 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~450 lines)
-├── .cursorrules                  # Cursor IDE configuration (~1170 lines)
+├── AGENT.md                      # This comprehensive documentation (~1160 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~445 lines)
+├── .cursorrules                  # Cursor IDE configuration (~1180 lines)
 ├── CHANGELOG.md                  # Version history and changes (~77 lines)
 ├── README.md                     # Project readme (~180 lines)
 ├── LICENSE                       # MIT License
@@ -682,9 +682,9 @@ Technical Implementation:
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
 - Status Updates: Real-time feedback and notifications
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
-- Help Modal: Shortcuts and usage guide (Laser Pointer, Presentation View, undo exclusions); `aria-describedby` summary
-- About Modal: Information about Citrana with creator details and links
-- Welcome Modal: First-time user experience; `closeWelcomeModal()` marks seen in `localStorage`
+- Help Modal: Shortcuts and usage guide (Laser Pointer, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
+- About Modal: Information about Citrana with creator details and links; mobile compact layout without scroll
+- Welcome Modal: First-time user experience; `closeWelcomeModal()` marks seen in `localStorage`; mobile compact layout without scroll
 - Options Modal: Chart indicator toggles and **Save Chart Only** export; shared modal width with Help (`width: min(600px, 90vw)`)
 - Confirmation Modal: Destructive-action confirm; dynamic message + warning in `aria-describedby`
 - Export Progress Modal: Non-dismissible; live status in `aria-describedby`; `aria-busy` while exporting

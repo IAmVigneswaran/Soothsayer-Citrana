@@ -29,7 +29,7 @@ Soothsayer-Citrana/
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2335 lines); consolidated `@media (max-width: 768px)`; JSColorPicker `--cp-*` theme; `.citrana-laser-canvas`; `body.presentation-view`
+│   │   └── styles.css            # Complete styling system (~2400 lines); primary `@media (max-width: 768px)` block plus post-base mobile overrides; JSColorPicker `--cp-*` theme; `.citrana-laser-canvas`; `body.presentation-view`
 │   ├── js/
 │   │   ├── app.js                # Main application coordinator (~1754 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~186 lines)
@@ -72,9 +72,9 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # Comprehensive documentation (~1150 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~450 lines)
-├── .cursorrules                  # This Cursor IDE configuration (~1170 lines)
+├── AGENT.md                      # Comprehensive documentation (~1160 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~445 lines)
+├── .cursorrules                  # This Cursor IDE configuration (~1180 lines)
 ├── CHANGELOG.md                  # Version history and changes (~77 lines)
 ├── README.md                     # Project readme (~180 lines)
 ├── LICENSE                       # MIT License
@@ -131,15 +131,17 @@ The application uses a floating UI system with absolute positioning for all inte
 #### Floating Zoom Controls
 - Desktop: bottom left (`--ui-inset` + safe area)
 - Mobile: bottom centre (288px width); includes `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`, Select, Hand
-- Block height: `--zoom-controls-block-height` (48px)
+- Block height: `--zoom-controls-block-height` (48px desktop; **50px mobile** — includes 1px border × 2 so outer height matches Help/About)
+- Mobile: explicit `height: var(--zoom-controls-block-height)` on `.floating-zoom-controls`
 - `#zoom-lock`: default locked; `lock` / `lock-open` Lucide icons; disables zoom in/out when locked
 - White background with black border
 
 #### Help and About Buttons
 - Help (`#help-btn`): top-right on desktop; bottom-left on mobile — aligned with zoom bar bottom edge
 - About (`#about-btn`): bottom-right on all viewports
-- Size: `--corner-btn-size` (48px) matches zoom bar block height
+- Size: `--corner-btn-size` (48px desktop; **50px mobile** — matches zoom bar outer height); mobile `border-radius: 8px` to match zoom bar
 - Icons: Help Lucide icon at 50% of button; About logo at 62.5% of button
+- **CSS cascade:** mobile Help/About reposition rules live in a separate `@media (max-width: 768px)` block **after** base `.help-btn` / `.about-btn` styles (not only in the main mobile block)
 - Hidden when `body.presentation-view` is active (Presentation View); Graha bar (`.floating-text-edit-controls`) and drawing Edit UI (`.floating-edit-ui`) hidden the same way
 
 #### Floating Edit UI
@@ -177,6 +179,8 @@ The application uses a floating UI system with absolute positioning for all inte
 - Responsive sizing for different screen sizes
 - Smooth animations for show/hide states
 - `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`; `aria-hidden` toggled by `openModal()` / `closeModal()`
+- Help intro: `#help-modal-description` uses `.help-modal-description` (margin before first section; not `.help-instructions` wrapper)
+- Mobile About/Welcome: compact typography; `overflow: hidden` (no scroll); mobile `@media` blocks **after** base modal CSS
 - **Escape** dismisses open modals via `dismissActiveModalOnEscape()` (export progress excepted)
 - **Tab focus trap** via `trapModalFocus()`; focus moves to close button on open and restores on close (`_modalFocusStack`)
 
@@ -212,11 +216,13 @@ The application uses a mobile-first approach with three main breakpoints:
 ### iOS Standalone PWA Layout (2.0)
 - `viewport-fit=cover` in `index.html`; `manifest.json` `display: standalone`
 - CSS safe-area variables: `--sat`, `--sar`, `--sab`, `--sal`; `--ui-inset` (20px), `--ui-inset-sm` (10px), `--ui-bottom-pad` (8px mobile / 4px standalone PWA)
-- Layout tokens: `--ui-bottom-stack` (60px — 48px zoom bar + 12px gap above Graha library on mobile), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px)
+- Layout tokens: `--ui-bottom-stack` (60px desktop token — 48px zoom + 12px gap above Graha library), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px); **mobile `≤768px` overrides** in main mobile block: 50px chrome height, `--ui-bottom-stack: 62px`
 - `body { position: fixed; inset: 0 }` and `.app-container { position: absolute; inset: 0 }` — avoids iOS `100dvh` bottom gap
 - Floating UI uses `calc(inset + safe-area)`; Graha library repositions to bottom stack on mobile (`--ui-bottom-stack`)
 - `app.handleResize()` uses `visualViewport` when available
 - Mobile (`≤768px`): arrow, line, pen, and laser toolbar buttons hidden; `#laser-help-shortcut` hidden in Help; Help moves to bottom-left
+
+**CSS responsive note:** Most tablet/mobile rules are in one `@media (max-width: 768px)` block near the top of the responsive section. Overrides that must beat later base component rules (Help/About position, About/Welcome/Confirmation/Export modal sizing) use **additional** `@media (max-width: 768px)` blocks placed **after** those base selectors in `styles.css`.
 
 ### Accessibility Features
 - High contrast colour scheme
@@ -716,9 +722,9 @@ Technical Implementation:
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
 - Status Updates: Real-time feedback and notifications
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
-- Help Modal: Keyboard shortcuts and usage guide (includes Laser Pointer and Presentation View); `aria-describedby` summary text
+- Help Modal: Keyboard shortcuts and usage guide (includes Laser Pointer and Presentation View); `#help-modal-description` / `.help-modal-description` intro before sections
 - About Modal: Information about Citrana with creator details and links
-- Welcome Modal: First-time user experience with getting started guide; `closeWelcomeModal()` marks seen in `localStorage`
+- Welcome Modal: First-time user experience with getting started guide; `closeWelcomeModal()` marks seen in `localStorage`; mobile compact layout without scroll
 - Options Modal: Chart indicator toggles and **Save Chart Only** export; shared modal width with Help
 - Confirmation Modal: Destructive-action confirm; dynamic message + warning in `aria-describedby`
 - Export Progress Modal: Non-dismissible; live status in `aria-describedby`; `aria-busy` while exporting
