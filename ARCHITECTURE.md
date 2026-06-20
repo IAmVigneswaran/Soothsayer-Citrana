@@ -2,6 +2,11 @@
 
 This document describes how Citrana is structured at a system level: runtime composition, module boundaries, data flows, and safe extension points. For feature-level documentation and usage guidance, see [AGENT.md](AGENT.md) and [README.md](README.md).
 
+
+## Terminology
+
+User-facing copy and docs use **Bhava**, **Graha**, and **Rashi** (with correct capitalisation and plurals). Legacy identifiers in source (`house`, `planet` in filenames, methods, Konva node names, and serialised keys) remain for compatibility.
+
 ## Design Principles
 
 - **Browser-only**: No build step, no server runtime. Open `index.html` or deploy static files to GitHub Pages.
@@ -20,7 +25,7 @@ index.html  (viewport-fit=cover; Konva in <head>)
   ├── chart-templates-south.js     → SouthIndianChartTemplate
   ├── chart-templates-north.js     → NorthIndianChartTemplate
   ├── chart-coordinator.js         → ChartCoordinator
-  ├── planet-system.js             → PlanetSystem
+  ├── planet-system.js             → GrahaSystem (`PlanetSystem` class)
   ├── drawing-tools.js             → DrawingTools (+ EditUI instance)
   ├── edit-ui.js                   → EditUI
   ├── context-menu.js              → ContextMenu
@@ -64,7 +69,7 @@ Script order matters: `citrana-debug.js` first; chart template classes before `C
 | `chart-coordinator.js` | ~360 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `chart-templates-south.js` | ~993 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds |
 | `chart-templates-north.js` | ~949 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds |
-| `planet-system.js` | ~884 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer planets), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
+| `planet-system.js` | ~884 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `drawing-tools.js` | ~1902 | Drawing tools, selection, control points, Graha text editing, `makeShapeSelectable()` on stroke complete, history `recordHistory()` calls |
 | `edit-ui.js` | ~775 | Floating property editor for drawing shapes (session-based undo on close) |
 | `context-menu.js` | ~721 | Right-click / long-press menus; unified hit-test routing |
@@ -85,7 +90,7 @@ Konva nodes use predictable `name` values for hit-testing and cleanup:
 
 ## Graha Data Model
 
-Each placed Graha is stored in the active template's `houseData` as an object on the house's `planets` array.
+Each placed Graha is stored in the active template's `houseData` as an object on the Bhava's `grahas` array.
 
 **South Indian** (`houseDataSouth[houseNumber].planets[]`):
 
@@ -117,7 +122,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 ### Retrograde
 
 - **Display**: Underlined Graha text on canvas.
-- **Storage**: `retrograde: boolean` on planet data.
+- **Storage**: `retrograde: boolean` on Graha data.
 - **Editing**: Double-click Graha, right-click → **Edit Graha**, or Edit UI → retrograde button (↺)
 - **Persistence**: `retrograde` is included in in-memory chart serialisation (`getChartData()` / undo snapshots); not restored after page refresh
 - **Legacy**: Labels containing the old Unicode subscript `ᵣ` are stripped on ingest; `retrograde` is set to `true`.
@@ -134,7 +139,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 1. User drags from Graha library → `PlanetSystem.handleDrop()` (desktop) or `handleMobileDrop()` (touch)
 2. Target bhava resolution (first match wins):
-   - **Selected bhava** (one-shot): `window.selectedBhavaSouth` or `window.selectedBhavaNorth` if the user clicked a house first — cleared after the next successful drop (`PlanetSystem.clearSelectedBhavaDropTarget()`) or when clicking empty canvas (`app.js`)
+   - **Selected bhava** (one-shot): `window.selectedBhavaSouth` or `window.selectedBhavaNorth` if the user clicked a Bhava first — cleared after the next successful drop (`PlanetSystem.clearSelectedBhavaDropTarget()`) or when clicking empty canvas (`app.js`)
    - **Pointer hit-test**: `ChartCoordinator.findHouseAtPointer()` or `findHouseAtClientPoint()`
 3. Coordinator converts coords with `stagePointerToChartCoords()` / `clientToChartCoords()`, then delegates to template `findHouseAtChartPoint()`:
    - **South**: axis-aligned rectangle test; nearest-centre fallback
@@ -144,13 +149,13 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 ### Set Lagna
 
 - **South Indian**
-  - House menu only → **Set as Lagna** on the clicked bhava (no chart-level Lagna menu)
+  - Bhava menu only → **Set as Lagna** on the clicked bhava (no chart-level Lagna menu)
   - `set-lagna` action → `setLagnaHouse(visualHouseNumber)`; `loadChartData()` restores with `{ skipSnapshot: true }`
-  - House menu header uses `getBhavaNumberForHouse()` — **House N** counts from Lagna
+  - Bhava menu header uses `getBhavaNumberForHouse()` — **Bhava N** counts from Lagna
 - **North Indian**
-  - Chart menu → **Set Lagna as…** → pick zodiac sign (`set-lagna` with `data-house` 1–12 = Rashi sign)
-  - House menu → **Set as First House** → `set-first-house` → `getRashiNumberForHouse(visualHouse)` → `setLagnaHouse(rashi)`
-  - `lagnaHouseNorth` stores **Rashi sign** (1–12), not visual house index
+  - Chart menu → **Set Lagna as…** → pick Rashi (`set-lagna` with `data-house` 1–12 = Rashi)
+  - Bhava menu → **Set as First Bhava** → `set-first-house` → `getRashiNumberForHouse(visualHouse)` → `setLagnaHouse(rashi)`
+  - `lagnaHouseNorth` stores **Rashi** (1–12), not visual Bhava index
   - `setLagnaHouse(n, options?)` → renumber rashi boxes, `repositionPlanetsForNewLagna()`; `options.skipSnapshot` on undo restore
 
 `set-lagna` requires a `houseNumber`; if missing, the action is skipped (no default fallback).
@@ -161,9 +166,9 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 1. `getShapeAtClientPoint()` → `stage.getIntersection(pos)`
 2. `resolveContextTarget()` walks Konva names: `house-*`, `planet-hit-*`, `planet-{abbr}-{house}-{id}`
-3. House → `showHouseMenu()`; Graha → `showPlanetMenu()`; else → `showChartMenu()`
+3. Bhava → `showHouseMenu()`; Graha → `showPlanetMenu()`; else → `showChartMenu()`
 
-**Desktop**: right-click on `#canvas-container` and Konva `contextmenu` on houses/planets (with `stopPropagation`).
+**Desktop**: right-click on `#canvas-container` and Konva `contextmenu` on Bhavas/Grahas (with `stopPropagation`).
 
 **Mobile**: 500ms long-press on canvas uses the same hit-test routing (not chart-menu-only).
 
@@ -171,8 +176,8 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 |------|---------|-------------|
 | Create | Empty canvas | North/South chart, Clear Canvas |
 | Existing chart | Canvas, no hit | North: Set Lagna as…; Reset Chart; Reset Drawings; Clear Canvas |
-| House | Bhava hit | South: Set as Lagna; North: Set as First House; Clear House; … |
-| Planet | Graha hit | Edit Graha, Delete Graha |
+| Bhava | Bhava hit | South: Set as Lagna; North: Set as First Bhava; Clear Bhava; … |
+| Graha | Graha hit | Edit Graha, Delete Graha |
 
 ### Zoom
 
@@ -190,7 +195,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 ### Edit Graha
 
 1. Double-click Graha text, or right-click → **Edit Graha** → `DrawingTools.editPlanetText()` / `openPlanetEditor()`
-2. On save → template callback updates `label`, `color`, `retrograde` in house data and Konva node
+2. On save → template callback updates `label`, `color`, `retrograde` in Bhava data and Konva node
 
 ### Draw annotation
 
@@ -212,7 +217,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 **Edit sessions** (one step on commit, not per click): drawing Edit UI (`hide()`), Graha text bar (`finish(true)`), inline text/heading double-click editors.
 
-**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference. **Deferred 2.1:** visible History panel.
+**Not tracked:** zoom, pan, active tool, Bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference. **Deferred 2.1:** visible History panel.
 
 ### Chart display options
 
@@ -254,8 +259,8 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | Symbol | Set by | Used for |
 |--------|--------|----------|
 | `window.app` | `index.html` on `DOMContentLoaded` | Cross-module access |
-| `window.selectedBhavaSouth` | South template house click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
-| `window.selectedBhavaNorth` | North template house click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
+| `window.selectedBhavaSouth` | South template Bhava click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
+| `window.selectedBhavaNorth` | North template Bhava click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
 | `localStorage.citrana_north_hide_indicators` | Options modal (North toggle) | `'1'` hides North bhava corner boxes; key removed when shown |
 | `localStorage.citrana_south_hide_indicators` | Options modal (South toggle) | `'1'` hides South lagna line and bhava/rashi boxes; key removed when shown |
@@ -327,7 +332,7 @@ Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setup
 
 | Area | Labels |
 |------|--------|
-| Chart | `Start`, `Create South Indian chart`, `Create North Indian chart`, `Set Lagna`, `Clear house`, `Clear canvas`, `Reset chart`, `Reset drawings` |
+| Chart | `Start`, `Create South Indian chart`, `Create North Indian chart`, `Set Lagna`, `Clear Bhava`, `Clear canvas`, `Reset chart`, `Reset drawings` |
 | Grahas | `Add Graha`, `Remove Graha`, `Move Graha`, `Edit Graha` |
 | Drawings | `Draw arrow`, `Draw line`, `Draw pen stroke`, `Add text`, `Add heading`, `Move drawing`, `Adjust drawing`, `Delete drawing` |
 | Edits | `Edit arrow`, `Edit line`, `Edit pen`, `Edit text`, `Edit heading`, `Edit centre label` |
@@ -348,14 +353,14 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 
 | Goal | Where to change |
 |------|-----------------|
-| Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` (Page 5: Upagrahas before outer planets) |
+| Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` (Page 5: Upagrahas before outer Grahas) |
 | Graha library layout | `.floating-planet-library`, `.planet-library-header`, `.planet-grid`, `.planet-item` in `styles.css`; markup in `index.html` |
 | Add drawing tool | `DrawingTools.startDrawing()` switch, toolbar in `index.html`, `app.setTool()` |
 | New chart type | New template class + routes in `ChartCoordinator` (include `findHouseAtChartPoint()`) |
 | Context menu action | `ContextMenu.handleAction()`; items in `showHouseMenu()` / `showPlanetMenu()` / `showExistingChartMenu()` |
 | South bhava menu header | `SouthIndianChartTemplate.getBhavaNumberForHouse()` |
-| North First House → Lagna | `handleAction('set-first-house')` |
-| North chart Lagna by sign | `handleAction('set-lagna')` with rashi 1–12 |
+| North First Bhava → Lagna | `handleAction('set-first-house')` |
+| North chart Lagna by Rashi | `handleAction('set-lagna')` with rashi 1–12 |
 | Library drop hit-test | `findHouseAtChartPoint()` in template; coords in `ChartCoordinator` |
 | Zoom fit behaviour | `zoomToFit()` in chart template |
 | Theme / layout / safe areas | `assets/css/styles.css` |

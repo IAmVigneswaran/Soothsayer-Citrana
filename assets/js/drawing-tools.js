@@ -1221,22 +1221,22 @@ class DrawingTools {
     }
 
     /**
-     * Make planet text editable with live preview
-     * @param {KonvaText} planetText - The planet text object
-     * @param {Function} onUpdate - Callback function to update the planet label
+     * Make Graha text editable with live preview
+     * @param {KonvaText} planetText - The Graha text object
+     * @param {Function} onUpdate - Callback function to update the Graha label
      */
     makePlanetTextEditable(planetText, onUpdate) {
-        // Double-click to edit planet text (desktop)
+        // Double-click to edit Graha text (desktop)
         planetText.on('dblclick', () => {
             // Prevent multiple editing sessions
             if (this.isEditingPlanet) {
-                citranaDebug('Already editing a planet, ignoring double-click');
+                citranaDebug('Already editing a Graha, ignoring double-click');
                 return;
             }
             this.editPlanetText(planetText, onUpdate);
         });
 
-        // Double-tap to edit planet text (mobile)
+        // Double-tap to edit Graha text (mobile)
         let lastTap = 0;
         let tapCount = 0;
         let tapTimer = null;
@@ -1254,7 +1254,7 @@ class DrawingTools {
 
                     // Prevent multiple editing sessions
                     if (this.isEditingPlanet) {
-                        citranaDebug('Already editing a planet, ignoring double-tap');
+                        citranaDebug('Already editing a Graha, ignoring double-tap');
                         return;
                     }
 
@@ -1275,9 +1275,9 @@ class DrawingTools {
     }
 
     /**
-     * Edit planet text using the floating UI
-     * @param {KonvaText} planetText - The planet text object
-     * @param {Function} onUpdate - Callback function to update the planet label
+     * Edit Graha text using the floating UI
+     * @param {KonvaText} planetText - The Graha text object
+     * @param {Function} onUpdate - Callback function to update the Graha label
      */
     editPlanetText(planetText, onUpdate) {
         const textEditControls = document.getElementById('text-edit-controls');
@@ -1492,9 +1492,9 @@ class DrawingTools {
     }
 
     /**
-     * Persist retrograde underline state for a planet on the chart
-     * @param {KonvaText} planetText - The planet text object
-     * @param {boolean} retrograde - Whether the planet is retrograde
+     * Persist retrograde underline state for a Graha on the chart
+     * @param {KonvaText} planetText - The Graha text object
+     * @param {boolean} retrograde - Whether the Graha is retrograde
      */
     setPlanetRetrogradeState(planetText, retrograde) {
         if (!planetText || planetText._planetHouseNumber === undefined || !window.app?.chartTemplates) {
@@ -1524,7 +1524,7 @@ class DrawingTools {
     }
 
     /**
-     * Cancel any existing planet editing session
+     * Cancel any existing Graha editing session
      */
     cancelPlanetEditing() {
         if (this.planetEditSession?.finish) {
@@ -1542,7 +1542,7 @@ class DrawingTools {
     showEditUI(element, tool) {
         citranaDebug(`[EDIT UI] Showing Edit UI for ${tool} tool, element:`, element);
 
-        // Cancel any existing planet editing
+        // Cancel any existing Graha editing
         this.cancelPlanetEditing();
 
         // Hide any existing Edit UI first

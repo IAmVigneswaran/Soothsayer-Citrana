@@ -12,7 +12,7 @@ class SouthIndianChartTemplate {
         this.houseDataSouth = {};
         this.lagnaHouseSouth = 1;
         this._southIndicatorsVisible = true;
-        this.selectedHouse = null; // Track selected house for highlight
+        this.selectedHouse = null; // Track selected Bhava for highlight
 
         if (stage && layer) {
             console.log('South Indian Chart Template initialized with stage and layer');
@@ -86,7 +86,7 @@ class SouthIndianChartTemplate {
 
         // Create 4x4 grid with center empty (South Indian layout)
         const positions = [
-            // Top row (houses 12, 1, 2, 3)
+            // Top row (Bhavas 12, 1, 2, 3)
             {
                 x: startX,
                 y: startY,
@@ -107,7 +107,7 @@ class SouthIndianChartTemplate {
                 y: startY,
                 house: 3
             },
-            // Second row (houses 11, empty, empty, 4)
+            // Second row (Bhavas 11, empty, empty, 4)
             {
                 x: startX,
                 y: startY + houseSize,
@@ -118,7 +118,7 @@ class SouthIndianChartTemplate {
                 y: startY + houseSize,
                 house: 4
             },
-            // Third row (houses 10, empty, empty, 5)
+            // Third row (Bhavas 10, empty, empty, 5)
             {
                 x: startX,
                 y: startY + houseSize * 2,
@@ -129,7 +129,7 @@ class SouthIndianChartTemplate {
                 y: startY + houseSize * 2,
                 house: 5
             },
-            // Bottom row (houses 9, 8, 7, 6)
+            // Bottom row (Bhavas 9, 8, 7, 6)
             {
                 x: startX,
                 y: startY + houseSize * 3,
@@ -282,7 +282,7 @@ class SouthIndianChartTemplate {
     }
 
     createHouse(x, y, width, height, houseNumber) {
-        // Create house rectangle
+        // Create Bhava rectangle
         const house = new Konva.Rect({
             x: x,
             y: y,
@@ -294,7 +294,7 @@ class SouthIndianChartTemplate {
             name: `house-${houseNumber}`
         });
 
-        // Rashi (Zodiac signs) mapping
+        // Rashi mapping
         const rashis = [
             '1', // Aries
             '2', // Taurus
@@ -341,7 +341,7 @@ class SouthIndianChartTemplate {
             name: `rashiNumberSouthText-${houseNumber}`
         });
 
-        // Store house data
+        // Store Bhava data
         this.houseDataSouth[houseNumber] = {
             x: x,
             y: y,
@@ -391,7 +391,7 @@ class SouthIndianChartTemplate {
         this.houseDataSouth[houseNumber].bhavaNumberSouthBox = bhavaNumberSouthBox;
         this.houseDataSouth[houseNumber].bhavaNumberSouthText = bhavaNumberSouthText;
 
-        // Draw Lagna indicator lines if this is the Lagna house
+        // Draw Lagna indicator lines if this is the Lagna Bhava
         if (houseNumber === this.lagnaHouseSouth) {
             // Single diagonal line from top-left to a point near top and left sides
             const line = new Konva.Line({
@@ -406,7 +406,7 @@ class SouthIndianChartTemplate {
 
         // Add right-click event for context menu
         house.on('contextmenu', (e) => {
-            citranaDebug('South Indian Chart House right-clicked:', houseNumber);
+            citranaDebug('South Indian Chart Bhava right-clicked:', houseNumber);
             e.evt.preventDefault();
             e.evt.stopPropagation();
             this.highlightHouse(houseNumber);
@@ -417,14 +417,14 @@ class SouthIndianChartTemplate {
         house.on('click', (e) => {
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
-            console.log('[SELECT] South Indian Chart House selected:', houseNumber);
+            console.log('[SELECT] South Indian Chart Bhava selected:', houseNumber);
         });
 
         // Add touch event for mobile selection
         house.on('tap', (e) => {
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
-            console.log('[SELECT] South Indian Chart House selected via touch:', houseNumber);
+            console.log('[SELECT] South Indian Chart Bhava selected via touch:', houseNumber);
         });
     }
 
@@ -449,12 +449,12 @@ class SouthIndianChartTemplate {
         }
     }
 
-    // --- Robust Planet Management ---
+    // --- Robust Graha Management ---
     addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, retrograde = false, skipSnapshot = false) {
         const house = this.houseDataSouth[houseNumber];
         if (!house) return;
         if (!house.planets) house.planets = [];
-        // Use unique ID for each planet instance
+        // Use unique ID for each Graha instance
         const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
         const planet = window.app.planetSystem.getPlanetInfo(planetAbbr);
         const planetColor = planet ? planet.color : '#000000';
@@ -473,7 +473,7 @@ class SouthIndianChartTemplate {
         });
         this.updatePlanetsInHouse(houseNumber);
         if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Add Graha');
-        citranaDebug(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
+        citranaDebug(`[ADD] Graha ${planetAbbr} (id=${planetId}) added to Bhava ${houseNumber}`);
     }
 
     removePlanetFromHouseById(houseNumber, planetId, skipSnapshot = false) {
@@ -489,15 +489,15 @@ class SouthIndianChartTemplate {
     updatePlanetsInHouse(houseNumber) {
         const house = this.houseDataSouth[houseNumber];
         if (!house) return;
-        // Remove all existing planet texts for this house
+        // Remove all existing Graha texts for this Bhava
         this.chartGroupSouth.getChildren(node => node.name() && node.name().startsWith(`planet-`) && node.name().includes(`-${houseNumber}-`)).forEach(node => node.destroy());
-        // Calculate font size based on number of planets
+        // Calculate font size based on number of Grahas
         const n = house.planets.length;
         const BASE_FONT = 24;
         const MIN_FONT = 14;
         const STEP = 4;
         const fontSize = Math.max(MIN_FONT, BASE_FONT - (n - 1) * STEP);
-        // Perfectly center all planet texts both horizontally and vertically in the house
+        // Perfectly center all Graha texts both horizontally and vertically in the Bhava
         const totalHeight = n * fontSize + (n - 1) * 4;
         const startY = house.y + house.height / 2 - totalHeight / 2;
         house.planets.forEach((planetObj, i) => {
@@ -519,7 +519,7 @@ class SouthIndianChartTemplate {
             // Safari-specific: Add touch event handling to hit rect
             hitRect.on('touchstart', (e) => {
                 e.evt.preventDefault();
-                citranaDebug(`Touch start for hit rect of planet ${planetObj.abbr} from house ${houseNumber}`);
+                citranaDebug(`Touch start for hit rect of Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
             });
 
             hitRect.on('touchmove', (e) => {
@@ -530,7 +530,7 @@ class SouthIndianChartTemplate {
                 e.evt.preventDefault();
             });
 
-            // The planet text - perfectly centered
+            // The Graha text - perfectly centered
             const isMobile = /Mobile|Android|iP(ad|hone|od)/.test(navigator.userAgent);
             const planetText = new Konva.Text({
                 x: house.x + house.width / 2,
@@ -569,7 +569,7 @@ class SouthIndianChartTemplate {
             // Safari-specific: Add touch event handling
             planetText.on('touchstart', (e) => {
                 e.evt.preventDefault();
-                citranaDebug(`Touch start for planet ${planetObj.abbr} from house ${houseNumber}`);
+                citranaDebug(`Touch start for Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
             });
 
             planetText.on('touchmove', (e) => {
@@ -580,16 +580,16 @@ class SouthIndianChartTemplate {
                 e.evt.preventDefault();
             });
 
-            // Make planet text editable with live preview
+            // Make Graha text editable with live preview
             if (window.app && window.app.drawingTools) {
                 window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel, newColor, newRetrograde) => {
-                    // Update the planet label in the house data
+                    // Update the Graha label in the Bhava data
                     const planetIndex = house.planets.findIndex(p => p.id === planetObj.id);
                     if (planetIndex !== -1) {
                         house.planets[planetIndex].label = newLabel;
                         house.planets[planetIndex].color = newColor;
                         house.planets[planetIndex].retrograde = !!newRetrograde;
-                        // Update the planet text and color
+                        // Update the Graha text and color
                         planetText.text(newLabel);
                         planetText.fill(newColor);
                         planetText.textDecoration(newRetrograde ? 'underline' : '');
@@ -627,7 +627,7 @@ class SouthIndianChartTemplate {
 
             // Drag-and-drop between bhavas (label only; hit rect is for selection)
             const dragStartHandler = (e) => {
-                citranaDebug(`Drag start for planet ${planetObj.abbr} from house ${houseNumber}`);
+                citranaDebug(`Drag start for Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
 
                 this._dragSource = {
                     houseNumber,
@@ -641,7 +641,7 @@ class SouthIndianChartTemplate {
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
-                citranaDebug(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
+                citranaDebug(`[DRAGSTART] Graha ${planetObj.abbr} (id=${planetObj.id}) from Bhava ${houseNumber}`);
             };
 
             const dragEndHandler = (e) => {
@@ -655,10 +655,10 @@ class SouthIndianChartTemplate {
                 }) ?? null;
 
                 if (targetHouse && targetHouse !== houseNumber) {
-                    // Move planet to new bhava by ID
+                    // Move Graha to new Bhava by ID
                     this.removePlanetFromHouseById(houseNumber, planetObj.id, true);
                     this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.retrograde, true);
-                    // Update the color of the moved planet
+                    // Update the color of the moved Graha
                     const targetHouseData = this.houseDataSouth[targetHouse];
                     if (targetHouseData && targetHouseData.planets) {
                         const movedPlanet = targetHouseData.planets.find(p => p.id === planetObj.id);
@@ -668,11 +668,11 @@ class SouthIndianChartTemplate {
                     }
                     this.updatePlanetsInHouse(targetHouse);
                     if (window.app?.recordHistory) window.app.recordHistory('Move Graha');
-                    citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}`);
+                    citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to Bhava ${targetHouse}`);
                 } else {
                     // Snap back to original position
                     this.updatePlanetsInHouse(houseNumber);
-                    citranaDebug(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id}) - Target house: ${targetHouse}, Original house: ${houseNumber}`);
+                    citranaDebug(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id}) - Target Bhava: ${targetHouse}, Original Bhava: ${houseNumber}`);
                 }
                 this._dragSource = null;
                 this.layer.batchDraw();
@@ -713,7 +713,7 @@ class SouthIndianChartTemplate {
 
     setLagnaHouse(houseNumber, options = {}) {
         const { skipSnapshot = false } = options;
-        citranaDebug('setLagnaHouse called with house number:', houseNumber);
+        citranaDebug('setLagnaHouse called with Bhava number:', houseNumber);
         // Remove old Lagna indicator lines if present
         if (this.houseDataSouth[this.lagnaHouseSouth] && this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth) {
             this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth.forEach(line => line.destroy());
@@ -740,13 +740,13 @@ class SouthIndianChartTemplate {
         }
         this.applySouthIndicatorsPreference();
         if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Set Lagna');
-        console.log(`Lagna set to house ${houseNumber}`);
+        console.log(`Lagna set to Bhava ${houseNumber}`);
     }
 
     /**
-     * Get the bhava number (1–12 from Lagna) for a fixed grid house position.
-     * Rashi signs are fixed per cell in the South Indian layout; bhava counting rotates with Lagna.
-     * @param {number} houseNumber - Fixed grid house number (1–12)
+     * Get the bhava number (1–12 from Lagna) for a fixed grid Bhava position.
+     * Rashis are fixed per cell in the South Indian layout; bhava counting rotates with Lagna.
+     * @param {number} houseNumber - Fixed grid Bhava number (1–12)
      * @returns {number} Bhava number relative to current Lagna
      */
     getBhavaNumberForHouse(houseNumber) {
@@ -761,7 +761,7 @@ class SouthIndianChartTemplate {
         // Initialize debug array at the beginning
         const debugBhavas = [];
 
-        // Visual order for South Indian chart (house numbers)
+        // Visual order for South Indian chart (Bhava numbers)
         const visualOrder = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
         let houseOrder;
 
@@ -795,11 +795,11 @@ class SouthIndianChartTemplate {
 
         this.layer.batchDraw();
         console.log('Bhava mapping:', debugBhavas);
-        console.log('Houses renumbered');
+        console.log('Bhavas renumbered');
     }
 
     /**
-     * Show or hide Lagna line, bhava number boxes, and rashi number boxes on all houses.
+     * Show or hide Lagna line, bhava number boxes, and rashi number boxes on all Bhavas.
      * @param {boolean} visible
      */
     setSouthIndicatorsVisible(visible) {
@@ -989,6 +989,6 @@ class SouthIndianChartTemplate {
             this.updatePlanetsInHouse(houseNum);
         }
         this.layer.batchDraw();
-        console.log('All planets cleared from South Indian chart');
+        console.log('All Grahas cleared from South Indian chart');
     }
 }

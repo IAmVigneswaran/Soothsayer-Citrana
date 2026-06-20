@@ -2,7 +2,7 @@
  * planet-system.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
  * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
- * Manages planet library, floating Graha Library UI, and drag-and-drop functionality
+ * Manages Graha library, floating Graha Library UI, and drag-and-drop functionality
  */
 class PlanetSystem {
     constructor(stage, layer, chartTemplates) {
@@ -20,9 +20,9 @@ class PlanetSystem {
         this.initialX = 0;
         this.initialY = 0;
 
-        // Planet data - Page 1 (Grahas)
+        // Graha data - Page 1 (Traditional Grahas)
         // Contains the 12 traditional grahas used in Vedic astrology
-        // To add more planets to this page, simply add new entries to this object
+        // To add more Grahas to this page, simply add new entries to this object
         // Structure: { abbreviation: { name, fullName, color } }
         this.planetsPage1 = {
             'Lg': {
@@ -87,7 +87,7 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 2 (Jaimini Karakas)
+        // Graha data - Page 2 (Jaimini Karakas)
         this.planetsPage2 = {
             'AK': {
                 name: 'AK',
@@ -151,7 +151,7 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 3 (In Tamil)
+        // Graha data - Page 3 (In Tamil)
         this.planetsPage3 = {
             'ல': {
                 name: 'லக்கினம்',
@@ -215,7 +215,7 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 4 (In Hindi)
+        // Graha data - Page 4 (In Hindi)
         this.planetsPage4 = {
             'लग्न': {
                 name: 'लग्न',
@@ -279,7 +279,7 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 5 (Upagrahas & Outer Planets)
+        // Graha data - Page 5 (Upagrahas & Outer Grahas)
         this.planetsPage5 = {
             'Dh': {
                 name: 'Dhuma',
@@ -363,7 +363,7 @@ class PlanetSystem {
         this.setupLibraryEventListeners();
         this.createPlanetLibrary();
         this.setupDragAndDrop();
-        console.log('Planet system initialized');
+        console.log('Graha system initialized');
     }
 
     // --- Graha Library Floating UI ---
@@ -404,7 +404,7 @@ class PlanetSystem {
         this.grahaLibrary.style.minHeight = this.initialHeight + 'px';
         this.grahaLibrary.style.maxHeight = this.initialHeight + 'px';
 
-        // Disable transitions on all planet items to prevent height changes
+        // Disable transitions on all Graha items to prevent height changes
         const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
         planetItems.forEach(item => {
             item.style.transition = 'none';
@@ -448,7 +448,7 @@ class PlanetSystem {
             this.grahaLibrary.style.minHeight = this.initialHeight + 'px';
             this.grahaLibrary.style.maxHeight = this.initialHeight + 'px';
 
-            // Re-enable transitions on planet items
+            // Re-enable transitions on Graha items
             const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
             planetItems.forEach(item => {
                 item.style.transition = '';
@@ -500,18 +500,18 @@ class PlanetSystem {
         }
     }
 
-    // --- Planet Library and Drag-and-Drop ---
+    // --- Graha Library and Drag-and-Drop ---
     createPlanetLibrary() {
         const library = document.getElementById('planet-library');
         if (!library) {
-            console.error('Planet library container not found');
+            console.error('Graha library container not found');
             return;
         }
 
         // Clear existing content
         library.innerHTML = '';
 
-        // Get current page planets
+        // Get current page Grahas
         let currentPlanets;
         if (this.currentPage === 1) {
             currentPlanets = this.planetsPage1;
@@ -525,7 +525,7 @@ class PlanetSystem {
             currentPlanets = this.planetsPage5;
         }
 
-        // Create planet items for current page
+        // Create Graha items for current page
         Object.entries(currentPlanets).forEach(([abbr, planet]) => {
             const planetItem = document.createElement('div');
             planetItem.className = 'planet-item';
@@ -566,7 +566,7 @@ class PlanetSystem {
         // Add visual feedback
         e.target.style.opacity = '0.5';
         e.target.style.transform = 'scale(0.9)';
-        console.log(`Started dragging planet: ${planetAbbr}`);
+        console.log(`Started dragging Graha: ${planetAbbr}`);
     }
     handleDragEnd(e) {
         this.draggedPlanet = null;
@@ -597,7 +597,7 @@ class PlanetSystem {
             passive: false
         });
 
-        console.log(`Touch started for planet: ${planetAbbr}`);
+        console.log(`Touch started for Graha: ${planetAbbr}`);
     }
 
     handleTouchMove(e, planetAbbr) {
@@ -657,10 +657,10 @@ class PlanetSystem {
         // Remove existing preview
         this.removeDragPreview();
 
-        // Get planet info from current page or both pages
+        // Get Graha info from current page or both pages
         const planetInfo = this.getPlanetInfo(planetAbbr);
         if (!planetInfo) {
-            console.error(`Planet info not found for: ${planetAbbr}`);
+            console.error(`Graha info not found for: ${planetAbbr}`);
             return;
         }
 
@@ -719,14 +719,14 @@ class PlanetSystem {
         }
 
         if (!targetHouse) {
-            // Find house based on touch position
+            // Find Bhava based on touch position
             targetHouse = this.findHouseAtPosition(x, y);
         }
 
         if (targetHouse && this.draggedPlanet) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
             this.clearSelectedBhavaDropTarget();
-            console.log(`Mobile drop: Planet ${this.draggedPlanet} placed in house ${targetHouse}`);
+            console.log(`Mobile drop: Graha ${this.draggedPlanet} placed in Bhava ${targetHouse}`);
         }
     }
 
@@ -762,9 +762,9 @@ class PlanetSystem {
         if (targetHouse) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
             this.clearSelectedBhavaDropTarget();
-            console.log(`Planet ${this.draggedPlanet} placed in house ${targetHouse}`);
+            console.log(`Planet ${this.draggedPlanet} placed in Bhava ${targetHouse}`);
         } else {
-            console.log('No suitable house found for planet placement');
+            console.log('No suitable Bhava found for Graha placement');
         }
         this.draggedPlanet = null;
     }
@@ -777,11 +777,11 @@ class PlanetSystem {
             console.error('Chart templates not available');
             return;
         }
-        // Add planet to the specified house
+        // Add Graha to the specified Bhava
         this.chartTemplates.addPlanetToHouse(planetAbbr, houseIndex, label, id);
     }
     getPlanetInfo(abbr) {
-        // Check all five pages for planet info
+        // Check all five pages for Graha info
         return this.planetsPage1[abbr] || this.planetsPage2[abbr] || this.planetsPage3[abbr] || this.planetsPage4[abbr] || this.planetsPage5[abbr] || null;
     }
 

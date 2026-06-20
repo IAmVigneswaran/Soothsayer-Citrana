@@ -1,10 +1,23 @@
 # Citrana - Vedic Astrology Chart Builder
 
-A modern, interactive web application for creating Vedic astrology charts with drag-and-drop planet placement and comprehensive drawing tools. Built with pure HTML5, CSS3, and JavaScript using Konva.js for canvas manipulation, this tool provides an intuitive interface for educators and students of Vedanga Jyotisha.
+A modern, interactive web application for creating Vedic astrology charts with drag-and-drop Graha placement and comprehensive drawing tools. Built with pure HTML5, CSS3, and JavaScript using Konva.js for canvas manipulation, this tool provides an intuitive interface for educators and students of Vedanga Jyotisha.
 
 ## Project Overview
 
-Citrana is a browser-based application that allows users to create both South Indian and North Indian astrological charts. The application features a floating planet library, comprehensive drawing tools, context menus, and export capabilities. It runs entirely in the browser with no build process required, making it immediately deployable on GitHub Pages or any web server.
+Citrana is a browser-based application that allows users to create both South Indian and North Indian astrological charts. The application features a floating Graha library, comprehensive drawing tools, context menus, and export capabilities. It runs entirely in the browser with no build process required, making it immediately deployable on GitHub Pages or any web server.
+
+
+## Terminology
+
+Citrana uses consistent Vedic terms in all user-facing text and documentation:
+
+| Use | Not |
+|-----|-----|
+| **Bhava** / **Bhavas** | House / Houses |
+| **Graha** / **Grahas** | Planet / Planets |
+| **Rashi** / **Rashis** | Sign / Signs / zodiac sign |
+
+Internal code identifiers (e.g. `planet-system.js`, `addPlanetToHouse()`, Konva names `house-*` / `planet-*`, data keys `planetsByHouse`) are unchanged for implementation stability.
 
 ## Technology Stack
 
@@ -30,7 +43,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---360-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---993-lines)
    - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---949-lines)
-   - [Planet System](#planet-system-planet-systemjs---884-lines)
+   - [Graha System](#planet-system-planet-systemjs---884-lines)
    - [Drawing Tools](#drawing-tools-drawing-toolsjs---1902-lines)
    - [Context Menu](#context-menu-context-menujs---721-lines)
    - [Edit UI](#edit-ui-edit-uijs---775-lines)
@@ -39,7 +52,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
    - [Chart Types](#chart-types)
    - [Chart Display Options](#chart-display-options)
    - [Chart Management](#chart-management-actions)
-   - [Planet Management](#planet-management)
+   - [Graha Management](#planet-management)
    - [Drawing Tool Summary](#drawing-tool-summary)
    - [Control Points](#control-points-feature)
    - [User Experience](#user-experience)
@@ -209,76 +222,76 @@ Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 Key Responsibilities:
 - Creates 4x4 grid layout with centre empty space
-- Manages house numbering and Lagna indicators
-- Handles planet placement and text scaling
-- Provides house highlighting and selection
+- Manages Bhava numbering and Lagna indicators
+- Handles Graha placement and text scaling
+- Provides Bhava highlighting and selection
 - Manages Rashi and Bhava number boxes
-- Handles house and Graha right-clicks (`stopPropagation`) for context menus
+- Handles Bhava and Graha right-clicks (`stopPropagation`) for context menus
 
 Key Features:
 - Traditional square grid layout
 - Centre empty space for annotations
 - Lagna indicator with diagonal line
-- Dynamic planet text sizing
-- House renumbering based on Lagna position
+- Dynamic Graha text sizing
+- Bhava renumbering based on Lagna position
 - Touch and mouse interaction support
 
 Key Methods:
 - `createSouthIndianChart()`: Build chart layout
-- `createHouse()`: Create individual house elements
-- `addPlanetToHouse()`: Place planets in houses
+- `createHouse()`: Create individual Bhava elements
+- `addPlanetToHouse()`: Place Grahas in Bhavas
 - `setLagnaHouse(houseNumber, options?)`: Set ascendant with visual indicator; `skipSnapshot` for undo restore
-- `renumberHouses()`: Update house numbering
-- `getBhavaNumberForHouse()`: Get house number (1–12 from Lagna) for a fixed grid cell
-- `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-house fallback) for library drops
-- `highlightHouse()` / `clearHighlight()`: Visual house selection
+- `renumberHouses()`: Update Bhava numbering
+- `getBhavaNumberForHouse()`: Get Bhava number (1–12 from Lagna) for a fixed grid cell
+- `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-Bhava fallback) for library drops
+- `highlightHouse()` / `clearHighlight()`: Visual Bhava selection
 - `setSouthIndicatorsVisible(visible)` / `applySouthIndicatorsPreference()`: Show or hide lagna line and bhava/rashi boxes per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (immune to current zoom/pan)
 
 ### North Indian Chart Template (chart-templates-north.js - ~949 lines)
-Handles the diamond-shaped North Indian chart layout with polygon-based houses.
+Handles the diamond-shaped North Indian chart layout with polygon-based Bhavas.
 
 Key Responsibilities:
 - Creates diamond-shaped polygon layout
-- Manages complex house positioning
+- Manages complex Bhava positioning
 - Handles tiny Rashi number boxes
-- Provides advanced Rashi numbering logic (`lagnaHouseNorth` stores Rashi sign 1–12)
-- Manages planet placement in polygon houses with per-Graha `rashiNumber`
-- Handles house and Graha right-clicks (`stopPropagation`) for context menus
+- Provides advanced Rashi numbering logic (`lagnaHouseNorth` stores Rashi 1–12)
+- Manages Graha placement in polygon Bhavas with per-Graha `rashiNumber`
+- Handles Bhava and Graha right-clicks (`stopPropagation`) for context menus
 
 Key Features:
 - Diamond-shaped polygon layout
-- Precise house positioning using SVG coordinates
+- Precise Bhava positioning using SVG coordinates
 - Tiny Rashi number boxes with exact positioning
 - Advanced Rashi numbering system
-- Dynamic house renumbering
+- Dynamic Bhava renumbering
 - Polygon-based hit detection
 
 Key Methods:
 - `createNorthIndianChart()`: Build diamond layout
-- `addPlanetToHouse()`: Place planets in polygon houses
+- `addPlanetToHouse()`: Place Grahas in polygon Bhavas
 - `setLagnaHouse(houseNumber, options?)`: Set Lagna rashi; renumber and `repositionPlanetsForNewLagna()`; `skipSnapshot` for undo restore
-- `renumberHouses()`: Update house numbering
-- `isPointInPolygon()`: Hit detection for polygon houses
+- `renumberHouses()`: Update Bhava numbering
+- `isPointInPolygon()`: Hit detection for polygon Bhavas
 - `getRashiNumberForHouse()`: Rashi calculation
 - `findHouseAtChartPoint()`: Polygon hit-test (with nearest-centroid fallback) for library drops
 - `setNorthIndicatorsVisible(visible)` / `applyNorthIndicatorsPreference()`: Show or hide `tinyBoxGroupNorth` (bhava numbers in black corner boxes) per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (desktop `extraTopMargin=-50`)
 
-### Planet System (planet-system.js - ~884 lines)
-Manages the floating planet library and drag-and-drop functionality with paging system.
+### Graha System (planet-system.js - ~884 lines)
+Manages the floating Graha library and drag-and-drop functionality with paging system.
 
 Key Responsibilities:
-- Creates and manages floating planet library UI with paging
-- Implements drag-and-drop for planet placement
+- Creates and manages floating Graha library UI with paging
+- Implements drag-and-drop for Graha placement
 - Handles touch and mouse interactions
-- Manages planet data and visual representations
+- Manages Graha data and visual representations
 - Provides drop zone detection and validation
 - Implements mobile-friendly drag preview
 - Manages paging navigation for desktop and mobile
 
 Key Features:
-- Floating, draggable planet library with paging
+- Floating, draggable Graha library with paging
 - 60 Grahas across five pages (12 per page)
 - Desktop navigation with clickable page dots
 - Mobile swipe navigation (left/right)
@@ -288,7 +301,7 @@ Key Features:
 - Mobile-optimised interactions
 - Library cells render `fullName` labels; grid layout has no scroll (desktop auto-fit columns; mobile 6×2)
 
-Planet Library - Page 1 (Traditional Grahas):
+Graha Library - Page 1 (Traditional Grahas):
 - Lg: Lagna (Ascendant)
 - Su: Sun
 - Mo: Moon
@@ -302,7 +315,7 @@ Planet Library - Page 1 (Traditional Grahas):
 - Md: Maandi
 - Cu: Custom
 
-Planet Library - Page 2 (Jaimini Karakas):
+Graha Library - Page 2 (Jaimini Karakas):
 - AK: Atmakaraka
 - AmK: Amatyakaraka
 - BK: Bhratrikaraka
@@ -316,7 +329,7 @@ Planet Library - Page 2 (Jaimini Karakas):
 - HL: Hora Lagna
 - SL: Sree Lagna
 
-Planet Library - Page 3 (Tamil Grahas):
+Graha Library - Page 3 (Tamil Grahas):
 - ல: லக்கினம் (Lagna)
 - சூ: சூரியன் (Sun)
 - சந்: சந்திரன் (Moon)
@@ -330,7 +343,7 @@ Planet Library - Page 3 (Tamil Grahas):
 - மா: மாந்தி (Maandi)
 - ப: பயன் (Custom)
 
-Planet Library - Page 4 (Hindi Grahas):
+Graha Library - Page 4 (Hindi Grahas):
 - लग्न: लग्न (Lagna)
 - सूर्य: सूर्य (Sun)
 - चंद्र: चंद्र (Moon)
@@ -344,7 +357,7 @@ Planet Library - Page 4 (Hindi Grahas):
 - मांदी: मांदी (Maandi)
 - कस: कस्टम (Custom)
 
-Planet Library - Page 5 (Upagrahas & Outer Planets):
+Graha Library - Page 5 (Upagrahas & Outer Grahas):
 - Dh: Dhuma
 - Vy: Vyatipata
 - Pv: Parivesha
@@ -359,7 +372,7 @@ Planet Library - Page 5 (Upagrahas & Outer Planets):
 - Pl: Pluto
 
 Key Methods:
-- `init()`: Initialise planet library
+- `init()`: Initialise Graha library
 - `createPlanetLibrary()`: Build UI elements with paging
 - `createPageDots()`: Create desktop navigation dots
 - `setupSwipeEvents()`: Configure mobile swipe navigation
@@ -371,7 +384,7 @@ Key Methods:
 - `clearSelectedBhavaDropTarget()`: Clear `window.selectedBhavaSouth` / `window.selectedBhavaNorth` after a successful library drop
 - `findClosestHouse()`: Delegates to `ChartCoordinator.findHouseAtPointer()` (Konva pointer during HTML5 drop)
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
-- `getPlanetInfo()`: Retrieve planet data from paged structure
+- `getPlanetInfo()`: Retrieve Graha data from paged structure
 
 ### Drawing Tools (drawing-tools.js - ~1902 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
@@ -426,15 +439,15 @@ Key Responsibilities:
 
 Menu Types:
 - **Chart Creation Menu** (empty canvas): Create North/South Indian chart, Clear Canvas
-- **Existing Chart Menu** (canvas, no house/planet hit): Reset Chart, Reset Drawings, Clear Canvas; **North Indian only**: Set Lagna as… (zodiac; submenu desktop, flat list mobile)
-- **House Menu** (bhava hit):
-  - **South Indian**: Header `House N` (Lagna-relative); **Set as Lagna** (`set-lagna`); Clear House; …
-  - **North Indian**: Header `House N` (visual); **Set as First House** (`set-first-house`); Clear House; …
-- **Planet Menu**: Edit Graha, Delete Graha
+- **Existing Chart Menu** (canvas, no Bhava/Graha hit): Reset Chart, Reset Drawings, Clear Canvas; **North Indian only**: Set Lagna as… (Rashi; submenu desktop, flat list mobile)
+- **Bhava Menu** (bhava hit):
+  - **South Indian**: Header `Bhava N` (Lagna-relative); **Set as Lagna** (`set-lagna`); Clear Bhava; …
+  - **North Indian**: Header `Bhava N` (visual); **Set as First Bhava** (`set-first-house`); Clear Bhava; …
+- **Graha Menu**: Edit Graha, Delete Graha
 
 Lagna actions (`handleAction`):
-- `set-lagna`: South house menu → `setLagnaHouse(visualHouse)`; North chart menu → `setLagnaHouse(rashi 1–12)`. Skipped if `houseNumber` missing (no default fallback).
-- `set-first-house`: North house menu only → `getRashiNumberForHouse()` → `setLagnaHouse(rashi)`
+- `set-lagna`: South Bhava menu → `setLagnaHouse(visualHouse)`; North chart menu → `setLagnaHouse(rashi 1–12)`. Skipped if `houseNumber` missing (no default fallback).
+- `set-first-house`: North Bhava menu only → `getRashiNumberForHouse()` → `setLagnaHouse(rashi)`
 
 Key Methods:
 - `openContextMenuAtClientPoint()`, `resolveContextTarget()`, `getShapeAtClientPoint()`, `findPlanetContextById()`
@@ -486,20 +499,20 @@ Toolbar buttons disable when `canUndo()` / `canRedo()` is false (`updateHistoryB
 
 Each step snapshots **chart data** (type, Lagna, Grahas, South centre label) and **drawings** (`drawing-*` Konva nodes).
 
-**Tracked:** create/reset/clear chart; add/move/remove/edit Grahas; set Lagna; clear house; draw/move/adjust/delete annotations; Edit UI style sessions; inline text/heading edits; centre label edit.
+**Tracked:** create/reset/clear chart; add/move/remove/edit Grahas; set Lagna; clear Bhava; draw/move/adjust/delete annotations; Edit UI style sessions; inline text/heading edits; centre label edit.
 
-**Not tracked:** zoom, pan, active tool, bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference.
+**Not tracked:** zoom, pan, active tool, Bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference.
 
 **Deferred 2.1:** visible History panel listing `entries[].label`.
 
 See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow and extension points.
 
 ### Chart Types
-- South Indian Chart: Traditional 4x4 square grid layout with centre empty space; Rashi signs are fixed per grid cell
+- South Indian Chart: Traditional 4x4 square grid layout with centre empty space; Rashis are fixed per grid cell
 - North Indian Chart: Diamond-shaped polygon layout with dynamic Rashi numbering based on Lagna
-- **South Indian Lagna**: Right-click a bhava → **Set as Lagna** only (no chart-level Set as Lagna). House menu header shows **House N** counted from Lagna (not fixed grid position)
-- **North Indian Lagna**: Right-click empty canvas → **Set Lagna as…** (choose zodiac sign); or right-click a bhava showing a sign → **Set as First House** (that Rashi becomes Lagna). Grahas reposition by stored `rashiNumber`
-- Dynamic House Numbering: South Indian bhava numbers (yellow boxes) rotate from Lagna; North Indian Rashi boxes recalculate from Lagna
+- **South Indian Lagna**: Right-click a bhava → **Set as Lagna** only (no chart-level Set as Lagna). Bhava menu header shows **Bhava N** counted from Lagna (not fixed grid position)
+- **North Indian Lagna**: Right-click empty canvas → **Set Lagna as…** (choose Rashi); or right-click a bhava showing a Rashi → **Set as First Bhava** (that Rashi becomes Lagna). Grahas reposition by stored `rashiNumber`
+- Dynamic Bhava Numbering: South Indian bhava numbers (yellow boxes) rotate from Lagna; North Indian Rashi boxes recalculate from Lagna
 
 ### Chart Display Options
 - **Options modal**: `#options-btn` (gear icon in toolbar export group, after Save) opens `#options-modal`
@@ -511,24 +524,24 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - **Undo**: Options preferences are not tracked in the undo timeline
 
 ### Chart Management Actions
-- Clear Canvas: Removes everything (charts, planets, drawings) and returns to blank canvas
-- Reset Chart: Removes planets and drawings, but keeps chart structure/layout
-- Reset Drawings: Removes only drawings, keeps planets and chart structure
+- Clear Canvas: Removes everything (charts, Grahas, drawings) and returns to blank canvas
+- Reset Chart: Removes Grahas and drawings, but keeps chart structure/layout
+- Reset Drawings: Removes only drawings, keeps Grahas and chart structure
 
-### Planet Management
-- 60 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 12 Upagrahas and outer planets on Page 5
+### Graha Management
+- 60 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 12 Upagrahas and outer Grahas on Page 5
 - Paging System: Five-page navigation with desktop dots and mobile swipe
 - Library Labels: Graha library cells show `fullName` (e.g. Page 5 Upagrahas); chart placement still uses text abbreviations
 - Library Layout: No grid scrolling — desktop auto-fit columns (80×40px cells); mobile 6×2 grid with 30px cells and word-wrap for long names
 - Text-based Display: Uses abbreviations on the chart instead of symbols for better compatibility
-- Drag & Drop: Grahas from the floating library land in the bhava under the pointer, or in a house you clicked first (`window.selectedBhavaSouth` / `window.selectedBhavaNorth` — one-shot: cleared after the next successful drop or when you click empty canvas)
-- Multiple Instances: Same planet can be placed multiple times
-- Dynamic Text Sizing: Planet text scales based on house occupancy
+- Drag & Drop: Grahas from the floating library land in the bhava under the pointer, or in a Bhava you clicked first (`window.selectedBhavaSouth` / `window.selectedBhavaNorth` — one-shot: cleared after the next successful drop or when you click empty canvas)
+- Multiple Instances: Same Graha can be placed multiple times
+- Dynamic Text Sizing: Graha text scales based on Bhava occupancy
 - Touch Support: Mobile-friendly touch interactions with visual feedback
 - Degree Support: Add degree positions to Grahas (e.g., "Su-20")
 - Graha Editing: Double-click a Graha, or right-click → **Edit Graha**, to open the floating edit panel (label, colour, retrograde)
 - Graha Deletion: Right-click → **Delete Graha**, delete from the edit panel, or press **Delete** when a Graha is selected
-- Retrograde Display: Underlined Graha text via Konva `textDecoration` (stored as `retrograde: boolean` on planet data, not appended to the label)
+- Retrograde Display: Underlined Graha text via Konva `textDecoration` (stored as `retrograde: boolean` on Graha data, not appended to the label)
 - Legacy Migration: Older charts that used the Unicode subscript `ᵣ` are normalised automatically (marker removed, underline applied)
 - 8-Character Limit: Applies to Graha label text only; retrograde does not consume a character slot
 
@@ -565,7 +578,7 @@ Technical Implementation:
 - Responsive Design: Optimised for desktop, tablet, and mobile devices
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
 - Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
-- Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific house actions; Graha edit/delete
+- Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific Bhava actions; Graha edit/delete
 - Status Updates: Real-time feedback and notifications
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
 - About Modal: Information about Citrana with creator details and links
@@ -600,7 +613,7 @@ While the codebase might have limited support for mobile or touch, officially it
 
 - Efficient Canvas Rendering: Konva.js optimisation
 - Optimised resize handlers
-- Optimised Planet Placement: Efficient algorithms
+- Optimised Graha Placement: Efficient algorithms
 - Minimal DOM Manipulation: Canvas-based rendering
 - Touch Event Optimisation: Mobile performance
 
@@ -645,10 +658,10 @@ All JavaScript and CSS files use a standardised comment header format:
 
 ## Customisation Guidelines
 
-### Adding New Planets
-Edit the planets objects in assets/js/planet-system.js:
+### Adding New Grahas
+Edit the Graha data objects in assets/js/planet-system.js:
 ```javascript
-// Planet data - Page 1 (Traditional Grahas)
+// Graha data - Page 1 (Traditional Grahas)
         this.planetsPage1 = {
             'Lg': {
                 name: 'Lagna',
@@ -712,7 +725,7 @@ Edit the planets objects in assets/js/planet-system.js:
             }
         };
 
-        // Planet data - Page 2 (Jaimini Karakas)
+        // Graha data - Page 2 (Jaimini Karakas)
         this.planetsPage2 = {
             'AK': {
                 name: 'AK',
@@ -776,7 +789,7 @@ Edit the planets objects in assets/js/planet-system.js:
             }
         };
 
-        // Planet data - Page 3 (In Tamil)
+        // Graha data - Page 3 (In Tamil)
         this.planetsPage3 = {
             'ல': {
                 name: 'லக்கினம்',
@@ -840,7 +853,7 @@ Edit the planets objects in assets/js/planet-system.js:
             }
         };
 
-        // Planet data - Page 4 (In Hindi)
+        // Graha data - Page 4 (In Hindi)
         this.planetsPage4 = {
             'लग्न': {
                 name: 'लग्न',
@@ -904,7 +917,7 @@ Edit the planets objects in assets/js/planet-system.js:
             }
         };
 
-        // Planet data - Page 5 (Upagrahas & Outer Planets)
+        // Graha data - Page 5 (Upagrahas & Outer Grahas)
         this.planetsPage5 = {
             'Dh': {
                 name: 'Dhuma',
@@ -976,7 +989,7 @@ Edit the planets objects in assets/js/planet-system.js:
 ```
 
 ### Modifying Chart Styles
-- House colours and borders in chart template files
+- Bhava colours and borders in chart template files
 - Grid line styles and text formatting
 - Layout dimensions and spacing
 - Theme colours and visual elements
@@ -990,8 +1003,8 @@ Edit the planets objects in assets/js/planet-system.js:
 ## Important Notes
 
 ### No Symbol Support
-- The application does NOT use planet symbols
-- All planets are displayed using text abbreviations (Su, Mo, Ma, etc.)
+- The application does NOT use Graha symbols
+- All Grahas are displayed using text abbreviations (Su, Mo, Ma, etc.)
 - This ensures better compatibility and accessibility
 
 ### No Build Process

@@ -14,7 +14,7 @@ class NorthIndianChartTemplate {
         this.houseDataNorth = {};
         this.lagnaHouseNorth = 1;
         this._northIndicatorsVisible = true;
-        this.selectedHouse = null; // Track selected house for highlight
+        this.selectedHouse = null; // Track selected Bhava for highlight
 
         if (stage && layer) {
             console.log('North Indian Chart Template initialized with stage and layer');
@@ -92,75 +92,75 @@ class NorthIndianChartTemplate {
             listening: false
         });
 
-        // House definitions based on SVG polygon coordinates
+        // Bhava definitions based on SVG polygon coordinates
         const houseDefinitionsNorth = [
-            // House 1 (Lagna) - Center diamond
+            // Bhava 1 (Lagna) - Center diamond
             {
                 number: 1,
                 points: [239.28571, 1.19048, 120.23809, 120.23809, 239.28571, 239.28571, 358.33333, 120.23809],
                 name: 'Lagna'
             },
-            // House 2
+            // Bhava 2
             {
                 number: 2,
                 points: [1.19048, 1.19048, 239.28571, 1.19048, 120.23809, 120.23809],
                 name: 'Dhan'
             },
-            // House 3
+            // Bhava 3
             {
                 number: 3,
                 points: [1.19048, 1.19048, 1.19048, 239.28571, 120.23809, 120.23809],
                 name: 'Sahaj'
             },
-            // House 4
+            // Bhava 4
             {
                 number: 4,
                 points: [120.23809, 120.23809, 1.19048, 239.28571, 120.23809, 358.33333, 239.28571, 239.28571],
                 name: 'Bandhu'
             },
-            // House 5
+            // Bhava 5
             {
                 number: 5,
                 points: [1.19048, 239.28571, 120.23809, 358.33333, 1.19048, 477.38095],
                 name: 'Putra'
             },
-            // House 6
+            // Bhava 6
             {
                 number: 6,
                 points: [239.28571, 477.38095, 120.23809, 358.33333, 1.19048, 477.38095],
                 name: 'Ripu'
             },
-            // House 7
+            // Bhava 7
             {
                 number: 7,
                 points: [239.28571, 477.38095, 120.23809, 358.33333, 239.28571, 239.28571, 358.33333, 358.33333],
                 name: 'Kalatra'
             },
-            // House 8
+            // Bhava 8
             {
                 number: 8,
                 points: [239.28571, 477.38095, 358.33333, 358.33333, 477.38095, 477.38095],
                 name: 'Mrit'
             },
-            // House 9
+            // Bhava 9
             {
                 number: 9,
                 points: [358.33333, 358.33333, 477.38095, 477.38095, 477.38095, 239.28571],
                 name: 'Bhagya'
             },
-            // House 10
+            // Bhava 10
             {
                 number: 10,
                 points: [358.33333, 358.33333, 477.38095, 239.28571, 358.33333, 120.23809, 239.28571, 239.28571],
                 name: 'Karma'
             },
-            // House 11
+            // Bhava 11
             {
                 number: 11,
                 points: [477.38095, 239.28571, 358.33333, 120.23809, 477.38095, 1.19048],
                 name: 'Labha'
             },
-            // House 12 (Vyaya)
+            // Bhava 12 (Vyaya)
             {
                 number: 12,
                 points: [358.33333, 120.23809, 477.38095, 1.19048, 239.28571, 1.19048],
@@ -175,7 +175,7 @@ class NorthIndianChartTemplate {
         };
 
         // Exact rashi number box positions from reference SVG - treated as individual elements
-        // These positions are fixed and independent of house polygons
+        // These positions are fixed and independent of Bhava polygons
         const tinyBoxPositionsNorth = {
             1: {
                 x: 230.8155 + globalOffsetNorth.x,
@@ -242,7 +242,7 @@ class NorthIndianChartTemplate {
         houseDefinitionsNorth.forEach((houseDefNorth) => {
             const houseNumberNorth = houseDefNorth.number;
 
-            // Create house polygon
+            // Create Bhava polygon
             const housePolygonNorth = new Konva.Line({
                 points: houseDefNorth.points,
                 stroke: '#374151',
@@ -259,14 +259,14 @@ class NorthIndianChartTemplate {
             housePolygonNorth.on('mousedown', (e) => {
                 this.highlightHouse(houseNumberNorth);
                 window.selectedBhavaNorth = houseNumberNorth;
-                console.log('[SELECT] North Indian Chart House selected:', houseNumberNorth);
+                console.log('[SELECT] North Indian Chart Bhava selected:', houseNumberNorth);
             });
 
             // Add touch support for mobile selection
             housePolygonNorth.on('tap', (e) => {
                 this.highlightHouse(houseNumberNorth);
                 window.selectedBhavaNorth = houseNumberNorth;
-                console.log('[SELECT] North Indian Chart House selected via touch:', houseNumberNorth);
+                console.log('[SELECT] North Indian Chart Bhava selected via touch:', houseNumberNorth);
             });
 
             // Add right-click event for context menu
@@ -277,7 +277,7 @@ class NorthIndianChartTemplate {
                 window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumberNorth);
             });
 
-            // Store house data
+            // Store Bhava data
             const centerXNorth = houseDefNorth.points.reduce((sum, val, index) => index % 2 === 0 ? sum + val : sum, 0) / (houseDefNorth.points.length / 2);
             const centerYNorth = houseDefNorth.points.reduce((sum, val, index) => index % 2 === 1 ? sum + val : sum, 0) / (houseDefNorth.points.length / 2);
             this.houseDataNorth[houseNumberNorth] = {
@@ -290,7 +290,7 @@ class NorthIndianChartTemplate {
                 housePolygonNorth: housePolygonNorth
             };
 
-            // Add house polygon to chart group
+            // Add Bhava polygon to chart group
             this.chartGroupNorth.add(housePolygonNorth);
         });
 
@@ -339,7 +339,7 @@ class NorthIndianChartTemplate {
             this.tinyBoxGroupNorth.add(rashiNumberTextNorth);
         });
 
-        // Rashi boxes render above the chart; listening is off so clicks reach houses and Grahas below
+        // Rashi boxes render above the chart; listening is off so clicks reach Bhavas and Grahas below
         this.layer.add(this.chartGroupNorth);
         this.layer.add(this.tinyBoxGroupNorth);
         this.chartGroupNorth.moveToTop();
@@ -348,7 +348,7 @@ class NorthIndianChartTemplate {
 
         citranaDebug('North Indian chart created with rashi number boxes (display only)');
 
-        // Call renumberHouses to set correct Rashi numbers based on Lagna and First House
+        // Call renumberHouses to set correct Rashi numbers based on Lagna and First Bhava
         this.renumberHouses();
         this.applyNorthIndicatorsPreference();
 
@@ -383,30 +383,30 @@ class NorthIndianChartTemplate {
 
     setLagnaHouse(houseNumber, options = {}) {
         const { skipSnapshot = false } = options;
-        citranaDebug('North Indian Chart - setLagnaHouse called with house number:', houseNumber);
-        citranaDebug('Previous Lagna House:', this.lagnaHouseNorth);
+        citranaDebug('North Indian Chart - setLagnaHouse called with Bhava number:', houseNumber);
+        citranaDebug('Previous Lagna Bhava:', this.lagnaHouseNorth);
 
         this.lagnaHouseNorth = houseNumber;
 
-        citranaDebug('New Lagna House set to:', this.lagnaHouseNorth);
+        citranaDebug('New Lagna Bhava set to:', this.lagnaHouseNorth);
         citranaDebug('Calling renumberHouses() to update Rashi numbers...');
 
         this.renumberHouses();
         this.clearHighlight();
 
-        // Reposition all planets based on their stored Rashi numbers
+        // Reposition all Grahas based on their stored Rashi numbers
         this.repositionPlanetsForNewLagna();
 
-        // Get zodiac sign name for the Lagna
+        // Get Rashi name for the Lagna
         const zodiacSigns = [
             'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
             'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
         ];
         const lagnaSignName = zodiacSigns[houseNumber - 1] || 'Unknown';
 
-        citranaDebug(`North Indian Chart - Lagna successfully set to house ${houseNumber} (${lagnaSignName})`);
+        citranaDebug(`North Indian Chart - Lagna successfully set to Bhava ${houseNumber} (${lagnaSignName})`);
         citranaDebug('Chart should now display updated Rashi numbers for the new Lagna');
-        citranaDebug('All planets have been repositioned to their correct Rashis');
+        citranaDebug('All Grahas have been repositioned to their correct Rashis');
         this.applyNorthIndicatorsPreference();
         if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Set Lagna');
     }
@@ -430,8 +430,8 @@ class NorthIndianChartTemplate {
     }
 
     /**
-     * Get the Rashi number for a given house with the current Lagna
-     * @param {number} houseNumber - The house number (1-12)
+     * Get the Rashi number for a given Bhava with the current Lagna
+     * @param {number} houseNumber - The Bhava number (1-12)
      * @returns {number} The Rashi number (1-12)
      */
     getRashiNumberForHouse(houseNumber) {
@@ -439,25 +439,25 @@ class NorthIndianChartTemplate {
     }
 
     /**
-     * Get the house number for a given Rashi with the current Lagna
+     * Get the Bhava number for a given Rashi with the current Lagna
      * @param {number} rashiNumber - The Rashi number (1-12)
-     * @returns {number} The house number (1-12)
+     * @returns {number} The Bhava number (1-12)
      */
     getHouseNumberForRashi(rashiNumber) {
-        // Reverse the formula: house = ((rashi - lagna + 1) % 12) + 1
+        // Reverse the formula: Bhava = ((rashi - lagna + 1) % 12) + 1
         let houseNumber = ((rashiNumber - this.lagnaHouseNorth + 1) % 12);
         if (houseNumber <= 0) houseNumber += 12;
         return houseNumber;
     }
 
     /**
-     * Reposition all planets to their correct houses based on their stored Rashi numbers
-     * This is called when the Lagna changes to ensure planets stay in their Rashis
+     * Reposition all Grahas to their correct Bhavas based on their stored Rashi numbers
+     * This is called when the Lagna changes to ensure Grahas stay in their Rashis
      */
     repositionPlanetsForNewLagna() {
-        citranaDebug('Repositioning planets for new Lagna...');
+        citranaDebug('Repositioning Grahas for new Lagna...');
 
-        // Collect all planets with their Rashi numbers
+        // Collect all Grahas with their Rashi numbers
         const allPlanets = [];
         for (const houseNum in this.houseDataNorth) {
             const house = this.houseDataNorth[houseNum];
@@ -473,19 +473,19 @@ class NorthIndianChartTemplate {
             }
         }
 
-        citranaDebug(`Found ${allPlanets.length} planets to reposition`);
+        citranaDebug(`Found ${allPlanets.length} Grahas to reposition`);
 
-        // Clear all planets from current positions
+        // Clear all Grahas from current positions
         for (const houseNum in this.houseDataNorth) {
             this.houseDataNorth[houseNum].planets = [];
         }
 
-        // Reposition each planet to its correct house based on Rashi
+        // Reposition each Graha to its correct Bhava based on Rashi
         allPlanets.forEach(planet => {
             const newHouseNumber = this.getHouseNumberForRashi(planet.rashiNumber);
-            citranaDebug(`Planet ${planet.abbr} (Rashi ${planet.rashiNumber}) moving from house ${planet.currentHouse} to house ${newHouseNumber}`);
+            citranaDebug(`Planet ${planet.abbr} (Rashi ${planet.rashiNumber}) moving from Bhava ${planet.currentHouse} to Bhava ${newHouseNumber}`);
 
-            // Add planet to new house
+            // Add Graha to new Bhava
             const house = this.houseDataNorth[newHouseNumber];
             if (house) {
                 if (!house.planets) house.planets = [];
@@ -500,13 +500,13 @@ class NorthIndianChartTemplate {
             }
         });
 
-        // Update visual representation for all houses
+        // Update visual representation for all Bhavas
         for (const houseNum in this.houseDataNorth) {
             this.updatePlanetsInHouse(parseInt(houseNum));
         }
 
         this.layer.batchDraw();
-        citranaDebug('Planet repositioning completed');
+        citranaDebug('Graha repositioning completed');
     }
 
 
@@ -696,22 +696,22 @@ class NorthIndianChartTemplate {
             this.updatePlanetsInHouse(houseNum);
         }
         this.layer.batchDraw();
-        console.log('All planets cleared from North Indian chart');
+        console.log('All Grahas cleared from North Indian chart');
     }
 
-    // --- Robust Planet Management ---
+    // --- Robust Graha Management ---
     addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, existingRashiNumber = null, existingRetrograde = null, skipSnapshot = false) {
         const house = this.houseDataNorth[houseNumber];
         if (!house) return;
         if (!house.planets) house.planets = [];
-        // Use unique ID for each planet instance
+        // Use unique ID for each Graha instance
         const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
 
-        // If this is a planet being moved (has existing Rashi), preserve it
-        // Otherwise, calculate the Rashi number for this house with current Lagna
+        // If this is a Graha being moved (has existing Rashi), preserve it
+        // Otherwise, calculate the Rashi number for this Bhava with current Lagna
         const rashiNumber = existingRashiNumber || this.getRashiNumberForHouse(houseNumber);
 
-        // Get planet color
+        // Get Graha color
         const planet = window.app.planetSystem.getPlanetInfo(planetAbbr);
         const planetColor = planet ? planet.color : '#000000';
         let resolvedLabel = label || planetAbbr;
@@ -725,13 +725,13 @@ class NorthIndianChartTemplate {
             abbr: planetAbbr,
             label: resolvedLabel,
             id: planetId,
-            rashiNumber: rashiNumber, // Store the Rashi number when planet is placed
+            rashiNumber: rashiNumber, // Store the Rashi number when Graha is placed
             color: planetColor,
             retrograde: resolvedRetrograde
         });
         this.updatePlanetsInHouse(houseNumber);
         if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Add Graha');
-        citranaDebug(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber} in Rashi ${rashiNumber}`);
+        citranaDebug(`[ADD] Graha ${planetAbbr} (id=${planetId}) added to Bhava ${houseNumber} in Rashi ${rashiNumber}`);
     }
 
     removePlanetFromHouseById(houseNumber, planetId, skipSnapshot = false) {
@@ -747,15 +747,15 @@ class NorthIndianChartTemplate {
     updatePlanetsInHouse(houseNumber) {
         const house = this.houseDataNorth[houseNumber];
         if (!house) return;
-        // Remove all existing planet texts for this house
+        // Remove all existing Graha texts for this Bhava
         this.chartGroupNorth.getChildren(node => node.name() && node.name().startsWith(`planet-`) && node.name().includes(`-${houseNumber}-`)).forEach(node => node.destroy());
-        // Calculate font size based on number of planets
+        // Calculate font size based on number of Grahas
         const n = house.planets.length;
         const BASE_FONT = 20;
         const MIN_FONT = 10;
         const STEP = 4;
         const fontSize = Math.max(MIN_FONT, BASE_FONT - (n - 1) * STEP);
-        // Perfectly center all planet texts both horizontally and vertically in the house
+        // Perfectly center all Graha texts both horizontally and vertically in the Bhava
         const totalHeight = n * fontSize + (n - 1) * 4;
         const startY = house.y - totalHeight / 2;
         house.planets.forEach((planetObj, i) => {
@@ -772,7 +772,7 @@ class NorthIndianChartTemplate {
                 name: `planet-hit-${planetObj.id}`,
                 listening: true
             });
-            // The planet text - perfectly centered
+            // The Graha text - perfectly centered
             const isMobile = /Mobile|Android|iP(ad|hone|od)/.test(navigator.userAgent);
             const planetText = new Konva.Text({
                 x: house.x,
@@ -803,16 +803,16 @@ class NorthIndianChartTemplate {
             planetText._planetHouseNumber = houseNumber;
             planetText._planetId = planetObj.id;
 
-            // Make planet text editable with live preview
+            // Make Graha text editable with live preview
             if (window.app && window.app.drawingTools) {
                 window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel, newColor, newRetrograde) => {
-                    // Update the planet label in the house data
+                    // Update the Graha label in the Bhava data
                     const planetIndex = house.planets.findIndex(p => p.id === planetObj.id);
                     if (planetIndex !== -1) {
                         house.planets[planetIndex].label = newLabel;
                         house.planets[planetIndex].color = newColor;
                         house.planets[planetIndex].retrograde = !!newRetrograde;
-                        // Update the planet text and color
+                        // Update the Graha text and color
                         planetText.text(newLabel);
                         planetText.fill(newColor);
                         planetText.textDecoration(newRetrograde ? 'underline' : '');
@@ -863,7 +863,7 @@ class NorthIndianChartTemplate {
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
-                citranaDebug(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber} in Rashi ${planetObj.rashiNumber}`);
+                citranaDebug(`[DRAGSTART] Graha ${planetObj.abbr} (id=${planetObj.id}) from Bhava ${houseNumber} in Rashi ${planetObj.rashiNumber}`);
             });
             planetText.on('dragend', (e) => {
                 planetText.opacity(1);
@@ -876,15 +876,15 @@ class NorthIndianChartTemplate {
                     chartLocalY: planetText.y()
                 }) ?? null;
 
-                // Restore z-order: move all planet texts and hitRects to top
+                // Restore z-order: move all Graha texts and hitRects to top
                 this.chartGroupNorth.getChildren(node => node.name() && (node.name().startsWith('planet-') || node.name().startsWith('planet-hit-'))).forEach(node => node.moveToTop());
                 this.tinyBoxGroupNorth.moveToTop();
                 this.layer.batchDraw();
                 if (targetHouse && targetHouse !== houseNumber) {
-                    // Move planet to new bhava by ID, preserving its Rashi number and color
+                    // Move Graha to new Bhava by ID, preserving its Rashi number and color
                     this.removePlanetFromHouseById(houseNumber, planetObj.id, true);
                     this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.rashiNumber, planetObj.retrograde, true);
-                    // Update the color of the moved planet
+                    // Update the color of the moved Graha
                     const targetHouseData = this.houseDataNorth[targetHouse];
                     if (targetHouseData && targetHouseData.planets) {
                         const movedPlanet = targetHouseData.planets.find(p => p.id === planetObj.id);
@@ -894,7 +894,7 @@ class NorthIndianChartTemplate {
                     }
                     this.updatePlanetsInHouse(targetHouse);
                     if (window.app?.recordHistory) window.app.recordHistory('Move Graha');
-                    citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}, staying in Rashi ${planetObj.rashiNumber}`);
+                    citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to Bhava ${targetHouse}, staying in Rashi ${planetObj.rashiNumber}`);
                 } else {
                     // Snap back to original position
                     this.updatePlanetsInHouse(houseNumber);
@@ -907,7 +907,7 @@ class NorthIndianChartTemplate {
             hitRect.moveToTop();
             planetText.moveToTop();
         });
-        // Do NOT move the house polygon to the top here!
+        // Do NOT move the Bhava polygon to the top here!
         this.layer.batchDraw();
     }
 

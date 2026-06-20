@@ -129,7 +129,7 @@ class ChartCoordinator {
     }
 
     setLagnaHouse(houseNumber, options = {}) {
-        citranaDebug('ChartCoordinator - setLagnaHouse called with house number:', houseNumber);
+        citranaDebug('ChartCoordinator - setLagnaHouse called with Bhava number:', houseNumber);
         citranaDebug('Current chart type:', this.currentChartType);
 
         if (this.currentChartType === 'south-indian') {

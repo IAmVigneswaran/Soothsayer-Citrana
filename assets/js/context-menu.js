@@ -275,7 +275,7 @@ class ContextMenu {
             <div class="context-menu-header">${chartName} Chart</div>
             <div class="context-menu-separator"></div>
         `;
-        // North Indian chart menu: Set Lagna as… (zodiac sign). South Indian Lagna is set via house right-click only.
+        // North Indian chart menu: Set Lagna as… (Rashi). South Indian Lagna is set via Bhava right-click only.
         if (chartType === 'north-indian') {
             if (isMobile) {
                 // Mobile: "Set as Lagna" header followed by list of rashis as regular menu items
@@ -439,13 +439,13 @@ class ContextMenu {
             }
         }
 
-        const headerSuffix = `House ${houseLabel}`;
+        const headerSuffix = `Bhava ${houseLabel}`;
 
         let lagnaActionHtml = '';
         if (chartType === 'south-indian') {
             lagnaActionHtml = `<div class="context-menu-item" data-action="set-lagna" data-house="${houseNumber}"><i data-lucide="target"></i> Set as Lagna</div>`;
         } else if (chartType === 'north-indian') {
-            lagnaActionHtml = `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}"><i data-lucide="home"></i> Set as First House</div>`;
+            lagnaActionHtml = `<div class="context-menu-item" data-action="set-first-house" data-house="${houseNumber}"><i data-lucide="home"></i> Set as First Bhava</div>`;
         }
 
         const menuHtml =
@@ -453,7 +453,7 @@ class ContextMenu {
             `<div class="context-menu-separator"></div>` +
             lagnaActionHtml +
             `<div class="context-menu-separator"></div>` +
-            `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}"><i data-lucide="trash-2"></i> Clear House</div>` +
+            `<div class="context-menu-item danger" data-action="clear-house" data-house="${houseNumber}"><i data-lucide="trash-2"></i> Clear Bhava</div>` +
             `<div class="context-menu-separator"></div>` +
             `<div class="context-menu-item" data-action="reset-chart"><i data-lucide="refresh-ccw"></i> Reset Chart</div>` +
             `<div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>`;
@@ -482,7 +482,7 @@ class ContextMenu {
 
     showPlanetMenu(x, y, houseNumber, planetAbbr, planetId) {
         const menuHtml = `
-            <div class="context-menu-header">Planet Options</div>
+            <div class="context-menu-header">Graha Options</div>
             <div class="context-menu-separator"></div>
             <div class="context-menu-item" data-action="rename-planet" data-house="${houseNumber}" data-abbr="${planetAbbr}" data-planetid="${planetId}"><i data-lucide="edit"></i> Edit Graha</div>
             <div class="context-menu-item danger last-item" data-action="delete-planet" data-house="${houseNumber}" data-abbr="${planetAbbr}" data-planetid="${planetId}"><i data-lucide="trash-2"></i> Delete Graha</div>
@@ -616,7 +616,7 @@ class ContextMenu {
         template.getLayer().batchDraw();
 
         if (window.app?.recordHistory) {
-            window.app.recordHistory('Clear house');
+            window.app.recordHistory('Clear Bhava');
         }
     }
 
@@ -634,20 +634,20 @@ class ContextMenu {
 
             case 'clear-chart':
                 window.app.showConfirmationDialog(
-                    'This will completely clear the entire canvas, removing all charts, planets, drawings, and any other content. The canvas will be returned to its initial blank state. This action cannot be undone.',
+                    'This will completely clear the entire canvas, removing all charts, Grahas, drawings, and any other content. The canvas will be returned to its initial blank state. This action cannot be undone.',
                     () => window.app.clearChart()
                 );
                 break;
             case 'reset-chart':
                 window.app.showConfirmationDialog(
-                    'This will reset the current chart by removing all planets and drawing elements (arrows, lines, pen strokes, text, and headings), but will preserve the chart structure and layout. The chart type (South Indian or North Indian) will remain the same. This action cannot be undone.',
+                    'This will reset the current chart by removing all Grahas and drawing elements (arrows, lines, pen strokes, text, and headings), but will preserve the chart structure and layout. The chart type (South Indian or North Indian) will remain the same. This action cannot be undone.',
                     () => window.app.resetChart()
                 );
                 break;
 
             case 'reset-drawings':
                 window.app.showConfirmationDialog(
-                    'This will remove all drawing elements (arrows, lines, pen strokes, text annotations, and headings) from the chart. The chart structure and all placed planets will remain unchanged. This action cannot be undone.',
+                    'This will remove all drawing elements (arrows, lines, pen strokes, text annotations, and headings) from the chart. The chart structure and all placed Grahas will remain unchanged. This action cannot be undone.',
                     () => window.app.resetDrawings()
                 );
                 break;

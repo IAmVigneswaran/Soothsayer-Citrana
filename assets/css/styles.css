@@ -759,7 +759,7 @@ body {
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Safari-specific planet text edit input fixes */
+  /* Safari-specific Graha text edit input fixes */
   .floating-text-edit-controls .text-edit-input {
     /* Ensure input is visible and functional */
     visibility: visible !important;
@@ -776,7 +776,7 @@ body {
     user-select: text;
   }
 
-  /* Safari-specific planet text edit color input fixes */
+  /* Safari-specific Graha text edit color input fixes */
   .floating-text-edit-controls .text-edit-color-input {
     /* Ensure color input is visible and functional */
     visibility: visible !important;
@@ -790,7 +790,7 @@ body {
     transform: translateZ(0);
   }
 
-  /* Safari-specific planet text edit button fixes */
+  /* Safari-specific Graha text edit button fixes */
   .floating-text-edit-controls button {
     /* Ensure buttons are visible and functional */
     visibility: visible !important;

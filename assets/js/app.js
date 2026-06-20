@@ -53,7 +53,7 @@ class CitranaApp {
         // Safari-specific configuration for better drag and drop
         this.stage.draggable(false); // Disable stage dragging by default
         this.stage.on('dragstart', (e) => {
-            // Prevent stage dragging when dragging planets
+            // Prevent stage dragging when dragging Grahas
             if (e.target && e.target.name() && e.target.name().startsWith('planet-')) {
                 e.evt.preventDefault();
             }
@@ -248,7 +248,7 @@ class CitranaApp {
 
         // Canvas events
         this.stage.on('mousedown', (e) => {
-            // If click is on empty space (not a chart house or planet), clear highlight
+            // If click is on empty space (not a chart Bhava or Graha), clear highlight
             if (!e.target || (e.target && !e.target.name().startsWith('house-') && !e.target.name().startsWith('planet-') && !e.target.name().startsWith('planet-hit-'))) {
                 if (this.chartTemplates.currentChartType === 'south-indian') {
                     this.chartTemplates.southIndianTemplate.clearHighlight();
@@ -264,7 +264,7 @@ class CitranaApp {
                 this.drawingTools.editUI.hide();
             }
 
-            // Cancel planet editing if clicking outside of editing areas
+            // Cancel Graha editing if clicking outside of editing areas
             if (this.drawingTools.isEditingPlanet) {
                 this.drawingTools.cancelPlanetEditing();
             }
@@ -349,7 +349,7 @@ class CitranaApp {
                     // Don't force display - let JavaScript control it
                     console.log('[SAFARI] Text Edit Controls visibility restored');
 
-                    // Fix individual planet text edit input elements
+                    // Fix individual Graha text edit input elements
                     const textEditInput = document.getElementById('text-edit-input');
                     const textEditColor = document.getElementById('text-edit-color');
                     const textEditButtons = textEditControls.querySelectorAll('button');
@@ -372,7 +372,7 @@ class CitranaApp {
                         // Don't force display - let existing CSS control it
                     });
 
-                    console.log('[SAFARI] Planet text edit input elements restored');
+                    console.log('[SAFARI] Graha text edit input elements restored');
                 }
             }, 100);
         };
@@ -1351,7 +1351,7 @@ class CitranaApp {
     }
 
     resetChart() {
-        // Clear all planets from the chart
+        // Clear all Grahas from the chart
         this.chartTemplates.clearAllPlanets();
         // Clear all annotations/drawings
         this.drawingTools.clearAll();
@@ -1360,7 +1360,7 @@ class CitranaApp {
         window.selectedBhavaNorth = null;
         this.recordHistory('Reset chart');
         this.layer.batchDraw();
-        console.log('Chart reset: all planets and annotations cleared');
+        console.log('Chart reset: all Grahas and annotations cleared');
     }
 
     resetDrawings() {
@@ -1372,7 +1372,7 @@ class CitranaApp {
 
         this.recordHistory('Reset drawings');
         this.layer.batchDraw();
-        console.log('Drawings reset: all drawing elements cleared while keeping chart structure and planets');
+        console.log('Drawings reset: all drawing elements cleared while keeping chart structure and Grahas');
     }
 
     // --- HISTORY (undo / redo) ---

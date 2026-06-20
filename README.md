@@ -8,7 +8,7 @@
 
 Citrana is a planetary chart builder and a whiteboard web application that allows students, gurus, and Vedanga Jyotisha practitioners to create Janma Kundali (Vedic charts) for study and reference. Built with pure HTML5, CSS3, and JavaScript, this modern, interactive tool provides an intuitive interface for creating both South Indian and North Indian astrological charts with drag-and-drop Graha placement and basic drawing tools.
 
-Perfect for educational purposes, research documentation, and professional chart analysis, Citrana offers a seamless experience for anyone studying or practising Vedanga Jyotisha (Vedic astrology). Whether you're a student learning the fundamentals, a guru teaching traditional methods, or a researcher documenting complex planetary combinations to decode Karma, Citrana provides the tools you need to build Janma Kundali for online classes, presentations, and personal reference.
+Perfect for educational purposes, research documentation, and professional chart analysis, Citrana offers a seamless experience for anyone studying or practising Vedanga Jyotisha (Vedic astrology). Whether you're a student learning the fundamentals, a guru teaching traditional methods, or a researcher documenting complex Graha combinations to decode Karma, Citrana provides the tools you need to build Janma Kundali for online classes, presentations, and personal reference.
 
 This codebase is developed using AI agents.
 
@@ -26,14 +26,14 @@ This codebase is developed using AI agents.
 ## Core Features
 
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
-- Graha Library: 60 Grahas across 5 pages — traditional Grahas, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Upagrahas with outer planets
-- Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that house on the **next** drop only (then the pointer takes over again)
+- Graha Library: 60 Grahas across 5 pages — traditional Grahas, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Upagrahas with outer Grahas
+- Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that Bhava on the **next** drop only (then the pointer takes over again)
 - Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (zoom and pan are not tracked)
 - Comprehensive Drawing Tools: Select, arrow, line, pen, text, and heading tools
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
 - Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark), from the toolbar **Options** modal; preferences persist in this browser
-- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear House**, **Edit Graha**, **Delete Graha**, and more)
+- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, and more)
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; your work stays in this browser session
@@ -116,8 +116,8 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 ### Creating Your First Chart
 
 1. **Choose Chart Type**: Right-click the canvas and select South Indian or North Indian layout
-2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna**. North Indian — right-click a Bhava and select **Set as First House**, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign
-3. **Add Grahas**: Drag Grahas from the Graha Library onto the Bhava under your pointer. Click a Bhava first if you want the **next** drop to go to that house specifically (subsequent drops follow the pointer again)
+2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna**. North Indian — right-click a Bhava and select **Set as First Bhava**, or right-click the chart and choose **Set Lagna as…** to pick a Rashi
+3. **Add Grahas**: Drag Grahas from the Graha Library onto the Bhava under your pointer. Click a Bhava first if you want the **next** drop to go to that Bhava specifically (subsequent drops follow the pointer again)
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click the save button to export your chart as a PNG
 
@@ -125,7 +125,7 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 
 South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any Bhava and select **Set as Lagna**. A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.
 
-North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First House** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as…** to pick a zodiac sign. Grahas reposition automatically when Lagna changes.
+North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First Bhava** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as…** to pick a Rashi. Grahas reposition automatically when Lagna changes.
 
 Chart Display Options: Click the gear icon in the toolbar (after Save) to open **Options**. Toggle **Hide North Indian Chart Indicators** to hide bhava numbers (black corner boxes). Toggle **Hide South Indian Chart Indicators** to hide the lagna diagonal line, yellow bhava numbers, and black rashi numbers. Toggle **Save Chart Only** to export only the chart area when you click Save — Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out of the image. The export uses a transparent background and omits the watermark (Toggle Transparency is turned on automatically). Preferences are saved in this browser; they are not included in undo/redo.
 
@@ -133,7 +133,7 @@ Chart Display Options: Click the gear icon in the toolbar (after Save) to open *
 
 Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it, or press **Delete** when a Graha is selected.
 
-Clear House: Right-click a Bhava and choose **Clear House** to remove every Graha from that house.
+Clear Bhava: Right-click a Bhava and choose **Clear Bhava** to remove every Graha from that Bhava.
 
 Custom Graha: There is also a "Custom" Graha available in the library. Drag and drop it into any Bhava, then double-click to edit the name. There is a maximum character limit of 8 characters for all Graha names.
 
