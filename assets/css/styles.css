@@ -22,6 +22,22 @@
   /* Bottom chrome: safe-area only + small pad (avoid double-stacking on iOS PWA) */
   --ui-bottom-pad: 8px;
   --ui-bottom-stack: 56px; /* zoom bar height (~48px) + gap above Graha library on mobile */
+
+  /* JSColorPicker — https://www.jscolorpicker.com/#customization */
+  --cp-size: 32px;
+  --cp-border-radius-sm: 4px;
+  --cp-border-radius-lg: 8px;
+  --cp-swatch-width: 2rem;
+  --cp-body-bg: #ffffff;
+  --cp-body-color: #000000;
+  --cp-body-color-rgb: 0, 0, 0;
+  --cp-border-color: #000000;
+  --cp-button-color: #000000;
+  --cp-border-color-translucent: rgba(0, 0, 0, 0.15);
+  --cp-tertiary-color: rgba(0, 0, 0, 0.5);
+  --cp-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --cp-box-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --cp-delay: 150ms;
 }
 
 html {
@@ -363,26 +379,73 @@ body {
   border-color: #000000;
 }
 
+.text-edit-color-input.color-picker,
+.edit-color-input.color-picker {
+  flex: 0 0 auto;
+  width: var(--cp-size);
+  height: var(--cp-size);
+  min-width: var(--cp-size);
+  max-width: var(--cp-size);
+  padding: 0;
+}
+
 .text-edit-color-input {
-  width: 32px;
+  flex: 0 0 auto;
+  min-width: 32px;
+  max-width: 32px;
   height: 32px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #000000;
   border-radius: 4px;
   cursor: pointer;
-  background: none;
+  background: #ffffff;
   padding: 0;
 }
 
-.text-edit-color-input::-webkit-color-swatch-wrapper {
-  padding: 0;
+.floating-text-edit-controls .color-picker,
+.edit-ui-content .color-picker {
+  border-color: #000000;
+  border-radius: 4px;
 }
 
-.text-edit-color-input::-webkit-color-swatch {
-  border: none;
-  border-radius: 3px;
+/* Chip only — hide hex field in compact toolbar toggles */
+.floating-text-edit-controls .cp_input,
+.edit-ui-content .cp_input {
+  display: none !important;
 }
 
-.floating-text-edit-controls button {
+/* Dialog — no format label (HEX/RGB tabs); value field remains */
+.cp_dialog .cp_formats {
+  display: none;
+}
+
+/* Swatch grid — 8 per row (16 swatches → 2 rows) */
+.cp_dialog .cp_swatches {
+  width: calc(8 * var(--cp-swatch-width) + 7 * 0.25rem);
+  margin-inline: auto;
+}
+
+/* Compact chips — solid swatch only, no dropdown caret */
+.edit-ui-content .color-picker .cp_caret,
+.floating-text-edit-controls .color-picker .cp_caret {
+  display: none !important;
+}
+
+.edit-ui-content .color-picker .cp_wrap,
+.floating-text-edit-controls .color-picker .cp_wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.edit-ui-content .color-picker .cp_button,
+.floating-text-edit-controls .color-picker .cp_button {
+  flex: 1 1 auto;
+  width: 100%;
+  aspect-ratio: auto;
+  border-left: none;
+  border-radius: 2px;
+}
+
+.floating-text-edit-controls button:not(.color-picker) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -396,12 +459,12 @@ body {
   border-radius: 4px;
 }
 
-.floating-text-edit-controls button:hover {
+.floating-text-edit-controls button:not(.color-picker):hover {
   background: #000000;
   color: white;
 }
 
-.floating-text-edit-controls button:active {
+.floating-text-edit-controls button:not(.color-picker):active {
   transform: scale(0.95);
 }
 
@@ -898,21 +961,19 @@ body {
 }
 
 .edit-color-input {
-  width: 32px;
+  flex: 0 0 auto;
+  min-width: 32px;
+  max-width: 32px;
   height: 32px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #000000;
   border-radius: 4px;
   cursor: pointer;
-  background: none;
-}
-
-.edit-color-input::-webkit-color-swatch-wrapper {
+  background: #ffffff;
   padding: 0;
 }
 
-.edit-color-input::-webkit-color-swatch {
-  border: none;
-  border-radius: 3px;
+.edit-color-input.color-picker:hover {
+  border-color: #000000;
 }
 
 @media (max-width: 768px) {
@@ -1013,8 +1074,7 @@ body {
 /* Prevent zooming on input focus in mobile browsers */
 .text-edit-input,
 .edit-ui-content input[type="text"],
-.edit-ui-content input[type="number"],
-.edit-ui-content input[type="color"] {
+.edit-ui-content input[type="number"] {
   /* Prevent zoom on focus in mobile browsers */
   font-size: 16px !important;
   /* Minimum font size to prevent zoom */
@@ -1036,8 +1096,7 @@ body {
 
   .text-edit-input,
   .edit-ui-content input[type="text"],
-  .edit-ui-content input[type="number"],
-  .edit-ui-content input[type="color"] {
+  .edit-ui-content input[type="number"] {
     /* Force minimum font size to prevent zoom */
     font-size: 16px !important;
     /* Prevent any scaling */
@@ -1051,12 +1110,16 @@ body {
     text-size-adjust: 100% !important;
   }
 
-  /* Prevent zoom on color inputs specifically */
-  input[type="color"] {
-    /* Force minimum size to prevent zoom */
+  /* JSColorPicker toggle sizing on mobile */
+  .floating-text-edit-controls,
+  .floating-edit-ui,
+  .edit-ui-content {
+    --cp-size: 32px;
+  }
+
+  .color-picker {
     min-width: 32px !important;
     min-height: 32px !important;
-    /* Prevent zoom behavior */
     -webkit-transform: scale(1) !important;
     transform: scale(1) !important;
   }

@@ -282,17 +282,11 @@ class DrawingTools {
     }
 
     startArrow(pos) {
-        const arrow = new Konva.Arrow({
-            points: [pos.x, pos.y, pos.x, pos.y],
-            stroke: '#FF0000',
-            strokeWidth: 5,
-            fill: '#FF0000',
-            pointerLength: 10,
-            pointerWidth: 8,
-            name: 'drawing-arrow',
-            perfectDrawEnabled: true,
-            listening: true,
-            draggable: false // Will be enabled when select tool is active
+        const arrow = CitranaArrow.create({
+            x1: pos.x,
+            y1: pos.y,
+            x2: pos.x,
+            y2: pos.y
         });
 
         // Create invisible bounding box for easier selection
@@ -312,10 +306,7 @@ class DrawingTools {
     updateArrow(pos) {
         if (!this.currentShape) return;
 
-        const points = this.currentShape.points();
-        points[2] = pos.x;
-        points[3] = pos.y;
-        this.currentShape.points(points);
+        CitranaArrow.setAnchor(this.currentShape, 'end', pos.x, pos.y);
 
         // Update bounding box if it exists
         if (this.currentShape.boundingBox) {
@@ -632,15 +623,36 @@ class DrawingTools {
         }
 
         drawingData.forEach((obj) => {
-            const shape = Konva.Node.create(obj);
+            let shape = Konva.Node.create(obj);
             const shapeName = shape.name();
 
             if (shapeName && shapeName.startsWith('bounding-box-')) {
                 return;
             }
 
-            if (obj.attrs?.points && typeof shape.points === 'function') {
+            if (shape instanceof Konva.Arrow) {
+                shape = CitranaArrow.fromLegacyNode(shape);
+            }
+
+            if (obj.attrs?.points && typeof shape.points === 'function' && !CitranaArrow.isArrow(shape)) {
                 shape.points(obj.attrs.points.slice());
+            }
+
+            if (CitranaArrow.isArrow(shape)) {
+                if (obj.attrs?.arrowAnchors) {
+                    shape.setAttr('arrowAnchors', obj.attrs.arrowAnchors.slice(0, 4));
+                }
+                if (obj.attrs?.arrowStrokeWidth !== undefined) {
+                    shape.setAttr('arrowStrokeWidth', obj.attrs.arrowStrokeWidth);
+                }
+                if (obj.attrs?.arrowPointerLength !== undefined) {
+                    shape.setAttr('arrowPointerLength', obj.attrs.arrowPointerLength);
+                }
+                if (obj.attrs?.arrowPointerWidth !== undefined) {
+                    shape.setAttr('arrowPointerWidth', obj.attrs.arrowPointerWidth);
+                }
+                CitranaArrow.rebuild(shape);
+                CitranaColorPicker.applyToKonvaArrow(shape, CitranaColorPicker.fromKonvaShape(shape));
             }
             if (obj.attrs?.x !== undefined && typeof shape.x === 'function') {
                 shape.x(obj.attrs.x);
@@ -677,7 +689,9 @@ class DrawingTools {
     createControlPoints(shape) {
         if (!shape || !shape.points) return;
 
-        const points = shape.points();
+        const points = CitranaArrow.isArrow(shape)
+            ? CitranaArrow.getControlPoints(shape)
+            : shape.points();
         if (points.length < 4) return; // Need at least start and end points
 
         // Clear existing control points
@@ -713,7 +727,9 @@ class DrawingTools {
         this.controlPoints.startPoint.on('dragstart', () => {
             this.isDraggingControlPoint = true;
             this.draggedControlPoint = 'start';
-            shape._cpDragStartPoints = shape.points().slice();
+            shape._cpDragStartPoints = CitranaArrow.isArrow(shape)
+                ? CitranaArrow.getAnchors(shape).slice()
+                : shape.points().slice();
         });
 
         this.controlPoints.startPoint.on('dragmove', () => {
@@ -750,10 +766,14 @@ class DrawingTools {
                 localY = localY / scaleY;
 
                 // Update shape points
-                const newPoints = this.selectedShape.points();
-                newPoints[0] = localX;
-                newPoints[1] = localY;
-                this.selectedShape.points(newPoints);
+                if (CitranaArrow.isArrow(this.selectedShape)) {
+                    CitranaArrow.setAnchor(this.selectedShape, 'start', localX, localY);
+                } else {
+                    const newPoints = this.selectedShape.points();
+                    newPoints[0] = localX;
+                    newPoints[1] = localY;
+                    this.selectedShape.points(newPoints);
+                }
 
                 // Update bounding box if it exists
                 if (this.selectedShape.boundingBox) {
@@ -772,7 +792,9 @@ class DrawingTools {
         this.controlPoints.endPoint.on('dragstart', () => {
             this.isDraggingControlPoint = true;
             this.draggedControlPoint = 'end';
-            shape._cpDragStartPoints = shape.points().slice();
+            shape._cpDragStartPoints = CitranaArrow.isArrow(shape)
+                ? CitranaArrow.getAnchors(shape).slice()
+                : shape.points().slice();
         });
 
         this.controlPoints.endPoint.on('dragmove', () => {
@@ -809,10 +831,14 @@ class DrawingTools {
                 localY = localY / scaleY;
 
                 // Update shape points
-                const newPoints = this.selectedShape.points();
-                newPoints[2] = localX;
-                newPoints[3] = localY;
-                this.selectedShape.points(newPoints);
+                if (CitranaArrow.isArrow(this.selectedShape)) {
+                    CitranaArrow.setAnchor(this.selectedShape, 'end', localX, localY);
+                } else {
+                    const newPoints = this.selectedShape.points();
+                    newPoints[2] = localX;
+                    newPoints[3] = localY;
+                    this.selectedShape.points(newPoints);
+                }
 
                 // Update bounding box if it exists
                 if (this.selectedShape.boundingBox) {
@@ -857,7 +883,9 @@ class DrawingTools {
     updateControlPointsPosition(shape) {
         if (!shape || !shape.points || !this.controlPoints.startPoint || !this.controlPoints.endPoint) return;
 
-        const points = shape.points();
+        const points = CitranaArrow.isArrow(shape)
+            ? CitranaArrow.getControlPoints(shape)
+            : shape.points();
         if (points.length < 4) return;
 
         // Get the shape's transformation matrix
@@ -930,7 +958,9 @@ class DrawingTools {
         this.draggedControlPoint = null;
 
         const startPoints = shape?._cpDragStartPoints;
-        const endPoints = shape?.points?.() ? shape.points().slice() : null;
+        const endPoints = CitranaArrow.isArrow(shape)
+            ? CitranaArrow.getAnchors(shape).slice()
+            : (shape?.points?.() ? shape.points().slice() : null);
         shape._cpDragStartPoints = null;
 
         if (startPoints && endPoints && this.pointsChanged(startPoints, endPoints)) {
@@ -1322,8 +1352,7 @@ class DrawingTools {
             cancelButton.removeEventListener('click', handleCancel);
             textEditInput.removeEventListener('keydown', handleKeyDown);
             textEditInput.removeEventListener('input', handleInput);
-            textEditColor.removeEventListener('change', handleColorChange);
-            textEditColor.removeEventListener('input', handleColorChange);
+            CitranaColorPicker.setGrahaPickCallback(null);
             if (deleteButton) {
                 deleteButton.removeEventListener('click', handleDelete);
             }
@@ -1356,7 +1385,7 @@ class DrawingTools {
 
             if (save && wasDirty) {
                 const newText = textEditInput.value.trim();
-                const newColor = textEditColor.value;
+                const newColor = CitranaColorPicker.getValue(textEditColor);
                 if (newText && newText.length <= 8) {
                     if (onUpdate) {
                         onUpdate(newText, newColor, retrogradeState);
@@ -1423,8 +1452,8 @@ class DrawingTools {
             markSessionDirty();
         };
 
-        const handleColorChange = (e) => {
-            editingPlanetText.fill(e.target.value);
+        const handleColorChange = (hex) => {
+            editingPlanetText.fill(hex);
             this.layer.batchDraw();
             markSessionDirty();
         };
@@ -1460,7 +1489,9 @@ class DrawingTools {
         }
 
         textEditInput.value = initialText;
-        textEditColor.value = initialColor;
+        CitranaColorPicker.initGrahaBar();
+        CitranaColorPicker.setValue(textEditColor, initialColor, false);
+        CitranaColorPicker.setGrahaPickCallback(handleColorChange);
         if (planetText.text().includes('ᵣ')) {
             editingPlanetText.text(initialText);
         }
@@ -1482,8 +1513,6 @@ class DrawingTools {
         cancelButton.addEventListener('click', handleCancel);
         textEditInput.addEventListener('keydown', handleKeyDown);
         textEditInput.addEventListener('input', handleInput);
-        textEditColor.addEventListener('change', handleColorChange);
-        textEditColor.addEventListener('input', handleColorChange);
         if (deleteButton) {
             deleteButton.addEventListener('click', handleDelete);
         }

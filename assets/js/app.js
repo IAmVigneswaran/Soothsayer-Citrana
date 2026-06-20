@@ -77,6 +77,10 @@ class CitranaApp {
         this.planetSystem.init();
         this.contextMenu.init();
 
+        if (typeof CitranaColorPicker !== 'undefined') {
+            CitranaColorPicker.initGrahaBar();
+        }
+
         this.updateZoomLevel();
 
         this.history = new CitranaHistory({
@@ -1417,6 +1421,12 @@ class CitranaApp {
                     x: node.x(),
                     y: node.y()
                 };
+                if (node.name()?.includes('drawing-arrow')) {
+                    obj.attrs.arrowAnchors = node.getAttr('arrowAnchors');
+                    obj.attrs.arrowStrokeWidth = node.getAttr('arrowStrokeWidth');
+                    obj.attrs.arrowPointerLength = node.getAttr('arrowPointerLength');
+                    obj.attrs.arrowPointerWidth = node.getAttr('arrowPointerWidth');
+                }
             } else if (className === 'Text') {
                 obj.attrs = {
                     ...obj.attrs,

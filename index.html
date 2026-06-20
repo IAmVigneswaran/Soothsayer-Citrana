@@ -2,7 +2,7 @@
 <!--
    sarvataḥ pāṇi-pādaṁ tat sarvato ’kṣhi-śhiro-mukham sarvataḥ śhrutimal loke sarvam āvṛitya tiṣhṭhati
    -->
-<html lang="en">
+<html lang="en" data-cp-theme="light">
    <head>
       <!-- Primary Meta Tags -->
       <meta charset="UTF-8">
@@ -36,6 +36,7 @@
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
       <!-- stylesheets -->
       <link rel="stylesheet" href="assets/css/styles.css">
+      <link rel="stylesheet" href="assets/vendor/colorpicker.min.css">
       <!-- favicon -->
       <link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon/apple-icon-57x57.png">
       <link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon/apple-icon-60x60.png">
@@ -178,7 +179,7 @@
          <!-- Floating Text Edit Controls -->
          <div class="floating-text-edit-controls" id="text-edit-controls" style="display: none;">
             <input type="text" id="text-edit-input" placeholder="Enter text (max 8 chars)" maxlength="8" class="text-edit-input">
-            <input type="color" id="text-edit-color" class="text-edit-color-input" title="Text color">
+            <button type="button" id="text-edit-color" class="text-edit-color-input" title="Graha colour" aria-label="Graha colour"></button>
             <button id="text-edit-retrograde" title="Toggle Retrograde">
             <i data-lucide="rotate-ccw"></i>
             </button>
@@ -438,11 +439,14 @@
       </div>
       <!-- Scripts -->
       <script src="assets/vendor/lucide.min.js"></script>
+      <script src="assets/vendor/colorpicker.iife.min.js"></script>
       <script src="assets/js/citrana-debug.js"></script>
       <script src="assets/js/chart-templates-south.js"></script>
       <script src="assets/js/chart-templates-north.js"></script>
       <script src="assets/js/chart-coordinator.js"></script>
       <script src="assets/js/planet-system.js"></script>
+      <script src="assets/js/citrana-arrow.js"></script>
+      <script src="assets/js/citrana-colorpicker.js"></script>
       <script src="assets/js/drawing-tools.js"></script>
       <script src="assets/js/edit-ui.js"></script>
       <script src="assets/js/context-menu.js"></script>

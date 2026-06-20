@@ -183,7 +183,28 @@ class EditUI {
      */
     clearContent() {
         const content = document.getElementById('edit-ui-content');
+        content.querySelectorAll('button.edit-color-input, input.edit-color-input').forEach((input) => {
+            if (typeof CitranaColorPicker !== 'undefined') {
+                CitranaColorPicker.destroy(input);
+            }
+        });
         content.innerHTML = '';
+    }
+
+    /**
+     * Create a themed colour control for the drawing Edit UI
+     * @param {string} color - Initial hex colour
+     * @param {string} title - Accessible label
+     * @param {Function} onPick - Called with hex when colour changes
+     * @returns {HTMLButtonElement}
+     */
+    createColorControl(color, title, onPick) {
+        return CitranaColorPicker.createInput({
+            color,
+            title,
+            context: 'drawing',
+            onPick
+        });
     }
 
     /**
@@ -252,20 +273,11 @@ class EditUI {
         });
 
         // Stroke Color Control
-        const colorInput = document.createElement('input');
-        colorInput.type = 'color';
-        colorInput.value = currentStrokeColor;
-        colorInput.className = 'edit-color-input';
-        colorInput.title = 'Line color';
-
-        colorInput.addEventListener('change', (e) => {
-            this.updateStrokeColor(e.target.value);
-        });
-
-        // Also listen for input event for better Chrome compatibility
-        colorInput.addEventListener('input', (e) => {
-            this.updateStrokeColor(e.target.value);
-        });
+        const colorInput = this.createColorControl(
+            currentStrokeColor,
+            'Line colour',
+            (hex) => this.updateStrokeColor(hex)
+        );
 
         // Add all controls to container
         controlsDiv.appendChild(decreaseWidth);
@@ -294,8 +306,10 @@ class EditUI {
      */
     createArrowControls(container) {
         // Get current values from the element with proper fallbacks
-        const currentStrokeWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5);
-        const currentStrokeColor = this.currentElement.stroke ? this.currentElement.stroke() : this.defaultProperties.arrow.strokeColor;
+        const currentStrokeWidth = CitranaArrow.isArrow(this.currentElement)
+            ? (this.currentElement.getAttr('arrowStrokeWidth') ?? this.defaultProperties.arrow.strokeWidth ?? 5)
+            : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5));
+        const currentStrokeColor = CitranaColorPicker.fromKonvaShape(this.currentElement);
 
         // Create controls container
         const controlsDiv = document.createElement('div');
@@ -317,35 +331,28 @@ class EditUI {
         increaseWidth.title = 'Increase thickness';
 
         // Width event listeners
+        const getArrowWidth = () => (CitranaArrow.isArrow(this.currentElement)
+            ? (this.currentElement.getAttr('arrowStrokeWidth') ?? this.defaultProperties.arrow.strokeWidth ?? 5)
+            : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5)));
+
         decreaseWidth.addEventListener('click', () => {
-            const currentWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5);
-            const newWidth = Math.max(1, currentWidth - 1);
+            const newWidth = Math.max(1, getArrowWidth() - 1);
             this.updateStrokeWidth(newWidth);
             widthValue.textContent = newWidth;
         });
 
         increaseWidth.addEventListener('click', () => {
-            const currentWidth = this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5);
-            const newWidth = Math.min(10, currentWidth + 1);
+            const newWidth = Math.min(10, getArrowWidth() + 1);
             this.updateStrokeWidth(newWidth);
             widthValue.textContent = newWidth;
         });
 
         // Arrow Color Control
-        const colorInput = document.createElement('input');
-        colorInput.type = 'color';
-        colorInput.value = currentStrokeColor;
-        colorInput.className = 'edit-color-input';
-        colorInput.title = 'Arrow color';
-
-        colorInput.addEventListener('change', (e) => {
-            this.updateStrokeColor(e.target.value);
-        });
-
-        // Also listen for input event for better Chrome compatibility
-        colorInput.addEventListener('input', (e) => {
-            this.updateStrokeColor(e.target.value);
-        });
+        const colorInput = this.createColorControl(
+            currentStrokeColor,
+            'Arrow colour',
+            (hex) => this.updateStrokeColor(hex)
+        );
 
         // Add all controls to container
         controlsDiv.appendChild(decreaseWidth);
@@ -545,20 +552,11 @@ class EditUI {
         });
 
         // Text Color Control
-        const colorInput = document.createElement('input');
-        colorInput.type = 'color';
-        colorInput.value = currentFill;
-        colorInput.className = 'edit-color-input';
-        colorInput.title = 'Text color';
-
-        colorInput.addEventListener('change', (e) => {
-            this.updateTextColor(e.target.value);
-        });
-
-        // Also listen for input event for better Chrome compatibility
-        colorInput.addEventListener('input', (e) => {
-            this.updateTextColor(e.target.value);
-        });
+        const colorInput = this.createColorControl(
+            currentFill,
+            'Text colour',
+            (hex) => this.updateTextColor(hex)
+        );
 
         // Add all controls to container
         controlsDiv.appendChild(decreaseSize);
@@ -704,7 +702,11 @@ class EditUI {
      */
     updateStrokeWidth(width) {
         if (this.currentElement) {
-            this.currentElement.strokeWidth(width);
+            if (CitranaArrow.isArrow(this.currentElement)) {
+                CitranaArrow.setStrokeWidth(this.currentElement, width);
+            } else {
+                this.currentElement.strokeWidth(width);
+            }
             this.currentElement.getLayer().batchDraw();
             this.markEditDirty();
         }
@@ -716,11 +718,10 @@ class EditUI {
      */
     updateStrokeColor(color) {
         if (this.currentElement) {
-            this.currentElement.stroke(color);
-
-            // For arrows, also update the fill color (arrowhead)
-            if (this.currentElement instanceof Konva.Arrow) {
-                this.currentElement.fill(color);
+            if (CitranaArrow.isArrow(this.currentElement)) {
+                CitranaColorPicker.applyToKonvaArrow(this.currentElement, color);
+            } else {
+                this.currentElement.stroke(color);
             }
 
             this.currentElement.getLayer().batchDraw();

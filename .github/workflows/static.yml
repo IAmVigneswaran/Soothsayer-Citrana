@@ -57,6 +57,8 @@ jobs:
           terser assets/js/chart-coordinator.js -o assets/js/chart-coordinator.min.js --compress --mangle
           terser assets/js/chart-templates-north.js -o assets/js/chart-templates-north.min.js --compress --mangle
           terser assets/js/chart-templates-south.js -o assets/js/chart-templates-south.min.js --compress --mangle
+          terser assets/js/citrana-arrow.js -o assets/js/citrana-arrow.min.js --compress --mangle
+          terser assets/js/citrana-colorpicker.js -o assets/js/citrana-colorpicker.min.js --compress --mangle
           terser assets/js/citrana-debug.js -o assets/js/citrana-debug.min.js --compress --mangle
           terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
           terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
@@ -74,6 +76,8 @@ jobs:
           sed -i 's|src="assets/js/chart-coordinator.js"|src="assets/js/chart-coordinator.min.js"|g' index.html
           sed -i 's|src="assets/js/chart-templates-north.js"|src="assets/js/chart-templates-north.min.js"|g' index.html
           sed -i 's|src="assets/js/chart-templates-south.js"|src="assets/js/chart-templates-south.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-arrow.js"|src="assets/js/citrana-arrow.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-colorpicker.js"|src="assets/js/citrana-colorpicker.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-debug.js"|src="assets/js/citrana-debug.min.js"|g' index.html
           sed -i 's|src="assets/js/context-menu.js"|src="assets/js/context-menu.min.js"|g' index.html
           sed -i 's|src="assets/js/drawing-tools.js"|src="assets/js/drawing-tools.min.js"|g' index.html
