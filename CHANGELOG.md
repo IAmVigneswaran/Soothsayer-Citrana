@@ -9,7 +9,7 @@
 - **Richer colour controls** — when editing a Graha or a drawing, pick from a **16-colour** rainbow palette, adjust **transparency**, or use the eyedropper. The same swatches appear in the Graha bar and the drawing Edit UI; the toolbar shows a compact colour chip instead of a hex code.
 - **Improved arrows** — arrow shaft and head render as one shape, with a straight (non-tapering) body and a clearer triangular head. Transparency applies evenly across the whole arrow.
 - **Fresh start on refresh** — your chart lives in this browser tab while you work. Reloading the page always begins with a blank canvas. Export a PNG when you want to keep a copy.
-- **Undo and redo** — step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Use the toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (and **Ctrl+Shift+Z** / **Cmd+Shift+Z** on Mac). Covers Graha placement and edits, Lagna, chart resets, annotations, and Edit UI sessions. Zoom, pan, and tool selection are not tracked.
+- **Undo and redo** — step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Use the toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (and **Ctrl+Shift+Z** / **Cmd+Shift+Z** on Mac). Covers Graha placement and edits, Lagna, chart resets, annotations, and Edit UI sessions. Zoom, pan, tool selection, laser pointer strokes, and Presentation View are not tracked.
 - **Edit or delete Grahas from the menu** — right-click any Graha for **Edit Graha** or **Delete Graha** (same editor as double-click).
 - **Clearer Lagna setup** by chart type:
   - **South Indian** — right-click a Bhava and choose **Set as Lagna**.
@@ -19,11 +19,12 @@
 - **Chart display options** — open **Options** (gear icon in the toolbar) to hide chart indicators per layout (North: bhava numbers in black corner boxes; South: lagna line, yellow bhava numbers, black rashi numbers), or enable **Save Chart Only** so the same Save button exports only the chart area — fits the chart, ignores zoom/pan, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, uses a transparent background, and omits the watermark. Preferences are saved in this browser and apply immediately; they are not tracked by undo/redo.
 - **Upagrahas in Graha Library** — Page 5 adds nine Upagrahas (Dhuma, Vyatipata, Parivesha, Indra Chapa, Upaketu, Kala, Mrityu, Ardha Prahara, Yama Ghantaka) before Uranus, Neptune, and Pluto — **60 Grahas** in total across five pages (12 per page).
 - **Laser Pointer** — draw a temporary red highlight over the chart for presentations (toolbar after Pen, shortcut **K**). The trail fades away over a few seconds; it is not saved, exported, or included in undo/redo. Hidden in the mobile toolbar layout.
+- **Presentation View** — right-click the canvas or a Bhava and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Choose **Exit Presentation View** from the same menu to restore the interface. Not tracked by undo/redo.
 
 **🔧 Improvements:**
 - Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
 - South Indian Bhava menus show **Bhava** numbers based on where Lagna is set.
-- Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, undo/redo, chart display options, Upagrahas on Page 5, Laser Pointer, and drawing stroke defaults.
+- Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, undo/redo, chart display options, Upagrahas on Page 5, Laser Pointer, Presentation View, and drawing stroke defaults.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied unused code from older versions, including automatic chart restore on refresh.
 - README aligned with in-app Help for **Delete** key routing (Graha first, then drawing), auto-switch to Select after arrow/line/text/heading, and one-shot bhava drop targeting.
@@ -33,6 +34,7 @@
 - **Colour picker polish** — cleaner chips in the Edit UI and Graha bar; a simpler picker dialog without format labels; semi-transparent colours look consistent on arrows and Graha labels.
 - **Smoother pen strokes** — freehand curves look less jagged and more natural when you draw with the Pen tool.
 - **Drawing stroke defaults** — Pen starts at 3px; Arrow and Line start at 4px.
+- **Help and About sizing** — corner buttons match the zoom bar at 48px; icons scaled for visual balance.
 - Consistent use of **Bhava**, **Graha**, and **Rashi** across the app and documentation.
 
 **🐛 Bug Fixes:**

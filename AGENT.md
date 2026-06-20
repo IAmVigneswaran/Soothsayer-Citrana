@@ -36,10 +36,10 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2330-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2350-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---1520-lines)
+   - [Main Application (app.js)](#main-application-appjs---1540-lines)
    - [History Engine (history.js)](#history-engine-historyjs---77-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---360-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---993-lines)
@@ -47,9 +47,9 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
    - [Graha System](#planet-system-planet-systemjs---884-lines)
    - [Citrana Arrow](#citrana-arrow-citrana-arrowjs---187-lines)
    - [Citrana Color Picker](#citrana-color-picker-citrana-colorpickerjs---378-lines)
-   - [Citrana Laser](#citrana-laser-citrana-laserjs---219-lines)
+   - [Citrana Laser](#citrana-laser-citrana-laserjs---250-lines)
    - [Drawing Tools](#drawing-tools-drawing-toolsjs---2030-lines)
-   - [Context Menu](#context-menu-context-menujs---721-lines)
+   - [Context Menu](#context-menu-context-menujs---740-lines)
    - [Edit UI](#edit-ui-edit-uijs---776-lines)
 6. [Core Features](#core-features)
    - [Undo / Redo](#undo--redo)
@@ -70,9 +70,13 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2340 lines)
+## CSS and Layout (styles.css - ~2350 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome), responsive breakpoints (769px desktop, 768px tablet, 600px mobile).
+
+**Layout tokens (`:root`):** `--ui-bottom-stack` (60px — 48px zoom bar + 12px gap above Graha library on mobile), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px for Help and About — matches zoom bar block height). Help icon at 50% of button; About logo at 62.5%.
+
+**Presentation View:** `body.presentation-view` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, and `.about-btn` via CSS. Toggled from context menu (`app.togglePresentationView()`).
 
 **Graha library layout:**
 - Header, grid, and page-dots styled in CSS (`.planet-library-header`, `.planet-grid`, `.page-dots`) — no inline styles in `index.html`
@@ -97,19 +101,19 @@ Soothsayer-Citrana/
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2340 lines); JSColorPicker `--cp-*` theme; `.citrana-laser-canvas`
+│   │   └── styles.css            # Complete styling system (~2350 lines); JSColorPicker `--cp-*` theme; `.citrana-laser-canvas`; `body.presentation-view`
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1520 lines)
+│   │   ├── app.js                # Main application coordinator (~1540 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~187 lines)
 │   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~378 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
-│   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~219 lines)
+│   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~250 lines)
 │   │   ├── chart-coordinator.js  # Chart type management (~360 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~993 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (~949 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~884 lines)
 │   │   ├── drawing-tools.js      # Drawing tools implementation (~2030 lines)
-│   │   ├── context-menu.js       # Context menu system (~721 lines)
+│   │   ├── context-menu.js       # Context menu system (~740 lines)
 │   │   ├── edit-ui.js            # Edit interface controls (~776 lines)
 │   │   └── history.js            # Unified undo/redo timeline (~77 lines)
 │   ├── vendor/
@@ -142,7 +146,7 @@ Soothsayer-Citrana/
 ├── ARCHITECTURE.md               # System architecture and data flows (~400 lines)
 ├── .cursorrules                  # Cursor IDE configuration (~1095 lines)
 ├── CHANGELOG.md                  # Version history and changes (~62 lines)
-├── README.md                     # Project readme (~177 lines)
+├── README.md                     # Project readme (~180 lines)
 ├── LICENSE                       # MIT License
 ├── SECURITY.md                   # Security policy
 └── .gitignore                    # Git ignore rules
@@ -154,7 +158,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1520 lines)
+### Main Application (app.js - ~1540 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -166,7 +170,7 @@ Key Responsibilities:
 - Handles chart export (full viewport or chart-only crop via Options)
 - Manages chart display options modal and `localStorage` preferences (indicators, Save Chart Only)
 - Provides mobile touch support and Safari compatibility
-- Manages zoom controls, zoom lock (default locked), zoom level display, and canvas resize (`visualViewport`)
+- Manages zoom controls, zoom lock (default locked), zoom level display, canvas resize (`visualViewport`), and **Presentation View**
 
 Key Methods:
 - `init()`: Application initialisation; loads `this.options` from `localStorage`
@@ -184,6 +188,7 @@ Key Methods:
 - `recordHistory()` / `captureHistoryState()` / `restoreHistoryState()`: Undo timeline integration
 - `undo()` / `redo()` / `updateHistoryButtons()`: Delegate to `this.history`; sync `#undo-btn` / `#redo-btn` disabled state
 - `clearChart()` / `resetChart()` / `resetDrawings()`
+- `isPresentationView()` / `togglePresentationView()`: Toggle `presentationView` and `body.presentation-view`; hides toolbar, zoom bar, Graha library, Help, About; Safari visibility fix skips when active; not undoable
 - `showWelcomeModal()` / `showConfirmationDialog()`
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`
 
@@ -444,12 +449,13 @@ Key Methods:
 - `restorePersistedDrawings()`: Rebuild drawings from history snapshots; migrates legacy `Konva.Arrow` via `CitranaArrow.fromLegacyNode()`
 - `clearLaser()` / `isLaserToolAvailable()`: Laser overlay lifecycle; wide viewport + non-mobile UA check
 
-### Citrana Laser (citrana-laser.js - ~219 lines)
+### Citrana Laser (citrana-laser.js - ~250 lines)
 Ephemeral laser pointer for presentations — separate from Konva chart objects.
 
 Key Responsibilities:
 - Canvas 2D overlay (`.citrana-laser-canvas`) above the Konva stage; `pointer-events: none`
-- Dense point sampling (`SAMPLE_STEP` 1px) for smooth trails; ~3s fade (`FADE_DURATION_MS`)
+- Dense point sampling (`SAMPLE_STEP` 1px) for smooth trails; ~3s fade per stroke (`FADE_DURATION_MS`)
+- Independent stroke groups per mouse gesture; `pruneStrokes()` removes expired points in place (preserves `activeStroke` reference)
 - Not included in `serializeDrawings()`, undo/redo, or PNG export (overlay is outside Konva `toDataURL`)
 - Initialised from `DrawingTools` constructor via `CitranaLaser.init(stage)`
 - Cleared on `clearAll()` / chart reset paths that call `drawingTools.clearAll()`
@@ -484,22 +490,26 @@ Key Methods:
 
 Vendor: `assets/vendor/colorpicker.iife.min.js`, `colorpicker.min.css`. Theme overrides: `--cp-*` in `styles.css`.
 
-### Context Menu (context-menu.js - ~721 lines)
+### Context Menu (context-menu.js - ~740 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:
 - Unified hit-test routing via `openContextMenuAtClientPoint()` (desktop right-click and mobile 500ms long-press)
 - Creates context-sensitive menus with chart-type-specific items
+- **Presentation View** on create chart, existing chart, and Bhava menus via `getPresentationViewMenuHtml()`
 - Prevents chart menu from overriding Graha or bhava menus
 - Implements mobile-friendly touch interactions
 
 Menu Types:
-- **Chart Creation Menu** (empty canvas): Create North/South Indian chart, Clear Canvas
-- **Existing Chart Menu** (canvas, no Bhava/Graha hit): Reset Chart, Reset Drawings, Clear Canvas; **North Indian only**: Set Lagna as… (Rashi; submenu desktop, flat list mobile)
+- **Chart Creation Menu** (empty canvas): Create North/South Indian chart, **Presentation View**, Clear Canvas
+- **Existing Chart Menu** (canvas, no Bhava/Graha hit): **Presentation View**; Reset Chart, Reset Drawings, Clear Canvas; **North Indian only**: Set Lagna as… (Rashi; submenu desktop, flat list mobile)
 - **Bhava Menu** (bhava hit):
-  - **South Indian**: Header `Bhava N` (Lagna-relative); **Set as Lagna** (`set-lagna`); Clear Bhava; …
-  - **North Indian**: Header `Bhava N` (visual); **Set as First Bhava** (`set-first-house`); Clear Bhava; …
+  - **South Indian**: Header `Bhava N` (Lagna-relative); **Set as Lagna** (`set-lagna`); Clear Bhava; **Presentation View**; …
+  - **North Indian**: Header `Bhava N` (visual); **Set as First Bhava** (`set-first-house`); Clear Bhava; **Presentation View**; …
 - **Graha Menu**: Edit Graha, Delete Graha
+
+Presentation View (`handleAction`):
+- `toggle-presentation-view` → `app.togglePresentationView()`; label **Presentation View** / **Exit Presentation View**; Lucide `presentation` icon
 
 Lagna actions (`handleAction`):
 - `set-lagna`: South Bhava menu → `setLagnaHouse(visualHouse)`; North chart menu → `setLagnaHouse(rashi 1–12)`. Skipped if `houseNumber` missing (no default fallback).
@@ -557,9 +567,7 @@ Each step snapshots **chart data** (type, Lagna, Grahas, South centre label) and
 
 **Tracked:** create/reset/clear chart; add/move/remove/edit Grahas; set Lagna; clear Bhava; draw/move/adjust/delete annotations; Edit UI style sessions; inline text/heading edits; centre label edit.
 
-**Not tracked:** zoom, pan, active tool, Bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference, **laser pointer strokes**.
-
-**Deferred 2.1:** visible History panel listing `entries[].label`.
+**Not tracked:** zoom, pan, active tool, Bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference, **laser pointer strokes**, **Presentation View**.
 
 See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow and extension points.
 
@@ -607,6 +615,7 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - Line Tool: Draw straight lines and connections with control points (default 4px)
 - Pen Tool: Freehand drawing with smoothed spline curves (default 3px)
 - Laser Pointer: Temporary fading highlight for presentations (`CitranaLaser` Canvas overlay; shortcut **K**; not saved or undoable)
+- Presentation View: Context menu toggle hides toolbar, zoom bar, Graha library, Help, and About
 - Text Tool: Add editable text boxes anywhere on canvas
 - Heading Tool: Create chart headings and titles
 - Undo/Redo: Unified timeline via `app.recordHistory()` — see [Undo / Redo](#undo--redo)
@@ -635,9 +644,10 @@ Technical Implementation:
 - Responsive Design: Optimised for desktop, tablet, and mobile devices
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
 - Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
-- Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific Bhava actions; Graha edit/delete
+- Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
 - Status Updates: Real-time feedback and notifications
 - Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
+- Help Modal: Shortcuts and usage guide (Laser Pointer, Presentation View, undo exclusions)
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First-time user experience with getting started guide
 - Options Modal: Chart indicator toggles and **Save Chart Only** export; shared modal width with Help (`width: min(600px, 90vw)`)

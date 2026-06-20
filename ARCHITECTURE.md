@@ -70,7 +70,7 @@ Script order matters: vendor libs first; `citrana-arrow.js` before `citrana-colo
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1520 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser when available; centralised **Delete** for Grahas and drawings), zoom lock, export (full viewport or chart-only crop), modals (including Options), chart display preferences, history coordinator, undo/redo toolbar; `serializeDrawings()` includes `arrowAnchors` for unified arrows |
+| `app.js` | ~1540 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser when available; centralised **Delete** for Grahas and drawings), zoom lock, export (full viewport or chart-only crop), modals (including Options), chart display preferences, history coordinator, undo/redo toolbar, **Presentation View** (`togglePresentationView`, `body.presentation-view`); `serializeDrawings()` includes `arrowAnchors` for unified arrows |
 | `history.js` | ~77 | Unified undo/redo timeline (`CitranaHistory`) |
 | `chart-coordinator.js` | ~360 | Unified API over South/North templates; zoom; chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `chart-templates-south.js` | ~993 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds |
@@ -78,12 +78,12 @@ Script order matters: vendor libs first; `citrana-arrow.js` before `citrana-colo
 | `planet-system.js` | ~884 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `citrana-arrow.js` | ~187 | Unified filled-arrow geometry (`Konva.Line` polygon); `arrowAnchors`; legacy `Konva.Arrow` migration |
 | `citrana-colorpicker.js` | ~378 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()` |
-| `citrana-laser.js` | ~219 | Ephemeral laser pointer — Canvas 2D overlay above stage; fade trail; not serialised or undoable |
+| `citrana-laser.js` | ~250 | Ephemeral laser pointer — Canvas 2D overlay above stage; independent strokes per gesture; ~3s fade; not serialised or undoable |
 | `drawing-tools.js` | ~2030 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, history `recordHistory()` calls (laser excluded) |
 | `edit-ui.js` | ~776 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close) |
-| `context-menu.js` | ~721 | Right-click / long-press menus; unified hit-test routing |
+| `context-menu.js` | ~740 | Right-click / long-press menus; unified hit-test routing; **Presentation View** toggle on chart and Bhava menus |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging |
-| `styles.css` | ~2340 | Light theme, floating UI, safe areas, iOS PWA layout, Graha library grid, JSColorPicker `--cp-*` theme, `.citrana-laser-canvas`, compact colour chips |
+| `styles.css` | ~2350 | Light theme, floating UI, safe areas, iOS PWA layout, Graha library grid, JSColorPicker `--cp-*` theme, `.citrana-laser-canvas`, `body.presentation-view`, Help/About `--corner-btn-size` (48px) |
 
 ## Canvas Object Naming
 
@@ -183,10 +183,12 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 | Menu | Trigger | Key actions |
 |------|---------|-------------|
-| Create | Empty canvas | North/South chart, Clear Canvas |
-| Existing chart | Canvas, no hit | North: Set Lagna as…; Reset Chart; Reset Drawings; Clear Canvas |
-| Bhava | Bhava hit | South: Set as Lagna; North: Set as First Bhava; Clear Bhava; … |
+| Create | Empty canvas | North/South chart, **Presentation View**, Clear Canvas |
+| Existing chart | Canvas, no hit | **Presentation View**; North: Set Lagna as…; Reset Chart; Reset Drawings; Clear Canvas |
+| Bhava | Bhava hit | South: Set as Lagna; North: Set as First Bhava; Clear Bhava; **Presentation View**; … |
 | Graha | Graha hit | Edit Graha, Delete Graha |
+
+**Presentation View:** `toggle-presentation-view` → `app.togglePresentationView()` toggles `presentationView` and `body.presentation-view` (hides toolbar, zoom bar, Graha library, Help, About). Label alternates **Presentation View** / **Exit Presentation View**. Not undoable.
 
 ### Zoom
 
@@ -212,8 +214,16 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 2. Mouse/touch on stage → `startDrawing` / `draw` / `stopDrawing`
 3. **Arrows:** `CitranaArrow.create()` → filled closed `Konva.Line` (constant-width shaft + prominent head); control points use `arrowAnchors` tail/tip
 4. Arrow, line, text, and heading auto-switch to Select after creation; Pen and Laser stay active. `makeShapeSelectable()` runs once in `stopDrawing()` (not per mousemove). Control points appear when arrow/line is selected
-5. **Laser:** `CitranaLaser.startStroke()` / `extendStroke()` on a DOM `<canvas>` overlay (not Konva); `stopDrawing()` skips `recordHistory()`; `clearLaser()` on `clearAll()`
+5. **Laser:** `CitranaLaser.startStroke()` / `extendStroke()` on a DOM `<canvas>` overlay (not Konva); each gesture is a separate stroke in `strokes[]`; `stopDrawing()` skips `recordHistory()`; `clearLaser()` on `clearAll()`
 6. Mobile (`≤768px`): arrow, line, pen, and laser toolbar buttons hidden in CSS (`#laser-help-shortcut` in Help)
+
+### Presentation View
+
+1. User right-clicks canvas or Bhava → **Presentation View** (or **Exit Presentation View** when active)
+2. `ContextMenu.handleAction('toggle-presentation-view')` → `app.togglePresentationView()`
+3. `document.body.classList.toggle('presentation-view')` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, `.about-btn`
+4. Safari iOS visibility fix (`fixUIElementsVisibility`) no-ops while `presentationView` is true
+5. Not tracked in undo/redo; state resets on page refresh
 
 ### Colour (Graha + drawings)
 
@@ -235,7 +245,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 **Edit sessions** (one step on commit, not per click): drawing Edit UI (`hide()`), Graha text bar (`finish(true)`), inline text/heading double-click editors.
 
-**Not tracked:** zoom, pan, active tool, Bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference, laser pointer strokes. **Deferred 2.1:** visible History panel.
+**Not tracked:** zoom, pan, active tool, Bhava highlight, Graha library page, modals, chart indicator visibility preferences, Save Chart Only export preference, laser pointer strokes, **Presentation View**.
 
 ### Chart display options
 
@@ -277,6 +287,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | Symbol | Set by | Used for |
 |--------|--------|----------|
 | `window.app` | `index.html` on `DOMContentLoaded` | Cross-module access |
+| `app.presentationView` | `togglePresentationView()` | In-memory Presentation View flag (not persisted) |
 | `window.selectedBhavaSouth` | South template Bhava click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
 | `window.selectedBhavaNorth` | North template Bhava click / context menu | One-shot library drop target; cleared after drop or empty-canvas click |
 | `localStorage.citrana_welcome_seen` | Welcome modal close | First-visit UX |
@@ -302,6 +313,7 @@ All interactive chrome is **fixed/absolute positioned** over a full-viewport can
 ### CSS layout (2.0)
 
 - `:root` safe-area vars: `--sat`, `--sar`, `--sab`, `--sal`; `--ui-inset` (20px desktop), `--ui-inset-sm` (10px mobile), `--ui-bottom-pad` (8px mobile / 4px standalone PWA)
+- Layout tokens: `--ui-bottom-stack` (60px — 48px zoom bar + 12px gap above Graha library on mobile), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px — Help and About match zoom bar height)
 - `body { position: fixed; inset: 0 }` — fills viewport on iOS (avoids `100dvh` gap)
 - `.app-container { position: absolute; inset: 0 }`
 - Top chrome: `top: calc(var(--ui-inset) + var(--sat))`
@@ -321,8 +333,8 @@ Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-gr
 
 - Top centre: tool toolbar — Undo/Redo, Select/Hand, drawing tools, export/transparency/**Options** (`#options-btn`)
 - Top left (desktop) / bottom stack (mobile): Graha library
-- Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`); mobile adds Select/Hand in zoom bar (288px width)
-- Bottom corners: Help (mobile bottom-left), About (bottom-right)
+- Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`); mobile adds Select/Hand in zoom bar (288px width, 48px block height)
+- Bottom corners: Help (mobile bottom-left; desktop top-right), About (bottom-right) — `--corner-btn-size` 48px; hidden in Presentation View
 - Bottom centre: Graha text edit bar, drawing Edit UI (dynamic)
 
 Modals: Welcome, Help, **Options**, About, Confirmation, Export Progress.
@@ -357,7 +369,7 @@ Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setup
 
 ### Not tracked
 
-Zoom level, pan position, active tool, bhava selection highlight, Graha library page, modal/UI state, chart indicator visibility preferences, Save Chart Only export preference, laser pointer strokes.
+Zoom level, pan position, active tool, bhava selection highlight, Graha library page, modal/UI state, chart indicator visibility preferences, Save Chart Only export preference, laser pointer strokes, **Presentation View**.
 
 ### Extension
 
@@ -365,7 +377,6 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 |------|-----------------|
 | New undoable action | Call `window.app.recordHistory('Label')` after the mutation; ensure data is in `getChartData()` or `drawing-*` nodes |
 | History depth | `maxSteps` in `app.setupComponents()` |
-| History panel (2.1) | UI over `app.history.entries`; no engine changes required |
 
 ## Extension Points
 
@@ -374,7 +385,8 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 | Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` (Page 5: Upagrahas before outer Grahas) |
 | Graha library layout | `.floating-planet-library`, `.planet-library-header`, `.planet-grid`, `.planet-item` in `styles.css`; markup in `index.html` |
 | Add drawing tool | `DrawingTools.startDrawing()` switch, toolbar in `index.html`, `app.setTool()` |
-| Laser pointer overlay | `citrana-laser.js` (`init`, fade loop, `isAvailable`); CSS `.citrana-laser-canvas`; exclude from `recordHistory` / `serializeDrawings` |
+| Laser pointer overlay | `citrana-laser.js` (`init`, fade loop, `pruneStrokes`, `isAvailable`); CSS `.citrana-laser-canvas`; exclude from `recordHistory` / `serializeDrawings` |
+| Presentation View | `app.togglePresentationView()`; `body.presentation-view` in `styles.css`; `getPresentationViewMenuHtml()` in `context-menu.js` |
 | Arrow geometry / transparency | `citrana-arrow.js` (`buildOutlinePoints`, `create`); colour via `CitranaColorPicker.applyToKonvaArrow()` |
 | Colour picker theme / swatches | `citrana-colorpicker.js` (`SWATCHES`, `BASE_OPTIONS`); `--cp-*` in `styles.css` |
 | New chart type | New template class + routes in `ChartCoordinator` (include `findHouseAtChartPoint()`) |
@@ -392,7 +404,6 @@ Zoom level, pan position, active tool, bhava selection highlight, Graha library 
 
 ## Known Limitations
 
-- **History panel**: Timeline labels exist in memory; visible panel deferred to 2.1.
 - **Single chart**: One chart per canvas by design.
 - **Mobile**: Touch code and PWA layout exist; officially unsupported for drawing complexity.
 - **About version**: `index.html` About modal version string should match `CHANGELOG.md` on each release.
