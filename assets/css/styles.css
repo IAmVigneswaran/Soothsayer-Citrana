@@ -850,195 +850,6 @@ body.presentation-view .about-btn {
   #laser-help-shortcut {
     display: none !important;
   }
-  .about-modal-content {
-    max-width: 90%;
-    max-height: 95vh;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  .about-logo {
-    max-width: 220px;
-  }
-
-  .about-app-name {
-    font-size: 18px;
-  }
-
-  .about-description {
-    font-size: 13px;
-  }
-
-  .about-definition {
-    font-size: 11px;
-    padding: 10px;
-    margin: 0 0 16px 0;
-  }
-
-  .about-creator {
-    font-size: 13px;
-    margin: 0 0 6px 0;
-  }
-
-  .about-email {
-    font-size: 11px;
-    margin: 0 0 16px 0;
-  }
-
-  .about-links {
-    gap: 6px;
-    margin-bottom: 16px;
-  }
-
-  .about-link {
-    font-size: 13px;
-    padding: 5px 10px;
-  }
-
-  .about-copyright {
-    font-size: 11px;
-    margin-bottom: 8px;
-  }
-
-  /* Mobile: Smaller welcome modal */
-  .welcome-modal-content {
-    max-width: 90%;
-    max-height: 90vh;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  .welcome-logo {
-    max-width: 220px;
-  }
-
-  .welcome-app-name {
-    font-size: 18px;
-  }
-
-  .welcome-instructions-title {
-    font-size: 14px;
-    margin: 0 0 8px 0;
-  }
-
-  .welcome-steps {
-    font-size: 12px;
-    margin: 0 0 12px 0;
-    padding-left: 16px;
-  }
-
-  .welcome-steps li {
-    margin-bottom: 6px;
-  }
-
-  .welcome-help-note {
-    font-size: 12px;
-    margin: 12px 0 6px 0;
-  }
-
-  .welcome-browser-note {
-    font-size: 10px;
-    margin: 6px 0 12px 0;
-  }
-
-  .about-version {
-    font-size: 7px;
-    margin: 0 0 3px 0;
-  }
-
-  .welcome-copyright {
-    font-size: 11px;
-    margin: 16px 0 12px 0;
-  }
-
-  .welcome-loading-container {
-    margin-top: 16px;
-  }
-
-  .welcome-loading-text {
-    font-size: 11px;
-  }
-  .confirmation-modal-content {
-    max-width: 90%;
-    margin: 20px;
-    width: calc(100% - 40px);
-  }
-
-  .confirmation-modal-header {
-    padding: 16px 20px 12px 20px;
-  }
-
-  .confirmation-modal-title {
-    font-size: 16px;
-  }
-
-  .confirmation-modal-body {
-    padding: 20px;
-  }
-
-  #confirmation-message {
-    font-size: 15px;
-  }
-
-  .confirmation-warning {
-    font-size: 13px;
-  }
-
-  .confirmation-modal-actions {
-    padding: 12px 20px 20px 20px;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .confirmation-btn {
-    padding: 10px 16px;
-    font-size: 14px;
-    min-width: 70px;
-    /* Touch-friendly improvements */
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    -webkit-touch-action: manipulation;
-    /* Prevent text selection */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  .confirmation-modal-close {
-    width: 32px;
-    height: 32px;
-    /* Touch-friendly improvements */
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    -webkit-touch-action: manipulation;
-  }
-
-  .confirmation-modal-close i {
-    width: 16px;
-    height: 16px;
-  }
-  .export-progress-modal-content {
-    max-width: 90%;
-    margin: 0 1rem;
-  }
-
-  .export-progress-modal-header {
-    padding: 1rem 1rem 0.5rem 1rem;
-  }
-
-  .export-progress-modal-title {
-    font-size: 1.125rem;
-  }
-
-  .export-progress-modal-body {
-    padding: 1rem;
-  }
-
-  .export-progress-text {
-    font-size: 0.8rem;
-  }
 
   .control-point-start,
   .control-point-end {
@@ -1915,6 +1726,77 @@ body.presentation-view .about-btn {
   margin: 0;
 }
 
+/* Mobile: Smaller about modal */
+@media (max-width: 768px) {
+  .about-modal-content {
+    max-width: 90%;
+    max-height: calc(100vh - var(--sat) - var(--sab) - 16px);
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  .about-modal-header {
+    margin-bottom: 12px;
+  }
+
+  .about-logo-container {
+    margin-bottom: 12px;
+  }
+
+  .about-divider {
+    margin: 12px 0;
+  }
+
+  .about-logo {
+    max-width: 220px;
+  }
+
+  .about-app-name {
+    font-size: 18px;
+  }
+
+  .about-description {
+    font-size: 13px;
+    margin: 0 0 10px 0;
+  }
+
+  .about-definition {
+    font-size: 11px;
+    padding: 10px;
+    margin: 0 0 12px 0;
+  }
+
+  .about-creator {
+    font-size: 13px;
+    margin: 0 0 6px 0;
+  }
+
+  .about-email {
+    font-size: 11px;
+    margin: 0 0 12px 0;
+  }
+
+  .about-links {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .about-link {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+
+  .about-version {
+    font-size: 7px;
+    margin: 0 0 3px 0;
+  }
+
+  .about-copyright {
+    font-size: 11px;
+    margin-bottom: 0;
+  }
+}
+
 /* Welcome Modal Styles */
 .welcome-modal {
   position: fixed;
@@ -2100,7 +1982,83 @@ body.presentation-view .about-btn {
   margin: 0;
 }
 
-/* Mobile: Smaller about modal */
+/* Mobile: Smaller welcome modal */
+@media (max-width: 768px) {
+  .welcome-modal-content {
+    max-width: 90%;
+    max-height: calc(100vh - var(--sat) - var(--sab) - 16px);
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  .welcome-modal-header {
+    margin-bottom: 12px;
+  }
+
+  .welcome-modal-body {
+    padding-bottom: 0;
+  }
+
+  .welcome-logo-container {
+    margin-bottom: 12px;
+  }
+
+  .welcome-divider {
+    margin: 12px 0;
+  }
+
+  .welcome-logo {
+    max-width: 220px;
+  }
+
+  .welcome-app-name {
+    font-size: 18px;
+    margin: 0 0 6px 0;
+  }
+
+  .welcome-instructions {
+    margin: 8px 0;
+  }
+
+  .welcome-instructions-title {
+    font-size: 14px;
+    margin: 0 0 6px 0;
+  }
+
+  .welcome-steps {
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0 0 8px 0;
+    padding-left: 16px;
+  }
+
+  .welcome-steps li {
+    margin-bottom: 4px;
+  }
+
+  .welcome-help-note {
+    font-size: 12px;
+    margin: 8px 0 4px 0;
+  }
+
+  .welcome-browser-note {
+    font-size: 10px;
+    margin: 4px 0 8px 0;
+  }
+
+  .welcome-copyright {
+    font-size: 11px;
+    margin: 8px 0 8px 0;
+  }
+
+  .welcome-loading-container {
+    margin-top: 10px;
+  }
+
+  .welcome-loading-text {
+    font-size: 11px;
+  }
+}
 
 /* Confirmation Dialog Modal */
 .confirmation-modal {
@@ -2242,6 +2200,66 @@ body.presentation-view .about-btn {
 }
 
 /* Mobile styles for confirmation dialog */
+@media (max-width: 768px) {
+  .confirmation-modal-content {
+    max-width: 90%;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+
+  .confirmation-modal-header {
+    padding: 16px 20px 12px 20px;
+  }
+
+  .confirmation-modal-title {
+    font-size: 16px;
+  }
+
+  .confirmation-modal-body {
+    padding: 20px;
+  }
+
+  #confirmation-message {
+    font-size: 15px;
+  }
+
+  .confirmation-warning {
+    font-size: 13px;
+  }
+
+  .confirmation-modal-actions {
+    padding: 12px 20px 20px 20px;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .confirmation-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    min-width: 70px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .confirmation-modal-close {
+    width: 32px;
+    height: 32px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+  }
+
+  .confirmation-modal-close i {
+    width: 16px;
+    height: 16px;
+  }
+}
 
 /* Export Progress Modal */
 .export-progress-modal {
@@ -2316,6 +2334,28 @@ body.presentation-view .about-btn {
   font-weight: 500;
 }
 
+@media (max-width: 768px) {
+  .export-progress-modal-content {
+    max-width: 90%;
+    margin: 0 1rem;
+  }
+
+  .export-progress-modal-header {
+    padding: 1rem 1rem 0.5rem 1rem;
+  }
+
+  .export-progress-modal-title {
+    font-size: 1.125rem;
+  }
+
+  .export-progress-modal-body {
+    padding: 1rem;
+  }
+
+  .export-progress-text {
+    font-size: 0.8rem;
+  }
+}
 
 /* Control Points Styles */
 .control-point-start,
