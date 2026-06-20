@@ -118,7 +118,7 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 ### Creating Your First Chart
 
 1. **Choose Chart Type**: Right-click the canvas and select South Indian or North Indian layout
-2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna**. North Indian — right-click a Bhava and select **Set as First Bhava**, or right-click the chart and choose **Set Lagna as…** to pick a Rashi
+2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna**. North Indian — right-click a Bhava and select **Set as First Bhava**, or right-click the chart and choose **Set Lagna as …** to pick a Rashi
 3. **Add Grahas**: Drag Grahas from the Graha Library onto the Bhava under your pointer. Click a Bhava first if you want the **next** drop to go to that Bhava specifically (subsequent drops follow the pointer again)
 4. **Add Annotations**: Use drawing tools to add notes and aspects
 5. **Export**: Click the save button to export your chart as a PNG
@@ -127,7 +127,7 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 
 South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click any Bhava and select **Set as Lagna**. A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.
 
-North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First Bhava** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as…** to pick a Rashi. Grahas reposition automatically when Lagna changes.
+North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First Bhava** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as …** to pick a Rashi. Grahas reposition automatically when Lagna changes.
 
 Chart Display Options: Click the gear icon in the toolbar (after Save) to open **Options**. Toggle **Hide North Indian Chart Indicators** to hide bhava numbers (black corner boxes). Toggle **Hide South Indian Chart Indicators** to hide the lagna diagonal line, yellow bhava numbers, and black rashi numbers. Toggle **Save Chart Only** to export only the chart area when you click Save — Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out of the image. The export uses a transparent background and omits the watermark (Toggle Transparency is turned on automatically). Preferences are saved in this browser; they are not included in undo/redo.
 

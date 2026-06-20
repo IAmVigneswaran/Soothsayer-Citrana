@@ -94,7 +94,7 @@ Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-devic
 | `citrana-laser.js` | ~248 | Ephemeral laser pointer — Canvas 2D overlay above stage; independent strokes per gesture; ~3s fade; `isAvailable()` → `CitranaDevice.isLaserViewport()`; not serialised or undoable |
 | `drawing-tools.js` | ~1968 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, history `recordHistory()` calls (laser excluded); `CitranaDevice` for touch/mobile |
 | `edit-ui.js` | ~776 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close) |
-| `context-menu.js` | ~644 | Right-click / long-press menus; unified hit-test routing; **Presentation View** toggle; North **Set Lagna as…** from `CitranaRashis.RASHIS` |
+| `context-menu.js` | ~644 | Right-click / long-press menus; unified hit-test routing; **Presentation View** toggle; North **Set Lagna as …** from `CitranaRashis.RASHIS` |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
 | `styles.css` | ~2400 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid, JSColorPicker `--cp-*` theme, `.help-modal-description`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
 
@@ -175,7 +175,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
   - `set-lagna` action → `setLagnaHouse(visualHouseNumber)`; `loadChartData()` restores with `{ skipSnapshot: true }`
   - Bhava menu header uses `getBhavaNumberForHouse()` — **Bhava N** counts from Lagna
 - **North Indian**
-  - Chart menu → **Set Lagna as…** → pick Rashi from `CitranaRashis.RASHIS` (`set-lagna` with `data-house` 1–12 = Rashi)
+  - Chart menu → **Set Lagna as …** → pick Rashi from `CitranaRashis.RASHIS` (`set-lagna` with `data-house` 1–12 = Rashi)
   - Bhava menu → **Set as First Bhava** → `set-first-house` → `getRashiNumberForHouse(visualHouse)` → `setLagnaHouse(rashi)`
   - `lagnaHouseNorth` stores **Rashi** (1–12), not visual Bhava index
   - `setLagnaHouse(n, options?)` → renumber rashi boxes, `repositionPlanetsForNewLagna()`; `options.skipSnapshot` on undo restore
@@ -197,7 +197,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | Menu | Trigger | Key actions |
 |------|---------|-------------|
 | Create | Empty canvas | North/South chart, **Presentation View**, Clear Canvas |
-| Existing chart | Canvas, no hit | **Presentation View**; North: Set Lagna as…; Reset Chart; Reset Drawings; Clear Canvas |
+| Existing chart | Canvas, no hit | **Presentation View**; North: Set Lagna as …; Reset Chart; Reset Drawings; Clear Canvas |
 | Bhava | Bhava hit | South: Set as Lagna; North: Set as First Bhava; Clear Bhava; **Presentation View**; … |
 | Graha | Graha hit | Edit Graha, Delete Graha |
 

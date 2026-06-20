@@ -547,7 +547,7 @@ Key Exports:
 - `getName(rashiNumber)`: Sign name for 1–12
 - `getNumberForHouseIndex(houseIndex0to11)`: Fixed grid Rashi number for South Indian cells
 
-Used by `context-menu.js` (North **Set Lagna as…** submenu) and chart templates (replacing duplicate inline arrays).
+Used by `context-menu.js` (North **Set Lagna as …** submenu) and chart templates (replacing duplicate inline arrays).
 
 ### Citrana Laser (assets/js/citrana-laser.js - ~248 lines)
 Ephemeral laser pointer for presentations — Canvas 2D overlay above Konva stage.
@@ -575,7 +575,7 @@ Key Responsibilities:
 
 Menu Types:
 - **Chart Creation Menu** (empty canvas): Create North/South Indian chart, **Presentation View**, Clear Canvas
-- **Existing Chart Menu** (canvas, no Bhava/Graha hit): **Presentation View**; Reset Chart, Reset Drawings, Clear Canvas; **North Indian only**: Set Lagna as… (Rashi submenu from `CitranaRashis.RASHIS`; flat list on touch)
+- **Existing Chart Menu** (canvas, no Bhava/Graha hit): **Presentation View**; Reset Chart, Reset Drawings, Clear Canvas; **North Indian only**: Set Lagna as … (Rashi submenu from `CitranaRashis.RASHIS`; flat list on touch)
 - **Bhava Menu** (bhava hit):
   - **South Indian**: Header `Bhava N` (Lagna-relative); **Set as Lagna** (`set-lagna`); Clear Bhava; **Presentation View**; …
   - **North Indian**: Header `Bhava N` (visual); **Set as First Bhava** (`set-first-house`); Clear Bhava; **Presentation View**; …
@@ -651,7 +651,7 @@ Call `window.app.recordHistory('Label')` after undoable mutations. See [ARCHITEC
 - South Indian Chart: Traditional 4x4 square grid layout with centre empty space; Rashis are fixed per grid cell
 - North Indian Chart: Diamond-shaped polygon layout with dynamic Rashi numbering based on Lagna
 - **South Indian Lagna**: Right-click a bhava → **Set as Lagna** only (no chart-level Set as Lagna). Bhava menu header shows **Bhava N** counted from Lagna (not fixed grid position)
-- **North Indian Lagna**: Right-click empty canvas → **Set Lagna as…** (choose Rashi); or right-click a bhava showing a Rashi → **Set as First Bhava** (that Rashi becomes Lagna). Grahas reposition by stored `rashiNumber`
+- **North Indian Lagna**: Right-click empty canvas → **Set Lagna as …** (choose Rashi); or right-click a bhava showing a Rashi → **Set as First Bhava** (that Rashi becomes Lagna). Grahas reposition by stored `rashiNumber`
 - Dynamic Bhava Numbering: South Indian bhava numbers (yellow boxes) rotate from Lagna; North Indian Rashi boxes recalculate from Lagna
 
 ### Chart Display Options

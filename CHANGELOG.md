@@ -13,7 +13,7 @@
 - **Edit or delete Grahas from the menu** — right-click any Graha for **Edit Graha** or **Delete Graha** (same editor as double-click).
 - **Clearer Lagna setup** by chart type:
   - **South Indian** — right-click a Bhava and choose **Set as Lagna**.
-  - **North Indian** — use **Set Lagna as…** on the chart menu (pick the Rashi), or **Set as First Bhava** on a Bhava menu.
+  - **North Indian** — use **Set Lagna as …** on the chart menu (pick the Rashi), or **Set as First Bhava** on a Bhava menu.
 - **Clear Bhava** removes every Graha from the Bhava you selected.
 - **Zoom lock** — on by default so scroll-wheel zoom does not catch you by surprise. Click the lock icon to zoom freely; **Reset Zoom** always works.
 - **Chart display options** — open **Options** (gear icon in the toolbar) to hide chart indicators per layout (North: bhava numbers in black corner boxes; South: lagna line, yellow bhava numbers, black rashi numbers), or enable **Save Chart Only** so the same Save button exports only the chart area — fits the chart, ignores zoom/pan, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, uses a transparent background, and omits the watermark. Preferences are saved in this browser and apply immediately; they are not tracked by undo/redo.

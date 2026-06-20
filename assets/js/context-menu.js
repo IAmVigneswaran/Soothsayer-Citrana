@@ -290,17 +290,17 @@ class ContextMenu {
             <div class="context-menu-header">${chartName} Chart</div>
             <div class="context-menu-separator"></div>
         `;
-        // North Indian chart menu: Set Lagna as… (Rashi). South Indian Lagna is set via Bhava right-click only.
+        // North Indian chart menu: Set Lagna as … (Rashi). South Indian Lagna is set via Bhava right-click only.
         if (chartType === 'north-indian') {
             if (!useFlyoutSubmenu) {
                 menuHtml += `
-                <div class="context-menu-header">Set Lagna as…</div>
+                <div class="context-menu-header">Set Lagna as …</div>
                 ${lagnaMenuItems}
                 <div class="context-menu-separator"></div>
                 `;
             } else {
                 menuHtml += `
-            <div class="context-menu-item has-submenu" data-action="set-lagna-parent"><i data-lucide="target"></i> Set Lagna as ...
+            <div class="context-menu-item has-submenu" data-action="set-lagna-parent"><i data-lucide="target"></i> Set Lagna as …
                 <div class="context-submenu context-menu">
                     ${lagnaMenuItems}
                 </div>
