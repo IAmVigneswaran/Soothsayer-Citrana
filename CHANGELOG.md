@@ -18,11 +18,12 @@
 - **Zoom lock** — on by default so scroll-wheel zoom does not catch you by surprise. Click the lock icon to zoom freely; **Reset Zoom** always works.
 - **Chart display options** — open **Options** (gear icon in the toolbar) to hide chart indicators per layout (North: bhava numbers in black corner boxes; South: lagna line, yellow bhava numbers, black rashi numbers), or enable **Save Chart Only** so the same Save button exports only the chart area — fits the chart, ignores zoom/pan, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, uses a transparent background, and omits the watermark. Preferences are saved in this browser and apply immediately; they are not tracked by undo/redo.
 - **Upagrahas in Graha Library** — Page 5 adds nine Upagrahas (Dhuma, Vyatipata, Parivesha, Indra Chapa, Upaketu, Kala, Mrityu, Ardha Prahara, Yama Ghantaka) before Uranus, Neptune, and Pluto — **60 Grahas** in total across five pages (12 per page).
+- **Laser Pointer** — draw a temporary red highlight over the chart for presentations (toolbar after Pen, shortcut **K**). The trail fades away over a few seconds; it is not saved, exported, or included in undo/redo. Hidden in the mobile toolbar layout.
 
 **🔧 Improvements:**
 - Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
 - South Indian Bhava menus show **Bhava** numbers based on where Lagna is set.
-- Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, undo/redo, chart display options, and Upagrahas on Page 5.
+- Help, Welcome, and README updated for the new Lagna flows, session behaviour, zoom lock, undo/redo, chart display options, Upagrahas on Page 5, Laser Pointer, and drawing stroke defaults.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied unused code from older versions, including automatic chart restore on refresh.
 - README aligned with in-app Help for **Delete** key routing (Graha first, then drawing), auto-switch to Select after arrow/line/text/heading, and one-shot bhava drop targeting.
@@ -31,6 +32,7 @@
 - Documentation refreshed for contributors and AI assistants.
 - **Colour picker polish** — cleaner chips in the Edit UI and Graha bar; a simpler picker dialog without format labels; semi-transparent colours look consistent on arrows and Graha labels.
 - **Smoother pen strokes** — freehand curves look less jagged and more natural when you draw with the Pen tool.
+- **Drawing stroke defaults** — Pen starts at 3px; Arrow and Line start at 4px.
 - Consistent use of **Bhava**, **Graha**, and **Rashi** across the app and documentation.
 
 **🐛 Bug Fixes:**
