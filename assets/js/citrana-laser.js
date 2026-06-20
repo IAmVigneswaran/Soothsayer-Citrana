@@ -16,8 +16,10 @@ const CitranaLaser = (() => {
     let stage = null;
     let canvas = null;
     let ctx = null;
-    /** @type {{ x: number, y: number, t: number }[]} */
-    let points = [];
+    /** @type {{ x: number, y: number, t: number }[][]} */
+    let strokes = [];
+    /** @type {{ x: number, y: number, t: number }[] | null} */
+    let activeStroke = null;
     let fadeRaf = null;
     let lastPoint = null;
     let lastTime = 0;
@@ -28,6 +30,29 @@ const CitranaLaser = (() => {
 
     function isAvailable() {
         return window.matchMedia('(min-width: 769px)').matches && !isMobile();
+    }
+
+    function hasVisibleStrokes() {
+        return strokes.some((stroke) => stroke.length > 0);
+    }
+
+    function pruneStrokes(now) {
+        for (let s = strokes.length - 1; s >= 0; s--) {
+            const stroke = strokes[s];
+
+            for (let i = stroke.length - 1; i >= 0; i--) {
+                if (now - stroke[i].t >= FADE_DURATION_MS) {
+                    stroke.splice(i, 1);
+                }
+            }
+
+            if (stroke.length === 0) {
+                if (activeStroke === stroke) {
+                    activeStroke = null;
+                }
+                strokes.splice(s, 1);
+            }
+        }
     }
 
     function syncCanvasSize() {
@@ -47,14 +72,11 @@ const CitranaLaser = (() => {
         paint();
     }
 
-    /**
-     * Fill gaps between mouse samples with closely spaced points so round caps overlap.
-     */
-    function interpolatePoints(x1, y1, x2, y2, tStart, tEnd) {
+    function interpolatePoints(stroke, x1, y1, x2, y2, tStart, tEnd) {
         const dist = Math.hypot(x2 - x1, y2 - y1);
 
         if (dist < SAMPLE_STEP * 0.5) {
-            points.push({ x: x2, y: y2, t: tEnd });
+            stroke.push({ x: x2, y: y2, t: tEnd });
             return;
         }
 
@@ -63,7 +85,7 @@ const CitranaLaser = (() => {
 
         for (let i = 1; i <= steps; i++) {
             const u = i / steps;
-            points.push({
+            stroke.push({
                 x: x1 + (x2 - x1) * u,
                 y: y1 + (y2 - y1) * u,
                 t: tStart + i * dt
@@ -71,44 +93,26 @@ const CitranaLaser = (() => {
         }
     }
 
-    function paint() {
-        if (!ctx || !stage) return;
+    function drawStroke(stroke, now) {
+        if (stroke.length === 0) return;
 
-        const width = stage.width();
-        const height = stage.height();
-        ctx.clearRect(0, 0, width, height);
-
-        const now = performance.now();
-        points = points.filter((point) => now - point.t < FADE_DURATION_MS);
-
-        if (points.length === 0) return;
-
-        ctx.save();
-        ctx.translate(stage.x(), stage.y());
-        ctx.scale(stage.scaleX(), stage.scaleY());
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = COLOR;
-
-        if (points.length === 1) {
-            const point = points[0];
+        if (stroke.length === 1) {
+            const point = stroke[0];
             const progress = (now - point.t) / FADE_DURATION_MS;
-            if (progress < 1) {
-                ctx.globalAlpha = 1 - progress;
-                ctx.fillStyle = COLOR;
-                const radius = (STROKE_WIDTH * (1 - progress * 0.65)) / 2;
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.restore();
-            ctx.globalAlpha = 1;
+            if (progress >= 1) return;
+
+            ctx.globalAlpha = 1 - progress;
+            ctx.fillStyle = COLOR;
+            const radius = (STROKE_WIDTH * (1 - progress * 0.65)) / 2;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+            ctx.fill();
             return;
         }
 
-        for (let i = 1; i < points.length; i++) {
-            const p0 = points[i - 1];
-            const p1 = points[i];
+        for (let i = 1; i < stroke.length; i++) {
+            const p0 = stroke[i - 1];
+            const p1 = stroke[i];
             const age = now - p0.t;
             const progress = age / FADE_DURATION_MS;
 
@@ -121,6 +125,30 @@ const CitranaLaser = (() => {
             ctx.lineTo(p1.x, p1.y);
             ctx.stroke();
         }
+    }
+
+    function paint() {
+        if (!ctx || !stage) return;
+
+        const width = stage.width();
+        const height = stage.height();
+        ctx.clearRect(0, 0, width, height);
+
+        const now = performance.now();
+        pruneStrokes(now);
+
+        if (!hasVisibleStrokes()) return;
+
+        ctx.save();
+        ctx.translate(stage.x(), stage.y());
+        ctx.scale(stage.scaleX(), stage.scaleY());
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = COLOR;
+
+        for (const stroke of strokes) {
+            drawStroke(stroke, now);
+        }
 
         ctx.restore();
         ctx.globalAlpha = 1;
@@ -132,7 +160,7 @@ const CitranaLaser = (() => {
         const tick = () => {
             paint();
 
-            if (points.length > 0) {
+            if (hasVisibleStrokes()) {
                 fadeRaf = requestAnimationFrame(tick);
             } else {
                 fadeRaf = null;
@@ -166,20 +194,21 @@ const CitranaLaser = (() => {
         const t = performance.now();
         lastPoint = { x: pos.x, y: pos.y };
         lastTime = t;
-        points.push({ x: pos.x, y: pos.y, t });
+        activeStroke = [{ x: pos.x, y: pos.y, t }];
+        strokes.push(activeStroke);
         ensureFadeLoop();
         paint();
     }
 
     function extendStroke(pos) {
-        if (!lastPoint) return;
+        if (!lastPoint || !activeStroke) return;
 
         const dx = pos.x - lastPoint.x;
         const dy = pos.y - lastPoint.y;
         if (Math.hypot(dx, dy) < MIN_POINT_DISTANCE) return;
 
         const tNow = performance.now();
-        interpolatePoints(lastPoint.x, lastPoint.y, pos.x, pos.y, lastTime, tNow);
+        interpolatePoints(activeStroke, lastPoint.x, lastPoint.y, pos.x, pos.y, lastTime, tNow);
         lastPoint = { x: pos.x, y: pos.y };
         lastTime = tNow;
         ensureFadeLoop();
@@ -187,6 +216,7 @@ const CitranaLaser = (() => {
     }
 
     function endStroke() {
+        activeStroke = null;
         lastPoint = null;
         lastTime = 0;
     }
@@ -197,7 +227,8 @@ const CitranaLaser = (() => {
             fadeRaf = null;
         }
 
-        points = [];
+        strokes = [];
+        activeStroke = null;
         lastPoint = null;
         lastTime = 0;
 
