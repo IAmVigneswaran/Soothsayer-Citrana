@@ -38,6 +38,10 @@ class DrawingTools {
         // Animation frame for bulletproof control point sync
         this.controlPointAnimationFrame = null;
 
+        if (typeof CitranaLaser !== 'undefined') {
+            CitranaLaser.init(stage);
+        }
+
         // Initialize Edit UI
         this.editUI = new EditUI();
 
@@ -78,6 +82,11 @@ class DrawingTools {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
+    /** Laser pointer — hidden on narrow viewports / mobile UA */
+    isLaserToolAvailable() {
+        return typeof CitranaLaser !== 'undefined' && CitranaLaser.isAvailable();
+    }
+
     /**
      * Get precise position from Konva event
      * @param {KonvaEvent} e - Konva event
@@ -113,6 +122,11 @@ class DrawingTools {
             return;
         }
 
+        if (tool === 'laser' && !this.isLaserToolAvailable()) {
+            this.isDrawing = false;
+            return;
+        }
+
         this.isDrawing = true;
         this.currentTool = tool;
         this.lastPoint = pos;
@@ -127,6 +141,9 @@ class DrawingTools {
             case 'pen':
                 this.startPen(pos);
                 break;
+            case 'laser':
+                this.startLaser(pos);
+                break;
             case 'text':
                 this.startText(pos);
                 break;
@@ -137,7 +154,8 @@ class DrawingTools {
     }
 
     draw(pos, tool) {
-        if (!this.isDrawing || !this.currentShape || !pos) return;
+        if (!this.isDrawing || !pos) return;
+        if (tool !== 'laser' && !this.currentShape) return;
 
         // Validate position coordinates
         if (typeof pos.x !== 'number' || typeof pos.y !== 'number' ||
@@ -146,8 +164,9 @@ class DrawingTools {
             return;
         }
 
-        // Pen: wider spacing reduces jitter; other tools: 1px minimum
-        const minDistance = tool === 'pen' ? PEN_MIN_POINT_DISTANCE : 1;
+        const minDistance = tool === 'pen'
+            ? PEN_MIN_POINT_DISTANCE
+            : (tool === 'laser' ? CitranaLaser.MIN_POINT_DISTANCE : 1);
         if (this.lastPoint && this.getDistance(pos, this.lastPoint) < minDistance) {
             return;
         }
@@ -161,6 +180,9 @@ class DrawingTools {
                 break;
             case 'pen':
                 this.updatePen(pos);
+                break;
+            case 'laser':
+                this.updateLaser(pos);
                 break;
         }
 
@@ -178,6 +200,10 @@ class DrawingTools {
         this.currentShape = null;
         this.currentTool = null;
         this.lastPoint = null;
+
+        if (completedTool === 'laser' && typeof CitranaLaser !== 'undefined') {
+            CitranaLaser.endStroke();
+        }
 
         // Bind selection/drag handlers once when the stroke is complete (not per mousemove)
         if (completedShape && completedTool === 'pen') {
@@ -197,7 +223,7 @@ class DrawingTools {
             text: 'Add text',
             heading: 'Add heading'
         };
-        if (completedTool && window.app?.recordHistory) {
+        if (completedTool && completedTool !== 'laser' && window.app?.recordHistory) {
             window.app.recordHistory(drawLabels[completedTool] || 'Draw');
         }
 
@@ -409,6 +435,22 @@ class DrawingTools {
         }
 
         this.layer.batchDraw();
+    }
+
+    startLaser(pos) {
+        if (typeof CitranaLaser === 'undefined') return;
+        CitranaLaser.startStroke(pos);
+    }
+
+    updateLaser(pos) {
+        if (typeof CitranaLaser === 'undefined') return;
+        CitranaLaser.extendStroke(pos);
+    }
+
+    clearLaser() {
+        if (typeof CitranaLaser !== 'undefined') {
+            CitranaLaser.clear();
+        }
     }
 
     /**
@@ -659,6 +701,8 @@ class DrawingTools {
     }
 
     clearAll() {
+        this.clearLaser();
+
         const drawingObjects = this.layer.find(node => {
             const name = node.name();
             return name && (name.startsWith('drawing-') || name.startsWith('bounding-box-'));

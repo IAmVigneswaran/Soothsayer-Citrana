@@ -100,6 +100,7 @@ class CitranaApp {
         document.getElementById('arrow-tool').addEventListener('click', () => this.setTool('arrow'));
         document.getElementById('line-tool').addEventListener('click', () => this.setTool('line'));
         document.getElementById('pen-tool').addEventListener('click', () => this.setTool('pen'));
+        document.getElementById('laser-tool').addEventListener('click', () => this.setTool('laser'));
         document.getElementById('text-tool').addEventListener('click', () => this.setTool('text'));
         document.getElementById('hand-tool').addEventListener('click', () => this.setTool('hand'));
         document.getElementById('heading-tool').addEventListener('click', () => this.setTool('heading'));
@@ -918,6 +919,9 @@ class CitranaApp {
             } else if (e.key === 'p' || e.key === 'P') {
                 e.preventDefault();
                 this.setTool('pen');
+            } else if ((e.key === 'k' || e.key === 'K') && this.drawingTools?.isLaserToolAvailable()) {
+                e.preventDefault();
+                this.setTool('laser');
             } else if (e.key === 't' || e.key === 'T') {
                 e.preventDefault();
                 this.setTool('text');
@@ -995,6 +999,10 @@ class CitranaApp {
     }
 
     setTool(tool) {
+        if (tool === 'laser' && !this.drawingTools?.isLaserToolAvailable()) {
+            tool = 'select';
+        }
+
         this.currentTool = tool;
         this.drawingTools.setTool(tool);
 
@@ -1052,9 +1060,9 @@ class CitranaApp {
         } else if (this.currentTool === 'select') {
             this.drawingTools.handleSelectMouseDown(pos, e);
         } else if (pos) {
-            this.isDrawing = true;
             this.lastPoint = pos;
             this.drawingTools.startDrawing(pos, this.currentTool);
+            this.isDrawing = this.drawingTools.isDrawing;
         }
     }
 
@@ -1101,9 +1109,9 @@ class CitranaApp {
             // For drawing tools, use the existing touch handling
             const pos = this.drawingTools.getPrecisePositionFromKonva(e);
             if (pos) {
-                this.isDrawing = true;
                 this.lastPoint = pos;
                 this.drawingTools.startDrawing(pos, this.currentTool);
+                this.isDrawing = this.drawingTools.isDrawing;
             }
         }
     }
@@ -1221,6 +1229,7 @@ class CitranaApp {
         this.stage.width(width);
         this.stage.height(height);
         this.stage.batchDraw();
+        CitranaLaser?.resize?.();
     }
 
     updateZoomLevel() {

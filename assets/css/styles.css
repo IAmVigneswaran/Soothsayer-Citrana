@@ -76,6 +76,15 @@ body {
   cursor: crosshair;
 }
 
+/* Ephemeral laser pointer — Canvas 2D overlay above Konva stage */
+.citrana-laser-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
 /* Floating Top Toolbar */
 .floating-top-toolbar {
   position: absolute;
@@ -1519,7 +1528,9 @@ body {
   /* Temporarily hide buggy drawing tools on mobile */
   #arrow-tool,
   #line-tool,
-  #pen-tool {
+  #pen-tool,
+  #laser-tool,
+  #laser-help-shortcut {
     display: none !important;
   }
 }
