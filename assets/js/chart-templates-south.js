@@ -15,7 +15,7 @@ class SouthIndianChartTemplate {
         this.selectedHouse = null; // Track selected Bhava for highlight
 
         if (stage && layer) {
-            console.log('South Indian Chart Template initialized with stage and layer');
+            citranaDebug('South Indian Chart Template initialized with stage and layer');
         }
     }
 
@@ -279,7 +279,7 @@ class SouthIndianChartTemplate {
             this.zoomToFit();
         }
 
-        console.log('South Indian chart created');
+        citranaDebug('South Indian chart created');
     }
 
     createHouse(x, y, width, height, houseNumber) {
@@ -295,24 +295,7 @@ class SouthIndianChartTemplate {
             name: `house-${houseNumber}`
         });
 
-        // Rashi mapping
-        const rashis = [
-            '1', // Aries
-            '2', // Taurus
-            '3', // Gemini
-            '4', // Cancer
-            '5', // Leo
-            '6', // Virgo
-            '7', // Libra
-            '8', // Scorpio
-            '9', // Sagittarius
-            '10', // Capricorn
-            '11', // Aquarius
-            '12' // Pisces
-        ];
-
-        const rashiIndex = (houseNumber - 1) % 12;
-        const rashiName = rashis[rashiIndex];
+        const rashiName = CitranaRashis.getNumberForHouseIndex(houseNumber - 1);
 
         // Create small rounded black box for Rashi
         const rashiNumberBoxSizeSouth = 20;
@@ -418,14 +401,14 @@ class SouthIndianChartTemplate {
         house.on('click', (e) => {
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
-            console.log('[SELECT] South Indian Chart Bhava selected:', houseNumber);
+            citranaDebug('[SELECT] South Indian Chart Bhava selected:', houseNumber);
         });
 
         // Add touch event for mobile selection
         house.on('tap', (e) => {
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
-            console.log('[SELECT] South Indian Chart Bhava selected via touch:', houseNumber);
+            citranaDebug('[SELECT] South Indian Chart Bhava selected via touch:', houseNumber);
         });
     }
 
@@ -532,7 +515,7 @@ class SouthIndianChartTemplate {
             });
 
             // The Graha text - perfectly centered
-            const isMobile = /Mobile|Android|iP(ad|hone|od)/.test(navigator.userAgent);
+            const isMobile = CitranaDevice.isMobileUA();
             const planetText = new Konva.Text({
                 x: house.x + house.width / 2,
                 y: planetY,
@@ -732,7 +715,7 @@ class SouthIndianChartTemplate {
         }
         this.applySouthIndicatorsPreference();
         if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Set Lagna');
-        console.log(`Lagna set to Bhava ${houseNumber}`);
+        citranaDebug(`Lagna set to Bhava ${houseNumber}`);
     }
 
     /**
@@ -819,7 +802,7 @@ class SouthIndianChartTemplate {
             this.stage.batchDraw();
         }
 
-        console.log('South Indian chart cleared');
+        citranaDebug('South Indian chart cleared');
     }
 
     zoomToFit() {
@@ -840,7 +823,7 @@ class SouthIndianChartTemplate {
         };
 
         // Detect mobile vs desktop (Zoom to fit)
-        const isMobile = window.innerWidth <= 600;
+        const isMobile = CitranaDevice.isCompactViewport();
         const scaleFactor = isMobile ? 0.95 : 0.7;
         const extraTopMargin = isMobile ? 20 : 20;
 
@@ -951,7 +934,7 @@ class SouthIndianChartTemplate {
                 }
             }
 
-            console.log('South Indian chart data loaded successfully');
+            citranaDebug('South Indian chart data loaded successfully');
         } catch (error) {
             console.error('Error loading South Indian chart data:', error);
         }
@@ -963,6 +946,6 @@ class SouthIndianChartTemplate {
             this.updatePlanetsInHouse(houseNum);
         }
         this.layer.batchDraw();
-        console.log('All Grahas cleared from South Indian chart');
+        citranaDebug('All Grahas cleared from South Indian chart');
     }
 }

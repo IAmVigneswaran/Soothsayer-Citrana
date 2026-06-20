@@ -13,7 +13,7 @@ class ContextMenu {
     init() {
         this.createMenu();
         this.setupEventListeners();
-        console.log('Context menu initialized');
+        citranaDebug('Context menu initialized');
     }
 
     createMenu() {
@@ -114,9 +114,9 @@ class ContextMenu {
 
         // Prevent immediate hiding when touching inside the menu
         document.addEventListener('touchstart', (e) => {
-            console.log('[CONTEXT MENU] Document touchstart, target:', e.target);
+            citranaDebug('[CONTEXT MENU] Document touchstart, target:', e.target);
             if (this.menu && this.menu.contains(e.target)) {
-                console.log('[CONTEXT MENU] Touching inside menu, preventing propagation');
+                citranaDebug('[CONTEXT MENU] Touching inside menu, preventing propagation');
                 // Prevent the touchstart from triggering the hide logic
                 e.stopPropagation();
             }
@@ -280,7 +280,11 @@ class ContextMenu {
 
     showExistingChartMenu(x, y, chartType) {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
-        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const isMobile = CitranaDevice.isTouchDevice();
+        const rashis = CitranaRashis.RASHIS;
+        const lagnaMenuItems = rashis.map((rashi, i) =>
+            `<div class='context-menu-item' data-action='set-lagna' data-house='${i + 1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`
+        ).join('');
 
         let menuHtml = `
             <div class="context-menu-header">${chartName} Chart</div>
@@ -289,116 +293,16 @@ class ContextMenu {
         // North Indian chart menu: Set Lagna as… (Rashi). South Indian Lagna is set via Bhava right-click only.
         if (chartType === 'north-indian') {
             if (isMobile) {
-                // Mobile: "Set as Lagna" header followed by list of rashis as regular menu items
-                const rashis = [{
-                        name: 'Aries',
-                        symbol: '\u2648'
-                    },
-                    {
-                        name: 'Taurus',
-                        symbol: '\u2649'
-                    },
-                    {
-                        name: 'Gemini',
-                        symbol: '\u264A'
-                    },
-                    {
-                        name: 'Cancer',
-                        symbol: '\u264B'
-                    },
-                    {
-                        name: 'Leo',
-                        symbol: '\u264C'
-                    },
-                    {
-                        name: 'Virgo',
-                        symbol: '\u264D'
-                    },
-                    {
-                        name: 'Libra',
-                        symbol: '\u264E'
-                    },
-                    {
-                        name: 'Scorpio',
-                        symbol: '\u264F'
-                    },
-                    {
-                        name: 'Sagittarius',
-                        symbol: '\u2650'
-                    },
-                    {
-                        name: 'Capricorn',
-                        symbol: '\u2651'
-                    },
-                    {
-                        name: 'Aquarius',
-                        symbol: '\u2652'
-                    },
-                    {
-                        name: 'Pisces',
-                        symbol: '\u2653'
-                    }
-                ];
                 menuHtml += `
                 <div class="context-menu-header">Set Lagna as…</div>
-                ${rashis.map((rashi, i) => `<div class='context-menu-item' data-action='set-lagna' data-house='${i+1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`).join('')}
+                ${lagnaMenuItems}
                 <div class="context-menu-separator"></div>
                 `;
             } else {
-                // Desktop: Submenu with all 12 rashis
-                const rashis = [{
-                        name: 'Aries',
-                        symbol: '\u2648'
-                    },
-                    {
-                        name: 'Taurus',
-                        symbol: '\u2649'
-                    },
-                    {
-                        name: 'Gemini',
-                        symbol: '\u264A'
-                    },
-                    {
-                        name: 'Cancer',
-                        symbol: '\u264B'
-                    },
-                    {
-                        name: 'Leo',
-                        symbol: '\u264C'
-                    },
-                    {
-                        name: 'Virgo',
-                        symbol: '\u264D'
-                    },
-                    {
-                        name: 'Libra',
-                        symbol: '\u264E'
-                    },
-                    {
-                        name: 'Scorpio',
-                        symbol: '\u264F'
-                    },
-                    {
-                        name: 'Sagittarius',
-                        symbol: '\u2650'
-                    },
-                    {
-                        name: 'Capricorn',
-                        symbol: '\u2651'
-                    },
-                    {
-                        name: 'Aquarius',
-                        symbol: '\u2652'
-                    },
-                    {
-                        name: 'Pisces',
-                        symbol: '\u2653'
-                    }
-                ];
                 menuHtml += `
             <div class="context-menu-item has-submenu" data-action="set-lagna-parent"><i data-lucide="target"></i> Set Lagna as ...
                 <div class="context-submenu context-menu">
-                    ${rashis.map((rashi, i) => `<div class='context-menu-item' data-action='set-lagna' data-house='${i+1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`).join('')}
+                    ${lagnaMenuItems}
                 </div>
             </div>
             <div class="context-menu-separator"></div>

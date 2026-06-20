@@ -15,7 +15,7 @@ class ChartCoordinator {
         this.northIndianTemplate = new NorthIndianChartTemplate(stage, layer);
 
         if (stage && layer) {
-            console.log('ChartCoordinator initialized with stage and layer');
+            citranaDebug('ChartCoordinator initialized with stage and layer');
         }
     }
 
@@ -259,7 +259,7 @@ class ChartCoordinator {
                 this.northIndianTemplate.loadChartData(data);
             }
 
-            console.log('Chart data loaded successfully');
+            citranaDebug('Chart data loaded successfully');
         } catch (error) {
             console.error('Error loading chart data:', error);
         }

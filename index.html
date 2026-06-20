@@ -449,6 +449,8 @@
       <script src="assets/vendor/lucide.min.js"></script>
       <script src="assets/vendor/colorpicker.iife.min.js"></script>
       <script src="assets/js/citrana-debug.js"></script>
+      <script src="assets/js/citrana-device.js"></script>
+      <script src="assets/js/citrana-rashis.js"></script>
       <script src="assets/js/chart-templates-south.js"></script>
       <script src="assets/js/chart-templates-north.js"></script>
       <script src="assets/js/chart-coordinator.js"></script>
@@ -467,7 +469,7 @@
          
          // Initialize the app
          document.addEventListener('DOMContentLoaded', function() {
-             console.log('DOM loaded, initializing Citrana...');
+             citranaDebug('DOM loaded, initializing Citrana...');
              window.app = new CitranaApp();
          });
       </script>

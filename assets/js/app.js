@@ -29,7 +29,7 @@ class CitranaApp {
     }
 
     init() {
-        console.log('Initializing Citrana App...');
+        citranaDebug('Initializing Citrana App...');
 
         this.setupCanvas();
         this.setupComponents();
@@ -41,7 +41,7 @@ class CitranaApp {
         // Show welcome modal on first visit
         this.showWelcomeModal();
 
-        console.log('App initialization complete');
+        citranaDebug('App initialization complete');
     }
 
     setupCanvas() {
@@ -66,7 +66,7 @@ class CitranaApp {
 
         this.stage.on('scaleXChange scaleYChange', () => this.updateZoomLevel());
 
-        console.log('Canvas setup complete');
+        citranaDebug('Canvas setup complete');
     }
 
     setupComponents() {
@@ -93,7 +93,7 @@ class CitranaApp {
         this.history.record('Start');
         this.updateHistoryButtons();
 
-        console.log('Components setup complete');
+        citranaDebug('Components setup complete');
     }
 
     setupEventListeners() {
@@ -344,7 +344,7 @@ class CitranaApp {
                     toolbar.style.visibility = 'visible';
                     toolbar.style.opacity = '1';
                     // Don't force display - let existing CSS control it
-                    console.log('[SAFARI] Top toolbar visibility restored');
+                    citranaDebug('[SAFARI] Top toolbar visibility restored');
                 }
 
                 // Fix floating edit UI - only if it should be visible
@@ -352,7 +352,7 @@ class CitranaApp {
                     editUI.style.visibility = 'visible';
                     editUI.style.opacity = '1';
                     // Don't force display - let JavaScript control it
-                    console.log('[SAFARI] Floating Edit UI visibility restored');
+                    citranaDebug('[SAFARI] Floating Edit UI visibility restored');
                 }
 
                 // Fix floating text edit controls - only if it should be visible
@@ -360,7 +360,7 @@ class CitranaApp {
                     textEditControls.style.visibility = 'visible';
                     textEditControls.style.opacity = '1';
                     // Don't force display - let JavaScript control it
-                    console.log('[SAFARI] Text Edit Controls visibility restored');
+                    citranaDebug('[SAFARI] Text Edit Controls visibility restored');
 
                     // Fix individual Graha text edit input elements
                     const textEditInput = document.getElementById('text-edit-input');
@@ -385,7 +385,7 @@ class CitranaApp {
                         // Don't force display - let existing CSS control it
                     });
 
-                    console.log('[SAFARI] Graha text edit input elements restored');
+                    citranaDebug('[SAFARI] Graha text edit input elements restored');
                 }
             }, 100);
         };
@@ -473,7 +473,7 @@ class CitranaApp {
                 }, 100);
             }
 
-            console.log('[MOBILE] Prevented zoom on input focus');
+            citranaDebug('[MOBILE] Prevented zoom on input focus');
         };
 
         // Listen for focus events on input fields
@@ -493,7 +493,7 @@ class CitranaApp {
             // Force focus without zoom
             target.focus();
 
-            console.log('[MOBILE] Prevented zoom on input touch');
+            citranaDebug('[MOBILE] Prevented zoom on input touch');
         };
 
         // Listen for touch events on input fields
@@ -551,11 +551,11 @@ class CitranaApp {
     exportChart() {
         // Prevent multiple concurrent exports
         if (this.isExporting) {
-            console.log('Export already in progress, ignoring duplicate request');
+            citranaDebug('Export already in progress, ignoring duplicate request');
             return;
         }
 
-        console.log('=== Starting export process ===');
+        citranaDebug('=== Starting export process ===');
         this.isExporting = true;
         this.showExportProgress();
 
@@ -717,7 +717,7 @@ class CitranaApp {
                     this.hideExportProgress();
                     this.isExporting = false;
                     this._lastDownloadedFile = null;
-                    console.log(`Chart exported successfully as: ${filename}`);
+                    citranaDebug(`Chart exported successfully as: ${filename}`);
                 }, 300);
             } catch (error) {
                 console.error('Error processing export:', error);
@@ -774,11 +774,11 @@ class CitranaApp {
 
     downloadFile(dataURL, filename) {
         // Chrome-specific fix: Use a more robust download method
-        console.log('Starting download for:', filename);
+        citranaDebug('Starting download for:', filename);
 
         // Prevent multiple downloads of the same file
         if (this._lastDownloadedFile === filename) {
-            console.log('File already downloaded, skipping duplicate:', filename);
+            citranaDebug('File already downloaded, skipping duplicate:', filename);
             return;
         }
         this._lastDownloadedFile = filename;
@@ -789,7 +789,7 @@ class CitranaApp {
 
         if (isChrome || isBrave) {
             // Chrome/Brave specific method: Use blob with proper cleanup
-            console.log('Using Chrome/Brave specific download method');
+            citranaDebug('Using Chrome/Brave specific download method');
 
             // Convert dataURL to blob
             const byteString = atob(dataURL.split(',')[1]);
@@ -827,7 +827,7 @@ class CitranaApp {
                 try {
                     // Try the standard click method first
                     link.click();
-                    console.log('Standard click triggered for Chrome/Brave');
+                    citranaDebug('Standard click triggered for Chrome/Brave');
                 } catch (clickError) {
                     console.error('Standard click failed, trying alternative:', clickError);
 
@@ -838,7 +838,7 @@ class CitranaApp {
                         cancelable: true
                     });
                     link.dispatchEvent(clickEvent);
-                    console.log('Mouse event triggered for Chrome/Brave');
+                    citranaDebug('Mouse event triggered for Chrome/Brave');
                 }
 
                 // Cleanup after a shorter delay for Chrome/Brave
@@ -848,7 +848,7 @@ class CitranaApp {
                         document.body.removeChild(linkElement);
                     }
                     window.URL.revokeObjectURL(url);
-                    console.log('Chrome/Brave download completed for:', filename);
+                    citranaDebug('Chrome/Brave download completed for:', filename);
                 }, 200); // Reduced from 500ms to 200ms
             };
 
@@ -857,7 +857,7 @@ class CitranaApp {
 
         } else {
             // Standard method for other browsers
-            console.log('Using standard download method');
+            citranaDebug('Using standard download method');
 
             try {
                 const link = document.createElement('a');
@@ -869,7 +869,7 @@ class CitranaApp {
                 link.click();
                 document.body.removeChild(link);
 
-                console.log('Standard download completed for:', filename);
+                citranaDebug('Standard download completed for:', filename);
 
             } catch (error) {
                 console.error('Standard download failed, trying blob method:', error);
@@ -887,7 +887,7 @@ class CitranaApp {
                         link.click();
                         document.body.removeChild(link);
                         window.URL.revokeObjectURL(url);
-                        console.log('Blob download completed for:', filename);
+                        citranaDebug('Blob download completed for:', filename);
                     });
                 } catch (blobError) {
                     console.error('All download methods failed:', blobError);
@@ -895,7 +895,7 @@ class CitranaApp {
                     // Last resort: Open in new window
                     const newWindow = window.open(dataURL, '_blank');
                     if (newWindow) {
-                        console.log('Opened image in new window as last resort');
+                        citranaDebug('Opened image in new window as last resort');
                     }
                 }
             }
@@ -1061,7 +1061,7 @@ class CitranaApp {
             this.stage.draggable(false);
         }
 
-        console.log(`Tool set to: ${tool}`);
+        citranaDebug(`Tool set to: ${tool}`);
     }
 
     handleMouseDown(e) {
@@ -1226,7 +1226,7 @@ class CitranaApp {
     }
 
     isTouchDevice() {
-        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        return CitranaDevice.isTouchDevice();
     }
 
     isPresentationView() {
@@ -1409,7 +1409,7 @@ class CitranaApp {
         window.selectedBhavaSouth = null;
         window.selectedBhavaNorth = null;
         this.recordHistory('Clear canvas');
-        console.log('Chart cleared');
+        citranaDebug('Chart cleared');
     }
 
     resetChart() {
@@ -1422,7 +1422,7 @@ class CitranaApp {
         window.selectedBhavaNorth = null;
         this.recordHistory('Reset chart');
         this.layer.batchDraw();
-        console.log('Chart reset: all Grahas and annotations cleared');
+        citranaDebug('Chart reset: all Grahas and annotations cleared');
     }
 
     resetDrawings() {
@@ -1434,7 +1434,7 @@ class CitranaApp {
 
         this.recordHistory('Reset drawings');
         this.layer.batchDraw();
-        console.log('Drawings reset: all drawing elements cleared while keeping chart structure and Grahas');
+        citranaDebug('Drawings reset: all drawing elements cleared while keeping chart structure and Grahas');
     }
 
     // --- HISTORY (undo / redo) ---

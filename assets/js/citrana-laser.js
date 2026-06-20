@@ -24,12 +24,10 @@ const CitranaLaser = (() => {
     let lastPoint = null;
     let lastTime = 0;
 
-    function isMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-
     function isAvailable() {
-        return window.matchMedia('(min-width: 769px)').matches && !isMobile();
+        return typeof CitranaDevice !== 'undefined'
+            ? CitranaDevice.isLaserViewport()
+            : window.matchMedia('(min-width: 769px)').matches;
     }
 
     function hasVisibleStrokes() {

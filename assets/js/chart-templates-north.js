@@ -17,7 +17,7 @@ class NorthIndianChartTemplate {
         this.selectedHouse = null; // Track selected Bhava for highlight
 
         if (stage && layer) {
-            console.log('North Indian Chart Template initialized with stage and layer');
+            citranaDebug('North Indian Chart Template initialized with stage and layer');
         }
     }
 
@@ -259,14 +259,14 @@ class NorthIndianChartTemplate {
             housePolygonNorth.on('mousedown', (e) => {
                 this.highlightHouse(houseNumberNorth);
                 window.selectedBhavaNorth = houseNumberNorth;
-                console.log('[SELECT] North Indian Chart Bhava selected:', houseNumberNorth);
+                citranaDebug('[SELECT] North Indian Chart Bhava selected:', houseNumberNorth);
             });
 
             // Add touch support for mobile selection
             housePolygonNorth.on('tap', (e) => {
                 this.highlightHouse(houseNumberNorth);
                 window.selectedBhavaNorth = houseNumberNorth;
-                console.log('[SELECT] North Indian Chart Bhava selected via touch:', houseNumberNorth);
+                citranaDebug('[SELECT] North Indian Chart Bhava selected via touch:', houseNumberNorth);
             });
 
             // Add right-click event for context menu
@@ -356,7 +356,7 @@ class NorthIndianChartTemplate {
             this.zoomToFit();
         }
 
-        console.log('North Indian chart created');
+        citranaDebug('North Indian chart created');
 
         // Do not add or handle the center label anymore.
     }
@@ -398,12 +398,7 @@ class NorthIndianChartTemplate {
         // Reposition all Grahas based on their stored Rashi numbers
         this.repositionPlanetsForNewLagna();
 
-        // Get Rashi name for the Lagna
-        const zodiacSigns = [
-            'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-            'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
-        ];
-        const lagnaSignName = zodiacSigns[houseNumber - 1] || 'Unknown';
+        const lagnaSignName = CitranaRashis.getName(houseNumber);
 
         citranaDebug(`North Indian Chart - Lagna successfully set to Bhava ${houseNumber} (${lagnaSignName})`);
         citranaDebug('Chart should now display updated Rashi numbers for the new Lagna');
@@ -563,7 +558,7 @@ class NorthIndianChartTemplate {
             this.stage.batchDraw();
         }
 
-        console.log('North Indian chart cleared');
+        citranaDebug('North Indian chart cleared');
     }
 
     zoomToFit() {
@@ -586,7 +581,7 @@ class NorthIndianChartTemplate {
         };
 
         // Detect mobile vs desktop
-        const isMobile = window.innerWidth <= 600;
+        const isMobile = CitranaDevice.isCompactViewport();
         const scaleFactor = isMobile ? 0.95 : 0.7;
         const extraTopMargin = isMobile ? 20 : -50;
 
@@ -685,7 +680,7 @@ class NorthIndianChartTemplate {
             this.restoreSavedPlanets(planetsByHouse, true);
             this.setLagnaHouse(lagnaHouse, { skipSnapshot: true });
 
-            console.log('North Indian chart data loaded successfully');
+            citranaDebug('North Indian chart data loaded successfully');
         } catch (error) {
             console.error('Error loading North Indian chart data:', error);
         }
@@ -697,7 +692,7 @@ class NorthIndianChartTemplate {
             this.updatePlanetsInHouse(houseNum);
         }
         this.layer.batchDraw();
-        console.log('All Grahas cleared from North Indian chart');
+        citranaDebug('All Grahas cleared from North Indian chart');
     }
 
     // --- Robust Graha Management ---
@@ -774,7 +769,7 @@ class NorthIndianChartTemplate {
                 listening: true
             });
             // The Graha text - perfectly centered
-            const isMobile = /Mobile|Android|iP(ad|hone|od)/.test(navigator.userAgent);
+            const isMobile = CitranaDevice.isMobileUA();
             const planetText = new Konva.Text({
                 x: house.x,
                 y: planetY,

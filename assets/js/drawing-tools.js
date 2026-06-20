@@ -18,7 +18,7 @@ class DrawingTools {
         this.currentShape = null;
         this.currentTool = null;
         this.lastPoint = null;
-        this.isTouchDevice = this.detectTouchDevice();
+        this.isTouchDevice = CitranaDevice.isTouchDevice();
         this.selectedShape = null;
         this.isDragging = false;
 
@@ -68,17 +68,6 @@ class DrawingTools {
             cancelAnimationFrame(this.controlPointAnimationFrame);
             this.controlPointAnimationFrame = null;
         }
-    }
-
-    detectTouchDevice() {
-        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    }
-
-    /**
-     * Check if device is mobile
-     */
-    isMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
     /** Laser pointer — hidden on narrow viewports / mobile UA */
@@ -231,7 +220,7 @@ class DrawingTools {
             window.app.setTool('select');
         }
 
-        console.log('Drawing stopped');
+        citranaDebug('Drawing stopped');
     }
 
     /**
@@ -1095,7 +1084,7 @@ class DrawingTools {
             obj.draggable(draggable);
         });
 
-        console.log(`Updated ${drawingObjects.length} drawing objects to draggable: ${draggable}`);
+        citranaDebug(`Updated ${drawingObjects.length} drawing objects to draggable: ${draggable}`);
     }
 
     /**
@@ -1952,7 +1941,7 @@ class DrawingTools {
     createBoundingBox(shape, toolType) {
         // Use larger padding for mobile devices for easier double-tap/selection
         let padding = 15;
-        if (this.isMobile()) {
+        if (CitranaDevice.isMobileUA()) {
             padding = 40; // Much larger for mobile
         }
         const bounds = this.getShapeBoundsInLayer(shape);
@@ -2003,7 +1992,7 @@ class DrawingTools {
     updateBoundingBox(boundingBox, shape) {
         // Use same padding logic as createBoundingBox
         let padding = 15;
-        if (this.isMobile()) {
+        if (CitranaDevice.isMobileUA()) {
             padding = 40;
         }
         const bounds = this.getShapeBoundsInLayer(shape);

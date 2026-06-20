@@ -60,6 +60,8 @@ jobs:
           terser assets/js/citrana-arrow.js -o assets/js/citrana-arrow.min.js --compress --mangle
           terser assets/js/citrana-colorpicker.js -o assets/js/citrana-colorpicker.min.js --compress --mangle
           terser assets/js/citrana-debug.js -o assets/js/citrana-debug.min.js --compress --mangle
+          terser assets/js/citrana-device.js -o assets/js/citrana-device.min.js --compress --mangle
+          terser assets/js/citrana-rashis.js -o assets/js/citrana-rashis.min.js --compress --mangle
           terser assets/js/citrana-laser.js -o assets/js/citrana-laser.min.js --compress --mangle
           terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
           terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
@@ -80,6 +82,8 @@ jobs:
           sed -i 's|src="assets/js/citrana-arrow.js"|src="assets/js/citrana-arrow.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-colorpicker.js"|src="assets/js/citrana-colorpicker.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-debug.js"|src="assets/js/citrana-debug.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-device.js"|src="assets/js/citrana-device.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-rashis.js"|src="assets/js/citrana-rashis.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-laser.js"|src="assets/js/citrana-laser.min.js"|g' index.html
           sed -i 's|src="assets/js/context-menu.js"|src="assets/js/context-menu.min.js"|g' index.html
           sed -i 's|src="assets/js/drawing-tools.js"|src="assets/js/drawing-tools.min.js"|g' index.html

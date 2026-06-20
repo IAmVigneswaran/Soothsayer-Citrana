@@ -363,7 +363,7 @@ class PlanetSystem {
         this.setupLibraryEventListeners();
         this.createPlanetLibrary();
         this.setupDragAndDrop();
-        console.log('Graha system initialized');
+        citranaDebug('Graha system initialized');
     }
 
     // --- Graha Library Floating UI ---
@@ -566,14 +566,14 @@ class PlanetSystem {
         // Add visual feedback
         e.target.style.opacity = '0.5';
         e.target.style.transform = 'scale(0.9)';
-        console.log(`Started dragging Graha: ${planetAbbr}`);
+        citranaDebug(`Started dragging Graha: ${planetAbbr}`);
     }
     handleDragEnd(e) {
         this.draggedPlanet = null;
         // Remove visual feedback
         e.target.style.opacity = '1';
         e.target.style.transform = 'scale(1)';
-        console.log('Drag ended');
+        citranaDebug('Drag ended');
     }
 
     // Mobile touch handlers
@@ -597,7 +597,7 @@ class PlanetSystem {
             passive: false
         });
 
-        console.log(`Touch started for Graha: ${planetAbbr}`);
+        citranaDebug(`Touch started for Graha: ${planetAbbr}`);
     }
 
     handleTouchMove(e, planetAbbr) {
@@ -613,7 +613,7 @@ class PlanetSystem {
         // Start dragging after a small movement threshold
         if (!this.isDragging && (deltaX > 5 || deltaY > 5)) {
             this.isDragging = true;
-            console.log('Started mobile drag');
+            citranaDebug('Started mobile drag');
         }
 
         if (this.dragPreview) {
@@ -650,7 +650,7 @@ class PlanetSystem {
             this.boundTouchEnd = null;
         }
 
-        console.log('Touch ended');
+        citranaDebug('Touch ended');
     }
 
     createDragPreview(planetAbbr, x, y) {
@@ -726,7 +726,7 @@ class PlanetSystem {
         if (targetHouse && this.draggedPlanet) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
             this.clearSelectedBhavaDropTarget();
-            console.log(`Mobile drop: Graha ${this.draggedPlanet} placed in Bhava ${targetHouse}`);
+            citranaDebug(`Mobile drop: Graha ${this.draggedPlanet} placed in Bhava ${targetHouse}`);
         }
     }
 
@@ -762,9 +762,9 @@ class PlanetSystem {
         if (targetHouse) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
             this.clearSelectedBhavaDropTarget();
-            console.log(`Planet ${this.draggedPlanet} placed in Bhava ${targetHouse}`);
+            citranaDebug(`Graha ${this.draggedPlanet} placed in Bhava ${targetHouse}`);
         } else {
-            console.log('No suitable Bhava found for Graha placement');
+            citranaDebug('No suitable Bhava found for Graha placement');
         }
         this.draggedPlanet = null;
     }
@@ -876,6 +876,6 @@ class PlanetSystem {
 
         this.currentPage = pageNumber;
         this.createPlanetLibrary();
-        console.log(`Switched to page ${pageNumber}`);
+        citranaDebug(`Switched to page ${pageNumber}`);
     }
 }
