@@ -24,10 +24,16 @@ const CitranaDevice = (() => {
         return window.matchMedia('(min-width: 769px)').matches && !isMobileUA();
     }
 
+    /** True when the primary input supports hover (desktop mouse/trackpad). */
+    function hasFinePointer() {
+        return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    }
+
     return {
         isTouchDevice,
         isMobileUA,
         isCompactViewport,
-        isLaserViewport
+        isLaserViewport,
+        hasFinePointer
     };
 })();

@@ -280,7 +280,7 @@ class ContextMenu {
 
     showExistingChartMenu(x, y, chartType) {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
-        const isMobile = CitranaDevice.isTouchDevice();
+        const useFlyoutSubmenu = CitranaDevice.hasFinePointer();
         const rashis = CitranaRashis.RASHIS;
         const lagnaMenuItems = rashis.map((rashi, i) =>
             `<div class='context-menu-item' data-action='set-lagna' data-house='${i + 1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`
@@ -292,7 +292,7 @@ class ContextMenu {
         `;
         // North Indian chart menu: Set Lagna as… (Rashi). South Indian Lagna is set via Bhava right-click only.
         if (chartType === 'north-indian') {
-            if (isMobile) {
+            if (!useFlyoutSubmenu) {
                 menuHtml += `
                 <div class="context-menu-header">Set Lagna as…</div>
                 ${lagnaMenuItems}
@@ -321,25 +321,6 @@ class ContextMenu {
         lucide.createIcons();
         this.show(x, y);
         this.setupMenuEventListeners();
-
-        // Setup submenu hover logic only for desktop
-        if (!isMobile) {
-            this.setupSubmenuHover();
-        }
-    }
-
-    setupSubmenuHover() {
-        // Show/hide submenu on hover for .has-submenu
-        const parent = this.menu.querySelector('.has-submenu');
-        if (parent) {
-            const submenu = parent.querySelector('.context-submenu');
-            parent.addEventListener('mouseenter', () => {
-                submenu.style.display = 'block';
-            });
-            parent.addEventListener('mouseleave', () => {
-                submenu.style.display = 'none';
-            });
-        }
     }
 
     showHouseMenu(x, y, houseNumber) {
@@ -422,6 +403,7 @@ class ContextMenu {
             if (!item) return;
             e.preventDefault();
             const action = item.dataset.action;
+            if (action === 'set-lagna-parent') return;
             const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
             const context = {
                 planetId: item.dataset.planetid,
@@ -450,6 +432,7 @@ class ContextMenu {
                 e.preventDefault();
                 e.stopPropagation();
                 const action = item.dataset.action;
+                if (action === 'set-lagna-parent') return;
                 const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
                 const context = {
                     planetId: item.dataset.planetid,

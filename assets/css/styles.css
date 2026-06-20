@@ -538,6 +538,7 @@ body.presentation-view .about-btn {
   padding: 4px 0;
   display: block;
   border-radius: 8px;
+  overflow: visible;
 }
 
 .context-menu.hidden {
@@ -609,6 +610,7 @@ body.presentation-view .about-btn {
   position: absolute;
   left: 100%;
   top: 0;
+  margin-left: -1px;
   min-width: 180px;
   background: #fff;
   border: 1px solid #000000;
@@ -635,7 +637,8 @@ body.presentation-view .about-btn {
   box-sizing: border-box;
 }
 
-.context-menu-item.has-submenu:hover>.context-submenu {
+.context-menu-item.has-submenu:hover > .context-submenu,
+.context-menu-item.has-submenu > .context-submenu:hover {
   display: block;
 }
 
