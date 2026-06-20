@@ -4,6 +4,12 @@
  * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
  * Handles all drawing functionality with precise mouse positioning and control points
  */
+
+/** Minimum px between sampled pen points (reduces jitter while drawing) */
+const PEN_MIN_POINT_DISTANCE = 3;
+/** Konva spline tension — 0 is straight segments; ~0.5 gives smooth curves */
+const PEN_TENSION = 0.5;
+
 class DrawingTools {
     constructor(stage, layer) {
         this.stage = stage;
@@ -140,8 +146,9 @@ class DrawingTools {
             return;
         }
 
-        // Ensure minimum distance for smooth drawing
-        if (this.lastPoint && this.getDistance(pos, this.lastPoint) < 1) {
+        // Pen: wider spacing reduces jitter; other tools: 1px minimum
+        const minDistance = tool === 'pen' ? PEN_MIN_POINT_DISTANCE : 1;
+        if (this.lastPoint && this.getDistance(pos, this.lastPoint) < minDistance) {
             return;
         }
 
@@ -173,6 +180,9 @@ class DrawingTools {
         this.lastPoint = null;
 
         // Bind selection/drag handlers once when the stroke is complete (not per mousemove)
+        if (completedShape && completedTool === 'pen') {
+            this.finishPenStroke(completedShape);
+        }
         if (completedShape && (completedTool === 'arrow' || completedTool === 'line' || completedTool === 'pen')) {
             this.makeShapeSelectable(completedShape, completedTool);
         }
@@ -365,10 +375,10 @@ class DrawingTools {
             lineCap: 'round',
             lineJoin: 'round',
             name: 'drawing-pen',
-            perfectDrawEnabled: true,
+            perfectDrawEnabled: false,
             listening: true,
             draggable: false, // Will be enabled when select tool is active
-            tension: 0.1 // Smooth curves
+            tension: PEN_TENSION
         });
 
         // Create invisible bounding box for easier selection
@@ -399,6 +409,53 @@ class DrawingTools {
         }
 
         this.layer.batchDraw();
+    }
+
+    /**
+     * Light 3-point moving average on pen points (endpoints unchanged).
+     * @param {number[]} flatPoints
+     * @returns {number[]}
+     */
+    smoothPenPoints(flatPoints) {
+        if (!flatPoints || flatPoints.length < 8) {
+            return flatPoints;
+        }
+
+        const smoothed = [flatPoints[0], flatPoints[1]];
+        for (let i = 2; i < flatPoints.length - 2; i += 2) {
+            const x0 = flatPoints[i - 2];
+            const y0 = flatPoints[i - 1];
+            const x1 = flatPoints[i];
+            const y1 = flatPoints[i + 1];
+            const x2 = flatPoints[i + 2];
+            const y2 = flatPoints[i + 3];
+            smoothed.push(
+                0.25 * x0 + 0.5 * x1 + 0.25 * x2,
+                0.25 * y0 + 0.5 * y1 + 0.25 * y2
+            );
+        }
+        smoothed.push(flatPoints[flatPoints.length - 2], flatPoints[flatPoints.length - 1]);
+        return smoothed;
+    }
+
+    /**
+     * Finalise a pen stroke: smooth sampled points and apply spline tension.
+     * @param {Konva.Line} line
+     */
+    finishPenStroke(line) {
+        if (!line || typeof line.points !== 'function') {
+            return;
+        }
+
+        const points = this.smoothPenPoints(line.points());
+        if (points.length >= 4) {
+            line.points(points);
+        }
+        line.tension(PEN_TENSION);
+
+        if (line.boundingBox) {
+            this.updateBoundingBox(line.boundingBox, line);
+        }
     }
 
     startText(pos) {

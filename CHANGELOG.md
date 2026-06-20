@@ -30,6 +30,7 @@
 - Browser chrome aligned to the white UI theme.
 - Documentation refreshed for contributors and AI assistants.
 - **Colour picker polish** — cleaner chips in the Edit UI and Graha bar; a simpler picker dialog without format labels; semi-transparent colours look consistent on arrows and Graha labels.
+- **Smoother pen strokes** — freehand curves look less jagged and more natural when you draw with the Pen tool.
 - Consistent use of **Bhava**, **Graha**, and **Rashi** across the app and documentation.
 
 **🐛 Bug Fixes:**
