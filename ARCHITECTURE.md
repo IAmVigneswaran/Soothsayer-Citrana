@@ -81,22 +81,22 @@ Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-devic
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1590 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser when available; centralised **Delete** for Grahas and drawings), zoom lock, export (full viewport or chart-only crop), modals (including Options), chart display preferences, history coordinator, undo/redo toolbar, **Presentation View** (`togglePresentationView`, `body.presentation-view`); `isModalBlockingShortcuts()` blocks shortcuts when modals open; `serializeDrawings()` includes `arrowAnchors` for unified arrows |
+| `app.js` | ~1754 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser when available; centralised **Delete** for Grahas and drawings; **Escape** modal dismiss; **Tab** focus trap), zoom lock, export (full viewport or chart-only crop), modals (`openModal`/`closeModal`, `aria-hidden`, focus stack), chart display preferences, history coordinator, undo/redo toolbar, **Presentation View** (`togglePresentationView`, `body.presentation-view`); `isModalBlockingShortcuts()` blocks shortcuts when modals open; `setupSafariToolbarFix()` via `visualViewport`; `serializeDrawings()` includes `arrowAnchors` for unified arrows |
 | `history.js` | ~77 | Unified undo/redo timeline (`CitranaHistory`) |
 | `chart-coordinator.js` | ~335 | Unified API over South/North templates; zoom (`zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `chart-templates-south.js` | ~950 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `CitranaRashis` / `CitranaDevice` |
-| `chart-templates-north.js` | ~937 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `CitranaRashis` / `CitranaDevice` |
-| `planet-system.js` | ~881 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
+| `chart-templates-north.js` | ~936 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `CitranaRashis` / `CitranaDevice` |
+| `planet-system.js` | ~880 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `citrana-arrow.js` | ~186 | Unified filled-arrow geometry (`Konva.Line` polygon); `arrowAnchors`; legacy `Konva.Arrow` migration |
 | `citrana-colorpicker.js` | ~370 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()` |
 | `citrana-device.js` | ~33 | Shared `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()`, `isLaserViewport()` |
 | `citrana-rashis.js` | ~41 | Shared `RASHIS`, `NAMES`, `NUMBERS`, `getName()`, `getNumberForHouseIndex()` |
 | `citrana-laser.js` | ~248 | Ephemeral laser pointer — Canvas 2D overlay above stage; independent strokes per gesture; ~3s fade; `isAvailable()` → `CitranaDevice.isLaserViewport()`; not serialised or undoable |
-| `drawing-tools.js` | ~2010 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, history `recordHistory()` calls (laser excluded); `CitranaDevice` for touch/mobile |
+| `drawing-tools.js` | ~1968 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, history `recordHistory()` calls (laser excluded); `CitranaDevice` for touch/mobile |
 | `edit-ui.js` | ~776 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close) |
-| `context-menu.js` | ~645 | Right-click / long-press menus; unified hit-test routing; **Presentation View** toggle; North **Set Lagna as…** from `CitranaRashis.RASHIS` |
+| `context-menu.js` | ~644 | Right-click / long-press menus; unified hit-test routing; **Presentation View** toggle; North **Set Lagna as…** from `CitranaRashis.RASHIS` |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
-| `styles.css` | ~2355 | Light theme, floating UI, safe areas, iOS PWA layout, Graha library grid, JSColorPicker `--cp-*` theme, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px) |
+| `styles.css` | ~2335 | Light theme, floating UI, safe areas, iOS PWA layout, consolidated `@media (max-width: 768px)`, Graha library grid, JSColorPicker `--cp-*` theme, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px) |
 
 ## Canvas Object Naming
 
@@ -211,7 +211,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | `#reset-zoom` | `app.zoomToFit()` → `ChartCoordinator.zoomToFit()` (routes by `currentChartType`) or scale reset (always available) |
 | `#zoom-lock` | `app.toggleZoomLock()` — default **locked** (`zoomLocked: true`); `lock` icon when locked, `lock-open` when unlocked |
 | Mouse wheel | `app.handleWheel()` (desktop only; scales about pointer when unlocked; no `preventDefault` when locked) |
-| Keyboard `+`/`-`/`0` | `+`/`-` zoom when unlocked; `0` reset zoom always; all shortcuts ignored when `isModalBlockingShortcuts()` or Graha/text inline editor focused |
+| Keyboard `+`/`-`/`0` | `+`/`-` zoom when unlocked; `0` reset zoom always; **Escape** closes dismissible modals; **Tab** trapped inside open modal; other shortcuts ignored when `isModalBlockingShortcuts()` or Graha/text inline editor focused |
 | Display | `stage.on('scaleXChange scaleYChange')` → `app.updateZoomLevel()` → `#zoom-level` text |
 
 **`zoomToFit()`** in both templates converts `getClientRect()` to **local bounds** (undoes current scale/pan) before computing fit scale. South: desktop `scaleFactor=0.7`, mobile `0.95`. North: desktop `extraTopMargin=-50`, mobile `20`.
@@ -235,7 +235,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 1. User right-clicks canvas or Bhava → **Presentation View** (or **Exit Presentation View** when active)
 2. `ContextMenu.handleAction('toggle-presentation-view')` → `app.togglePresentationView()`
 3. `document.body.classList.toggle('presentation-view')` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, `.about-btn`, `.floating-text-edit-controls`, `.floating-edit-ui`; dismisses open Graha bar and drawing Edit UI
-4. Safari iOS visibility fix (`fixUIElementsVisibility`) no-ops while `presentationView` is true
+4. Safari iOS visibility fix (`setupSafariToolbarFix` / `fixUIElementsVisibility`) listens to `focusin`/`focusout`, `resize`, `scroll`, and `visualViewport` events — no polling timer; no-ops while `presentationView` is true
 5. Not tracked in undo/redo; state resets on page refresh
 
 ### Colour (Graha + drawings)
@@ -354,6 +354,15 @@ Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-gr
 
 Modals: Welcome, Help, **Options**, About, Confirmation, Export Progress.
 
+**Modal accessibility (`index.html` + `app.js`):**
+- Overlays: `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`; `aria-hidden` toggled on open/close
+- Canvas: `#canvas-container` has `role="application"` and descriptive `aria-label`
+- **Escape** → `dismissActiveModalOnEscape()` (export progress not dismissible)
+- **Tab** → `trapModalFocus()` cycles focus within the active modal
+- `openModal()` / `showExportProgress()` push prior focus onto `_modalFocusStack` and focus close button (or modal root if no focusables)
+- `closeModal()` / `hideExportProgress()` pop stack and restore focus
+- Export progress: `aria-busy="true"` during export; status text id referenced by `aria-describedby`
+
 Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit factor. Official support is desktop-only; iOS standalone PWA layout is tuned but not officially supported.
 
 ### PWA
@@ -369,7 +378,7 @@ Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setup
 |--------|--------|
 | Engine | `CitranaHistory` — `entries[]`, `index`, `maxSteps: 50` |
 | Snapshot | `{ chartData, drawingData }` deep-cloned on each `record()` |
-| Keyboard | **Ctrl+Z** / **Cmd+Z** undo; **Ctrl+Y**, **Ctrl+Shift+Z**, **Cmd+Shift+Z** redo; **V/A/L/P/K/T/H** tools (K = laser when available); **Delete** removes selected Graha first, else deletes selected drawing when Select tool is active; blocked when modals open (`isModalBlockingShortcuts`) |
+| Keyboard | **Ctrl+Z** / **Cmd+Z** undo; **Ctrl+Y**, **Ctrl+Shift+Z**, **Cmd+Shift+Z** redo; **V/A/L/P/K/T/H** tools (K = laser when available); **Delete** removes selected Graha first, else deletes selected drawing when Select tool is active; **Escape** closes dismissible modals; **Tab** trapped in modals; other shortcuts blocked when modals open (`isModalBlockingShortcuts`) |
 | Toolbar | `#undo-btn` / `#redo-btn` (first group); Lucide `undo-2` / `redo-2`; disabled via `updateHistoryButtons()` |
 | API | `app.recordHistory(label)`, `app.undo()`, `app.redo()`, `app.updateHistoryButtons()` |
 
@@ -419,6 +428,7 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | Export behaviour | `app.exportChart()` / `finalizeExportImage()`; crop bounds in `ChartCoordinator.getExportCropRect()` |
 | Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
 | Save Chart Only export | `app.setSaveChartOnly()`, `applySaveChartOnlyTransparency()`, `#save-chart-only-toggle` in `index.html` |
+| Modal accessibility | `index.html` dialog `aria-*`; `app.openModal()` / `closeModal()`, `trapModalFocus()`, `dismissActiveModalOnEscape()`, export progress focus in `showExportProgress()` / `hideExportProgress()` |
 | Undo/redo | `history.js`, `app.recordHistory()` / `captureHistoryState()` / `updateHistoryButtons()` |
 
 ## Known Limitations

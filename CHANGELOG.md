@@ -37,6 +37,8 @@
 - **Help and About sizing** — corner buttons match the zoom bar at 48px; icons scaled for visual balance.
 - **More room on mobile** — extra space between the Graha library and the zoom bar so bottom controls are easier to use.
 - Consistent use of **Bhava**, **Graha**, and **Rashi** across the app and documentation.
+- **Modal accessibility** — dialogs expose titles and descriptions to screen readers; press **Escape** to close an open modal (export progress excepted); **Tab** stays within the dialog; focus moves to the close control when a modal opens and returns to where you were when you dismiss it.
+- **Clearer page semantics** — the chart canvas and modal overlays use accessible roles and labels for assistive technology.
 
 **🐛 Bug Fixes:**
 - Fixed undo not covering some edits — centre label text, text and heading content, element drags, and arrow/line control-point adjustments now step correctly.
@@ -62,6 +64,7 @@
 - Fixed **Delete** key — removes the selected Graha first, then the selected drawing when the Select tool is active (no duplicate per-chart listeners).
 - Fixed library drops still going to a Bhava you had clicked earlier — after one drop, the next Graha follows your pointer again unless you click a Bhava on purpose.
 - Fixed semi-transparent arrows looking like two separate pieces (line and head) — they now fade as one arrow.
+- Fixed Safari floating toolbar drift — the top toolbar now follows viewport resize events instead of a background timer.
 
 ---
 
