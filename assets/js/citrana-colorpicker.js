@@ -3,14 +3,14 @@
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana
  * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * Centralised JSColorPicker (v1.1.0) theme and helpers for Citrana
- * @see https://www.jscolorpicker.com/#customization
+ * Documentation https://www.jscolorpicker.com/#customization
  */
 const CitranaColorPicker = (() => {
     /**
      * Apple-style rainbow swatches — shared by Graha bar and drawing Edit UI.
      * 16 colours in continuous spectral order (black → rose); 2 rows of 8.
      * Warm pinks run dark → light: magenta → raspberry → pink → rose.
-     * @see https://developer.apple.com/design/human-interface-guidelines/color
+     * Reference https://developer.apple.com/design/human-interface-guidelines/color
      */
     const SWATCHES = [
         '#000000', // Black
