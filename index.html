@@ -197,7 +197,7 @@
          </div>
       </div>
       <!-- Options Modal -->
-      <div id="options-modal" class="options-modal" role="dialog" aria-modal="true" aria-labelledby="options-modal-title" aria-hidden="true">
+      <div id="options-modal" class="options-modal" role="dialog" aria-modal="true" aria-labelledby="options-modal-title" aria-describedby="options-modal-description" aria-hidden="true">
          <div class="options-modal-content">
             <div class="options-modal-header">
                <h2 id="options-modal-title" class="options-modal-title">Options</h2>
@@ -205,6 +205,7 @@
                <i data-lucide="x"></i>
                </button>
             </div>
+            <p id="options-modal-description" class="options-toggle-hint">Chart display and export preferences saved in this browser.</p>
             <div class="options-list">
                <label class="options-toggle-row" for="north-hide-indicators-toggle">
                   <span class="options-toggle-text">
@@ -231,7 +232,7 @@
          </div>
       </div>
       <!-- Help Modal -->
-      <div id="help-modal" class="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" aria-hidden="true">
+      <div id="help-modal" class="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" aria-describedby="help-modal-description" aria-hidden="true">
          <div class="help-modal-content">
             <div class="help-modal-header">
                <h2 id="help-modal-title" class="help-modal-title">Help</h2>
@@ -239,6 +240,7 @@
                <i data-lucide="x"></i>
                </button>
             </div>
+            <p id="help-modal-description" class="help-instructions">Keyboard shortcuts and guidance for building Vedic astrology charts in Citrana.</p>
             <div class="help-section">
                <h3 class="help-section-title">Keyboard Shortcuts</h3>
                <div class="help-shortcuts">
@@ -334,7 +336,7 @@
          </div>
       </div>
       <!-- Confirmation Dialog Modal -->
-      <div id="confirmation-modal" class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-hidden="true">
+      <div id="confirmation-modal" class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-describedby="confirmation-message confirmation-warning" aria-hidden="true">
          <div class="confirmation-modal-content">
             <div class="confirmation-modal-header">
                <h2 id="confirmation-modal-title" class="confirmation-modal-title">Confirm Action</h2>
@@ -344,7 +346,7 @@
             </div>
             <div class="confirmation-modal-body">
                <p id="confirmation-message">Are you sure you want to proceed? This action cannot be undone.</p>
-               <p class="confirmation-warning"><strong>Warning:</strong> Be sure to save your image before proceeding.</p>
+               <p class="confirmation-warning" id="confirmation-warning"><strong>Warning:</strong> Be sure to save your image before proceeding.</p>
             </div>
             <div class="confirmation-modal-actions">
                <button class="confirmation-btn confirmation-btn-yes" id="confirmation-yes">Yes</button>
@@ -353,7 +355,7 @@
          </div>
       </div>
       <!-- Export Progress Modal -->
-      <div id="export-progress-modal" class="export-progress-modal" role="dialog" aria-modal="true" aria-labelledby="export-progress-modal-title" aria-hidden="true" aria-busy="false">
+      <div id="export-progress-modal" class="export-progress-modal" role="dialog" aria-modal="true" aria-labelledby="export-progress-modal-title" aria-describedby="export-progress-text" aria-hidden="true" aria-busy="false">
          <div class="export-progress-modal-content">
             <div class="export-progress-modal-header">
                <h2 id="export-progress-modal-title" class="export-progress-modal-title">Exporting Chart</h2>
@@ -369,7 +371,7 @@
          </div>
       </div>
       <!-- About Modal -->
-      <div id="about-modal" class="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-modal-title" aria-hidden="true">
+      <div id="about-modal" class="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-modal-title" aria-describedby="about-modal-description" aria-hidden="true">
          <div class="about-modal-content">
             <div class="about-modal-header">
                <h2 id="about-modal-title" class="about-modal-title">About</h2>
@@ -384,7 +386,7 @@
                <div class="about-divider"></div>
                <div class="about-content">
                   <h3 class="about-app-name">Citrana</h3>
-                  <p class="about-description">Citrana is a Planetary Chart Builder for Vedanga Jyotisha Practitioners.</p>
+                  <p id="about-modal-description" class="about-description">Citrana is a Planetary Chart Builder for Vedanga Jyotisha Practitioners.</p>
                   <blockquote class="about-definition">
                      <strong>Sanskrit (संस्कृतम्):</strong> <strong>Citraṇā</strong> (चित्रणा): The act of painting, drawing, illustration, or portrayal. Derived from the Sanskrit root <em>citrayati</em> with the suffix <em>-anā</em>.<br><br>
                      <strong>Tamil (தமிழ்):</strong> <strong>சித்திரம்</strong> (Cittiram): Artistic representation, drawing, illustration, or systematic arrangement.<br><br>
@@ -404,7 +406,7 @@
          </div>
       </div>
       <!-- Welcome Modal -->
-      <div id="welcome-modal" class="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-modal-title" aria-hidden="true">
+      <div id="welcome-modal" class="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-modal-title" aria-describedby="welcome-modal-description" aria-hidden="true">
          <div class="welcome-modal-content">
             <div class="welcome-modal-header">
                <h2 id="welcome-modal-title" class="welcome-modal-title">Welcome</h2>
@@ -420,6 +422,7 @@
                <div class="welcome-content">
                   <h3 class="welcome-app-name">Citrana</h3>
                   <div class="welcome-instructions">
+                     <p id="welcome-modal-description" class="welcome-browser-note">Quick steps to create your first South or North Indian chart.</p>
                      <h5 class="welcome-instructions-title">Creating Your First Chart</h5>
                      <p class="welcome-browser-note">Screen Size: If the site appears too large, utilise your browser's zoom control to adjust the viewpoint.</p>
                      <ol class="welcome-steps">

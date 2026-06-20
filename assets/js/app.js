@@ -20,6 +20,7 @@ class CitranaApp {
         this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
         this.presentationView = false;
         this.welcomeLoadingInterval = null;
+        this._modalFocusStack = [];
         this.options = {
             northHideIndicators: localStorage.getItem('citrana_north_hide_indicators') === '1',
             southHideIndicators: localStorage.getItem('citrana_south_hide_indicators') === '1',
@@ -230,19 +231,13 @@ class CitranaApp {
         // Welcome modal event listeners
         if (welcomeModal && welcomeModalClose) {
             welcomeModalClose.addEventListener('click', () => {
-                this.clearWelcomeLoadingInterval();
-                this.closeModal(welcomeModal);
-                // Mark as seen when user closes the modal
-                localStorage.setItem('citrana_welcome_seen', 'true');
+                this.closeWelcomeModal();
             });
 
             // Close modal when clicking outside
             welcomeModal.addEventListener('click', (e) => {
                 if (e.target === welcomeModal) {
-                    this.clearWelcomeLoadingInterval();
-                    this.closeModal(welcomeModal);
-                    // Mark as seen when user closes the modal
-                    localStorage.setItem('citrana_welcome_seen', 'true');
+                    this.closeWelcomeModal();
                 }
             });
         }
@@ -735,11 +730,16 @@ class CitranaApp {
         const progressText = document.getElementById('export-progress-text');
 
         if (modal && progressFill && progressText) {
+            const wasVisible = modal.style.display === 'block';
             progressFill.style.width = '0%';
             progressText.textContent = 'Preparing chart for export...';
             modal.style.display = 'block';
             modal.setAttribute('aria-hidden', 'false');
             modal.setAttribute('aria-busy', 'true');
+            if (!wasVisible) {
+                this.pushModalFocus();
+                requestAnimationFrame(() => this.focusModalEntry(modal));
+            }
         }
     }
 
@@ -756,9 +756,13 @@ class CitranaApp {
     hideExportProgress() {
         const modal = document.getElementById('export-progress-modal');
         if (modal) {
+            const wasVisible = modal.style.display === 'block';
             modal.style.display = 'none';
             modal.setAttribute('aria-hidden', 'true');
             modal.setAttribute('aria-busy', 'false');
+            if (wasVisible) {
+                this.popModalFocus();
+            }
         }
     }
 
@@ -904,6 +908,15 @@ class CitranaApp {
                     return; // Let the textarea handle these
                 }
                 return; // Ignore all other keyboard shortcuts during text editing
+            }
+
+            if (e.key === 'Escape' && this.dismissActiveModalOnEscape()) {
+                e.preventDefault();
+                return;
+            }
+
+            if (e.key === 'Tab' && this.trapModalFocus(e)) {
+                return;
             }
 
             if (this.isModalBlockingShortcuts()) {
@@ -1223,16 +1236,161 @@ class CitranaApp {
         return this.presentationView;
     }
 
+    getModalFocusableElements(modal) {
+        const selector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+        return Array.from(modal.querySelectorAll(selector)).filter((el) => {
+            if (el.disabled || el.getAttribute('aria-hidden') === 'true') {
+                return false;
+            }
+            return el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0;
+        });
+    }
+
+    getModalInitialFocusElement(modal) {
+        const closeButton = modal.querySelector('button[class*="modal-close"]');
+        if (closeButton) {
+            return closeButton;
+        }
+
+        const focusable = this.getModalFocusableElements(modal);
+        return focusable[0] || null;
+    }
+
+    pushModalFocus() {
+        this._modalFocusStack.push(document.activeElement);
+    }
+
+    popModalFocus() {
+        const previous = this._modalFocusStack.pop();
+        if (previous && document.contains(previous) && typeof previous.focus === 'function') {
+            previous.focus();
+        }
+    }
+
+    focusModalEntry(modal) {
+        const target = this.getModalInitialFocusElement(modal);
+        if (target) {
+            target.focus();
+            return;
+        }
+
+        if (!modal.hasAttribute('tabindex')) {
+            modal.setAttribute('tabindex', '-1');
+        }
+        modal.focus();
+    }
+
+    trapModalFocus(e) {
+        const modal = this.getActiveModal();
+        if (!modal) {
+            return false;
+        }
+
+        const focusable = this.getModalFocusableElements(modal);
+        if (focusable.length === 0) {
+            e.preventDefault();
+            this.focusModalEntry(modal);
+            return true;
+        }
+
+        if (focusable.length === 1) {
+            e.preventDefault();
+            focusable[0].focus();
+            return true;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+
+        if (e.shiftKey) {
+            if (active === first || !modal.contains(active)) {
+                e.preventDefault();
+                last.focus();
+                return true;
+            }
+        } else if (active === last || !modal.contains(active)) {
+            e.preventDefault();
+            first.focus();
+            return true;
+        }
+
+        return false;
+    }
+
     openModal(modal) {
         if (!modal) return;
+        const wasActive = modal.classList.contains('active');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        if (!wasActive) {
+            this.pushModalFocus();
+            requestAnimationFrame(() => this.focusModalEntry(modal));
+        }
     }
 
     closeModal(modal) {
         if (!modal) return;
+        const wasActive = modal.classList.contains('active');
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
+        if (wasActive) {
+            this.popModalFocus();
+        }
+    }
+
+    closeWelcomeModal() {
+        const welcomeModal = document.getElementById('welcome-modal');
+        if (!welcomeModal?.classList.contains('active')) return;
+        this.clearWelcomeLoadingInterval();
+        this.closeModal(welcomeModal);
+        localStorage.setItem('citrana_welcome_seen', 'true');
+    }
+
+    /**
+     * Returns the topmost open modal overlay, or null.
+     * Export progress is included but is not dismissible with Escape.
+     */
+    getActiveModal() {
+        const exportModal = document.getElementById('export-progress-modal');
+        if (exportModal?.style.display === 'block') {
+            return exportModal;
+        }
+
+        const modalIds = [
+            'confirmation-modal',
+            'welcome-modal',
+            'help-modal',
+            'options-modal',
+            'about-modal'
+        ];
+
+        for (const id of modalIds) {
+            const el = document.getElementById(id);
+            if (el?.classList.contains('active')) {
+                return el;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Close the active modal on Escape. Returns true when a modal was dismissed.
+     */
+    dismissActiveModalOnEscape() {
+        const modal = this.getActiveModal();
+        if (!modal || modal.id === 'export-progress-modal') {
+            return false;
+        }
+
+        if (modal.id === 'welcome-modal') {
+            this.closeWelcomeModal();
+        } else {
+            this.closeModal(modal);
+        }
+
+        return true;
     }
 
     /**
