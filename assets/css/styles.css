@@ -1,7 +1,7 @@
 /**
  * styles.css
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
- * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * Complete styling system for the Citrana application
  */
 
@@ -645,6 +645,7 @@ body.presentation-view .about-btn {
     --ui-bottom-pad: 4px;
   }
 }
+/* Tablet and mobile (≤768px) */
 @media (max-width: 768px) {
   .floating-top-toolbar {
     top: calc(var(--ui-inset-sm) + var(--sat));
@@ -710,9 +711,6 @@ body.presentation-view .about-btn {
     bottom: calc(var(--ui-bottom-pad) + var(--sab));
     left: calc(var(--ui-inset-sm) + var(--sal));
   }
-}
-
-@media (max-width: 768px) {
   .floating-zoom-controls {
     position: fixed !important;
     left: 0 !important;
@@ -737,7 +735,342 @@ body.presentation-view .about-btn {
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
+  .floating-edit-ui {
+    top: calc(72px + var(--sat));
+    bottom: auto;
+    flex-wrap: nowrap;
+    max-width: 100vw;
+    overflow-x: auto;
+    gap: 4px;
+    padding: 4px;
+    height: 40px;
+  }
+
+  .edit-btn {
+    width: 28px;
+    height: 28px;
+    /* Touch-friendly improvements */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .edit-ui-content,
+  .edit-controls-group {
+    flex-wrap: nowrap;
+  }
+
+  .floating-text-edit-controls {
+    top: 72px;
+    bottom: auto;
+    flex-wrap: nowrap;
+    max-width: 100vw;
+    overflow-x: auto;
+    gap: 4px;
+    padding: 4px;
+    height: 40px;
+  }
+
+  .floating-text-edit-controls button {
+    width: 28px;
+    height: 28px;
+    /* Touch-friendly improvements */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .text-edit-input,
+  .edit-ui-content input[type="text"],
+  .edit-ui-content input[type="number"] {
+    /* Force minimum font size to prevent zoom */
+    font-size: 16px !important;
+    /* Prevent any scaling */
+    -webkit-transform: scale(1) !important;
+    transform: scale(1) !important;
+    /* Ensure proper input behavior */
+    -webkit-appearance: none;
+    border-radius: 4px;
+    /* Prevent zoom on focus */
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+
+  /* JSColorPicker toggle sizing on mobile */
+  .floating-text-edit-controls,
+  .floating-edit-ui,
+  .edit-ui-content {
+    --cp-size: 32px;
+  }
+
+  .color-picker {
+    min-width: 32px !important;
+    min-height: 32px !important;
+    -webkit-transform: scale(1) !important;
+    transform: scale(1) !important;
+  }
+  .help-modal-content,
+  .options-modal-content {
+    width: 90%;
+    max-width: 90%;
+    max-height: 70vh;
+    padding: 20px;
+    padding-right: 30px;
+    margin-right: 6px;
+  }
+  .options-toggle-row {
+    align-items: center;
+    padding: 14px 0;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .options-toggle-input {
+    width: 22px;
+    height: 22px;
+    margin-top: 0;
+    flex-shrink: 0;
+  }
+  .help-btn {
+    position: fixed;
+    bottom: calc(var(--ui-bottom-pad) + var(--sab));
+    left: calc(var(--ui-inset-sm) + var(--sal));
+    top: auto;
+    right: auto;
+    z-index: 1001;
+  }
+
+  .about-btn {
+    bottom: calc(var(--ui-bottom-pad) + var(--sab));
+    right: calc(var(--ui-inset-sm) + var(--sar));
+  }
+
+  /* Temporarily hide buggy drawing tools on mobile */
+  #arrow-tool,
+  #line-tool,
+  #pen-tool,
+  #laser-tool,
+  #laser-help-shortcut {
+    display: none !important;
+  }
+  .about-modal-content {
+    max-width: 90%;
+    max-height: 95vh;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .about-logo {
+    max-width: 220px;
+  }
+
+  .about-app-name {
+    font-size: 18px;
+  }
+
+  .about-description {
+    font-size: 13px;
+  }
+
+  .about-definition {
+    font-size: 11px;
+    padding: 10px;
+    margin: 0 0 16px 0;
+  }
+
+  .about-creator {
+    font-size: 13px;
+    margin: 0 0 6px 0;
+  }
+
+  .about-email {
+    font-size: 11px;
+    margin: 0 0 16px 0;
+  }
+
+  .about-links {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .about-link {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+
+  .about-copyright {
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  /* Mobile: Smaller welcome modal */
+  .welcome-modal-content {
+    max-width: 90%;
+    max-height: 90vh;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .welcome-logo {
+    max-width: 220px;
+  }
+
+  .welcome-app-name {
+    font-size: 18px;
+  }
+
+  .welcome-instructions-title {
+    font-size: 14px;
+    margin: 0 0 8px 0;
+  }
+
+  .welcome-steps {
+    font-size: 12px;
+    margin: 0 0 12px 0;
+    padding-left: 16px;
+  }
+
+  .welcome-steps li {
+    margin-bottom: 6px;
+  }
+
+  .welcome-help-note {
+    font-size: 12px;
+    margin: 12px 0 6px 0;
+  }
+
+  .welcome-browser-note {
+    font-size: 10px;
+    margin: 6px 0 12px 0;
+  }
+
+  .about-version {
+    font-size: 7px;
+    margin: 0 0 3px 0;
+  }
+
+  .welcome-copyright {
+    font-size: 11px;
+    margin: 16px 0 12px 0;
+  }
+
+  .welcome-loading-container {
+    margin-top: 16px;
+  }
+
+  .welcome-loading-text {
+    font-size: 11px;
+  }
+  .confirmation-modal-content {
+    max-width: 90%;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+
+  .confirmation-modal-header {
+    padding: 16px 20px 12px 20px;
+  }
+
+  .confirmation-modal-title {
+    font-size: 16px;
+  }
+
+  .confirmation-modal-body {
+    padding: 20px;
+  }
+
+  #confirmation-message {
+    font-size: 15px;
+  }
+
+  .confirmation-warning {
+    font-size: 13px;
+  }
+
+  .confirmation-modal-actions {
+    padding: 12px 20px 20px 20px;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .confirmation-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    min-width: 70px;
+    /* Touch-friendly improvements */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .confirmation-modal-close {
+    width: 32px;
+    height: 32px;
+    /* Touch-friendly improvements */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-action: manipulation;
+  }
+
+  .confirmation-modal-close i {
+    width: 16px;
+    height: 16px;
+  }
+  .export-progress-modal-content {
+    max-width: 90%;
+    margin: 0 1rem;
+  }
+
+  .export-progress-modal-header {
+    padding: 1rem 1rem 0.5rem 1rem;
+  }
+
+  .export-progress-modal-title {
+    font-size: 1.125rem;
+  }
+
+  .export-progress-modal-body {
+    padding: 1rem;
+  }
+
+  .export-progress-text {
+    font-size: 0.8rem;
+  }
+
+  .control-point-start,
+  .control-point-end {
+    /* Larger touch targets for mobile */
+    transform: scale(1.2);
+  }
+
+  .control-point-start:hover,
+  .control-point-end:hover {
+    transform: scale(1.4);
+  }
+
+  .control-point-start:active,
+  .control-point-end:active {
+    transform: scale(1.3);
+  }
 }
+
+
 
 /* Safari-specific zoom controls fix */
 @supports (-webkit-touch-callout: none) {
@@ -998,62 +1331,6 @@ body.presentation-view .about-btn {
   border-color: #000000;
 }
 
-@media (max-width: 768px) {
-  .floating-edit-ui {
-    top: calc(72px + var(--sat));
-    bottom: auto;
-    flex-wrap: nowrap;
-    max-width: 100vw;
-    overflow-x: auto;
-    gap: 4px;
-    padding: 4px;
-    height: 40px;
-  }
-
-  .edit-btn {
-    width: 28px;
-    height: 28px;
-    /* Touch-friendly improvements */
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    -webkit-touch-action: manipulation;
-    /* Prevent text selection */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  .edit-ui-content,
-  .edit-controls-group {
-    flex-wrap: nowrap;
-  }
-
-  .floating-text-edit-controls {
-    top: 72px;
-    bottom: auto;
-    flex-wrap: nowrap;
-    max-width: 100vw;
-    overflow-x: auto;
-    gap: 4px;
-    padding: 4px;
-    height: 40px;
-  }
-
-  .floating-text-edit-controls button {
-    width: 28px;
-    height: 28px;
-    /* Touch-friendly improvements */
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    -webkit-touch-action: manipulation;
-    /* Prevent text selection */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-}
 
 /* Mobile drag preview */
 .planet-drag-preview {
@@ -1114,38 +1391,6 @@ body.presentation-view .about-btn {
 }
 
 /* Additional mobile-specific input fixes */
-@media (max-width: 768px) {
-
-  .text-edit-input,
-  .edit-ui-content input[type="text"],
-  .edit-ui-content input[type="number"] {
-    /* Force minimum font size to prevent zoom */
-    font-size: 16px !important;
-    /* Prevent any scaling */
-    -webkit-transform: scale(1) !important;
-    transform: scale(1) !important;
-    /* Ensure proper input behavior */
-    -webkit-appearance: none;
-    border-radius: 4px;
-    /* Prevent zoom on focus */
-    -webkit-text-size-adjust: 100% !important;
-    text-size-adjust: 100% !important;
-  }
-
-  /* JSColorPicker toggle sizing on mobile */
-  .floating-text-edit-controls,
-  .floating-edit-ui,
-  .edit-ui-content {
-    --cp-size: 32px;
-  }
-
-  .color-picker {
-    min-width: 32px !important;
-    min-height: 32px !important;
-    -webkit-transform: scale(1) !important;
-    transform: scale(1) !important;
-  }
-}
 
 @media (max-width: 600px) {
   .context-menu {
@@ -1313,17 +1558,6 @@ body.presentation-view .about-btn {
 }
 
 /* Mobile: Smaller help/options modal */
-@media (max-width: 768px) {
-  .help-modal-content,
-  .options-modal-content {
-    width: 90%;
-    max-width: 90%;
-    max-height: 70vh;
-    padding: 20px;
-    padding-right: 30px;
-    margin-right: 6px;
-  }
-}
 
 /* Custom scrollbar styling for help/options modal */
 .help-modal-content::-webkit-scrollbar,
@@ -1446,21 +1680,6 @@ body.presentation-view .about-btn {
   cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  .options-toggle-row {
-    align-items: center;
-    padding: 14px 0;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  .options-toggle-input {
-    width: 22px;
-    height: 22px;
-    margin-top: 0;
-    flex-shrink: 0;
-  }
-}
 
 .help-section {
   margin-bottom: 24px;
@@ -1521,30 +1740,6 @@ body.presentation-view .about-btn {
 }
 
 /* Mobile: Reposition help button to bottom left; align with zoom bar */
-@media (max-width: 768px) {
-  .help-btn {
-    position: fixed;
-    bottom: calc(var(--ui-bottom-pad) + var(--sab));
-    left: calc(var(--ui-inset-sm) + var(--sal));
-    top: auto;
-    right: auto;
-    z-index: 1001;
-  }
-
-  .about-btn {
-    bottom: calc(var(--ui-bottom-pad) + var(--sab));
-    right: calc(var(--ui-inset-sm) + var(--sar));
-  }
-
-  /* Temporarily hide buggy drawing tools on mobile */
-  #arrow-tool,
-  #line-tool,
-  #pen-tool,
-  #laser-tool,
-  #laser-help-shortcut {
-    display: none !important;
-  }
-}
 
 /* About Modal */
 .about-modal {
@@ -1904,116 +2099,6 @@ body.presentation-view .about-btn {
 }
 
 /* Mobile: Smaller about modal */
-@media (max-width: 768px) {
-  .about-modal-content {
-    max-width: 90%;
-    max-height: 95vh;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  .about-logo {
-    max-width: 220px;
-  }
-
-  .about-app-name {
-    font-size: 18px;
-  }
-
-  .about-description {
-    font-size: 13px;
-  }
-
-  .about-definition {
-    font-size: 11px;
-    padding: 10px;
-    margin: 0 0 16px 0;
-  }
-
-  .about-creator {
-    font-size: 13px;
-    margin: 0 0 6px 0;
-  }
-
-  .about-email {
-    font-size: 11px;
-    margin: 0 0 16px 0;
-  }
-
-  .about-links {
-    gap: 6px;
-    margin-bottom: 16px;
-  }
-
-  .about-link {
-    font-size: 13px;
-    padding: 5px 10px;
-  }
-
-  .about-copyright {
-    font-size: 11px;
-    margin-bottom: 8px;
-  }
-
-  /* Mobile: Smaller welcome modal */
-  .welcome-modal-content {
-    max-width: 90%;
-    max-height: 90vh;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  .welcome-logo {
-    max-width: 220px;
-  }
-
-  .welcome-app-name {
-    font-size: 18px;
-  }
-
-  .welcome-instructions-title {
-    font-size: 14px;
-    margin: 0 0 8px 0;
-  }
-
-  .welcome-steps {
-    font-size: 12px;
-    margin: 0 0 12px 0;
-    padding-left: 16px;
-  }
-
-  .welcome-steps li {
-    margin-bottom: 6px;
-  }
-
-  .welcome-help-note {
-    font-size: 12px;
-    margin: 12px 0 6px 0;
-  }
-
-  .welcome-browser-note {
-    font-size: 10px;
-    margin: 6px 0 12px 0;
-  }
-
-  .about-version {
-    font-size: 7px;
-    margin: 0 0 3px 0;
-  }
-
-  .welcome-copyright {
-    font-size: 11px;
-    margin: 16px 0 12px 0;
-  }
-
-  .welcome-loading-container {
-    margin-top: 16px;
-  }
-
-  .welcome-loading-text {
-    font-size: 11px;
-  }
-}
 
 /* Confirmation Dialog Modal */
 .confirmation-modal {
@@ -2155,69 +2240,6 @@ body.presentation-view .about-btn {
 }
 
 /* Mobile styles for confirmation dialog */
-@media (max-width: 768px) {
-  .confirmation-modal-content {
-    max-width: 90%;
-    margin: 20px;
-    width: calc(100% - 40px);
-  }
-
-  .confirmation-modal-header {
-    padding: 16px 20px 12px 20px;
-  }
-
-  .confirmation-modal-title {
-    font-size: 16px;
-  }
-
-  .confirmation-modal-body {
-    padding: 20px;
-  }
-
-  #confirmation-message {
-    font-size: 15px;
-  }
-
-  .confirmation-warning {
-    font-size: 13px;
-  }
-
-  .confirmation-modal-actions {
-    padding: 12px 20px 20px 20px;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .confirmation-btn {
-    padding: 10px 16px;
-    font-size: 14px;
-    min-width: 70px;
-    /* Touch-friendly improvements */
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    -webkit-touch-action: manipulation;
-    /* Prevent text selection */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  .confirmation-modal-close {
-    width: 32px;
-    height: 32px;
-    /* Touch-friendly improvements */
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    -webkit-touch-action: manipulation;
-  }
-
-  .confirmation-modal-close i {
-    width: 16px;
-    height: 16px;
-  }
-}
 
 /* Export Progress Modal */
 .export-progress-modal {
@@ -2292,28 +2314,6 @@ body.presentation-view .about-btn {
   font-weight: 500;
 }
 
-@media (max-width: 768px) {
-  .export-progress-modal-content {
-    max-width: 90%;
-    margin: 0 1rem;
-  }
-
-  .export-progress-modal-header {
-    padding: 1rem 1rem 0.5rem 1rem;
-  }
-
-  .export-progress-modal-title {
-    font-size: 1.125rem;
-  }
-
-  .export-progress-modal-body {
-    padding: 1rem;
-  }
-
-  .export-progress-text {
-    font-size: 0.8rem;
-  }
-}
 
 /* Control Points Styles */
 .control-point-start,
@@ -2332,24 +2332,4 @@ body.presentation-view .about-btn {
 .control-point-end:active {
   cursor: grabbing;
   transform: scale(1.1);
-}
-
-/* Mobile optimisations for control points */
-@media (max-width: 768px) {
-
-  .control-point-start,
-  .control-point-end {
-    /* Larger touch targets for mobile */
-    transform: scale(1.2);
-  }
-
-  .control-point-start:hover,
-  .control-point-end:hover {
-    transform: scale(1.4);
-  }
-
-  .control-point-start:active,
-  .control-point-end:active {
-    transform: scale(1.3);
-  }
 }

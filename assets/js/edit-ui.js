@@ -1,7 +1,7 @@
 /**
  * edit-ui.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
- * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * Provides context-sensitive editing controls for different drawing tools and elements
  */
 class EditUI {

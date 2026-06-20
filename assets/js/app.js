@@ -1,7 +1,7 @@
 /**
  * app.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
- * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * Main application coordinator that manages all components and application lifecycle
  */
 class CitranaApp {
@@ -134,17 +134,17 @@ class CitranaApp {
 
         if (helpBtn && helpModal && helpModalClose) {
             helpBtn.addEventListener('click', () => {
-                helpModal.classList.add('active');
+                this.openModal(helpModal);
             });
 
             helpModalClose.addEventListener('click', () => {
-                helpModal.classList.remove('active');
+                this.closeModal(helpModal);
             });
 
             // Close modal when clicking outside
             helpModal.addEventListener('click', (e) => {
                 if (e.target === helpModal) {
-                    helpModal.classList.remove('active');
+                    this.closeModal(helpModal);
                 }
             });
         }
@@ -189,16 +189,16 @@ class CitranaApp {
                 if (saveChartOnlyToggle) {
                     saveChartOnlyToggle.checked = this.options.saveChartOnly;
                 }
-                optionsModal.classList.add('active');
+                this.openModal(optionsModal);
             });
 
             optionsModalClose.addEventListener('click', () => {
-                optionsModal.classList.remove('active');
+                this.closeModal(optionsModal);
             });
 
             optionsModal.addEventListener('click', (e) => {
                 if (e.target === optionsModal) {
-                    optionsModal.classList.remove('active');
+                    this.closeModal(optionsModal);
                 }
             });
         }
@@ -212,17 +212,17 @@ class CitranaApp {
 
         if (aboutBtn && aboutModal && aboutModalClose) {
             aboutBtn.addEventListener('click', () => {
-                aboutModal.classList.add('active');
+                this.openModal(aboutModal);
             });
 
             aboutModalClose.addEventListener('click', () => {
-                aboutModal.classList.remove('active');
+                this.closeModal(aboutModal);
             });
 
             // Close modal when clicking outside
             aboutModal.addEventListener('click', (e) => {
                 if (e.target === aboutModal) {
-                    aboutModal.classList.remove('active');
+                    this.closeModal(aboutModal);
                 }
             });
         }
@@ -231,7 +231,7 @@ class CitranaApp {
         if (welcomeModal && welcomeModalClose) {
             welcomeModalClose.addEventListener('click', () => {
                 this.clearWelcomeLoadingInterval();
-                welcomeModal.classList.remove('active');
+                this.closeModal(welcomeModal);
                 // Mark as seen when user closes the modal
                 localStorage.setItem('citrana_welcome_seen', 'true');
             });
@@ -240,7 +240,7 @@ class CitranaApp {
             welcomeModal.addEventListener('click', (e) => {
                 if (e.target === welcomeModal) {
                     this.clearWelcomeLoadingInterval();
-                    welcomeModal.classList.remove('active');
+                    this.closeModal(welcomeModal);
                     // Mark as seen when user closes the modal
                     localStorage.setItem('citrana_welcome_seen', 'true');
                 }
@@ -497,12 +497,12 @@ class CitranaApp {
         if (confirmationModal && confirmationClose && confirmationYes && confirmationNo) {
             // Close button
             confirmationClose.addEventListener('click', () => {
-                confirmationModal.classList.remove('active');
+                this.closeModal(confirmationModal);
             });
 
             // No button - close modal
             confirmationNo.addEventListener('click', () => {
-                confirmationModal.classList.remove('active');
+                this.closeModal(confirmationModal);
             });
 
             // Yes button - execute the callback
@@ -511,13 +511,13 @@ class CitranaApp {
                     this.pendingConfirmationCallback();
                     this.pendingConfirmationCallback = null;
                 }
-                confirmationModal.classList.remove('active');
+                this.closeModal(confirmationModal);
             });
 
             // Close when clicking outside
             confirmationModal.addEventListener('click', (e) => {
                 if (e.target === confirmationModal) {
-                    confirmationModal.classList.remove('active');
+                    this.closeModal(confirmationModal);
                 }
             });
         }
@@ -530,7 +530,7 @@ class CitranaApp {
         if (confirmationModal && confirmationMessage) {
             confirmationMessage.textContent = message;
             this.pendingConfirmationCallback = callback;
-            confirmationModal.classList.add('active');
+            this.openModal(confirmationModal);
         }
     }
 
@@ -738,6 +738,8 @@ class CitranaApp {
             progressFill.style.width = '0%';
             progressText.textContent = 'Preparing chart for export...';
             modal.style.display = 'block';
+            modal.setAttribute('aria-hidden', 'false');
+            modal.setAttribute('aria-busy', 'true');
         }
     }
 
@@ -755,6 +757,8 @@ class CitranaApp {
         const modal = document.getElementById('export-progress-modal');
         if (modal) {
             modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            modal.setAttribute('aria-busy', 'false');
         }
     }
 
@@ -992,7 +996,7 @@ class CitranaApp {
                 e.preventDefault();
                 const helpModal = document.getElementById('help-modal');
                 if (helpModal) {
-                    helpModal.classList.add('active');
+                    this.openModal(helpModal);
                 }
             }
         });
@@ -1217,6 +1221,18 @@ class CitranaApp {
 
     isPresentationView() {
         return this.presentationView;
+    }
+
+    openModal(modal) {
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+
+    closeModal(modal) {
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
     }
 
     /**
@@ -1545,7 +1561,7 @@ class CitranaApp {
         }
 
         // Show the modal
-        welcomeModal.classList.add('active');
+        this.openModal(welcomeModal);
 
         this.clearWelcomeLoadingInterval();
 

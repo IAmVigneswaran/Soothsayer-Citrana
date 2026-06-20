@@ -731,7 +731,7 @@ All JavaScript and CSS files use a standardised comment header format:
 /**
  * filename.extension
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
- * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * One line description of the file
  */
 ```

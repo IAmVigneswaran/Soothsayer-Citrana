@@ -52,7 +52,6 @@
       <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
       <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon/favicon-48x48.png">
       <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon/favicon-96x96.png">
-      <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
       <link rel="icon" type="image/x-icon" href="/assets/favicon/favicon.ico">
       <link rel="manifest" href="/assets/favicon/manifest.json">
       <meta name="msapplication-TileColor" content="#ffffff">
@@ -85,11 +84,11 @@
       <!-- End Google Tag Manager (noscript) -->
       <div class="app-container">
          <!-- Help Button (Desktop Only) -->
-         <button id="help-btn" class="help-btn" title="Help">
+         <button id="help-btn" class="help-btn" type="button" title="Help" aria-label="Help">
          <i data-lucide="help-circle"></i>
          </button>
          <!-- About Button -->
-         <button id="about-btn" class="about-btn" title="About Citrana">
+         <button id="about-btn" class="about-btn" type="button" title="About Citrana" aria-label="About Citrana">
          <img src="assets/images/Soothsayer-Logo-Black.png" alt="About" class="about-btn-icon about-btn-icon-black" fetchpriority="high">
          <img src="assets/images/Soothsayer-Logo-White.png" alt="About" class="about-btn-icon about-btn-icon-white" fetchpriority="high">
          </button>
@@ -155,7 +154,7 @@
             </div>
          </div>
          <!-- Canvas Container -->
-         <div class="canvas-container" id="canvas-container"></div>
+         <div class="canvas-container" id="canvas-container" role="application" aria-label="Vedic astrology chart canvas. Use the toolbar and Graha library to build your chart."></div>
          <!-- Floating Zoom Controls -->
          <div class="floating-zoom-controls">
             <button id="zoom-out" title="Zoom Out (-)">
@@ -198,10 +197,10 @@
          </div>
       </div>
       <!-- Options Modal -->
-      <div id="options-modal" class="options-modal">
+      <div id="options-modal" class="options-modal" role="dialog" aria-modal="true" aria-labelledby="options-modal-title" aria-hidden="true">
          <div class="options-modal-content">
             <div class="options-modal-header">
-               <h2 class="options-modal-title">Options</h2>
+               <h2 id="options-modal-title" class="options-modal-title">Options</h2>
                <button class="options-modal-close" id="options-modal-close" type="button" aria-label="Close options">
                <i data-lucide="x"></i>
                </button>
@@ -232,11 +231,11 @@
          </div>
       </div>
       <!-- Help Modal -->
-      <div id="help-modal" class="help-modal">
+      <div id="help-modal" class="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" aria-hidden="true">
          <div class="help-modal-content">
             <div class="help-modal-header">
-               <h2 class="help-modal-title">Help</h2>
-               <button class="help-modal-close" id="help-modal-close">
+               <h2 id="help-modal-title" class="help-modal-title">Help</h2>
+               <button class="help-modal-close" id="help-modal-close" type="button" aria-label="Close help">
                <i data-lucide="x"></i>
                </button>
             </div>
@@ -335,11 +334,11 @@
          </div>
       </div>
       <!-- Confirmation Dialog Modal -->
-      <div id="confirmation-modal" class="confirmation-modal">
+      <div id="confirmation-modal" class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-hidden="true">
          <div class="confirmation-modal-content">
             <div class="confirmation-modal-header">
-               <h2 class="confirmation-modal-title">Confirm Action</h2>
-               <button class="confirmation-modal-close" id="confirmation-modal-close">
+               <h2 id="confirmation-modal-title" class="confirmation-modal-title">Confirm Action</h2>
+               <button class="confirmation-modal-close" id="confirmation-modal-close" type="button" aria-label="Close confirmation">
                <i data-lucide="x"></i>
                </button>
             </div>
@@ -354,10 +353,10 @@
          </div>
       </div>
       <!-- Export Progress Modal -->
-      <div id="export-progress-modal" class="export-progress-modal">
+      <div id="export-progress-modal" class="export-progress-modal" role="dialog" aria-modal="true" aria-labelledby="export-progress-modal-title" aria-hidden="true" aria-busy="false">
          <div class="export-progress-modal-content">
             <div class="export-progress-modal-header">
-               <h2 class="export-progress-modal-title">Exporting Chart</h2>
+               <h2 id="export-progress-modal-title" class="export-progress-modal-title">Exporting Chart</h2>
             </div>
             <div class="export-progress-modal-body">
                <div class="export-progress-container">
@@ -370,11 +369,11 @@
          </div>
       </div>
       <!-- About Modal -->
-      <div id="about-modal" class="about-modal">
+      <div id="about-modal" class="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-modal-title" aria-hidden="true">
          <div class="about-modal-content">
             <div class="about-modal-header">
-               <h2 class="about-modal-title">About</h2>
-               <button class="about-modal-close" id="about-modal-close">
+               <h2 id="about-modal-title" class="about-modal-title">About</h2>
+               <button class="about-modal-close" id="about-modal-close" type="button" aria-label="Close about">
                <i data-lucide="x"></i>
                </button>
             </div>
@@ -405,11 +404,11 @@
          </div>
       </div>
       <!-- Welcome Modal -->
-      <div id="welcome-modal" class="welcome-modal">
+      <div id="welcome-modal" class="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-modal-title" aria-hidden="true">
          <div class="welcome-modal-content">
             <div class="welcome-modal-header">
-               <h2 class="welcome-modal-title">Welcome</h2>
-               <button class="welcome-modal-close" id="welcome-modal-close">
+               <h2 id="welcome-modal-title" class="welcome-modal-title">Welcome</h2>
+               <button class="welcome-modal-close" id="welcome-modal-close" type="button" aria-label="Close welcome">
                <i data-lucide="x"></i>
                </button>
             </div>
