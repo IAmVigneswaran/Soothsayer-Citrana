@@ -841,19 +841,6 @@ body.presentation-view .about-btn {
     margin-top: 0;
     flex-shrink: 0;
   }
-  .help-btn {
-    position: fixed;
-    bottom: calc(var(--ui-bottom-pad) + var(--sab));
-    left: calc(var(--ui-inset-sm) + var(--sal));
-    top: auto;
-    right: auto;
-    z-index: 1001;
-  }
-
-  .about-btn {
-    bottom: calc(var(--ui-bottom-pad) + var(--sab));
-    right: calc(var(--ui-inset-sm) + var(--sar));
-  }
 
   /* Temporarily hide buggy drawing tools on mobile */
   #arrow-tool,
@@ -1521,6 +1508,23 @@ body.presentation-view .about-btn {
   display: block;
 }
 
+/* Mobile: Reposition help button to bottom left; align with zoom bar */
+@media (max-width: 768px) {
+  .help-btn {
+    position: fixed;
+    bottom: calc(var(--ui-bottom-pad) + var(--sab));
+    left: calc(var(--ui-inset-sm) + var(--sal));
+    top: auto;
+    right: auto;
+    z-index: 1001;
+  }
+
+  .about-btn {
+    bottom: calc(var(--ui-bottom-pad) + var(--sab));
+    right: calc(var(--ui-inset-sm) + var(--sar));
+  }
+}
+
 /* Help & Options Modals */
 .help-modal,
 .options-modal {
@@ -1738,8 +1742,6 @@ body.presentation-view .about-btn {
 .help-instructions p:last-child {
   margin-bottom: 0;
 }
-
-/* Mobile: Reposition help button to bottom left; align with zoom bar */
 
 /* About Modal */
 .about-modal {
