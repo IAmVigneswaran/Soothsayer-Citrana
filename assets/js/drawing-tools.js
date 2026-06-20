@@ -330,7 +330,7 @@ class DrawingTools {
         const line = new Konva.Line({
             points: [pos.x, pos.y, pos.x, pos.y],
             stroke: '#FF0000',
-            strokeWidth: 5,
+            strokeWidth: 4,
             name: 'drawing-line',
             perfectDrawEnabled: true,
             listening: true,
@@ -371,7 +371,7 @@ class DrawingTools {
         const line = new Konva.Line({
             points: [pos.x, pos.y],
             stroke: '#FF0000',
-            strokeWidth: 5,
+            strokeWidth: 3,
             lineCap: 'round',
             lineJoin: 'round',
             name: 'drawing-pen',

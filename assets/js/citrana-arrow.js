@@ -6,7 +6,7 @@
  */
 const CitranaArrow = (() => {
     const DEFAULTS = {
-        strokeWidth: 5,
+        strokeWidth: 4,
         pointerLength: 14,
         pointerWidth: 16,
         fill: '#FF0000'

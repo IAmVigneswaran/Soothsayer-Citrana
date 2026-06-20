@@ -19,15 +19,15 @@ class EditUI {
         // Default properties for different tools
         this.defaultProperties = {
             pen: {
-                strokeWidth: 5,
+                strokeWidth: 3,
                 strokeColor: '#FF0000'
             },
             line: {
-                strokeWidth: 5,
+                strokeWidth: 4,
                 strokeColor: '#FF0000'
             },
             arrow: {
-                strokeWidth: 5,
+                strokeWidth: 4,
                 strokeColor: '#FF0000'
             },
             text: {
@@ -307,8 +307,8 @@ class EditUI {
     createArrowControls(container) {
         // Get current values from the element with proper fallbacks
         const currentStrokeWidth = CitranaArrow.isArrow(this.currentElement)
-            ? (this.currentElement.getAttr('arrowStrokeWidth') ?? this.defaultProperties.arrow.strokeWidth ?? 5)
-            : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5));
+            ? (this.currentElement.getAttr('arrowStrokeWidth') ?? this.defaultProperties.arrow.strokeWidth ?? 4)
+            : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 4));
         const currentStrokeColor = CitranaColorPicker.fromKonvaShape(this.currentElement);
 
         // Create controls container
@@ -332,8 +332,8 @@ class EditUI {
 
         // Width event listeners
         const getArrowWidth = () => (CitranaArrow.isArrow(this.currentElement)
-            ? (this.currentElement.getAttr('arrowStrokeWidth') ?? this.defaultProperties.arrow.strokeWidth ?? 5)
-            : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 5)));
+            ? (this.currentElement.getAttr('arrowStrokeWidth') ?? this.defaultProperties.arrow.strokeWidth ?? 4)
+            : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : (this.defaultProperties.arrow.strokeWidth || 4)));
 
         decreaseWidth.addEventListener('click', () => {
             const newWidth = Math.max(1, getArrowWidth() - 1);
