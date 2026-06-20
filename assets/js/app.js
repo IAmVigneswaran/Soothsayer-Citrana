@@ -19,6 +19,7 @@ class CitranaApp {
         this.isExporting = false; // Prevent multiple concurrent exports
         this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
         this.presentationView = false;
+        this.welcomeLoadingInterval = null;
         this.options = {
             northHideIndicators: localStorage.getItem('citrana_north_hide_indicators') === '1',
             southHideIndicators: localStorage.getItem('citrana_south_hide_indicators') === '1',
@@ -229,6 +230,7 @@ class CitranaApp {
         // Welcome modal event listeners
         if (welcomeModal && welcomeModalClose) {
             welcomeModalClose.addEventListener('click', () => {
+                this.clearWelcomeLoadingInterval();
                 welcomeModal.classList.remove('active');
                 // Mark as seen when user closes the modal
                 localStorage.setItem('citrana_welcome_seen', 'true');
@@ -237,6 +239,7 @@ class CitranaApp {
             // Close modal when clicking outside
             welcomeModal.addEventListener('click', (e) => {
                 if (e.target === welcomeModal) {
+                    this.clearWelcomeLoadingInterval();
                     welcomeModal.classList.remove('active');
                     // Mark as seen when user closes the modal
                     localStorage.setItem('citrana_welcome_seen', 'true');
@@ -299,6 +302,8 @@ class CitranaApp {
                 } else if (this.chartTemplates.currentChartType === 'north-indian') {
                     this.chartTemplates.northIndianTemplate.clearHighlight();
                 }
+                window.selectedBhavaSouth = null;
+                window.selectedBhavaNorth = null;
             }
         });
 
@@ -911,6 +916,10 @@ class CitranaApp {
                 return; // Ignore all other keyboard shortcuts during text editing
             }
 
+            if (this.isModalBlockingShortcuts()) {
+                return;
+            }
+
             // Tool shortcuts
             if (e.key === 'v' || e.key === 'V') {
                 e.preventDefault();
@@ -1074,9 +1083,7 @@ class CitranaApp {
     handleMouseMove(e) {
         const pos = this.drawingTools.getPrecisePositionFromKonva(e);
 
-        if (this.currentTool === 'select') {
-            this.drawingTools.handleSelectMouseMove(pos);
-        } else if (this.isDrawing && pos) {
+        if (this.isDrawing && pos) {
             this.drawingTools.draw(pos, this.currentTool);
             this.lastPoint = pos;
         }
@@ -1129,10 +1136,7 @@ class CitranaApp {
         // Prevent default to avoid browser gestures
         e.evt.preventDefault();
 
-        if (this.currentTool === 'select') {
-            const pos = this.drawingTools.getPrecisePositionFromKonva(e);
-            this.drawingTools.handleSelectMouseMove(pos);
-        } else if (this.isDrawing) {
+        if (this.isDrawing) {
             const pos = this.drawingTools.getPrecisePositionFromKonva(e);
             if (pos) {
                 this.drawingTools.draw(pos, this.currentTool);
@@ -1229,9 +1233,39 @@ class CitranaApp {
         return this.presentationView;
     }
 
+    /**
+     * True when a modal overlay is open — canvas shortcuts should not run.
+     */
+    isModalBlockingShortcuts() {
+        const activeModalIds = [
+            'help-modal',
+            'options-modal',
+            'about-modal',
+            'welcome-modal',
+            'confirmation-modal'
+        ];
+
+        for (const id of activeModalIds) {
+            const el = document.getElementById(id);
+            if (el?.classList.contains('active')) {
+                return true;
+            }
+        }
+
+        const exportModal = document.getElementById('export-progress-modal');
+        return exportModal?.style.display === 'block';
+    }
+
     togglePresentationView() {
         this.presentationView = !this.presentationView;
         document.body.classList.toggle('presentation-view', this.presentationView);
+        if (this.presentationView) {
+            this.drawingTools?.editUI?.hide();
+            this.drawingTools?.clearSelection?.();
+            if (this.drawingTools?.isEditingPlanet) {
+                this.drawingTools.cancelPlanetEditing();
+            }
+        }
         citranaDebug('Presentation view:', this.presentationView);
     }
 
@@ -1419,11 +1453,23 @@ class CitranaApp {
     restoreHistoryState(state) {
         if (!state) return;
 
+        const savedViewport = {
+            scaleX: this.stage.scaleX(),
+            scaleY: this.stage.scaleY(),
+            x: this.stage.x(),
+            y: this.stage.y()
+        };
+
         this.drawingTools?.editUI?.hide();
         this.drawingTools?.clearSelection?.();
 
         this.chartTemplates.loadChartData(state.chartData);
         this.restoreDrawings(state.drawingData);
+
+        // loadChartData → clearChart() resets stage to 1× at origin; restore user's zoom/pan
+        this.stage.scale({ x: savedViewport.scaleX, y: savedViewport.scaleY });
+        this.stage.position({ x: savedViewport.x, y: savedViewport.y });
+        this.updateZoomLevel();
 
         window.selectedBhavaSouth = null;
         window.selectedBhavaNorth = null;
@@ -1490,6 +1536,13 @@ class CitranaApp {
     /**
      * Show welcome modal on first visit
      */
+    clearWelcomeLoadingInterval() {
+        if (this.welcomeLoadingInterval != null) {
+            clearInterval(this.welcomeLoadingInterval);
+            this.welcomeLoadingInterval = null;
+        }
+    }
+
     showWelcomeModal() {
         const welcomeModal = document.getElementById('welcome-modal');
         const welcomeLoadingFill = document.querySelector('.welcome-loading-fill');
@@ -1508,9 +1561,11 @@ class CitranaApp {
         // Show the modal
         welcomeModal.classList.add('active');
 
+        this.clearWelcomeLoadingInterval();
+
         // Simulate loading progress
         let progress = 0;
-        const loadingInterval = setInterval(() => {
+        this.welcomeLoadingInterval = setInterval(() => {
             progress += Math.random() * 15; // Random progress increments
             if (progress > 100) progress = 100;
 
@@ -1527,7 +1582,7 @@ class CitranaApp {
             }
 
             if (progress >= 100) {
-                clearInterval(loadingInterval);
+                this.clearWelcomeLoadingInterval();
                 // Don't auto-close - let user close manually
                 // Mark as seen when user closes the modal
             }

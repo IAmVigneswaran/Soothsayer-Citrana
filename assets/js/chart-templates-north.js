@@ -70,7 +70,7 @@ class NorthIndianChartTemplate {
     }
 
     createNorthIndianChart(options = {}) {
-        const { initialLagna = 1 } = options;
+        const { initialLagna = 1, skipZoomToFit = false } = options;
 
         if (!this.stage || !this.layer) {
             console.error('Stage or layer not initialized');
@@ -352,8 +352,9 @@ class NorthIndianChartTemplate {
         this.renumberHouses();
         this.applyNorthIndicatorsPreference();
 
-        // Zoom to fit
-        this.zoomToFit();
+        if (!skipZoomToFit) {
+            this.zoomToFit();
+        }
 
         console.log('North Indian chart created');
 
@@ -680,7 +681,7 @@ class NorthIndianChartTemplate {
             const lagnaHouse = data.lagnaHouse || 1;
             const planetsByHouse = this.parseSavedPlanets(data);
 
-            this.createNorthIndianChart({ initialLagna: lagnaHouse });
+            this.createNorthIndianChart({ initialLagna: lagnaHouse, skipZoomToFit: true });
             this.restoreSavedPlanets(planetsByHouse, true);
             this.setLagnaHouse(lagnaHouse, { skipSnapshot: true });
 
@@ -850,15 +851,6 @@ class NorthIndianChartTemplate {
 
             // Drag-and-drop between bhavas
             planetText.on('dragstart', (e) => {
-                this._dragSource = {
-                    houseNumber,
-                    abbr: planetObj.abbr,
-                    id: planetObj.id,
-                    label: planetObj.label,
-                    rashiNumber: planetObj.rashiNumber, // Store the Rashi number for the move
-                    color: planetObj.color,
-                    retrograde: planetObj.retrograde
-                };
                 planetText.opacity(0.5);
                 planetText.moveToTop();
                 hitRect.moveToTop();

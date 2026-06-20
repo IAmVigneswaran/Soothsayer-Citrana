@@ -31,12 +31,6 @@ const CitranaColorPicker = (() => {
         '#FF6482'  // Rose
     ];
 
-    /** @deprecated Use SWATCHES — kept for compatibility */
-    const GRAHA_SWATCHES = SWATCHES;
-
-    /** @deprecated Use SWATCHES — kept for compatibility */
-    const DRAWING_SWATCHES = SWATCHES;
-
     /** Chip-only toggle (no hex field in the toolbar) */
     const BASE_OPTIONS = {
         toggleStyle: 'button',
@@ -358,8 +352,6 @@ const CitranaColorPicker = (() => {
 
     return {
         SWATCHES,
-        GRAHA_SWATCHES,
-        DRAWING_SWATCHES,
         BASE_OPTIONS,
         CONTEXT_OPTIONS,
         isAvailable,

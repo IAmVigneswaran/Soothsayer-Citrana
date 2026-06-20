@@ -62,7 +62,7 @@ class SouthIndianChartTemplate {
     }
 
     createSouthIndianChart(options = {}) {
-        const { initialLagna = 1 } = options;
+        const { initialLagna = 1, skipZoomToFit = false } = options;
 
         if (!this.stage || !this.layer) {
             console.error('Stage or layer not initialized');
@@ -275,8 +275,9 @@ class SouthIndianChartTemplate {
         this.renumberHouses();
         this.applySouthIndicatorsPreference();
 
-        // Zoom to fit
-        this.zoomToFit();
+        if (!skipZoomToFit) {
+            this.zoomToFit();
+        }
 
         console.log('South Indian chart created');
     }
@@ -629,14 +630,6 @@ class SouthIndianChartTemplate {
             const dragStartHandler = (e) => {
                 citranaDebug(`Drag start for Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
 
-                this._dragSource = {
-                    houseNumber,
-                    abbr: planetObj.abbr,
-                    id: planetObj.id,
-                    label: planetObj.label,
-                    color: planetObj.color,
-                    retrograde: planetObj.retrograde
-                };
                 planetText.opacity(0.5);
                 planetText.moveToTop();
                 hitRect.moveToTop();
@@ -674,7 +667,6 @@ class SouthIndianChartTemplate {
                     this.updatePlanetsInHouse(houseNumber);
                     citranaDebug(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id}) - Target Bhava: ${targetHouse}, Original Bhava: ${houseNumber}`);
                 }
-                this._dragSource = null;
                 this.layer.batchDraw();
             };
 
@@ -758,9 +750,6 @@ class SouthIndianChartTemplate {
     }
 
     renumberHouses() {
-        // Initialize debug array at the beginning
-        const debugBhavas = [];
-
         // Visual order for South Indian chart (Bhava numbers)
         const visualOrder = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
         let houseOrder;
@@ -769,23 +758,9 @@ class SouthIndianChartTemplate {
         const lagnaIdx = visualOrder.indexOf(this.lagnaHouseSouth);
         houseOrder = visualOrder.slice(lagnaIdx).concat(visualOrder.slice(0, lagnaIdx));
 
-        const rashis = [
-            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
-        ];
-
         for (let i = 0; i < houseOrder.length; i++) {
             const houseNum = houseOrder[i];
             const bhavaNum = i + 1;
-
-            // For South Indian chart, use the original logic
-            const rashiIndex = (houseNum - 1) % 12;
-            const rashiName = rashis[rashiIndex];
-
-            debugBhavas.push({
-                bhavaNum,
-                houseNum,
-                rashiName
-            });
 
             // Update South Indian chart bhava numbers
             if (this.houseDataSouth[houseNum] && this.houseDataSouth[houseNum].bhavaNumberSouthText) {
@@ -794,8 +769,7 @@ class SouthIndianChartTemplate {
         }
 
         this.layer.batchDraw();
-        console.log('Bhava mapping:', debugBhavas);
-        console.log('Bhavas renumbered');
+        citranaDebug('South Indian Bhavas renumbered');
     }
 
     /**
@@ -965,7 +939,7 @@ class SouthIndianChartTemplate {
             const lagnaHouse = data.lagnaHouse || 1;
             const planetsByHouse = this.parseSavedPlanets(data);
 
-            this.createSouthIndianChart({ initialLagna: lagnaHouse });
+            this.createSouthIndianChart({ initialLagna: lagnaHouse, skipZoomToFit: true });
             this.restoreSavedPlanets(planetsByHouse, true);
             this.setLagnaHouse(lagnaHouse, { skipSnapshot: true });
 

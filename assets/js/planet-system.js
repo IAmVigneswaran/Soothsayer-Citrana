@@ -753,7 +753,7 @@ class PlanetSystem {
             }
             const pointer = stage.getPointerPosition();
             if (pointer) {
-                targetHouse = this.findClosestHouse(pointer);
+                targetHouse = this.chartTemplates.findHouseAtPointer(pointer);
             }
             if (!targetHouse) {
                 targetHouse = this.findHouseAtPosition(e.clientX, e.clientY);
@@ -767,10 +767,6 @@ class PlanetSystem {
             console.log('No suitable Bhava found for Graha placement');
         }
         this.draggedPlanet = null;
-    }
-    findClosestHouse(pointer) {
-        if (!this.chartTemplates) return null;
-        return this.chartTemplates.findHouseAtPointer(pointer);
     }
     placePlanetInHouse(planetAbbr, houseIndex, label = null, id = null) {
         if (!this.chartTemplates) {

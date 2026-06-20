@@ -176,7 +176,6 @@ const CitranaArrow = (() => {
         isArrow,
         getAnchors,
         getControlPoints,
-        buildOutlinePoints,
         rebuild,
         setAnchors,
         setAnchor,

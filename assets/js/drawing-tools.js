@@ -24,7 +24,6 @@ class DrawingTools {
 
         // Track editing state to prevent conflicts
         this.isEditingPlanet = false;
-        this.currentlyEditingPlanet = null;
         this.planetEditSession = null;
 
         // Control points functionality
@@ -1305,15 +1304,6 @@ class DrawingTools {
     }
 
     /**
-     * Handle mouse move for select tool
-     * @param {Object} pos - Mouse position
-     */
-    handleSelectMouseMove(pos) {
-        // Dragging is handled automatically by Konva when draggable is true
-        // This method can be used for additional selection behavior if needed
-    }
-
-    /**
      * Handle mouse up for select tool
      */
     handleSelectMouseUp() {
@@ -1470,7 +1460,6 @@ class DrawingTools {
             }
             editingPlanetText.draggable(true);
             this.isEditingPlanet = false;
-            this.currentlyEditingPlanet = null;
             this.planetEditSession = null;
         };
 
@@ -1505,7 +1494,6 @@ class DrawingTools {
 
             editingPlanetText.draggable(true);
             this.isEditingPlanet = false;
-            this.currentlyEditingPlanet = null;
         };
 
         const handleSave = () => finishEditing(true);
@@ -1570,7 +1558,6 @@ class DrawingTools {
         };
 
         this.isEditingPlanet = true;
-        this.currentlyEditingPlanet = planetText;
         this.planetEditSession = {
             finish: finishEditing
         };

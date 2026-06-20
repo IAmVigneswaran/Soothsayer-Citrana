@@ -91,6 +91,8 @@ body {
 body.presentation-view .floating-top-toolbar,
 body.presentation-view .floating-zoom-controls,
 body.presentation-view .floating-planet-library,
+body.presentation-view .floating-text-edit-controls,
+body.presentation-view .floating-edit-ui,
 body.presentation-view .help-btn,
 body.presentation-view .about-btn {
   display: none !important;

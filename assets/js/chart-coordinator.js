@@ -104,22 +104,6 @@ class ChartCoordinator {
         this.northIndianTemplate.createNorthIndianChart();
     }
 
-    highlightHouse(houseNumber) {
-        if (this.currentChartType === 'south-indian') {
-            this.southIndianTemplate.highlightHouse(houseNumber);
-        } else if (this.currentChartType === 'north-indian') {
-            this.northIndianTemplate.highlightHouse(houseNumber);
-        }
-    }
-
-    clearHighlight() {
-        if (this.currentChartType === 'south-indian') {
-            this.southIndianTemplate.clearHighlight();
-        } else if (this.currentChartType === 'north-indian') {
-            this.northIndianTemplate.clearHighlight();
-        }
-    }
-
     addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null) {
         if (this.currentChartType === 'south-indian') {
             this.southIndianTemplate.addPlanetToHouse(planetAbbr, houseNumber, label, id);
@@ -140,14 +124,6 @@ class ChartCoordinator {
             this.northIndianTemplate.setLagnaHouse(houseNumber, options);
         } else {
             citranaDebug('ERROR: Unknown chart type:', this.currentChartType);
-        }
-    }
-
-    renumberHouses() {
-        if (this.currentChartType === 'south-indian') {
-            this.southIndianTemplate.renumberHouses();
-        } else if (this.currentChartType === 'north-indian') {
-            this.northIndianTemplate.renumberHouses();
         }
     }
 
@@ -226,15 +202,14 @@ class ChartCoordinator {
     zoomToFit() {
         citranaDebug('zoomToFit called, currentChartType:', this.currentChartType);
 
-        // Check if chart groups exist to determine chart type
-        if (this.southIndianTemplate && this.southIndianTemplate.chartGroupSouth) {
+        if (this.currentChartType === 'south-indian' && this.southIndianTemplate?.chartGroupSouth) {
             citranaDebug('Using South Indian zoomToFit');
             this.southIndianTemplate.zoomToFit();
-        } else if (this.northIndianTemplate && this.northIndianTemplate.chartGroupNorth) {
+        } else if (this.currentChartType === 'north-indian' && this.northIndianTemplate?.chartGroupNorth) {
             citranaDebug('Using North Indian zoomToFit');
             this.northIndianTemplate.zoomToFit();
         } else if (this.stage) {
-            citranaDebug('No chart groups found, using simple reset');
+            citranaDebug('No active chart, using simple reset');
             this.stage.scale({
                 x: 1,
                 y: 1
