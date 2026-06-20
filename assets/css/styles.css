@@ -22,6 +22,8 @@
   /* Bottom chrome: safe-area only + small pad (avoid double-stacking on iOS PWA) */
   --ui-bottom-pad: 8px;
   --ui-bottom-stack: 56px; /* zoom bar height (~48px) + gap above Graha library on mobile */
+  --zoom-controls-block-height: 48px; /* .floating-zoom-controls: 8px padding × 2 + 32px buttons */
+  --corner-btn-size: 48px; /* Help & About — match zoom bar block height */
 
   /* JSColorPicker — https://www.jscolorpicker.com/#customization */
   --cp-size: 32px;
@@ -1183,8 +1185,8 @@ body {
   position: fixed;
   top: calc(var(--ui-inset) + var(--sat));
   right: calc(var(--ui-inset) + var(--sar));
-  width: 40px;
-  height: 40px;
+  width: var(--corner-btn-size);
+  height: var(--corner-btn-size);
   border: 1px solid #000000;
   background: white;
   color: #000000;
@@ -1210,8 +1212,8 @@ body {
 }
 
 .help-btn i {
-  width: 20px;
-  height: 20px;
+  width: calc(var(--corner-btn-size) * 0.5);
+  height: calc(var(--corner-btn-size) * 0.5);
 }
 
 /* About Button */
@@ -1219,8 +1221,8 @@ body {
   position: fixed;
   bottom: calc(var(--ui-inset) + var(--sab));
   right: calc(var(--ui-inset) + var(--sar));
-  width: 40px;
-  height: 40px;
+  width: var(--corner-btn-size);
+  height: var(--corner-btn-size);
   border: 1px solid #000000;
   background: white;
   color: #000000;
@@ -1246,8 +1248,8 @@ body {
 }
 
 .about-btn-icon {
-  width: 25px;
-  height: 25px;
+  width: calc(var(--corner-btn-size) * 0.625);
+  height: calc(var(--corner-btn-size) * 0.625);
   transition: all 0.2s ease;
 }
 
@@ -1507,7 +1509,7 @@ body {
   margin-bottom: 0;
 }
 
-/* Mobile: Reposition help button to bottom left */
+/* Mobile: Reposition help button to bottom left; align with zoom bar */
 @media (max-width: 768px) {
   .help-btn {
     position: fixed;
@@ -1515,8 +1517,6 @@ body {
     left: calc(var(--ui-inset-sm) + var(--sal));
     top: auto;
     right: auto;
-    width: 40px;
-    height: 40px;
     z-index: 1001;
   }
 
