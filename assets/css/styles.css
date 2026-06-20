@@ -647,6 +647,12 @@ body.presentation-view .about-btn {
 }
 /* Tablet and mobile (≤768px) */
 @media (max-width: 768px) {
+  :root {
+    --zoom-controls-block-height: 50px; /* include 1px border × 2 so Help/About match zoom bar */
+    --corner-btn-size: 50px;
+    --ui-bottom-stack: 62px;
+  }
+
   .floating-top-toolbar {
     top: calc(var(--ui-inset-sm) + var(--sat));
     left: 50%;
@@ -710,6 +716,8 @@ body.presentation-view .about-btn {
   .floating-zoom-controls {
     bottom: calc(var(--ui-bottom-pad) + var(--sab));
     left: calc(var(--ui-inset-sm) + var(--sal));
+    height: var(--zoom-controls-block-height);
+    box-sizing: border-box;
   }
   .floating-zoom-controls {
     position: fixed !important;
@@ -1321,6 +1329,13 @@ body.presentation-view .about-btn {
 
 /* Mobile: Reposition help button to bottom left; align with zoom bar */
 @media (max-width: 768px) {
+  .help-btn,
+  .about-btn {
+    width: var(--zoom-controls-block-height);
+    height: var(--zoom-controls-block-height);
+    border-radius: 8px;
+  }
+
   .help-btn {
     position: fixed;
     bottom: calc(var(--ui-bottom-pad) + var(--sab));
