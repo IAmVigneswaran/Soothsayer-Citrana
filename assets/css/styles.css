@@ -21,7 +21,7 @@
   --ui-inset-sm: 10px;
   /* Bottom chrome: safe-area only + small pad (avoid double-stacking on iOS PWA) */
   --ui-bottom-pad: 8px;
-  --ui-bottom-stack: 56px; /* zoom bar height (~48px) + gap above Graha library on mobile */
+  --ui-bottom-stack: 60px; /* zoom bar height (~48px) + 12px gap above Graha library on mobile */
   --zoom-controls-block-height: 48px; /* .floating-zoom-controls: 8px padding × 2 + 32px buttons */
   --corner-btn-size: 48px; /* Help & About — match zoom bar block height */
 
