@@ -38,24 +38,33 @@ class ContextMenu {
             // Desktop: Right-click context menu
             canvas.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
+                if (this.shouldBlockCanvasContextMenu()) {
+                    return;
+                }
                 this.openContextMenuAtClientPoint(e.clientX, e.clientY);
             });
 
-            // Mobile: Long press for context menu (same hit-test routing as desktop)
+            // Mobile: Long press for context menu (Select tool only)
             let longPressTimer = null;
             let longPressTriggered = false;
 
             canvas.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    longPressTriggered = false;
-                    const clientX = e.touches[0].clientX;
-                    const clientY = e.touches[0].clientY;
-                    longPressTimer = setTimeout(() => {
-                        e.preventDefault();
-                        longPressTriggered = true;
-                        this.openContextMenuAtClientPoint(clientX, clientY);
-                    }, 500);
+                if (e.touches.length !== 1) {
+                    return;
                 }
+
+                if (this.shouldBlockCanvasContextMenu()) {
+                    return;
+                }
+
+                longPressTriggered = false;
+                const clientX = e.touches[0].clientX;
+                const clientY = e.touches[0].clientY;
+                longPressTimer = setTimeout(() => {
+                    e.preventDefault();
+                    longPressTriggered = true;
+                    this.openContextMenuAtClientPoint(clientX, clientY);
+                }, 500);
             }, { passive: false });
 
             canvas.addEventListener('touchmove', (e) => {
@@ -130,6 +139,20 @@ class ContextMenu {
                 this.hide();
             }
         });
+    }
+
+    shouldBlockCanvasContextMenu() {
+        const app = window.app;
+        if (!app) {
+            return false;
+        }
+
+        if (app.isDrawing) {
+            return true;
+        }
+
+        const tool = app.currentTool;
+        return tool && tool !== 'select' && tool !== 'hand';
     }
 
     getShapeAtClientPoint(clientX, clientY) {

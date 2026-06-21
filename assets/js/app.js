@@ -75,10 +75,12 @@ class CitranaApp {
         this.planetSystem = new PlanetSystem(this.stage, this.layer, this.chartTemplates);
         this.drawingTools = new DrawingTools(this.stage, this.layer);
         this.contextMenu = new ContextMenu();
+        this.itemsMenu = new CitranaItemsMenu();
 
         // Initialize components
         this.planetSystem.init();
         this.contextMenu.init();
+        this.itemsMenu.init();
 
         if (typeof CitranaColorPicker !== 'undefined') {
             CitranaColorPicker.initGrahaBar();
@@ -107,8 +109,6 @@ class CitranaApp {
         document.getElementById('text-tool').addEventListener('click', () => this.setTool('text'));
         document.getElementById('hand-tool').addEventListener('click', () => this.setTool('hand'));
         document.getElementById('heading-tool').addEventListener('click', () => this.setTool('heading'));
-        document.getElementById('zoom-select-tool').addEventListener('click', () => this.setTool('select'));
-        document.getElementById('zoom-hand-tool').addEventListener('click', () => this.setTool('hand'));
 
         // Action buttons
         document.getElementById('undo-btn').addEventListener('click', () => this.undo());
@@ -1094,29 +1094,8 @@ class CitranaApp {
 
         // Update UI
         document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
-        // Main toolbar
         const mainBtn = document.getElementById(`${tool}-tool`);
         if (mainBtn) mainBtn.classList.add('active');
-        // Special case: sync hand tool, and select tool in zoom controls
-        if (tool === 'hand') {
-            const zoomHandBtn = document.getElementById('zoom-hand-tool');
-            if (zoomHandBtn) zoomHandBtn.classList.add('active');
-            // Remove active from zoom select tool
-            const zoomSelectBtn = document.getElementById('zoom-select-tool');
-            if (zoomSelectBtn) zoomSelectBtn.classList.remove('active');
-        } else if (tool === 'select') {
-            const zoomSelectBtn = document.getElementById('zoom-select-tool');
-            if (zoomSelectBtn) zoomSelectBtn.classList.add('active');
-            // Remove active from zoom hand tool
-            const zoomHandBtn = document.getElementById('zoom-hand-tool');
-            if (zoomHandBtn) zoomHandBtn.classList.remove('active');
-        } else {
-            // Remove active from both zoom tools if not hand or select
-            const zoomHandBtn = document.getElementById('zoom-hand-tool');
-            if (zoomHandBtn) zoomHandBtn.classList.remove('active');
-            const zoomSelectBtn = document.getElementById('zoom-select-tool');
-            if (zoomSelectBtn) zoomSelectBtn.classList.remove('active');
-        }
 
         // Update cursor and touch behavior
         const container = document.getElementById('canvas-container');
@@ -1431,6 +1410,7 @@ class CitranaApp {
             'welcome-modal',
             'help-modal',
             'options-modal',
+            'items-modal',
             'about-modal'
         ];
 
@@ -1469,6 +1449,7 @@ class CitranaApp {
         const activeModalIds = [
             'help-modal',
             'options-modal',
+            'items-modal',
             'about-modal',
             'welcome-modal',
             'confirmation-modal'

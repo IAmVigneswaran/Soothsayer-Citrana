@@ -399,15 +399,7 @@ body.presentation-view .about-btn {
   align-self: center;
 }
 
-/* Hide separator, hand tool, and select tool on desktop */
-@media (min-width: 769px) {
-
-  .zoom-divider,
-  #zoom-hand-tool,
-  #zoom-select-tool {
-    display: none !important;
-  }
-}
+/* Hide separator, hand tool, and select tool on desktop — Items button shown on all viewports */
 
 /* Floating Text Edit Controls */
 .floating-text-edit-controls {
@@ -1586,6 +1578,144 @@ body.presentation-view .about-btn {
   flex-shrink: 0;
   accent-color: #000000;
   cursor: pointer;
+}
+
+.items-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.items-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 10px 0;
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.items-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.items-list .items-row:first-child {
+  border-top: none;
+}
+
+.items-row-label-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.items-row-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.items-row-meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.items-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.items-action-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: white;
+  color: #000000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.items-action-btn:hover {
+  background: #000000;
+  color: white;
+  border-color: #000000;
+}
+
+.items-action-btn i {
+  width: 16px;
+  height: 16px;
+}
+
+.items-chart-type {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.items-empty {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.items-lagna-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.items-lagna-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  color: #000000;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.items-lagna-btn:hover {
+  background: #000000;
+  color: white;
+  border-color: #000000;
+}
+
+.items-lagna-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 

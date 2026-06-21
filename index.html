@@ -187,12 +187,9 @@
             <button id="zoom-lock" type="button" title="Unlock zoom" aria-pressed="true" aria-label="Unlock zoom">
             <i data-lucide="lock"></i>
             </button>
-            <span class="zoom-divider" style="width:1px;height:24px;background:#000;opacity:0.15;margin:0 8px;display:inline-block;"></span>
-            <button id="zoom-select-tool" title="Select Tool (V)">
-            <i data-lucide="mouse-pointer"></i>
-            </button>
-            <button id="zoom-hand-tool" title="Hand Tool (H)">
-            <i data-lucide="hand"></i>
+            <span class="zoom-divider" aria-hidden="true"></span>
+            <button id="items-menu-btn" type="button" title="Items" aria-label="Items">
+            <i data-lucide="layers"></i>
             </button>
          </div>
          <!-- Floating Text Edit Controls -->
@@ -246,6 +243,19 @@
                   <input type="checkbox" id="save-chart-only-toggle" class="options-toggle-input">
                </label>
             </div>
+         </div>
+      </div>
+      <!-- Items Modal (uses Options modal styles) -->
+      <div id="items-modal" class="options-modal" role="dialog" aria-modal="true" aria-labelledby="items-modal-title" aria-describedby="items-modal-description" aria-hidden="true">
+         <div class="options-modal-content">
+            <div class="options-modal-header">
+               <h2 id="items-modal-title" class="options-modal-title">Items</h2>
+               <button class="options-modal-close" id="items-modal-close" type="button" aria-label="Close items">
+               <i data-lucide="x"></i>
+               </button>
+            </div>
+            <p id="items-modal-description" class="options-toggle-hint">Chart, Bhava, Graha, and annotation actions.</p>
+            <div id="items-modal-body" class="items-modal-body"></div>
          </div>
       </div>
       <!-- Help Modal -->
@@ -524,6 +534,7 @@
       <script src="assets/js/drawing-tools.js"></script>
       <script src="assets/js/edit-ui.js"></script>
       <script src="assets/js/context-menu.js"></script>
+      <script src="assets/js/citrana-items-menu.js"></script>
       <script src="assets/js/history.js"></script>
       <script src="assets/js/citrana-session.js"></script>
       <script src="assets/js/app.js"></script>
