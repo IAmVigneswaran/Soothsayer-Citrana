@@ -1670,6 +1670,17 @@ body.presentation-view .about-btn {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.35;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.items-row-label .zodiac-symbol {
+  font-size: 0.9em;
+  margin-right: 0;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .items-row-meta {
