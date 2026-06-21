@@ -1579,6 +1579,24 @@ body.presentation-view .about-btn {
   margin-bottom: 0;
 }
 
+.help-instructions ul.help-sublist {
+  margin: 0 0 12px 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.help-instructions p + ul.help-sublist {
+  margin-top: -4px;
+}
+
+.help-instructions ul.help-sublist li {
+  margin-bottom: 6px;
+}
+
+.help-instructions ul.help-sublist li:last-child {
+  margin-bottom: 0;
+}
+
 /* About Modal */
 .about-modal {
   position: fixed;
