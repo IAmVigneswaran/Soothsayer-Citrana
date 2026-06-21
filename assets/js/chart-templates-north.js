@@ -257,6 +257,7 @@ class NorthIndianChartTemplate {
 
             // Make the polygon selectable by listening to click events
             housePolygonNorth.on('mousedown', (e) => {
+                this.clearSelectedPlanet();
                 this.highlightHouse(houseNumberNorth);
                 window.selectedBhavaNorth = houseNumberNorth;
                 citranaDebug('[SELECT] North Indian Chart Bhava selected:', houseNumberNorth);
@@ -264,6 +265,7 @@ class NorthIndianChartTemplate {
 
             // Add touch support for mobile selection
             housePolygonNorth.on('tap', (e) => {
+                this.clearSelectedPlanet();
                 this.highlightHouse(houseNumberNorth);
                 window.selectedBhavaNorth = houseNumberNorth;
                 citranaDebug('[SELECT] North Indian Chart Bhava selected via touch:', houseNumberNorth);
@@ -833,7 +835,9 @@ class NorthIndianChartTemplate {
                 this.selectPlanet && this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
             };
             hitRect.on('click', selectHandler);
+            hitRect.on('tap', selectHandler);
             planetText.on('click', selectHandler);
+            planetText.on('tap', selectHandler);
             // Right-click context menu
             const contextHandler = (e) => {
                 e.evt.preventDefault();
@@ -900,6 +904,8 @@ class NorthIndianChartTemplate {
 
     selectPlanet(planetText, houseNumber, abbr, id) {
         window.app?.chartTemplates?.southIndianTemplate?.clearSelectedPlanet?.();
+        window.app?.drawingTools?.clearSelection?.();
+        window.app?.drawingTools?.editUI?.hide?.();
         this.clearSelectedPlanet();
         this.selectedPlanet = {
             planetText,

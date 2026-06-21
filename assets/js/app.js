@@ -12,6 +12,7 @@ class CitranaApp {
         this.planetSystem = null;
         this.drawingTools = null;
         this.contextMenu = null;
+        this.itemsMenu = null;
         this.currentTool = 'select';
         this.isDrawing = false;
         this.lastPoint = null;
@@ -97,6 +98,53 @@ class CitranaApp {
         this.updateHistoryButtons();
 
         citranaDebug('Components setup complete');
+    }
+
+    /**
+     * True when the Konva target is not a Graha, drawing, or control handle.
+     * @param {Konva.Node|null} target
+     * @returns {boolean}
+     */
+    isEmptyCanvasTarget(target) {
+        if (!target || typeof target.name !== 'function') {
+            return true;
+        }
+
+        const name = target.name() || '';
+        if (name.startsWith('planet-') || name.startsWith('planet-hit-')) {
+            return false;
+        }
+        if (name.startsWith('drawing-') || name.startsWith('bounding-box-')) {
+            return false;
+        }
+        if (name === 'control-point-start' || name === 'control-point-end') {
+            return false;
+        }
+
+        return true;
+    }
+
+    clearPlanetSelection() {
+        this.chartTemplates?.southIndianTemplate?.clearSelectedPlanet?.();
+        this.chartTemplates?.northIndianTemplate?.clearSelectedPlanet?.();
+    }
+
+    clearBhavaHighlight() {
+        this.chartTemplates?.southIndianTemplate?.clearHighlight?.();
+        this.chartTemplates?.northIndianTemplate?.clearHighlight?.();
+        window.selectedBhavaSouth = null;
+        window.selectedBhavaNorth = null;
+    }
+
+    /**
+     * Clear Graha, Bhava, and annotation selections plus any open edit bars.
+     */
+    clearCanvasSelection() {
+        this.clearPlanetSelection();
+        this.clearBhavaHighlight();
+        this.drawingTools?.clearSelection?.();
+        this.drawingTools?.editUI?.hide?.();
+        this.drawingTools?.dismissPlanetEditing?.();
     }
 
     setupEventListeners() {
@@ -274,25 +322,16 @@ class CitranaApp {
 
         // Canvas events
         this.stage.on('mousedown', (e) => {
-            // If click is on empty space (not a chart Bhava or Graha), clear highlight
-            if (!e.target || (e.target && !e.target.name().startsWith('house-') && !e.target.name().startsWith('planet-') && !e.target.name().startsWith('planet-hit-'))) {
-                if (this.chartTemplates.currentChartType === 'south-indian') {
-                    this.chartTemplates.southIndianTemplate.clearHighlight();
-                } else if (this.chartTemplates.currentChartType === 'north-indian') {
-                    this.chartTemplates.northIndianTemplate.clearHighlight();
+            if (this.isEmptyCanvasTarget(e.target)) {
+                this.clearCanvasSelection();
+            } else {
+                // Dismiss edit bars when tapping another canvas element
+                if (this.drawingTools.editUI && this.drawingTools.editUI.isEditUIVisible()) {
+                    this.drawingTools.editUI.hide();
                 }
-                window.selectedBhavaSouth = null;
-                window.selectedBhavaNorth = null;
-            }
-
-            // Hide Edit UI if clicking outside of it
-            if (this.drawingTools.editUI && this.drawingTools.editUI.isEditUIVisible()) {
-                this.drawingTools.editUI.hide();
-            }
-
-            // Dismiss Graha edit bar when clicking outside (commits changes if edited)
-            if (this.drawingTools.isEditingPlanet) {
-                this.drawingTools.dismissPlanetEditing();
+                if (this.drawingTools.isEditingPlanet) {
+                    this.drawingTools.dismissPlanetEditing();
+                }
             }
 
             this.handleMouseDown(e);
@@ -308,19 +347,8 @@ class CitranaApp {
 
         // Tap-outside-to-deselect for mobile
         this.stage.on('tap', (e) => {
-            if (!e.target || (
-                    e.target &&
-                    !e.target.name().startsWith('house-') &&
-                    !e.target.name().startsWith('planet-') &&
-                    !e.target.name().startsWith('planet-hit-')
-                )) {
-                if (this.chartTemplates.currentChartType === 'south-indian') {
-                    this.chartTemplates.southIndianTemplate.clearHighlight();
-                } else if (this.chartTemplates.currentChartType === 'north-indian') {
-                    this.chartTemplates.northIndianTemplate.clearHighlight();
-                }
-                window.selectedBhavaSouth = null;
-                window.selectedBhavaNorth = null;
+            if (this.isEmptyCanvasTarget(e.target)) {
+                this.clearCanvasSelection();
             }
         });
 
@@ -1167,6 +1195,9 @@ class CitranaApp {
             document.getElementById('canvas-container').style.cursor = 'grabbing';
         } else if (this.currentTool === 'select') {
             const pos = this.drawingTools.getPrecisePositionFromKonva(e);
+            if (this.isEmptyCanvasTarget(e.target)) {
+                this.clearCanvasSelection();
+            }
             this.drawingTools.handleSelectTouchDown(pos, e);
         } else {
             // For drawing tools, use the existing touch handling

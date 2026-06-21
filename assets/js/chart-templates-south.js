@@ -399,6 +399,7 @@ class SouthIndianChartTemplate {
 
         // Add click event for selection
         house.on('click', (e) => {
+            this.clearSelectedPlanet();
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
             citranaDebug('[SELECT] South Indian Chart Bhava selected:', houseNumber);
@@ -406,6 +407,7 @@ class SouthIndianChartTemplate {
 
         // Add touch event for mobile selection
         house.on('tap', (e) => {
+            this.clearSelectedPlanet();
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
             citranaDebug('[SELECT] South Indian Chart Bhava selected via touch:', houseNumber);
@@ -598,7 +600,9 @@ class SouthIndianChartTemplate {
                 this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
             };
             hitRect.on('click', selectHandler);
+            hitRect.on('tap', selectHandler);
             planetText.on('click', selectHandler);
+            planetText.on('tap', selectHandler);
             // Right-click context menu
             const contextHandler = (e) => {
                 e.evt.preventDefault();
@@ -666,6 +670,8 @@ class SouthIndianChartTemplate {
     // --- Selection and Keyboard Delete ---
     selectPlanet(planetText, houseNumber, abbr, id) {
         window.app?.chartTemplates?.northIndianTemplate?.clearSelectedPlanet?.();
+        window.app?.drawingTools?.clearSelection?.();
+        window.app?.drawingTools?.editUI?.hide?.();
         this.clearSelectedPlanet();
         this.selectedPlanet = {
             planetText,

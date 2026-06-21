@@ -1102,6 +1102,7 @@ class DrawingTools {
      * @param {KonvaObject} shape - The shape to select
      */
     selectShape(shape) {
+        window.app?.clearPlanetSelection?.();
         this.clearSelection();
 
         if (shape && shape.name() && shape.name().startsWith('drawing-')) {

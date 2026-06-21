@@ -8,6 +8,16 @@ class ContextMenu {
     constructor() {
         this.menu = null;
         this._menuTouchBound = false;
+        this._canvasContextMenuEnabled = true;
+
+        try {
+            const stored = localStorage.getItem('citrana_context_menu_enabled');
+            if (stored !== null) {
+                this._canvasContextMenuEnabled = stored === 'true';
+            }
+        } catch (_) {
+            // localStorage unavailable
+        }
     }
 
     init() {
@@ -142,6 +152,10 @@ class ContextMenu {
     }
 
     shouldBlockCanvasContextMenu() {
+        if (!this.isCanvasContextMenuEnabled()) {
+            return true;
+        }
+
         const app = window.app;
         if (!app) {
             return false;
@@ -153,6 +167,33 @@ class ContextMenu {
 
         const tool = app.currentTool;
         return tool && tool !== 'select' && tool !== 'hand';
+    }
+
+    isCanvasContextMenuEnabled() {
+        return this._canvasContextMenuEnabled !== false;
+    }
+
+    setCanvasContextMenuEnabled(enabled) {
+        this._canvasContextMenuEnabled = !!enabled;
+
+        try {
+            localStorage.setItem('citrana_context_menu_enabled', String(this._canvasContextMenuEnabled));
+        } catch (_) {
+            // localStorage unavailable
+        }
+
+        if (!enabled) {
+            this.hide();
+        }
+    }
+
+    toggleCanvasContextMenu() {
+        this.setCanvasContextMenuEnabled(!this.isCanvasContextMenuEnabled());
+        return this.isCanvasContextMenuEnabled();
+    }
+
+    getContextMenuToggleLabel() {
+        return this.isCanvasContextMenuEnabled() ? 'Disable Context Menu' : 'Enable Context Menu';
     }
 
     getShapeAtClientPoint(clientX, clientY) {
@@ -234,6 +275,10 @@ class ContextMenu {
     }
 
     openContextMenuAtClientPoint(clientX, clientY) {
+        if (!this.isCanvasContextMenuEnabled()) {
+            return;
+        }
+
         const shape = this.getShapeAtClientPoint(clientX, clientY);
         const target = this.resolveContextTarget(shape);
 

@@ -203,6 +203,33 @@ class CitranaItemsMenu {
         return 'presentation';
     }
 
+    renderUtilitySection() {
+        const cm = this.getContextMenu();
+        if (!cm) {
+            return '';
+        }
+
+        const contextMenuLabel = cm.getContextMenuToggleLabel();
+        const contextMenuIcon = cm.isCanvasContextMenuEnabled() ? 'circle-off' : 'circle';
+
+        const rows = [
+            this.renderRow(
+                'Clear Selection',
+                'Grahas, Bhavas, annotations',
+                this.actionButton('clear-selection', 'Clear Selection', 'mouse-pointer-2'),
+                'mouse-pointer-2'
+            ),
+            this.renderRow(
+                contextMenuLabel,
+                'Long-press and right-click menu',
+                this.actionButton('toggle-context-menu', contextMenuLabel, contextMenuIcon),
+                contextMenuIcon
+            )
+        ].join('');
+
+        return this.renderSection('Canvas', rows);
+    }
+
     getBhavaLabel(chartType, houseNumber) {
         if (chartType === 'south-indian') {
             const template = this.getChartTemplates()?.southIndianTemplate;
@@ -339,6 +366,7 @@ class CitranaItemsMenu {
         const template = this.getActiveTemplate();
 
         this.bodyEl.innerHTML = [
+            this.renderUtilitySection(),
             this.renderChartSection(chartType),
             this.renderBhavasSection(chartType, template),
             this.renderGrahasSection(chartType, template),
@@ -384,6 +412,19 @@ class CitranaItemsMenu {
             case 'toggle-presentation-view':
                 this.getContextMenu()?.handleAction(action, houseNumber);
                 this.close();
+                break;
+
+            case 'clear-selection':
+                window.app?.clearCanvasSelection?.();
+                this.close();
+                break;
+
+            case 'toggle-context-menu':
+                this.getContextMenu()?.toggleCanvasContextMenu();
+                this.render();
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
                 break;
 
             case 'select-bhava':
