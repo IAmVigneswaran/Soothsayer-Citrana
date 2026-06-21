@@ -20,12 +20,12 @@ User-facing copy and docs use **Bhava**, **Graha**, and **Rashi** (with correct 
 ```
 index.html  (viewport-fit=cover; Konva + colorpicker CSS in <head>)
   ├── assets/vendor/konva.min.js        (Konva 9.3.20)
-  ├── assets/vendor/lucide.min.js       (Lucide 0.468.0)
+  ├── assets/vendor/lucide.min.js       (Lucide 0.576.0)
   ├── assets/vendor/colorpicker.min.css (JSColorPicker 1.1.0)
   ├── assets/vendor/colorpicker.iife.min.js (JSColorPicker 1.1.0)
   ├── citrana-debug.js                  → window.citranaDebug (on by default)
   ├── citrana-device.js                 → CitranaDevice (touch, mobile UA, viewport)
-  ├── citrana-rashis.js                 → CitranaRashis (Rashi names, symbols, grid numbers)
+  ├── citrana-rashis.js                 → CitranaRashis (Rashi names, Lucide zodiac icons, grid numbers)
   ├── citrana-graha-selection.js        → CitranaGrahaSelection (Graha Selection Pill)
   ├── chart-templates-south.js          → SouthIndianChartTemplate
   ├── chart-templates-north.js          → NorthIndianChartTemplate
@@ -105,7 +105,7 @@ Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-devic
 | `citrana-arrow.js` | ~185 | Unified filled-arrow geometry (`Konva.Line` polygon); `arrowAnchors`; legacy `Konva.Arrow` migration |
 | `citrana-colorpicker.js` | ~383 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()`; `isPickerPopupTarget()` for touch-outside dismiss |
 | `citrana-device.js` | ~39 | Shared `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()`, `isLaserViewport()` (all viewports), `hasFinePointer()` |
-| `citrana-rashis.js` | ~41 | Shared `RASHIS`, `NAMES`, `NUMBERS`, `getName()`, `getNumberForHouseIndex()` |
+| `citrana-rashis.js` | ~49 | Shared `RASHIS` (`icon`: Lucide `zodiac-*`), `NAMES`, `NUMBERS`, `getName()`, `getNumberForHouseIndex()`, `iconHtml()` |
 | `citrana-graha-selection.js` | ~96 | Graha Selection Pill — white `Konva.Rect` (`planet-selection-pill`) behind Graha text; `attach()` / `sync()` / `detach()`; extra padding on mobile |
 | `citrana-laser.js` | ~248 | Ephemeral laser pointer — Canvas 2D overlay above stage; independent strokes per gesture; ~3s fade; `isAvailable()` → `CitranaDevice.isLaserViewport()`; not serialised or undoable |
 | `drawing-tools.js` | ~2134 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, `startInlineContentEdit()`, `bindRestoredDrawingInteractions()`; history `recordHistory()` calls (laser excluded); notifies `app.notifyCanvasSelectionChanged()` on select/clear; `CitranaDevice` for touch/mobile |

@@ -350,7 +350,7 @@ class ContextMenu {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
         const rashis = CitranaRashis.RASHIS;
         const lagnaMenuItems = rashis.map((rashi, i) =>
-            `<div class='context-menu-item' data-action='set-lagna' data-house='${i + 1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`
+            `<div class='context-menu-item' data-action='set-lagna' data-house='${i + 1}'>${CitranaRashis.iconHtml(rashi.icon)} ${rashi.name}</div>`
         ).join('');
 
         let menuHtml = `

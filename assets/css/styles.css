@@ -663,8 +663,7 @@ body.presentation-view .about-btn {
 
 .context-submenu .context-menu-item {
   white-space: nowrap;
-  padding-left: 32px;
-  padding-right: 16px;
+  padding: 0 1rem;
   font: inherit;
   color: #000;
   /* Ensure visible text in submenu */
@@ -1113,13 +1112,20 @@ body.presentation-view .about-btn {
   }
 }
 
-.zodiac-symbol {
-  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols', 'Symbola', 'DejaVu Sans', 'Arial Unicode MS', sans-serif;
-  font-size: 1.2em;
-  margin-right: 0.5em;
-  font-weight: normal;
-  line-height: 1;
+.zodiac-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   vertical-align: middle;
+  margin-right: 0.5em;
+  color: currentColor;
+}
+
+.zodiac-icon i,
+.zodiac-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* Floating Edit UI */
@@ -1317,8 +1323,7 @@ body.presentation-view .about-btn {
   }
 
   .context-submenu .context-menu-item {
-    padding-left: 18px;
-    padding-right: 8px;
+    padding: 0 8px;
     font-size: 13px;
   }
 }
@@ -1676,11 +1681,8 @@ body.presentation-view .about-btn {
   gap: 0.3em;
 }
 
-.items-row-label .zodiac-symbol {
-  font-size: 0.9em;
+.items-row-label .zodiac-icon {
   margin-right: 0;
-  line-height: 1;
-  flex-shrink: 0;
 }
 
 .items-row-meta {

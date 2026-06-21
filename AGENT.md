@@ -25,7 +25,7 @@ Internal code identifiers (e.g. `planet-system.js`, `addPlanetToHouse()`, Konva 
 - Graphics: HTML5 Canvas API with Konva.js (self-hosted, `assets/vendor/konva.min.js` v9.3.20)
 - Colour picker: JSColorPicker (self-hosted, `assets/vendor/colorpicker.iife.min.js` v1.1.0; theme in `citrana-colorpicker.js`)
 - Styling: Custom CSS only
-- Icons: Lucide Icons (self-hosted, `assets/vendor/lucide.min.js` v0.468.0)
+- Icons: Lucide Icons (self-hosted, `assets/vendor/lucide.min.js` v0.576.0)
 - Storage: Browser `localStorage` for preferences (welcome modal, chart indicator toggles, Save Chart Only export, context menu enable/disable, debug opt-out)
 - Analytics: Google Analytics and Google Tag Manager
 - No build process required - runs entirely in browser
@@ -116,7 +116,7 @@ Soothsayer-Citrana/
 │   │   ├── citrana-graha-selection.js # Graha Selection Pill (~96 lines)
 │   │   ├── citrana-items-menu.js # Items panel — chart/Bhava/Graha/annotation actions (~635 lines)
 │   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~248 lines)
-│   │   ├── citrana-rashis.js     # Shared Rashi names, symbols, and grid numbers (~41 lines)
+│   │   ├── citrana-rashis.js     # Shared Rashi names, Lucide zodiac icons, grid numbers (~49 lines)
 │   │   ├── citrana-session.js    # Save/open `.citrana.json` session files (~214 lines)
 │   │   ├── chart-coordinator.js  # Chart type management (~334 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~984 lines)
@@ -128,7 +128,7 @@ Soothsayer-Citrana/
 │   │   └── history.js            # Unified undo/redo timeline (~94 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
-│   │   ├── lucide.min.js         # Lucide 0.468.0 (self-hosted)
+│   │   ├── lucide.min.js         # Lucide 0.576.0 (self-hosted)
 │   │   ├── colorpicker.iife.min.js  # JSColorPicker 1.1.0 (self-hosted)
 │   │   └── colorpicker.min.css   # JSColorPicker 1.1.0 stylesheet
 │   ├── images/                   # 14 files (logos, demo GIFs, browser screenshot)
@@ -492,11 +492,13 @@ Key Methods:
 
 Used by `app.js`, chart templates, `drawing-tools.js`, `context-menu.js`, and `citrana-laser.js`.
 
-### Citrana Rashis (citrana-rashis.js - ~41 lines)
-Shared Rashi names, symbols, and South Indian grid numbers (1–12).
+### Citrana Rashis (citrana-rashis.js - ~49 lines)
+Shared Rashi names, Lucide zodiac icons (`zodiac-aries`, …), and South Indian grid numbers (1–12).
 
 Key Exports:
-- `RASHIS`, `NAMES`, `NUMBERS`, `getName(rashiNumber)`, `getNumberForHouseIndex(houseIndex0to11)`
+- `RASHIS`: Array of `{ name, icon, number }` for all 12 signs
+- `NAMES`, `NUMBERS`: Derived arrays
+- `getName(rashiNumber)`, `getNumberForHouseIndex(houseIndex0to11)`, `iconHtml(icon)`
 
 Used by `context-menu.js` (North **Set Lagna as …** submenu), chart templates, and `citrana-items-menu.js` (South Bhava row labels).
 
@@ -595,7 +597,7 @@ Key Responsibilities:
 - Renders sections: **Chart**, **Canvas**, **Bhavas**, **Grahas**, **Annotations**
 - **Canvas**: **Clear Selection** (`app.clearCanvasSelection()`), **Disable Context Menu** / **Enable Context Menu**
 - Selected rows use `.items-row-selected`; `refreshSelectionHighlight()` syncs with `app.getCanvasSelection()`
-- South Indian Bhava rows show fixed Rashi names with zodiac symbols (`CitranaRashis`)
+- South Indian Bhava rows show fixed Rashi names with Lucide zodiac icons (`CitranaRashis.iconHtml`)
 - Reuses `context-menu.js` `handleAction()` for chart/Bhava/Graha actions where possible
 - Text/Heading rows: **Edit text** (`startInlineContentEdit`) and **Style** (`showEditUI`); other annotations: single **Edit** → `showEditUI`
 - **Presentation View** and chart management actions mirror context menu icons

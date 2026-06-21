@@ -177,7 +177,7 @@ class CitranaItemsMenu {
         if (chartType === 'north-indian') {
             const lagnaButtons = CitranaRashis.RASHIS.map((rashi, i) => (
                 `<button type="button" class="items-lagna-btn" data-action="set-lagna" data-house="${i + 1}" title="Set Lagna as ${rashi.name}" aria-label="Set Lagna as ${rashi.name}">
-                    <span class="zodiac-symbol">${rashi.symbol}</span>
+                    ${CitranaRashis.iconHtml(rashi.icon)}
                     <span class="items-lagna-name">${rashi.name}</span>
                 </button>`
             )).join('');
@@ -285,7 +285,7 @@ class CitranaItemsMenu {
         if (chartType === 'south-indian') {
             const rashi = this.getFixedRashiForHouse(houseNumber);
             if (rashi) {
-                return `<span class="zodiac-symbol">${rashi.symbol}</span> ${this.escapeHtml(rashi.name)}`;
+                return `${CitranaRashis.iconHtml(rashi.icon)} ${this.escapeHtml(rashi.name)}`;
             }
         }
         return this.escapeHtml(`Bhava ${this.getBhavaLabel(chartType, houseNumber)}`);
