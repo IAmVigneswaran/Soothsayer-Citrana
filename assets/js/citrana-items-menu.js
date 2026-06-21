@@ -284,17 +284,25 @@ class CitranaItemsMenu {
         const rows = this._shapes.map((shape, index) => {
             const label = this.escapeHtml(this.getAnnotationDisplayName(shape));
             const rowIcon = this.getAnnotationIcon(shape);
-            const editBtn = this.canEditAnnotation(shape)
-                ? this.actionButton('edit-annotation', 'Edit annotation', 'pencil', `data-shape-index="${index}"`)
-                : '';
+            const toolType = this.getAnnotationToolType(shape);
+            const shapeAttrs = `data-shape-index="${index}"`;
 
             const actions = [
-                this.actionButton('select-annotation', 'Select annotation', 'mouse-pointer', `data-shape-index="${index}"`),
-                editBtn,
-                this.actionButton('delete-annotation', 'Delete annotation', 'trash-2', `data-shape-index="${index}"`)
-            ].filter(Boolean).join('');
+                this.actionButton('select-annotation', 'Select annotation', 'mouse-pointer', shapeAttrs)
+            ];
 
-            return this.renderRow(label, '', actions, rowIcon);
+            if (toolType === 'text' || toolType === 'heading') {
+                actions.push(
+                    this.actionButton('edit-annotation-text', 'Edit text', 'text-cursor', shapeAttrs),
+                    this.actionButton('style-annotation', 'Style', 'palette', shapeAttrs)
+                );
+            } else if (this.canEditAnnotation(shape)) {
+                actions.push(this.actionButton('edit-annotation', 'Edit annotation', 'pencil', shapeAttrs));
+            }
+
+            actions.push(this.actionButton('delete-annotation', 'Delete annotation', 'trash-2', shapeAttrs));
+
+            return this.renderRow(label, '', actions.filter(Boolean).join(''), rowIcon);
         }).join('');
 
         return this.renderSection('Annotations', rows);
@@ -324,10 +332,7 @@ class CitranaItemsMenu {
         const shape = shapeIndex !== undefined && shapeIndex !== ''
             ? this._shapes[parseInt(shapeIndex, 10)]
             : null;
-        const inlineTextEdit = action === 'edit-annotation' && shape && (
-            this.getAnnotationToolType(shape) === 'text' ||
-            this.getAnnotationToolType(shape) === 'heading'
-        );
+        const inlineTextEdit = action === 'edit-annotation-text' && shape;
 
         if (!inlineTextEdit) {
             e.preventDefault();
@@ -378,6 +383,14 @@ class CitranaItemsMenu {
 
             case 'edit-annotation':
                 this.editAnnotation(shapeIndex);
+                break;
+
+            case 'edit-annotation-text':
+                this.editAnnotationText(shapeIndex);
+                break;
+
+            case 'style-annotation':
+                this.styleAnnotation(shapeIndex);
                 break;
 
             case 'delete-annotation':
@@ -437,18 +450,52 @@ class CitranaItemsMenu {
         if (!shape || !this.canEditAnnotation(shape)) return;
 
         const toolType = this.getAnnotationToolType(shape);
+        if (toolType === 'text' || toolType === 'heading') {
+            return;
+        }
+
         this.close();
         window.app?.setTool('select');
         const drawingTools = window.app?.drawingTools;
         if (!drawingTools) return;
 
         drawingTools.selectShape(shape);
+        drawingTools.showEditUI(shape, toolType);
+    }
 
-        if (toolType === 'text' || toolType === 'heading') {
-            drawingTools.startInlineContentEdit(shape);
+    editAnnotationText(shapeIndex) {
+        const shape = this._shapes[parseInt(shapeIndex, 10)];
+        if (!shape) return;
+
+        const toolType = this.getAnnotationToolType(shape);
+        if (toolType !== 'text' && toolType !== 'heading') {
             return;
         }
 
+        this.close();
+        window.app?.setTool('select');
+        const drawingTools = window.app?.drawingTools;
+        if (!drawingTools) return;
+
+        drawingTools.selectShape(shape);
+        drawingTools.startInlineContentEdit(shape);
+    }
+
+    styleAnnotation(shapeIndex) {
+        const shape = this._shapes[parseInt(shapeIndex, 10)];
+        if (!shape) return;
+
+        const toolType = this.getAnnotationToolType(shape);
+        if (toolType !== 'text' && toolType !== 'heading') {
+            return;
+        }
+
+        this.close();
+        window.app?.setTool('select');
+        const drawingTools = window.app?.drawingTools;
+        if (!drawingTools) return;
+
+        drawingTools.selectShape(shape);
         drawingTools.showEditUI(shape, toolType);
     }
 

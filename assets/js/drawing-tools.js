@@ -761,14 +761,61 @@ class DrawingTools {
                 this.layer.add(boundingBox);
             }
 
+            this.bindRestoredDrawingInteractions(shape);
+        });
+
+        this.updateDrawingObjectsDraggable(this.currentTool === 'select');
+        this.layer.batchDraw();
+    }
+
+    /**
+     * Re-attach interaction handlers after undo/redo or session restore.
+     * @param {Konva.Node} shape
+     */
+    bindRestoredDrawingInteractions(shape) {
+        if (!shape || !shape.name()) {
+            return;
+        }
+
+        const shapeName = shape.name();
+        let toolType = null;
+
+        if (shapeName === 'drawing-text') {
+            toolType = 'text';
+            this.makeTextEditable(shape);
+            shape.on('click', (e) => {
+                e.cancelBubble = true;
+                this.showEditUI(shape, 'text');
+            });
+            if (this.isTouchDevice) {
+                this.addDoubleTapSupport(shape, 'text');
+            }
+        } else if (shapeName === 'drawing-heading') {
+            toolType = 'heading';
+            this.makeHeadingEditable(shape);
+        } else if (shapeName.includes('drawing-arrow')) {
+            toolType = 'arrow';
+            shape.on('click', () => {
+                this.showEditUI(shape, 'arrow');
+            });
+        } else if (shapeName === 'drawing-line') {
+            toolType = 'line';
+            shape.on('click', () => {
+                this.showEditUI(shape, 'line');
+            });
+        } else if (shapeName.includes('drawing-pen')) {
+            toolType = 'pen';
+            shape.on('click', () => {
+                this.showEditUI(shape, 'pen');
+            });
+        } else {
             shape.on('click tap', (e) => {
                 e.cancelBubble = true;
                 this.showEditUIForShape(shape);
             });
-            this.makeShapeSelectable(shape);
-        });
+        }
 
-        this.layer.batchDraw();
+        this.makeShapeSelectable(shape, toolType);
     }
 
     /**

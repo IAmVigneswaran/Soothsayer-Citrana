@@ -1689,9 +1689,12 @@ class CitranaApp {
 
         this.drawingTools?.editUI?.hide();
         this.drawingTools?.clearSelection?.();
+        document.querySelector('.konva-textarea')?.remove();
 
         this.chartTemplates.loadChartData(state.chartData);
         this.restoreDrawings(state.drawingData);
+
+        this.drawingTools?.updateDrawingObjectsDraggable(this.currentTool === 'select');
 
         // loadChartData → clearChart() resets stage to 1× at origin; restore user's zoom/pan
         this.stage.scale({ x: savedViewport.scaleX, y: savedViewport.scaleY });
