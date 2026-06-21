@@ -213,6 +213,33 @@ class CitranaItemsMenu {
         return houseNumber;
     }
 
+    /** South Indian grid cells have fixed Rashis; North Indian rows use Bhava numbers. */
+    getFixedRashiForHouse(houseNumber) {
+        const house = parseInt(houseNumber, 10);
+        if (house < 1 || house > 12) return null;
+        return CitranaRashis.RASHIS[house - 1] || null;
+    }
+
+    getBhavaRowLabel(chartType, houseNumber) {
+        if (chartType === 'south-indian') {
+            const rashi = this.getFixedRashiForHouse(houseNumber);
+            if (rashi) {
+                return `<span class="zodiac-symbol">${rashi.symbol}</span> ${this.escapeHtml(rashi.name)}`;
+            }
+        }
+        return this.escapeHtml(`Bhava ${this.getBhavaLabel(chartType, houseNumber)}`);
+    }
+
+    getBhavaMetaLabel(chartType, houseNumber) {
+        if (chartType === 'south-indian') {
+            const rashi = this.getFixedRashiForHouse(houseNumber);
+            if (rashi) {
+                return this.escapeHtml(rashi.name);
+            }
+        }
+        return this.escapeHtml(`Bhava ${this.getBhavaLabel(chartType, houseNumber)}`);
+    }
+
     renderBhavasSection(chartType, template) {
         if (!chartType || !template) return '';
 
@@ -220,7 +247,6 @@ class CitranaItemsMenu {
         const rows = [];
 
         for (let houseNumber = 1; houseNumber <= 12; houseNumber += 1) {
-            const bhavaLabel = this.getBhavaLabel(chartType, houseNumber);
             const grahaCount = houseData[houseNumber]?.planets?.length || 0;
             const meta = grahaCount === 1 ? '1 Graha' : `${grahaCount} Grahas`;
 
@@ -237,7 +263,7 @@ class CitranaItemsMenu {
                 this.actionButton('clear-house', 'Clear Bhava', 'trash-2', `data-house="${houseNumber}"`)
             ].filter(Boolean).join('');
 
-            rows.push(this.renderRow(`Bhava ${bhavaLabel}`, meta, actions));
+            rows.push(this.renderRow(this.getBhavaRowLabel(chartType, houseNumber), meta, actions));
         }
 
         return this.renderSection('Bhavas', rows.join(''));
@@ -253,7 +279,7 @@ class CitranaItemsMenu {
             const planets = houseData[houseNumber]?.planets;
             if (!Array.isArray(planets)) continue;
 
-            const bhavaLabel = this.getBhavaLabel(chartType, houseNumber);
+            const bhavaLabel = this.getBhavaMetaLabel(chartType, houseNumber);
 
             planets.forEach((planet) => {
                 const label = this.escapeHtml(planet.label || planet.abbr || 'Graha');
@@ -263,7 +289,7 @@ class CitranaItemsMenu {
                     this.actionButton('delete-graha', 'Delete Graha', 'trash-2', `data-house="${houseNumber}" data-planet-id="${planet.id}"`)
                 ].join('');
 
-                rows.push(this.renderRow(label, `Bhava ${bhavaLabel}`, actions, 'orbit'));
+                rows.push(this.renderRow(label, bhavaLabel, actions, 'orbit'));
             });
         }
 
