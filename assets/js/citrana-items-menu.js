@@ -484,7 +484,6 @@ class CitranaItemsMenu {
         if (!cm || !template || !houseNumber || !planetId) return;
 
         const house = parseInt(houseNumber, 10);
-        const planetText = cm.findPlanetTextNode(house, planetId);
         const houseData = template.getHouseData()[house];
         const planet = houseData?.planets?.find((p) => p.id === planetId);
 
@@ -492,9 +491,12 @@ class CitranaItemsMenu {
         window.app?.setTool('select');
         template.highlightHouse?.(house);
 
-        if (planetText && planet && template.selectPlanet) {
-            template.selectPlanet(planetText, house, planet.abbr, planetId);
-        }
+        window.requestAnimationFrame(() => {
+            const planetText = cm.findPlanetTextNode(house, planetId);
+            if (planetText && planet && template.selectPlanet) {
+                template.selectPlanet(planetText, house, planet.abbr, planetId);
+            }
+        });
     }
 
     editGraha(houseNumber, planetId) {

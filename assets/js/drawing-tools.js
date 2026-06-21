@@ -220,6 +220,10 @@ class DrawingTools {
             window.app.setTool('select');
         }
 
+        if (completedTool && completedTool !== 'laser' && completedTool !== 'text' && completedTool !== 'heading') {
+            this.raiseDrawingsAboveChart();
+        }
+
         citranaDebug('Drawing stopped');
     }
 
@@ -272,6 +276,12 @@ class DrawingTools {
                 }
             }, 150);
         }
+
+        const resolvedTool = toolForTap ?? (shape.name() || '').replace('drawing-', '');
+        if (resolvedTool === 'line' || resolvedTool === 'pen') {
+            this.applyDrawingHitTarget(shape, resolvedTool);
+        }
+        this.syncBoundingBoxListening();
     }
 
     /**
@@ -360,6 +370,7 @@ class DrawingTools {
         });
 
         this.currentShape = line;
+        this.applyDrawingHitTarget(line, 'line');
         this.layer.add(line);
         this.layer.add(boundingBox);
         this.layer.batchDraw();
@@ -405,6 +416,7 @@ class DrawingTools {
         });
 
         this.currentShape = line;
+        this.applyDrawingHitTarget(line, 'pen');
         this.layer.add(line);
         this.layer.add(boundingBox);
         this.layer.batchDraw();
@@ -764,6 +776,8 @@ class DrawingTools {
             this.bindRestoredDrawingInteractions(shape);
         });
 
+        this.syncBoundingBoxListening();
+        this.raiseDrawingsAboveChart();
         this.updateDrawingObjectsDraggable(this.currentTool === 'select');
         this.layer.batchDraw();
     }
@@ -816,6 +830,55 @@ class DrawingTools {
         }
 
         this.makeShapeSelectable(shape, toolType);
+        if (toolType === 'line' || toolType === 'pen') {
+            this.applyDrawingHitTarget(shape, toolType);
+        }
+        this.syncBoundingBoxListening();
+    }
+
+    getDrawingHitStrokeWidth() {
+        return CitranaDevice.isMobileUA() ? 28 : 18;
+    }
+
+    applyDrawingHitTarget(shape, toolType) {
+        if (!shape) {
+            return;
+        }
+
+        if (toolType === 'line' || toolType === 'pen') {
+            shape.hitStrokeWidth(this.getDrawingHitStrokeWidth());
+        }
+    }
+
+    syncBoundingBoxListening() {
+        this.layer.find((node) => {
+            const name = node.name();
+            return name && name.startsWith('bounding-box-');
+        }).forEach((box) => {
+            // Invisible pick rects sit above the chart and block Graha drag when listening.
+            box.listening(false);
+        });
+    }
+
+    /**
+     * Keep annotations above North Indian rashi indicator boxes (and chart content).
+     */
+    raiseDrawingsAboveChart() {
+        if (!this.layer) {
+            return;
+        }
+
+        const drawingNodes = this.layer.find((node) => {
+            const name = node.name() || '';
+            return name.startsWith('drawing-') ||
+                name.startsWith('bounding-box-') ||
+                name === 'control-point-start' ||
+                name === 'control-point-end';
+        });
+
+        drawingNodes.forEach((node) => node.moveToTop());
+        this.controlPoints.startPoint?.moveToTop();
+        this.controlPoints.endPoint?.moveToTop();
     }
 
     /**
@@ -828,7 +891,9 @@ class DrawingTools {
         const points = CitranaArrow.isArrow(shape)
             ? CitranaArrow.getControlPoints(shape)
             : shape.points();
-        if (points.length < 4) return; // Need at least start and end points
+        if (points.length < 4) return;
+
+        const cpRadius = CitranaDevice.isMobileUA() ? 12 : 6;
 
         // Clear existing control points
         this.clearControlPoints();
@@ -837,7 +902,7 @@ class DrawingTools {
         this.controlPoints.startPoint = new Konva.Circle({
             x: points[0],
             y: points[1],
-            radius: 6,
+            radius: cpRadius,
             fill: '#ffffff',
             stroke: '#000000',
             strokeWidth: 2,
@@ -850,7 +915,7 @@ class DrawingTools {
         this.controlPoints.endPoint = new Konva.Circle({
             x: points[2],
             y: points[3],
-            radius: 6,
+            radius: cpRadius,
             fill: '#ffffff',
             stroke: '#000000',
             strokeWidth: 2,
@@ -967,6 +1032,9 @@ class DrawingTools {
         this.updateControlPointsPosition(shape);
         this.layer.add(this.controlPoints.startPoint);
         this.layer.add(this.controlPoints.endPoint);
+        this.controlPoints.startPoint.moveToTop();
+        this.controlPoints.endPoint.moveToTop();
+        this.syncBoundingBoxListening();
         this.layer.batchDraw();
     }
 
@@ -1094,6 +1162,7 @@ class DrawingTools {
             this.selectedShape = null;
         }
         this.clearControlPoints();
+        this.syncBoundingBoxListening(null);
         this.layer.batchDraw();
     }
 
@@ -1116,6 +1185,7 @@ class DrawingTools {
             }
 
             // No visual selection indicator - just track the selected shape
+            this.syncBoundingBoxListening();
             this.layer.batchDraw();
         }
     }
@@ -2009,7 +2079,7 @@ class DrawingTools {
             stroke: 'transparent',
             strokeWidth: 0,
             name: `bounding-box-${toolType}`,
-            listening: true,
+            listening: false,
             draggable: false,
             perfectDrawEnabled: false
         });

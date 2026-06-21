@@ -503,17 +503,8 @@ class SouthIndianChartTemplate {
             });
 
             // Safari-specific: Add touch event handling to hit rect
-            hitRect.on('touchstart', (e) => {
-                e.evt.preventDefault();
+            hitRect.on('touchstart', () => {
                 citranaDebug(`Touch start for hit rect of Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
-            });
-
-            hitRect.on('touchmove', (e) => {
-                e.evt.preventDefault();
-            });
-
-            hitRect.on('touchend', (e) => {
-                e.evt.preventDefault();
             });
 
             // The Graha text - perfectly centered
@@ -553,17 +544,8 @@ class SouthIndianChartTemplate {
             }, 10);
 
             // Safari-specific: Add touch event handling
-            planetText.on('touchstart', (e) => {
-                e.evt.preventDefault();
+            planetText.on('touchstart', () => {
                 citranaDebug(`Touch start for Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
-            });
-
-            planetText.on('touchmove', (e) => {
-                e.evt.preventDefault();
-            });
-
-            planetText.on('touchend', (e) => {
-                e.evt.preventDefault();
             });
 
             // Make Graha text editable with live preview
@@ -679,6 +661,7 @@ class SouthIndianChartTemplate {
             abbr,
             id
         };
+        planetText.strokeEnabled(true);
         planetText.stroke('#f59e42');
         planetText.strokeWidth(2);
         this.layer.batchDraw();

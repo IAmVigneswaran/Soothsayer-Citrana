@@ -263,6 +263,13 @@ class NorthIndianChartTemplate {
                 citranaDebug('[SELECT] North Indian Chart Bhava selected:', houseNumberNorth);
             });
 
+            housePolygonNorth.on('click', (e) => {
+                this.clearSelectedPlanet();
+                this.highlightHouse(houseNumberNorth);
+                window.selectedBhavaNorth = houseNumberNorth;
+                citranaDebug('[SELECT] North Indian Chart Bhava selected via click:', houseNumberNorth);
+            });
+
             // Add touch support for mobile selection
             housePolygonNorth.on('tap', (e) => {
                 this.clearSelectedPlanet();
@@ -353,6 +360,7 @@ class NorthIndianChartTemplate {
         // Call renumberHouses to set correct Rashi numbers based on Lagna and First Bhava
         this.renumberHouses();
         this.applyNorthIndicatorsPreference();
+        this.syncNorthChartLayerOrder();
 
         if (!skipZoomToFit) {
             this.zoomToFit();
@@ -361,6 +369,24 @@ class NorthIndianChartTemplate {
         citranaDebug('North Indian chart created');
 
         // Do not add or handle the center label anymore.
+    }
+
+    /**
+     * Grahas above Bhava polygons; rashi boxes above chart; annotations above rashi boxes.
+     */
+    syncNorthChartLayerOrder() {
+        if (!this.chartGroupNorth || !this.tinyBoxGroupNorth) {
+            return;
+        }
+
+        this.chartGroupNorth.getChildren((node) => {
+            const name = node.name();
+            return name && (name.startsWith('planet-') || name.startsWith('planet-hit-'));
+        }).forEach((node) => node.moveToTop());
+
+        this.chartGroupNorth.moveToTop();
+        this.tinyBoxGroupNorth.moveToTop();
+        window.app?.drawingTools?.raiseDrawingsAboveChart?.();
     }
 
     highlightHouse(houseNumber) {
@@ -867,9 +893,8 @@ class NorthIndianChartTemplate {
                     chartLocalY: planetText.y()
                 }) ?? null;
 
-                // Restore z-order: move all Graha texts and hitRects to top
-                this.chartGroupNorth.getChildren(node => node.name() && (node.name().startsWith('planet-') || node.name().startsWith('planet-hit-'))).forEach(node => node.moveToTop());
-                this.tinyBoxGroupNorth.moveToTop();
+                // Restore z-order: Grahas and rashi boxes above Bhavas; annotations stay on top
+                this.syncNorthChartLayerOrder();
                 this.layer.batchDraw();
                 if (targetHouse && targetHouse !== houseNumber) {
                     // Move Graha to new Bhava by ID, preserving its Rashi number and color
@@ -899,6 +924,7 @@ class NorthIndianChartTemplate {
             planetText.moveToTop();
         });
         // Do NOT move the Bhava polygon to the top here!
+        this.syncNorthChartLayerOrder();
         this.layer.batchDraw();
     }
 
@@ -913,6 +939,7 @@ class NorthIndianChartTemplate {
             abbr,
             id
         };
+        planetText.strokeEnabled(true);
         planetText.stroke('#f59e42');
         planetText.strokeWidth(2);
         this.layer.batchDraw();

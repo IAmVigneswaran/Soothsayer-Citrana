@@ -550,6 +550,11 @@ class ContextMenu {
         const chartGroup = template.getChartGroup();
         if (!chartGroup) return null;
 
+        const byId = chartGroup.findOne((node) => node.getAttr?.('_planetId') === planetId);
+        if (byId) {
+            return byId;
+        }
+
         const house = parseInt(houseNumber, 10);
         const suffix = `-${house}-${planetId}`;
 

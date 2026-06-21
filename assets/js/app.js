@@ -114,6 +114,9 @@ class CitranaApp {
         if (name.startsWith('planet-') || name.startsWith('planet-hit-')) {
             return false;
         }
+        if (name.startsWith('house-')) {
+            return false;
+        }
         if (name.startsWith('drawing-') || name.startsWith('bounding-box-')) {
             return false;
         }
@@ -1186,8 +1189,17 @@ class CitranaApp {
      * @param {KonvaEvent} e - Konva touch event
      */
     handleTouchStart(e) {
-        // Prevent default to avoid browser gestures
-        e.evt.preventDefault();
+        const target = e.target;
+        const targetName = target?.name?.() || '';
+        const preserveTouchDrag = targetName === 'control-point-start' ||
+            targetName === 'control-point-end' ||
+            targetName.startsWith('planet-') ||
+            targetName.startsWith('planet-hit-');
+
+        // Allow Konva drag on Grahas and arrow/line control points; block scroll elsewhere
+        if (!preserveTouchDrag) {
+            e.evt.preventDefault();
+        }
 
         if (this.currentTool === 'hand') {
             // Enable stage dragging for hand tool
@@ -1215,8 +1227,17 @@ class CitranaApp {
      * @param {KonvaEvent} e - Konva touch event
      */
     handleTouchMove(e) {
-        // Prevent default to avoid browser gestures
-        e.evt.preventDefault();
+        const target = e.target;
+        const targetName = target?.name?.() || '';
+        const preserveTouchDrag = targetName === 'control-point-start' ||
+            targetName === 'control-point-end' ||
+            targetName.startsWith('planet-') ||
+            targetName.startsWith('planet-hit-') ||
+            this.drawingTools?.isDraggingControlPoint;
+
+        if (!preserveTouchDrag) {
+            e.evt.preventDefault();
+        }
 
         if (this.isDrawing) {
             const pos = this.drawingTools.getPrecisePositionFromKonva(e);
