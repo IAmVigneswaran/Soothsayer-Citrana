@@ -576,6 +576,8 @@ class DrawingTools {
             existingTextarea.remove();
         }
 
+        this.editUI?.hide();
+
         // Get the absolute position of the text
         const textPosition = text.absolutePosition();
         const stageBox = this.stage.container().getBoundingClientRect();
@@ -623,9 +625,7 @@ class DrawingTools {
         textarea.style.touchAction = 'manipulation';
         textarea.style.WebkitTouchAction = 'manipulation';
 
-        // Focus and select all text
-        textarea.focus();
-        textarea.select();
+        this.focusInlineTextarea(textarea);
 
         // Disable dragging while editing and hide the original text
         text.setAttrs({
@@ -1600,6 +1600,51 @@ class DrawingTools {
     }
 
     /**
+     * Open the inline textarea editor for text or heading annotations.
+     * @param {Konva.Text} shape
+     */
+    startInlineContentEdit(shape) {
+        if (!shape || !shape.name()) {
+            return;
+        }
+
+        const name = shape.name();
+        if (name.includes('drawing-heading')) {
+            this.editHeading(shape);
+        } else if (name.includes('drawing-text')) {
+            this.editText(shape);
+        }
+    }
+
+    /**
+     * Focus an inline Konva textarea and open the mobile keyboard when possible.
+     * @param {HTMLTextAreaElement} textarea
+     * @param {boolean} allowRetry
+     */
+    focusInlineTextarea(textarea, allowRetry = true) {
+        if (!textarea) {
+            return;
+        }
+
+        textarea.focus({ preventScroll: true });
+
+        try {
+            const length = textarea.value.length;
+            textarea.setSelectionRange(0, length);
+        } catch (_) {
+            textarea.select();
+        }
+
+        if (this.isTouchDevice && allowRetry) {
+            setTimeout(() => {
+                if (document.activeElement !== textarea) {
+                    this.focusInlineTextarea(textarea, false);
+                }
+            }, 100);
+        }
+    }
+
+    /**
      * Show floating Edit UI for style controls (stroke, font, colour, delete).
      * Content edits use inline editors; heading line count is limited in editHeading().
      * @param {Object} element - The Konva element to edit
@@ -1766,6 +1811,9 @@ class DrawingTools {
         if (existingTextarea) {
             existingTextarea.remove();
         }
+
+        this.editUI?.hide();
+
         // Get the absolute position of the heading
         const textPosition = heading.absolutePosition();
         const stageBox = this.stage.container().getBoundingClientRect();
@@ -1816,9 +1864,7 @@ class DrawingTools {
                 textarea.value = lines.slice(0, 2).join('\n');
             }
         });
-        // Focus and select all text
-        textarea.focus();
-        textarea.select();
+        this.focusInlineTextarea(textarea);
         // Disable dragging while editing and hide the original heading
         heading.setAttrs({
             draggable: false,

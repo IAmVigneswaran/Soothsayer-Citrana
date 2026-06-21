@@ -321,7 +321,17 @@ class CitranaItemsMenu {
         const planetId = btn.dataset.planetId;
         const shapeIndex = btn.dataset.shapeIndex;
 
-        e.preventDefault();
+        const shape = shapeIndex !== undefined && shapeIndex !== ''
+            ? this._shapes[parseInt(shapeIndex, 10)]
+            : null;
+        const inlineTextEdit = action === 'edit-annotation' && shape && (
+            this.getAnnotationToolType(shape) === 'text' ||
+            this.getAnnotationToolType(shape) === 'heading'
+        );
+
+        if (!inlineTextEdit) {
+            e.preventDefault();
+        }
 
         switch (action) {
             case 'create-south-indian':
@@ -426,11 +436,20 @@ class CitranaItemsMenu {
         const shape = this._shapes[parseInt(shapeIndex, 10)];
         if (!shape || !this.canEditAnnotation(shape)) return;
 
+        const toolType = this.getAnnotationToolType(shape);
         this.close();
         window.app?.setTool('select');
         const drawingTools = window.app?.drawingTools;
-        drawingTools?.selectShape(shape);
-        drawingTools?.showEditUI(shape, this.getAnnotationToolType(shape));
+        if (!drawingTools) return;
+
+        drawingTools.selectShape(shape);
+
+        if (toolType === 'text' || toolType === 'heading') {
+            drawingTools.startInlineContentEdit(shape);
+            return;
+        }
+
+        drawingTools.showEditUI(shape, toolType);
     }
 
     deleteAnnotation(shapeIndex) {

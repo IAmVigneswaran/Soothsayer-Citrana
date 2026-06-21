@@ -144,6 +144,11 @@ class EditUI {
                 return;
             }
 
+            // Don't hide if touching the inline text/heading editor
+            if (e.target.closest('.konva-textarea')) {
+                return;
+            }
+
             // Don't hide if touching on context menu items
             if (e.target.closest('.context-menu-item')) {
                 return;
