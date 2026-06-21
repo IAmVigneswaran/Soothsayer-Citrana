@@ -1164,6 +1164,7 @@ class DrawingTools {
         this.clearControlPoints();
         this.syncBoundingBoxListening(null);
         this.layer.batchDraw();
+        window.app?.notifyCanvasSelectionChanged?.();
     }
 
     /**
@@ -1188,6 +1189,7 @@ class DrawingTools {
             this.syncBoundingBoxListening();
             this.layer.batchDraw();
         }
+        window.app?.notifyCanvasSelectionChanged?.();
     }
 
     /**

@@ -134,13 +134,14 @@ class CitranaItemsMenu {
         `;
     }
 
-    renderRow(label, meta, actionsHtml, rowIcon = '') {
+    renderRow(label, meta, actionsHtml, rowIcon = '', options = {}) {
         const metaHtml = meta ? `<span class="items-row-meta">${meta}</span>` : '';
         const iconHtml = rowIcon
             ? `<span class="items-row-icon" aria-hidden="true"><i data-lucide="${rowIcon}"></i></span>`
             : '';
+        const selectedClass = options.selected ? ' items-row-selected' : '';
         return `
-            <div class="items-row">
+            <div class="items-row${selectedClass}">
                 <div class="items-row-main">
                     ${iconHtml}
                     <div class="items-row-label-wrap">
@@ -201,6 +202,39 @@ class CitranaItemsMenu {
 
     getPresentationIcon() {
         return 'presentation';
+    }
+
+    isRowSelected(kind, data = {}) {
+        const selection = window.app?.getCanvasSelection?.();
+        if (!selection || selection.type !== kind) {
+            return false;
+        }
+
+        if (kind === 'bhava') {
+            return selection.houseNumber === parseInt(data.houseNumber, 10);
+        }
+
+        if (kind === 'graha') {
+            return selection.houseNumber === parseInt(data.houseNumber, 10) &&
+                selection.planetId === data.planetId;
+        }
+
+        if (kind === 'annotation') {
+            return selection.shapeIndex === parseInt(data.shapeIndex, 10);
+        }
+
+        return false;
+    }
+
+    refreshSelectionHighlight() {
+        if (!this.modal || this.modal.getAttribute('aria-hidden') !== 'false') {
+            return;
+        }
+
+        this.render();
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     renderUtilitySection() {
@@ -290,7 +324,13 @@ class CitranaItemsMenu {
                 this.actionButton('clear-house', 'Clear Bhava', 'trash-2', `data-house="${houseNumber}"`)
             ].filter(Boolean).join('');
 
-            rows.push(this.renderRow(this.getBhavaRowLabel(chartType, houseNumber), meta, actions));
+            rows.push(this.renderRow(
+                this.getBhavaRowLabel(chartType, houseNumber),
+                meta,
+                actions,
+                '',
+                { selected: this.isRowSelected('bhava', { houseNumber }) }
+            ));
         }
 
         return this.renderSection('Bhavas', rows.join(''));
@@ -316,7 +356,13 @@ class CitranaItemsMenu {
                     this.actionButton('delete-graha', 'Delete Graha', 'trash-2', `data-house="${houseNumber}" data-planet-id="${planet.id}"`)
                 ].join('');
 
-                rows.push(this.renderRow(label, bhavaLabel, actions, 'orbit'));
+                rows.push(this.renderRow(
+                    label,
+                    bhavaLabel,
+                    actions,
+                    'orbit',
+                    { selected: this.isRowSelected('graha', { houseNumber, planetId: planet.id }) }
+                ));
             });
         }
 
@@ -355,7 +401,13 @@ class CitranaItemsMenu {
 
             actions.push(this.actionButton('delete-annotation', 'Delete annotation', 'trash-2', shapeAttrs));
 
-            return this.renderRow(label, '', actions.filter(Boolean).join(''), rowIcon);
+            return this.renderRow(
+                label,
+                '',
+                actions.filter(Boolean).join(''),
+                rowIcon,
+                { selected: this.isRowSelected('annotation', { shapeIndex: index }) }
+            );
         }).join('');
 
         return this.renderSection('Annotations', rows);

@@ -1688,6 +1688,10 @@ body.presentation-view .about-btn {
   color: #6b7280;
 }
 
+.items-row-selected {
+  background: #f3f4f6;
+}
+
 .items-row-actions {
   display: flex;
   align-items: center;

@@ -148,6 +148,69 @@ class CitranaApp {
         this.drawingTools?.clearSelection?.();
         this.drawingTools?.editUI?.hide?.();
         this.drawingTools?.dismissPlanetEditing?.();
+        this.notifyCanvasSelectionChanged();
+    }
+
+    getDrawingShapes() {
+        return this.drawingTools?.layer?.find((node) => {
+            const name = node.name();
+            return name && name.startsWith('drawing-');
+        }) || [];
+    }
+
+    /**
+     * Current canvas selection for Items panel row highlight.
+     * @returns {{ type: 'graha'|'bhava'|'annotation', houseNumber?: number, planetId?: string, shapeIndex?: number }|null}
+     */
+    getCanvasSelection() {
+        const chartType = this.chartTemplates?.currentChartType;
+
+        if (chartType === 'south-indian') {
+            const template = this.chartTemplates.southIndianTemplate;
+            const selectedPlanet = template?.selectedPlanet;
+            if (selectedPlanet) {
+                return {
+                    type: 'graha',
+                    houseNumber: selectedPlanet.houseNumber,
+                    planetId: selectedPlanet.id
+                };
+            }
+
+            const houseNumber = template?.selectedHouse || window.selectedBhavaSouth;
+            if (houseNumber) {
+                return { type: 'bhava', houseNumber: parseInt(houseNumber, 10) };
+            }
+        } else if (chartType === 'north-indian') {
+            const template = this.chartTemplates.northIndianTemplate;
+            const selectedPlanet = template?.selectedPlanet;
+            if (selectedPlanet) {
+                return {
+                    type: 'graha',
+                    houseNumber: selectedPlanet.houseNumber,
+                    planetId: selectedPlanet.id
+                };
+            }
+
+            const houseNumber = template?.selectedHouse || window.selectedBhavaNorth;
+            if (houseNumber) {
+                return { type: 'bhava', houseNumber: parseInt(houseNumber, 10) };
+            }
+        }
+
+        const selectedShape = this.drawingTools?.selectedShape;
+        if (selectedShape?.name?.()?.startsWith('drawing-')) {
+            const shapes = this.getDrawingShapes();
+            const shapeIndex = shapes.indexOf(selectedShape);
+            if (shapeIndex >= 0) {
+                return { type: 'annotation', shapeIndex };
+            }
+        }
+
+        return null;
+    }
+
+    notifyCanvasSelectionChanged() {
+        this.itemsMenu?.refreshSelectionHighlight?.();
     }
 
     setupEventListeners() {

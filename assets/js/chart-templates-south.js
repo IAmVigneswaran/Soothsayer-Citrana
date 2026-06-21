@@ -425,6 +425,7 @@ class SouthIndianChartTemplate {
             this.selectedHouse = houseNumber;
             this.layer.batchDraw();
         }
+        window.app?.notifyCanvasSelectionChanged?.();
     }
 
     clearHighlight() {
@@ -433,6 +434,7 @@ class SouthIndianChartTemplate {
             this.selectedHouse = null;
             this.layer.batchDraw();
         }
+        window.app?.notifyCanvasSelectionChanged?.();
     }
 
     // --- Robust Graha Management ---
@@ -600,10 +602,22 @@ class SouthIndianChartTemplate {
                 citranaDebug(`Drag start for Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
 
                 planetText.opacity(0.5);
+                if (this.selectedPlanet?.planetText === planetText) {
+                    CitranaGrahaSelection?.sync?.(planetText);
+                }
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
                 citranaDebug(`[DRAGSTART] Graha ${planetObj.abbr} (id=${planetObj.id}) from Bhava ${houseNumber}`);
+            };
+
+            const dragMoveHandler = () => {
+                if (this.selectedPlanet?.planetText === planetText) {
+                    CitranaGrahaSelection?.sync?.(planetText);
+                    hitRect.moveToTop();
+                    planetText.moveToTop();
+                    this.layer.batchDraw();
+                }
             };
 
             const dragEndHandler = (e) => {
@@ -640,13 +654,35 @@ class SouthIndianChartTemplate {
             };
 
             planetText.on('dragstart', dragStartHandler);
+            planetText.on('dragmove', dragMoveHandler);
             planetText.on('dragend', dragEndHandler);
             this.chartGroupSouth.add(hitRect);
             this.chartGroupSouth.add(planetText);
             hitRect.moveToTop();
             planetText.moveToTop();
         });
+
+        this.restorePlanetSelectionInHouse(houseNumber);
         this.layer.batchDraw();
+    }
+
+    restorePlanetSelectionInHouse(houseNumber) {
+        const selectedId = this.selectedPlanet?.id;
+        const selectedHouse = this.selectedPlanet?.houseNumber;
+        if (!selectedId || selectedHouse !== houseNumber) {
+            return;
+        }
+
+        const house = this.houseDataSouth[houseNumber];
+        const planet = house?.planets?.find((p) => p.id === selectedId);
+        const planetText = this.chartGroupSouth.findOne((node) => node.getAttr?.('_planetId') === selectedId);
+        if (!planet || !planetText) {
+            this.clearSelectedPlanet();
+            return;
+        }
+
+        this.selectedPlanet = null;
+        this.selectPlanet(planetText, houseNumber, planet.abbr, selectedId);
     }
 
     // --- Selection and Keyboard Delete ---
@@ -654,25 +690,34 @@ class SouthIndianChartTemplate {
         window.app?.chartTemplates?.northIndianTemplate?.clearSelectedPlanet?.();
         window.app?.drawingTools?.clearSelection?.();
         window.app?.drawingTools?.editUI?.hide?.();
-        this.clearSelectedPlanet();
+        this.clearSelectedPlanet({ notify: false });
+
+        const parent = planetText.getParent();
+        if (typeof CitranaGrahaSelection !== 'undefined' && parent) {
+            CitranaGrahaSelection.attach(planetText, parent);
+            const hitRect = parent.findOne((node) => node.name() === `planet-hit-${id}`);
+            hitRect?.moveToTop();
+            planetText.moveToTop();
+        }
+
         this.selectedPlanet = {
             planetText,
             houseNumber,
             abbr,
             id
         };
-        planetText.strokeEnabled(true);
-        planetText.stroke('#f59e42');
-        planetText.strokeWidth(2);
         this.layer.batchDraw();
+        window.app?.notifyCanvasSelectionChanged?.();
     }
-    clearSelectedPlanet() {
-        if (this.selectedPlanet && this.selectedPlanet.planetText) {
-            this.selectedPlanet.planetText.strokeEnabled(false);
-            this.selectedPlanet.planetText.strokeWidth(0);
+    clearSelectedPlanet({ notify = true } = {}) {
+        if (this.selectedPlanet?.planetText) {
+            CitranaGrahaSelection?.detach?.(this.selectedPlanet.planetText);
         }
         this.selectedPlanet = null;
         this.layer.batchDraw();
+        if (notify) {
+            window.app?.notifyCanvasSelectionChanged?.();
+        }
     }
 
     setLagnaHouse(houseNumber, options = {}) {

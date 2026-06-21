@@ -400,6 +400,7 @@ class NorthIndianChartTemplate {
             this.selectedHouse = houseNumber;
             this.layer.batchDraw();
         }
+        window.app?.notifyCanvasSelectionChanged?.();
     }
 
     clearHighlight() {
@@ -408,6 +409,7 @@ class NorthIndianChartTemplate {
             this.selectedHouse = null;
             this.layer.batchDraw();
         }
+        window.app?.notifyCanvasSelectionChanged?.();
     }
 
     setLagnaHouse(houseNumber, options = {}) {
@@ -875,12 +877,23 @@ class NorthIndianChartTemplate {
             planetText.on('contextmenu', contextHandler);
 
             // Drag-and-drop between bhavas
-            planetText.on('dragstart', (e) => {
+            planetText.on('dragstart', () => {
                 planetText.opacity(0.5);
+                if (this.selectedPlanet?.planetText === planetText) {
+                    CitranaGrahaSelection?.sync?.(planetText);
+                }
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
                 citranaDebug(`[DRAGSTART] Graha ${planetObj.abbr} (id=${planetObj.id}) from Bhava ${houseNumber} in Rashi ${planetObj.rashiNumber}`);
+            });
+            planetText.on('dragmove', () => {
+                if (this.selectedPlanet?.planetText === planetText) {
+                    CitranaGrahaSelection?.sync?.(planetText);
+                    hitRect.moveToTop();
+                    planetText.moveToTop();
+                    this.layer.batchDraw();
+                }
             });
             planetText.on('dragend', (e) => {
                 planetText.opacity(1);
@@ -924,33 +937,62 @@ class NorthIndianChartTemplate {
             planetText.moveToTop();
         });
         // Do NOT move the Bhava polygon to the top here!
+        this.restorePlanetSelectionInHouse(houseNumber);
         this.syncNorthChartLayerOrder();
         this.layer.batchDraw();
+    }
+
+    restorePlanetSelectionInHouse(houseNumber) {
+        const selectedId = this.selectedPlanet?.id;
+        const selectedHouse = this.selectedPlanet?.houseNumber;
+        if (!selectedId || selectedHouse !== houseNumber) {
+            return;
+        }
+
+        const house = this.houseDataNorth[houseNumber];
+        const planet = house?.planets?.find((p) => p.id === selectedId);
+        const planetText = this.chartGroupNorth.findOne((node) => node.getAttr?.('_planetId') === selectedId);
+        if (!planet || !planetText) {
+            this.clearSelectedPlanet();
+            return;
+        }
+
+        this.selectedPlanet = null;
+        this.selectPlanet(planetText, houseNumber, planet.abbr, selectedId);
     }
 
     selectPlanet(planetText, houseNumber, abbr, id) {
         window.app?.chartTemplates?.southIndianTemplate?.clearSelectedPlanet?.();
         window.app?.drawingTools?.clearSelection?.();
         window.app?.drawingTools?.editUI?.hide?.();
-        this.clearSelectedPlanet();
+        this.clearSelectedPlanet({ notify: false });
+
+        const parent = planetText.getParent();
+        if (typeof CitranaGrahaSelection !== 'undefined' && parent) {
+            CitranaGrahaSelection.attach(planetText, parent);
+            const hitRect = parent.findOne((node) => node.name() === `planet-hit-${id}`);
+            hitRect?.moveToTop();
+            planetText.moveToTop();
+        }
+
         this.selectedPlanet = {
             planetText,
             houseNumber,
             abbr,
             id
         };
-        planetText.strokeEnabled(true);
-        planetText.stroke('#f59e42');
-        planetText.strokeWidth(2);
         this.layer.batchDraw();
+        window.app?.notifyCanvasSelectionChanged?.();
     }
-    clearSelectedPlanet() {
-        if (this.selectedPlanet && this.selectedPlanet.planetText) {
-            this.selectedPlanet.planetText.strokeEnabled(false);
-            this.selectedPlanet.planetText.strokeWidth(0);
+    clearSelectedPlanet({ notify = true } = {}) {
+        if (this.selectedPlanet?.planetText) {
+            CitranaGrahaSelection?.detach?.(this.selectedPlanet.planetText);
         }
         this.selectedPlanet = null;
         this.layer.batchDraw();
+        if (notify) {
+            window.app?.notifyCanvasSelectionChanged?.();
+        }
     }
 
     // --- Utility: Point-in-Polygon ---
