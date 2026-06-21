@@ -36,11 +36,13 @@ index.html  (viewport-fit=cover; Konva + colorpicker CSS in <head>)
   ├── drawing-tools.js                  → DrawingTools (+ EditUI instance)
   ├── edit-ui.js                        → EditUI
   ├── context-menu.js                   → ContextMenu
+  ├── citrana-items-menu.js             → CitranaItemsMenu (Items panel)
   ├── history.js                        → CitranaHistory (undo/redo timeline)
+  ├── citrana-session.js                → CitranaSession (save/open `.citrana.json`)
   └── app.js                            → CitranaApp (window.app on DOMContentLoaded)
 ```
 
-Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-device.js` and `citrana-rashis.js` before chart templates; `citrana-arrow.js` before `citrana-colorpicker.js`; `citrana-laser.js` before `drawing-tools.js`; `history.js` immediately before `app.js`.
+Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-device.js` and `citrana-rashis.js` before chart templates; `citrana-arrow.js` before `citrana-colorpicker.js`; `citrana-laser.js` before `drawing-tools.js`; `context-menu.js` before `citrana-items-menu.js`; `history.js` and `citrana-session.js` immediately before `app.js`.
 
 ## High-Level Component Diagram
 
@@ -69,10 +71,13 @@ Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-devic
 ┌─────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
 │DrawingTools │  │ CitranaLaser │  │   EditUI     │  │ ContextMenu  │
 │  (Konva)    │  │ (Canvas 2D)  │  │+ColorPicker  │  │              │
-└──────┬──────┘  └──────────────┘  └──────────────┘  └──────────────┘
-       └── CitranaArrow
+└──────┬──────┘  └──────────────┘  └──────────────┘  └──────┬───────┘
+       └── CitranaArrow                                      │
+                                                    ┌────────▼────────┐
+                                                    │ CitranaItemsMenu │
+                                                    └─────────────────┘
 
-  CitranaDevice · CitranaRashis · citranaDebug  (shared utilities)
+  CitranaSession · CitranaDevice · CitranaRashis · citranaDebug  (shared utilities)
 ```
 
 `CitranaDevice` and `CitranaRashis` are used across `app.js`, chart templates, `drawing-tools.js`, `context-menu.js`, and `citrana-laser.js`. `CitranaHistory` is wired in `app.setupComponents()` for undo/redo snapshots.
@@ -81,22 +86,24 @@ Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-devic
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~1754 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser when available; centralised **Delete** for Grahas and drawings; **Escape** modal dismiss; **Tab** focus trap), zoom lock, export (full viewport or chart-only crop), modals (`openModal`/`closeModal`, `aria-hidden`, focus stack), chart display preferences, history coordinator, undo/redo toolbar, **Presentation View** (`togglePresentationView`, `body.presentation-view`); `isModalBlockingShortcuts()` blocks shortcuts when modals open; `setupSafariToolbarFix()` via `visualViewport`; `serializeDrawings()` includes `arrowAnchors` for unified arrows |
-| `history.js` | ~77 | Unified undo/redo timeline (`CitranaHistory`) |
-| `chart-coordinator.js` | ~335 | Unified API over South/North templates; zoom (`zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
+| `app.js` | ~1904 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser when available; centralised **Delete** for Grahas and drawings; **Escape** modal dismiss; **Tab** focus trap), zoom lock, export (full viewport or chart-only crop), modals (`openModal`/`closeModal`, `aria-hidden`, focus stack), chart display preferences, history coordinator, undo/redo toolbar, **Presentation View**, **Save/Open Session**, **Items** panel init, toolbar scroll; `isModalBlockingShortcuts()` blocks shortcuts when modals open; `setupSafariToolbarFix()` via `visualViewport`; `serializeDrawings()` includes `arrowAnchors` for unified arrows |
+| `history.js` | ~94 | Unified undo/redo timeline (`CitranaHistory`) |
+| `chart-coordinator.js` | ~334 | Unified API over South/North templates; zoom (`zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `chart-templates-south.js` | ~950 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `CitranaRashis` / `CitranaDevice` |
 | `chart-templates-north.js` | ~936 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `CitranaRashis` / `CitranaDevice` |
 | `planet-system.js` | ~880 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
-| `citrana-arrow.js` | ~186 | Unified filled-arrow geometry (`Konva.Line` polygon); `arrowAnchors`; legacy `Konva.Arrow` migration |
-| `citrana-colorpicker.js` | ~370 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()` |
-| `citrana-device.js` | ~33 | Shared `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()`, `isLaserViewport()` |
+| `citrana-arrow.js` | ~185 | Unified filled-arrow geometry (`Konva.Line` polygon); `arrowAnchors`; legacy `Konva.Arrow` migration |
+| `citrana-colorpicker.js` | ~383 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()`; `isPickerPopupTarget()` for touch-outside dismiss |
+| `citrana-device.js` | ~39 | Shared `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()`, `isLaserViewport()`, `hasFinePointer()` |
 | `citrana-rashis.js` | ~41 | Shared `RASHIS`, `NAMES`, `NUMBERS`, `getName()`, `getNumberForHouseIndex()` |
 | `citrana-laser.js` | ~248 | Ephemeral laser pointer — Canvas 2D overlay above stage; independent strokes per gesture; ~3s fade; `isAvailable()` → `CitranaDevice.isLaserViewport()`; not serialised or undoable |
-| `drawing-tools.js` | ~1968 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, history `recordHistory()` calls (laser excluded); `CitranaDevice` for touch/mobile |
-| `edit-ui.js` | ~776 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close) |
-| `context-menu.js` | ~644 | Right-click / long-press menus; unified hit-test routing; **Presentation View** toggle; North **Set Lagna as …** from `CitranaRashis.RASHIS` |
+| `drawing-tools.js` | ~2061 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, `startInlineContentEdit()`, `bindRestoredDrawingInteractions()`; history `recordHistory()` calls (laser excluded); `CitranaDevice` for touch/mobile |
+| `edit-ui.js` | ~786 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close); touch-outside dismiss excludes picker popup and `.konva-textarea` |
+| `context-menu.js` | ~650 | Right-click / long-press menus; `shouldBlockCanvasContextMenu()` (Select/Hand only, not while drawing); unified hit-test routing; **Presentation View** toggle; North **Set Lagna as …** from `CitranaRashis.RASHIS` |
+| `citrana-items-menu.js` | ~514 | **Items** panel (`#items-menu-btn`); Chart/Bhava/Graha/Annotation sections; reuses `ContextMenu.handleAction()`; Text/Heading **Edit text** + **Style** actions |
+| `citrana-session.js` | ~214 | Save/open `.citrana.json` (`format: citrana-session`, `version: 1`); `capture()`, `validate()`, `download()`, `applyOptions()` |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
-| `styles.css` | ~2400 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid, JSColorPicker `--cp-*` theme, `.help-modal-description`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
+| `styles.css` | ~2654 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid, JSColorPicker `--cp-*` theme, `.items-*` panel, `.toolbar-scroll-*`, `.help-modal-description`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
 
 ## Canvas Object Naming
 
@@ -184,6 +191,8 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 ### Context menus
 
+**Gating** (`shouldBlockCanvasContextMenu`): Canvas context menus are suppressed while `app.isDrawing` or when the active tool is not Select/Hand. Reduces touch conflicts during drawing.
+
 **Unified routing** (`openContextMenuAtClientPoint`):
 
 1. `getShapeAtClientPoint()` → `stage.getIntersection(pos)`
@@ -201,7 +210,15 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | Bhava | Bhava hit | South: Set as Lagna; North: Set as First Bhava; Clear Bhava; **Presentation View**; … |
 | Graha | Graha hit | Edit Graha, Delete Graha |
 
-**Presentation View:** `toggle-presentation-view` → `app.togglePresentationView()` toggles `presentationView` and `body.presentation-view` (hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, drawing Edit UI). Dismisses active edit sessions on enter. Label alternates **Presentation View** / **Exit Presentation View**. Not undoable.
+**Presentation View:** `toggle-presentation-view` → `app.togglePresentationView()` toggles `presentationView` and `body.presentation-view` (hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, drawing Edit UI). Dismisses active edit sessions on enter. Label alternates **Presentation View** / **Exit Presentation View**. Available from context menus and the **Items** panel. Not undoable.
+
+### Items panel
+
+1. User clicks `#items-menu-btn` (zoom bar) → `CitranaItemsMenu.open()` → `render()` lists Chart, Bhavas, Grahas, Annotations
+2. Chart rows dispatch `ContextMenu.handleAction()` (create/reset/clear, **Presentation View**, North Set Lagna, etc.)
+3. Bhava/Graha rows reuse the same action handlers as context menus
+4. Annotation rows: Text/Heading offer **Edit text** (`startInlineContentEdit`) and **Style** (`showEditUI`); other types offer **Edit** → `showEditUI`
+5. Modal uses Options modal shell (`#items-modal`); included in `isModalBlockingShortcuts()`
 
 ### Zoom
 
@@ -228,11 +245,11 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 3. **Arrows:** `CitranaArrow.create()` → filled closed `Konva.Line` (constant-width shaft + prominent head); control points use `arrowAnchors` tail/tip
 4. Arrow, line, text, and heading auto-switch to Select after creation; Pen and Laser stay active. `makeShapeSelectable()` runs once in `stopDrawing()` (not per mousemove). Control points appear when arrow/line is selected
 5. **Laser:** `CitranaLaser.startStroke()` / `extendStroke()` on a DOM `<canvas>` overlay (not Konva); each gesture is a separate stroke in `strokes[]`; `stopDrawing()` skips `recordHistory()`; `clearLaser()` on `clearAll()`
-6. Mobile (`≤768px`): arrow, line, pen, and laser toolbar buttons hidden in CSS (`#laser-help-shortcut` in Help)
+6. Mobile: drawing tools visible in toolbar; toolbar horizontal scroll with chevrons; **Items** button in zoom bar for touch-friendly actions
 
 ### Presentation View
 
-1. User right-clicks canvas or Bhava → **Presentation View** (or **Exit Presentation View** when active)
+1. User right-clicks canvas or Bhava → **Presentation View**, or uses **Items** panel → **Presentation View** (or **Exit Presentation View** when active)
 2. `ContextMenu.handleAction('toggle-presentation-view')` → `app.togglePresentationView()`
 3. `document.body.classList.toggle('presentation-view')` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, `.about-btn`, `.floating-text-edit-controls`, `.floating-edit-ui`; dismisses open Graha bar and drawing Edit UI
 4. Safari iOS visibility fix (`setupSafariToolbarFix` / `fixUIElementsVisibility`) listens to `focusin`/`focusout`, `resize`, `scroll`, and `visualViewport` events — no polling timer; no-ops while `presentationView` is true
@@ -289,13 +306,20 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 4. Restore zoom/pan and control points
 5. `finalizeExportImage({ chartOnly: true })` — transparent background, no padding, no watermark
 
-### Session model (ephemeral)
+### Session model
 
+**In-tab (default):**
 1. Chart Grahas, Lagna, and drawings live in memory on the Konva stage for the current tab visit
-2. Refreshing the page always starts a blank session — nothing is restored from `localStorage`
+2. Refreshing the page starts a blank session — nothing is auto-restored from `localStorage`
 3. On init, any legacy `citranaChartData` key from older builds is removed
 4. `getChartData()` / `loadChartData()` support undo snapshots within the same visit
-5. **Export PNG** is how users keep a copy
+
+**Save / Open Session (`.citrana.json`):**
+1. User clicks **Save Session** → `CitranaSession.capture(app)` → `download()` with timestamped filename
+2. Payload: `{ format: 'citrana-session', version: 1, chartData, drawingData, options }` where `options` mirrors indicator toggles and Save Chart Only preference
+3. **Open Session** → file picker → `CitranaSession.readFile()` → `validate()` → confirm if canvas has content → `app.restoreSessionState()`
+4. Import applies chart + drawings + options; `history.resetToState()` seeds a fresh undo timeline
+5. **Export PNG** remains the raster copy path; session files are the structured save path
 
 ## Global State
 
@@ -346,13 +370,13 @@ Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-gr
 
 ### Floating elements
 
-- Top centre: tool toolbar — Undo/Redo, Select/Hand, drawing tools, export/transparency/**Options** (`#options-btn`)
+- Top centre: tool toolbar — Undo/Redo, Select/Hand, drawing tools, **Save Session** / **Open Session**, export/transparency/**Options** (`#options-btn`); `#toolbar-scroll-viewport` with chevrons when overflow
 - Top left (desktop) / bottom stack (mobile): Graha library
-- Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`); mobile adds Select/Hand in zoom bar (288px width; 48px block height desktop, **50px mobile** including border)
+- Bottom: zoom controls (`#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock`, `#zoom-level`, divider, **`#items-menu-btn`**); 288px width on mobile; 48px block height desktop, **50px mobile** including border
 - Bottom corners: Help (mobile bottom-left; desktop top-right), About (bottom-right) — `--corner-btn-size` 48px desktop / 50px mobile; hidden in Presentation View along with Graha bar and drawing Edit UI
 - Bottom centre: Graha text edit bar, drawing Edit UI (dynamic)
 
-Modals: Welcome, Help, **Options**, About, Confirmation, Export Progress.
+Modals: Welcome, Help, **Options**, About, **Items**, Confirmation, Export Progress.
 
 **Modal accessibility (`index.html` + `app.js`):**
 - Overlays: `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`; `aria-hidden` toggled on open/close
@@ -367,7 +391,7 @@ Modals: Welcome, Help, **Options**, About, Confirmation, Export Progress.
 
 **CSS responsive cascade:** Additional `@media (max-width: 768px)` blocks after base `.help-btn`, `.about-btn`, and modal selectors override desktop rules that appear later in the file.
 
-Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit factor. Official support is desktop-only; iOS standalone PWA layout is tuned but not officially supported.
+Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit factor. Desktop is the primary supported experience; mobile/touch layouts are tuned with the **Items** panel as the recommended action surface.
 
 ### PWA
 
@@ -418,7 +442,10 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | Laser pointer overlay | `citrana-laser.js` (`init`, fade loop, `pruneStrokes`, `isAvailable` → `CitranaDevice.isLaserViewport()`); CSS `.citrana-laser-canvas`; exclude from `recordHistory` / `serializeDrawings` |
 | Device / viewport helpers | `citrana-device.js` (`isTouchDevice`, `isMobileUA`, `isCompactViewport`, `isLaserViewport`) |
 | Rashi data | `citrana-rashis.js` (`RASHIS`, `getName`, `getNumberForHouseIndex`); North Lagna submenu in `context-menu.js` |
-| Presentation View | `app.togglePresentationView()`; `body.presentation-view` in `styles.css` (includes edit bars); `getPresentationViewMenuHtml()` in `context-menu.js` |
+| Presentation View | `app.togglePresentationView()`; `body.presentation-view` in `styles.css` (includes edit bars); `getPresentationViewMenuHtml()` in `context-menu.js`; Items panel chart actions |
+| Items panel action | `citrana-items-menu.js` (`render`, `handleBodyClick`); reuse `ContextMenu.handleAction()` where possible |
+| Save/open session | `citrana-session.js` (`capture`, `validate`, `download`); `app.saveSession()` / `restoreSessionState()` |
+| Context menu gating | `context-menu.js` `shouldBlockCanvasContextMenu()` — Select/Hand only, not while `app.isDrawing` |
 | Arrow geometry / transparency | `citrana-arrow.js` (`buildOutlinePoints`, `create`); colour via `CitranaColorPicker.applyToKonvaArrow()` |
 | Colour picker theme / swatches | `citrana-colorpicker.js` (`SWATCHES`, `BASE_OPTIONS`); `--cp-*` in `styles.css` |
 | New chart type | New template class + routes in `ChartCoordinator` (include `findHouseAtChartPoint()`) |
@@ -438,7 +465,7 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 ## Known Limitations
 
 - **Single chart**: One chart per canvas by design.
-- **Mobile**: Touch code and PWA layout exist; officially unsupported for drawing complexity.
+- **Mobile/touch**: Layout and Items panel are tuned; desktop remains the primary supported experience; laser pointer gated by `isLaserViewport()`.
 - **About version**: `index.html` About modal version string should match `CHANGELOG.md` on each release.
 
 ## Related Documentation

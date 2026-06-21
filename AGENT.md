@@ -36,23 +36,25 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2400-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2654-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---1754-lines)
-   - [History Engine (history.js)](#history-engine-historyjs---77-lines)
-   - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---335-lines)
+   - [Main Application (app.js)](#main-application-appjs---1904-lines)
+   - [History Engine (history.js)](#history-engine-historyjs---94-lines)
+   - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---334-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---950-lines)
    - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---936-lines)
    - [Graha System](#planet-system-planet-systemjs---880-lines)
    - [Citrana Arrow](#citrana-arrow-citrana-arrowjs---187-lines)
    - [Citrana Color Picker](#citrana-color-picker-citrana-colorpickerjs---370-lines)
-   - [Citrana Device](#citrana-device-citrana-devicejs---33-lines)
+   - [Citrana Device](#citrana-device-citrana-devicejs---39-lines)
    - [Citrana Rashis](#citrana-rashis-citrana-rashisjs---41-lines)
    - [Citrana Laser](#citrana-laser-citrana-laserjs---248-lines)
-   - [Drawing Tools](#drawing-tools-drawing-toolsjs---1968-lines)
-   - [Context Menu](#context-menu-context-menujs---644-lines)
-   - [Edit UI](#edit-ui-edit-uijs---776-lines)
+   - [Drawing Tools](#drawing-tools-drawing-toolsjs---2061-lines)
+   - [Context Menu](#context-menu-context-menujs---650-lines)
+   - [Citrana Items Menu](#citrana-items-menu-citrana-items-menujs---514-lines)
+   - [Citrana Session](#citrana-session-citrana-sessionjs---214-lines)
+   - [Edit UI](#edit-ui-edit-uijs---786-lines)
 6. [Core Features](#core-features)
    - [Undo / Redo](#undo--redo)
    - [Chart Types](#chart-types)
@@ -72,13 +74,13 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2400 lines)
+## CSS and Layout (styles.css - ~2654 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome; `role="dialog"` + `aria-*`), responsive breakpoints (769px desktop, 768px tablet, 600px mobile). Most tablet/mobile rules live in one `@media (max-width: 768px)` block; **post-base mobile overrides** (Help/About position, modal compact sizing) use separate `@media` blocks **after** base component selectors so cascade order is correct.
 
 **Layout tokens (`:root`):** Desktop — `--ui-bottom-stack` (60px), `--zoom-controls-block-height` (48px), `--corner-btn-size` (48px). Mobile `≤768px` overrides in the main mobile block — 50px chrome height (zoom bar border included), `--ui-bottom-stack: 62px`. Help icon at 50% of button; About logo at 62.5%.
 
-**Presentation View:** `body.presentation-view` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, `.about-btn`, `.floating-text-edit-controls`, and `.floating-edit-ui` via CSS. Toggled from context menu (`app.togglePresentationView()`); dismisses active edit sessions on enter.
+**Presentation View:** `body.presentation-view` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, `.about-btn`, `.floating-text-edit-controls`, and `.floating-edit-ui` via CSS. Toggled from context menu or **Items** panel (`app.togglePresentationView()`); dismisses active edit sessions on enter.
 
 **Graha library layout:**
 - Header, grid, and page-dots styled in CSS (`.planet-library-header`, `.planet-grid`, `.page-dots`) — no inline styles in `index.html`
@@ -92,34 +94,36 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 - Safe-area CSS vars (`--sat` … `--sal`, `--ui-inset`, `--ui-bottom-pad`, `--ui-bottom-stack`)
 - `body { position: fixed; inset: 0 }` — avoids bottom gap on iOS
 - `viewport-fit=cover`; manifest `display: standalone`
-- Mobile: Graha library bottom stack; Help bottom-left; arrow, line, pen, and laser hidden in toolbar (`#laser-help-shortcut` hidden in Help)
+- Mobile: Graha library bottom stack; Help bottom-left; drawing tools visible in toolbar; toolbar horizontal scroll with chevrons when overflow; **Items** button in zoom bar
 
 ## Complete Project Structure
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~479 lines); viewport-fit=cover; PWA meta; modal a11y (role, aria-*)
+├── index.html                    # Main entry (~562 lines); viewport-fit=cover; PWA meta; modal a11y; Items modal; toolbar scroll viewport
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2400 lines); primary mobile block + post-base mobile overrides; JSColorPicker `--cp-*` theme; `.citrana-laser-canvas`; `body.presentation-view`
+│   │   └── styles.css            # Complete styling system (~2654 lines); primary mobile block + post-base mobile overrides; JSColorPicker `--cp-*` theme; `.items-*`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*`
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1754 lines)
-│   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~186 lines)
-│   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~370 lines)
+│   │   ├── app.js                # Main application coordinator (~1904 lines)
+│   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
+│   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~383 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
-│   │   ├── citrana-device.js     # Shared touch, mobile UA, and viewport helpers (~33 lines)
+│   │   ├── citrana-device.js     # Shared touch, mobile UA, and viewport helpers (~39 lines)
+│   │   ├── citrana-items-menu.js # Items panel — chart/Bhava/Graha/annotation actions (~514 lines)
 │   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~248 lines)
 │   │   ├── citrana-rashis.js     # Shared Rashi names, symbols, and grid numbers (~41 lines)
-│   │   ├── chart-coordinator.js  # Chart type management (~335 lines)
+│   │   ├── citrana-session.js    # Save/open `.citrana.json` session files (~214 lines)
+│   │   ├── chart-coordinator.js  # Chart type management (~334 lines)
 │   │   ├── chart-templates-south.js  # South Indian chart logic (~950 lines)
 │   │   ├── chart-templates-north.js  # North Indian chart logic (~936 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~880 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (~1968 lines)
-│   │   ├── context-menu.js       # Context menu system (~644 lines)
-│   │   ├── edit-ui.js            # Edit interface controls (~776 lines)
-│   │   └── history.js            # Unified undo/redo timeline (~77 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (~2061 lines)
+│   │   ├── context-menu.js       # Context menu system (~650 lines)
+│   │   ├── edit-ui.js            # Edit interface controls (~786 lines)
+│   │   └── history.js            # Unified undo/redo timeline (~94 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
 │   │   ├── lucide.min.js         # Lucide 0.468.0 (self-hosted)
@@ -146,11 +150,11 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # This comprehensive documentation (~1160 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~445 lines)
-├── .cursorrules                  # Cursor IDE configuration (~1180 lines)
-├── CHANGELOG.md                  # Version history and changes (~77 lines)
-├── README.md                     # Project readme (~180 lines)
+├── AGENT.md                      # This comprehensive documentation (~1202 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~476 lines)
+├── .cursorrules                  # Cursor IDE configuration (~1232 lines)
+├── CHANGELOG.md                  # Version history and changes (~87 lines)
+├── README.md                     # Project readme (~199 lines)
 ├── LICENSE                       # MIT License
 ├── SECURITY.md                   # Security policy
 └── .gitignore                    # Git ignore rules
@@ -162,7 +166,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1754 lines)
+### Main Application (app.js - ~1904 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -173,14 +177,17 @@ Key Responsibilities:
 - Manages unified undo/redo via `CitranaHistory` (`history.js`)
 - Handles chart export (full viewport or chart-only crop via Options)
 - Manages chart display options modal and `localStorage` preferences (indicators, Save Chart Only)
+- **Save/Open Session** via `CitranaSession` (`.citrana.json` files)
+- Initialises **Items panel** (`CitranaItemsMenu`) and toolbar horizontal scroll
 - Provides mobile touch support and Safari compatibility
 - Manages zoom controls, zoom lock (default locked), zoom level display, canvas resize (`visualViewport`), and **Presentation View**
-- Manages modal open/close, focus trap, and Escape dismiss for all overlays (including export progress focus)
+- Manages modal open/close, focus trap, and Escape dismiss for all overlays (including export progress and **Items** modal)
 
 Key Methods:
 - `init()`: Application initialisation; loads `this.options` from `localStorage`
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
-- `setupKeyboardShortcuts()`: Tool/action shortcuts; **Escape** → `dismissActiveModalOnEscape()`; **Tab** → `trapModalFocus()` when a modal is open; otherwise blocked while inline Graha/text editors are focused or `isModalBlockingShortcuts()` (Help, Options, About, Welcome, Confirmation, export progress)
+- `setupToolbarScroll()`: Horizontal toolbar overflow with `#toolbar-scroll-prev` / `#toolbar-scroll-next`
+- `setupKeyboardShortcuts()`: Tool/action shortcuts; **Escape** → `dismissActiveModalOnEscape()`; **Tab** → `trapModalFocus()` when a modal is open; otherwise blocked while inline Graha/text editors are focused or `isModalBlockingShortcuts()` (Help, Options, About, Welcome, Confirmation, Items, export progress)
 - `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop `_modalFocusStack`; focus close button on open
 - `closeWelcomeModal()`: Welcome close + `localStorage.citrana_welcome_seen`
 - `getActiveModal()` / `dismissActiveModalOnEscape()`: Topmost modal; Escape dismiss (export progress not dismissible)
@@ -206,10 +213,12 @@ Key Methods:
 - `setupSafariToolbarFix()`: Touch Safari UI visibility restore on focus/viewport events (`visualViewport` resize/scroll; no polling timer)
 - `showConfirmationDialog()`
 - `showExportProgress()` / `hideExportProgress()`: Export modal (`display: block`); focus trap; `aria-busy` during export
+- `saveSession()` / `openSessionFromFile()` / `restoreSessionState()`: `.citrana.json` export/import via `CitranaSession`; confirms before replacing existing work; `history.resetToState()` on import
+- `hasSessionContent()`: Whether chart or drawings exist before session replace prompt
 
 Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `K` Laser Pointer (when available), `T` Text, `H` Hand, `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` remove selected Graha or delete selected drawing (Select tool), `?`/`/` Help, **Escape** close modal. No Heading shortcut. Ignored when a modal is open (except Escape/Tab for modal UX) or Graha/text inline editor is focused.
 
-### History Engine (history.js - ~77 lines)
+### History Engine (history.js - ~94 lines)
 Unified undo/redo timeline for the entire session.
 
 Key Responsibilities:
@@ -224,7 +233,7 @@ Key Methods:
 
 Wired in `app.setupComponents()` with `captureState` → `captureHistoryState()` and `restoreState` → `restoreHistoryState()`.
 
-### Chart Coordinator (chart-coordinator.js - ~335 lines)
+### Chart Coordinator (chart-coordinator.js - ~334 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -418,7 +427,7 @@ Key Methods:
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
 - `getPlanetInfo()`: Retrieve Graha data from paged structure
 
-### Drawing Tools (drawing-tools.js - ~1968 lines)
+### Drawing Tools (drawing-tools.js - ~2061 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
@@ -457,16 +466,18 @@ Key Methods:
 - `startDrawing()` / `draw()` / `stopDrawing()`: Drawing lifecycle
 - `makeShapeSelectable()` / `bindMoveDragHistory()`: Selection and move undo
 - `editPlanetText()` / `dismissPlanetEditing()` / `cancelPlanetEditing()`: Graha label/colour/retrograde bar — dismiss commits if edited (click outside); cancel discards (Cancel / Escape)
-- `editText()` / `editHeading()`: Inline content editors with undo on commit
+- `editText()` / `editHeading()`: Inline content editors with undo on commit; hide Edit UI before opening
+- `startInlineContentEdit()` / `focusInlineTextarea()`: Items **Edit text** and double-click path for Text/Heading
 - `showEditUIForShape()`: Edit interface integration
 - `setPlanetRetrogradeState()`: Persist retrograde underline on Graha text
 - `createControlPoints()` / `commitControlPointAdjust()`: Arrow/line endpoint handles
 - `updateControlPointsPosition()` / `clearControlPoints()`: Control point sync
-- `restorePersistedDrawings()`: Rebuild drawings from history snapshots; migrates legacy `Konva.Arrow` via `CitranaArrow.fromLegacyNode()`
+- `restorePersistedDrawings()`: Rebuild drawings from history snapshots; migrates legacy `Konva.Arrow` via `CitranaArrow.fromLegacyNode()`; calls `bindRestoredDrawingInteractions()`
+- `bindRestoredDrawingInteractions()`: Re-bind selection/drag handlers after undo or session restore
 - `clearLaser()` / `isLaserToolAvailable()`: Laser overlay lifecycle; delegates to `CitranaDevice.isLaserViewport()`
 - Touch detection via `CitranaDevice.isTouchDevice()`; mobile font sizing via `CitranaDevice.isMobileUA()`
 
-### Citrana Device (citrana-device.js - ~33 lines)
+### Citrana Device (citrana-device.js - ~39 lines)
 Shared touch, mobile UA, and viewport helpers.
 
 Key Methods:
@@ -496,7 +507,7 @@ Key Responsibilities:
 Key Methods:
 - `init()`, `startStroke()`, `extendStroke()`, `endStroke()`, `clear()`, `resize()`, `isAvailable()` — `isAvailable()` delegates to `CitranaDevice.isLaserViewport()`
 
-Availability: `CitranaDevice.isLaserViewport()`; toolbar `#laser-tool` and `#laser-help-shortcut` hidden at `≤768px` in CSS; `app.setTool('laser')` falls back to Select when unavailable.
+Availability: `CitranaDevice.isLaserViewport()` (desktop-wide, non-mobile UA); toolbar `#laser-tool` is visible on mobile but `app.setTool('laser')` falls back to Select when unavailable.
 
 ### Citrana Arrow (citrana-arrow.js - ~186 lines)
 Unified filled-arrow geometry — shaft and head are one `Konva.Line` polygon so semi-transparent colours render correctly.
@@ -519,15 +530,16 @@ Key Responsibilities:
 
 Key Methods:
 - `attach()`, `destroy()`, `getValue()`, `setValue()`, `createInput()`, `initGrahaBar()`, `setGrahaPickCallback()`
-- `parseColorString()`, `toHex()`, `toRgbaString()`
+- `parseColorString()`, `toHex()`, `toRgbaString()`, `isPickerPopupTarget()`
 
 Vendor: `assets/vendor/colorpicker.iife.min.js`, `colorpicker.min.css`. Theme overrides: `--cp-*` in `styles.css`.
 
-### Context Menu (context-menu.js - ~644 lines)
+### Context Menu (context-menu.js - ~650 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:
 - Unified hit-test routing via `openContextMenuAtClientPoint()` (desktop right-click and mobile 500ms long-press)
+- **`shouldBlockCanvasContextMenu()`**: Suppresses canvas menus while drawing or when active tool is not Select/Hand
 - Creates context-sensitive menus with chart-type-specific items
 - **Presentation View** on create chart, existing chart, and Bhava menus via `getPresentationViewMenuHtml()`
 - Prevents chart menu from overriding Graha or bhava menus
@@ -551,10 +563,38 @@ Lagna actions (`handleAction`):
 Key Methods:
 - `openContextMenuAtClientPoint()`, `resolveContextTarget()`, `getShapeAtClientPoint()`, `findPlanetContextById()`
 - `showChartMenu()`, `showHouseMenu()`, `showPlanetMenu()`, `showExistingChartMenu()`, `showCreateChartMenu()`
-- `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`
+- `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`, `shouldBlockCanvasContextMenu()`
 - `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
-### Edit UI (edit-ui.js - ~776 lines)
+### Citrana Items Menu (citrana-items-menu.js - ~514 lines)
+Floating **Items** panel for chart, Bhava, Graha, and annotation actions — primary touch-friendly alternative to context menus.
+
+Key Responsibilities:
+- Opens from `#items-menu-btn` in the zoom bar (desktop and mobile)
+- Renders sections: **Chart**, **Bhavas**, **Grahas**, **Annotations**
+- Reuses `context-menu.js` `handleAction()` for chart/Bhava/Graha actions where possible
+- Text/Heading rows: **Edit text** (`startInlineContentEdit`) and **Style** (`showEditUI`); other annotations: single **Edit** → `showEditUI`
+- **Presentation View** and chart management actions mirror context menu icons
+
+Key Methods:
+- `init()`, `open()`, `close()`, `render()`, `handleBodyClick()`
+- `getDrawingShapes()`, `getAnnotationDisplayName()`, `getAnnotationIcon()`
+
+### Citrana Session (citrana-session.js - ~214 lines)
+Save and open `.citrana.json` session files.
+
+Key Responsibilities:
+- `capture(app)` — chart data, drawings, and Options preferences (`format: citrana-session`, `version: 1`)
+- `validate()` / `readFile()` — parse and validate imported JSON
+- `download()` — timestamped filename `citrana-session-YYYY-MM-DD-HHMMSS.citrana.json`
+- `applyOptions()` — restore indicator and Save Chart Only preferences on import
+
+Key Methods:
+- `capture()`, `validate()`, `readFile()`, `download()`, `applyOptions()`, `buildExportFileName()`
+
+Wired from `app.saveSession()` / `app.openSessionFromFile()` / `app.restoreSessionState()`; import resets undo timeline via `history.resetToState()`.
+
+### Edit UI (edit-ui.js - ~786 lines)
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
@@ -564,6 +604,7 @@ Key Responsibilities:
 - Handles colour and stroke customisation
 - Implements text editing controls
 - Records one undo step per edit session on `hide()` when properties changed
+- Touch-outside dismiss ignores colour picker popup (`.cp_dialog`) and Konva inline textarea (`.konva-textarea`)
 
 Edit Controls:
 - Stroke width and colour controls (pen, line, arrow) — defaults Pen 3px, Line/Arrow 4px; colour via `CitranaColorPicker.createInput()` chips
@@ -650,7 +691,7 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - Line Tool: Draw straight lines and connections with control points (default 4px)
 - Pen Tool: Freehand drawing with smoothed spline curves (default 3px)
 - Laser Pointer: Temporary fading highlight for presentations (`CitranaLaser` Canvas overlay; shortcut **K**; not saved or undoable)
-- Presentation View: Context menu toggle hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, and drawing Edit UI; dismisses active edit sessions on enter
+- Presentation View: Context menu or **Items** panel toggle hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, and drawing Edit UI; dismisses active edit sessions on enter
 - Text Tool: Add editable text boxes anywhere on canvas
 - Heading Tool: Create chart headings and titles
 - Undo/Redo: Unified timeline via `app.recordHistory()` — see [Undo / Redo](#undo--redo)
@@ -676,29 +717,30 @@ Technical Implementation:
 
 ### User Experience
 - Light Theme: Clean, professional appearance with high contrast
-- Responsive Design: Optimised for desktop, tablet, and mobile devices
+- Responsive Design: Optimised for desktop, tablet, and mobile viewports
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
 - Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
-- Context Menus: Right-click or long-press on canvas, bhava, or Graha; chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
+- Context Menus: Right-click or long-press on canvas, bhava, or Graha (Select/Hand only; suppressed while drawing); chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
+- **Items Panel**: `#items-menu-btn` in zoom bar — chart/Bhava/Graha/annotation actions; primary mobile/touch workflow
 - Status Updates: Real-time feedback and notifications
-- Ephemeral Sessions: Chart work lives in this browser tab; refresh starts fresh — export PNG to keep a copy
-- Help Modal: Shortcuts and usage guide (Laser Pointer, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
+- Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
+- Help Modal: Shortcuts and usage guide (Laser Pointer, Items panel, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
 - About Modal: Information about Citrana with creator details and links; mobile compact layout without scroll
 - Welcome Modal: First-time user experience; `closeWelcomeModal()` marks seen in `localStorage`; mobile compact layout without scroll
 - Options Modal: Chart indicator toggles and **Save Chart Only** export; shared modal width with Help (`width: min(600px, 90vw)`)
 - Confirmation Modal: Destructive-action confirm; dynamic message + warning in `aria-describedby`
 - Export Progress Modal: Non-dismissible; live status in `aria-describedby`; `aria-busy` while exporting
 - Modal accessibility: Escape dismiss, Tab focus trap, focus restore on close; canvas `role="application"` with `aria-label`
-- Zoom Controls: `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock` (default locked), `#zoom-level`; mobile adds Select/Hand in zoom bar
+- Zoom Controls: `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock` (default locked), `#zoom-level`, **`#items-menu-btn`**
 - Zoom Lock: Prevents accidental scroll-wheel and +/- zoom until user unlocks; reset zoom always available
-- iOS PWA: Safe-area layout for home-screen install (see CSS section); officially desktop-only
-- Mobile drawing: Arrow, line, pen, and laser toolbar buttons hidden in CSS on `≤768px`
+- Toolbar scroll: `#toolbar-scroll-viewport` with chevrons when tools overflow on narrow screens
+- iOS PWA: Safe-area layout for home-screen install (see CSS section); desktop is primary supported experience
 
 ### Export & Sharing
 - **Full viewport export** (default): `stage.toDataURL({ pixelRatio: 2 })` on entire stage; 100px padding and watermark via `finalizeExportImage()`; respects current zoom/pan and `#toggle-transparency-btn`
 - **Save Chart Only** (`options.saveChartOnly` + active chart): temporarily `zoomToFit()`, crop to `ChartCoordinator.getExportCropRect()` (chart group + visible North `tinyBoxGroupNorth`), transparent background, no padding or watermark; restores user's zoom/pan after capture
-- High-Resolution PNG: `pixelRatio: 2` for both modes
-- Ephemeral Sessions: Work is not restored after refresh; export PNG to keep a copy
+- **Save Session**: `.citrana.json` file with chart, Grahas, drawings, and Options preferences
+- High-Resolution PNG: `pixelRatio: 2` for both export modes
 - Cross-Platform: Works on all modern browsers
 - GitHub Pages Compatible: No build process required
 
@@ -708,11 +750,11 @@ Technical Implementation:
 - Note: For Brave browser, disable Brave Shields for optimal functionality
 - Features: Canvas API, localStorage, ES6+ JavaScript (classic script tags), Touch Events
 
-Mobile Support:
-- Citrana is not supported on mobile or touch devices
-
-Special Note on Mobile Support:
-While the codebase might have limited support for mobile or touch, officially it is advertised as mobile is not supported due to its complexity and limited resources. Project owners have to acquire various mobile or touch devices with different screen sizes. It is not a practical task for a free and open-source application.
+Mobile and touch:
+- Desktop is the primary supported experience
+- Mobile/touch layouts are tuned (safe areas, compact Graha library, toolbar scroll, drawing tools in toolbar)
+- Use the **Items** panel (`#items-menu-btn`) for chart/Bhava/Graha/annotation actions when context menus are awkward on touch
+- Laser pointer remains gated by `CitranaDevice.isLaserViewport()` even though the toolbar button may appear on mobile
 
 ## Performance Optimisation
 
@@ -1119,8 +1161,8 @@ Edit the Graha data objects in assets/js/planet-system.js:
 - Ready for immediate deployment on GitHub Pages
 
 ### Data Management
-- Chart work lives in the browser tab for the current visit only; refreshing the page starts a fresh session
-- Export PNG to keep a copy; chart data is not uploaded to a server
+- Chart work lives in the browser tab for the current visit; refreshing starts fresh unless the user **Save Session** / **Open Session** (`.citrana.json`)
+- Export PNG or Save Session to keep a copy; chart data is not uploaded to a server
 - `localStorage` is used for preferences: welcome modal seen (`citrana_welcome_seen`), chart indicator toggles (`citrana_north_hide_indicators`, `citrana_south_hide_indicators`), Save Chart Only export (`citrana_save_chart_only`), optional `citrana_debug` opt-out
 
 ## Support and Documentation
@@ -1146,7 +1188,7 @@ Edit the Graha data objects in assets/js/planet-system.js:
 - **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
 - **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
 - **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
-- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-laser`, `citrana-rashis`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
+- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-items-menu`, `citrana-laser`, `citrana-rashis`, `citrana-session`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
 - **Not minified in CI:** `assets/vendor/*` (Konva, Lucide, JSColorPicker — already minified)
 
 ### Local development
