@@ -28,6 +28,7 @@ This codebase is developed using AI agents.
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
 - Graha Library: 60 Grahas across 5 pages — traditional Grahas, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Upagrahas with outer Grahas
 - Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that Bhava on the **next** drop only (then the pointer takes over again)
+- Graha Selection Pill: Click or tap a placed Graha to select it; a **Selection Pill** appears behind the Graha text
 - Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo (zoom and pan are not tracked)
 - Save and Open Session: Download or restore a **`.citrana.json`** working file (chart, Grahas, annotations, and Options) from the toolbar; only `.citrana.json` files are accepted
 - Comprehensive Drawing Tools: Select, arrow, line, pen, laser pointer, text, and heading tools
@@ -36,8 +37,8 @@ This codebase is developed using AI agents.
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
 - Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
-- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); suppressed while drawing tools are active so strokes are not interrupted
-- Items Panel: Intended for mobile and touch devices — layers button in the zoom bar opens chart actions, Bhavas, Grahas, and annotations with select, edit, and delete controls; Text and Heading annotations offer separate **Edit text** and **Style** actions (also available on desktop)
+- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); can be disabled from the Items panel; suppressed while drawing tools are active so strokes are not interrupted
+- Items Panel: Intended for mobile and touch devices — layers button in the zoom bar opens chart actions, Bhavas, Grahas, and annotations with select, edit, and delete controls; **Clear Selection** and **Disable Context Menu** in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading annotations offer separate **Edit text** and **Style** actions (also available on desktop)
 - Keyboard Shortcuts: Tools (including **K** for Laser Pointer), undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; save a **`.citrana.json`** session file or export PNG to keep a copy
@@ -136,7 +137,7 @@ Chart Display Options: Click the gear icon in the toolbar (after Save) to open *
 
 ### Working with Grahas
 
-Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it, or press **Delete** when a Graha is selected.
+Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Click or tap a placed Graha to select it; a **Selection Pill** appears behind the Graha text. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it, or press **Delete** when a Graha is selected.
 
 Clear Bhava: Right-click a Bhava and choose **Clear Bhava** to remove every Graha from that Bhava.
 
@@ -158,12 +159,15 @@ The **Items** panel is intended for **mobile and touch devices**, where right-cl
 
 The panel lists chart actions, all Bhavas, placed Grahas, and annotations in one place.
 
+- **Canvas:** **Clear Selection** and **Disable Context Menu** (saved in this browser)
 - **Chart:** create a chart, set Lagna (North Indian), Presentation View, Reset Chart, Reset Drawings, and Clear Canvas
-- **Bhavas:** select a Bhava, set as Lagna or First Bhava, or clear Grahas in that Bhava
+- **Bhavas:** select a Bhava, set as Lagna or First Bhava, or clear Grahas in that Bhava; South Indian rows show each cell's fixed Rashi name with its zodiac symbol
 - **Grahas:** select, edit, or delete placed Grahas
 - **Annotations:** select, edit, or delete arrows, lines, pen strokes, text, and headings
 
-For **Text** and **Heading** annotations, use **Edit text** to change wording (opens the keyboard on touch devices) and **Style** to adjust colour, font size, bold, italic, and alignment. Canvas right-click and long-press menus work in Select and Hand; they are suppressed while Arrow, Line, Pen, Text, Heading, or Laser tools are active so drawing is not interrupted.
+Selected Bhavas, Grahas, and annotations are highlighted in the list and stay in sync with the canvas.
+
+For **Text** and **Heading** annotations, use **Edit text** to change wording (opens the keyboard on touch devices) and **Style** to adjust colour, font size, bold, italic, and alignment. Canvas right-click and long-press menus work in Select and Hand when enabled; they are suppressed while Arrow, Line, Pen, Text, Heading, or Laser tools are active so drawing is not interrupted.
 
 ### Export, Session, and Limitations
 

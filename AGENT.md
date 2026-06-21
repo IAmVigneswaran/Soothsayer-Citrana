@@ -26,7 +26,7 @@ Internal code identifiers (e.g. `planet-system.js`, `addPlanetToHouse()`, Konva 
 - Colour picker: JSColorPicker (self-hosted, `assets/vendor/colorpicker.iife.min.js` v1.1.0; theme in `citrana-colorpicker.js`)
 - Styling: Custom CSS only
 - Icons: Lucide Icons (self-hosted, `assets/vendor/lucide.min.js` v0.468.0)
-- Storage: Browser `localStorage` for preferences (welcome modal, chart indicator toggles, Save Chart Only export, debug opt-out)
+- Storage: Browser `localStorage` for preferences (welcome modal, chart indicator toggles, Save Chart Only export, context menu enable/disable, debug opt-out)
 - Analytics: Google Analytics and Google Tag Manager
 - No build process required - runs entirely in browser
 
@@ -39,20 +39,21 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 3. [CSS and Layout](#css-and-layout-stylescss---2654-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---1904-lines)
+   - [Main Application (app.js)](#main-application-appjs---2020-lines)
    - [History Engine (history.js)](#history-engine-historyjs---94-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---334-lines)
-   - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---950-lines)
-   - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---936-lines)
+   - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---984-lines)
+   - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---1011-lines)
    - [Graha System](#planet-system-planet-systemjs---880-lines)
    - [Citrana Arrow](#citrana-arrow-citrana-arrowjs---187-lines)
    - [Citrana Color Picker](#citrana-color-picker-citrana-colorpickerjs---370-lines)
    - [Citrana Device](#citrana-device-citrana-devicejs---39-lines)
    - [Citrana Rashis](#citrana-rashis-citrana-rashisjs---41-lines)
+   - [Citrana Graha Selection](#citrana-graha-selection-citrana-graha-selectionjs---96-lines)
    - [Citrana Laser](#citrana-laser-citrana-laserjs---248-lines)
-   - [Drawing Tools](#drawing-tools-drawing-toolsjs---2061-lines)
-   - [Context Menu](#context-menu-context-menujs---650-lines)
-   - [Citrana Items Menu](#citrana-items-menu-citrana-items-menujs---514-lines)
+   - [Drawing Tools](#drawing-tools-drawing-toolsjs---2134-lines)
+   - [Context Menu](#context-menu-context-menujs---717-lines)
+   - [Citrana Items Menu](#citrana-items-menu-citrana-items-menujs---635-lines)
    - [Citrana Session](#citrana-session-citrana-sessionjs---214-lines)
    - [Edit UI](#edit-ui-edit-uijs---786-lines)
 6. [Core Features](#core-features)
@@ -74,7 +75,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2654 lines)
+## CSS and Layout (styles.css - ~2681 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome; `role="dialog"` + `aria-*`), responsive breakpoints (769px desktop, 768px tablet, 600px mobile). Most tablet/mobile rules live in one `@media (max-width: 768px)` block; **post-base mobile overrides** (Help/About position, modal compact sizing) use separate `@media` blocks **after** base component selectors so cascade order is correct.
 
@@ -100,28 +101,29 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~562 lines); viewport-fit=cover; PWA meta; modal a11y; Items modal; toolbar scroll viewport
+├── index.html                    # Main entry (~567 lines); viewport-fit=cover; PWA meta; modal a11y; Items modal; toolbar scroll viewport
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~2654 lines); primary mobile block + post-base mobile overrides; JSColorPicker `--cp-*` theme; `.items-*`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*`
+│   │   └── styles.css            # Complete styling system (~2681 lines); primary mobile block + post-base mobile overrides; JSColorPicker `--cp-*` theme; `.items-*`; `.items-row-selected`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*`
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~1904 lines)
+│   │   ├── app.js                # Main application coordinator (~2020 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
 │   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~383 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
 │   │   ├── citrana-device.js     # Shared touch, mobile UA, and viewport helpers (~39 lines)
-│   │   ├── citrana-items-menu.js # Items panel — chart/Bhava/Graha/annotation actions (~514 lines)
+│   │   ├── citrana-graha-selection.js # Graha Selection Pill (~96 lines)
+│   │   ├── citrana-items-menu.js # Items panel — chart/Bhava/Graha/annotation actions (~635 lines)
 │   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~248 lines)
 │   │   ├── citrana-rashis.js     # Shared Rashi names, symbols, and grid numbers (~41 lines)
 │   │   ├── citrana-session.js    # Save/open `.citrana.json` session files (~214 lines)
 │   │   ├── chart-coordinator.js  # Chart type management (~334 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (~950 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (~936 lines)
+│   │   ├── chart-templates-south.js  # South Indian chart logic (~984 lines)
+│   │   ├── chart-templates-north.js  # North Indian chart logic (~1011 lines)
 │   │   ├── planet-system.js      # Graha library and drag-drop (~880 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (~2061 lines)
-│   │   ├── context-menu.js       # Context menu system (~650 lines)
+│   │   ├── drawing-tools.js      # Drawing tools implementation (~2134 lines)
+│   │   ├── context-menu.js       # Context menu system (~717 lines)
 │   │   ├── edit-ui.js            # Edit interface controls (~786 lines)
 │   │   └── history.js            # Unified undo/redo timeline (~94 lines)
 │   ├── vendor/
@@ -151,7 +153,7 @@ Soothsayer-Citrana/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
 ├── AGENT.md                      # This comprehensive documentation (~1202 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~476 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~500 lines)
 ├── .cursorrules                  # Cursor IDE configuration (~1232 lines)
 ├── CHANGELOG.md                  # Version history and changes (~87 lines)
 ├── README.md                     # Project readme (~199 lines)
@@ -166,7 +168,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~1904 lines)
+### Main Application (app.js - ~2020 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -209,7 +211,8 @@ Key Methods:
 - `clearChart()` / `resetChart()` / `resetDrawings()`
 - `isPresentationView()` / `togglePresentationView()`: Toggle `presentationView` and `body.presentation-view`; hides toolbar, zoom bar, Graha library, Help, About, Graha bar, and drawing Edit UI; dismisses open edit sessions on enter; Safari visibility fix skips when active; not undoable
 - `clearWelcomeLoadingInterval()` / `showWelcomeModal()`: Welcome progress timer cleared on close or at 100%
-- Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`; `mousedown` and `tap` on empty canvas clear `window.selectedBhavaSouth` / `selectedBhavaNorth`
+- Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`; empty-canvas `mousedown`/`tap` → `clearCanvasSelection()` (Bhavas, Grahas, annotations, edit bars)
+- `clearCanvasSelection()` / `getCanvasSelection()` / `notifyCanvasSelectionChanged()`: Unified selection state for Items panel row highlight
 - `setupSafariToolbarFix()`: Touch Safari UI visibility restore on focus/viewport events (`visualViewport` resize/scroll; no polling timer)
 - `showConfirmationDialog()`
 - `showExportProgress()` / `hideExportProgress()`: Export modal (`display: block`); focus trap; `aria-busy` during export
@@ -257,7 +260,7 @@ Key Methods:
 
 **Removed:** `setFirstHouse()`, `getDropZones()`, `highlightHouse()`, `clearHighlight()`, `renumberHouses()` (use template methods directly).
 
-### South Indian Chart Template (chart-templates-south.js - ~950 lines)
+### South Indian Chart Template (chart-templates-south.js - ~984 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 Key Responsibilities:
@@ -284,12 +287,13 @@ Key Methods:
 - `renumberHouses()`: Update Bhava numbering
 - `getBhavaNumberForHouse()`: Get Bhava number (1–12 from Lagna) for a fixed grid cell
 - `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-Bhava fallback) for library drops
-- `highlightHouse()` / `clearHighlight()`: Visual Bhava selection
+- `highlightHouse()` / `clearHighlight()`: Visual Bhava selection (`#f3f4f6`)
+- `selectPlanet()` / `clearSelectedPlanet()`: Graha selection via `CitranaGrahaSelection`
 - Rashi number boxes use `CitranaRashis.getNumberForHouseIndex()`; mobile fit uses `CitranaDevice.isCompactViewport()` / `isMobileUA()`
 - `setSouthIndicatorsVisible(visible)` / `applySouthIndicatorsPreference()`: Show or hide lagna line and bhava/rashi boxes per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (immune to current zoom/pan)
 
-### North Indian Chart Template (chart-templates-north.js - ~936 lines)
+### North Indian Chart Template (chart-templates-north.js - ~1011 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based Bhavas.
 
 Key Responsibilities:
@@ -316,6 +320,9 @@ Key Methods:
 - `isPointInPolygon()`: Hit detection for polygon Bhavas
 - `getRashiNumberForHouse()`: Rashi calculation
 - `findHouseAtChartPoint()`: Polygon hit-test (with nearest-centroid fallback) for library drops
+- `highlightHouse()` / `clearHighlight()`: Visual Bhava selection (`#f3f4f6`)
+- `selectPlanet()` / `clearSelectedPlanet()`: Graha selection via `CitranaGrahaSelection`
+- `raiseDrawingsAboveChart()` / `syncNorthChartLayerOrder()`: Keep annotations above chart layer
 - Lagna logging uses `CitranaRashis.getName()`; mobile fit uses `CitranaDevice.isCompactViewport()`
 - `setNorthIndicatorsVisible(visible)` / `applyNorthIndicatorsPreference()`: Show or hide `tinyBoxGroupNorth` (bhava numbers in black corner boxes) per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (desktop `extraTopMargin=-50`)
@@ -427,7 +434,7 @@ Key Methods:
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
 - `getPlanetInfo()`: Retrieve Graha data from paged structure
 
-### Drawing Tools (drawing-tools.js - ~2061 lines)
+### Drawing Tools (drawing-tools.js - ~2134 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
@@ -481,7 +488,7 @@ Key Methods:
 Shared touch, mobile UA, and viewport helpers.
 
 Key Methods:
-- `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()` (`innerWidth <= 600`), `isLaserViewport()` (`min-width: 769px` and not mobile UA)
+- `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()` (`innerWidth <= 600`), `isLaserViewport()` (all viewports), `hasFinePointer()`
 
 Used by `app.js`, chart templates, `drawing-tools.js`, `context-menu.js`, and `citrana-laser.js`.
 
@@ -491,7 +498,20 @@ Shared Rashi names, symbols, and South Indian grid numbers (1–12).
 Key Exports:
 - `RASHIS`, `NAMES`, `NUMBERS`, `getName(rashiNumber)`, `getNumberForHouseIndex(houseIndex0to11)`
 
-Used by `context-menu.js` (North **Set Lagna as …** submenu) and chart templates.
+Used by `context-menu.js` (North **Set Lagna as …** submenu), chart templates, and `citrana-items-menu.js` (South Bhava row labels).
+
+### Citrana Graha Selection (citrana-graha-selection.js - ~96 lines)
+Graha **Selection Pill** — colour-independent indicator behind Graha text.
+
+Key Responsibilities:
+- Selection Pill — white rounded `Konva.Rect` (`planet-selection-pill`) behind selected Graha text
+- `listening: false` on pill; Graha text stays on top for hit-testing
+- Extra padding on mobile (`CitranaDevice.isMobileUA()`)
+
+Key Methods:
+- `attach(planetText, parentGroup)`, `sync(planetText)`, `detach(planetText)`
+
+Wired from South/North `selectPlanet()` / `clearSelectedPlanet()` and on Graha `dragmove`.
 
 ### Citrana Laser (citrana-laser.js - ~248 lines)
 Ephemeral laser pointer for presentations — separate from Konva chart objects.
@@ -507,7 +527,7 @@ Key Responsibilities:
 Key Methods:
 - `init()`, `startStroke()`, `extendStroke()`, `endStroke()`, `clear()`, `resize()`, `isAvailable()` — `isAvailable()` delegates to `CitranaDevice.isLaserViewport()`
 
-Availability: `CitranaDevice.isLaserViewport()` (desktop-wide, non-mobile UA); toolbar `#laser-tool` is visible on mobile but `app.setTool('laser')` falls back to Select when unavailable.
+Availability: `CitranaDevice.isLaserViewport()` returns `true` on all viewports including mobile/touch.
 
 ### Citrana Arrow (citrana-arrow.js - ~186 lines)
 Unified filled-arrow geometry — shaft and head are one `Konva.Line` polygon so semi-transparent colours render correctly.
@@ -534,12 +554,12 @@ Key Methods:
 
 Vendor: `assets/vendor/colorpicker.iife.min.js`, `colorpicker.min.css`. Theme overrides: `--cp-*` in `styles.css`.
 
-### Context Menu (context-menu.js - ~650 lines)
+### Context Menu (context-menu.js - ~717 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:
 - Unified hit-test routing via `openContextMenuAtClientPoint()` (desktop right-click and mobile 500ms long-press)
-- **`shouldBlockCanvasContextMenu()`**: Suppresses canvas menus while drawing or when active tool is not Select/Hand
+- **`shouldBlockCanvasContextMenu()`**: Suppresses canvas menus when disabled by user, while drawing, or when active tool is not Select/Hand
 - Creates context-sensitive menus with chart-type-specific items
 - **Presentation View** on create chart, existing chart, and Bhava menus via `getPresentationViewMenuHtml()`
 - Prevents chart menu from overriding Graha or bhava menus
@@ -564,20 +584,25 @@ Key Methods:
 - `openContextMenuAtClientPoint()`, `resolveContextTarget()`, `getShapeAtClientPoint()`, `findPlanetContextById()`
 - `showChartMenu()`, `showHouseMenu()`, `showPlanetMenu()`, `showExistingChartMenu()`, `showCreateChartMenu()`
 - `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`, `shouldBlockCanvasContextMenu()`
+- `isCanvasContextMenuEnabled()` / `setCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()` — persisted in `localStorage.citrana_context_menu_enabled`
 - `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
-### Citrana Items Menu (citrana-items-menu.js - ~514 lines)
+### Citrana Items Menu (citrana-items-menu.js - ~635 lines)
 Floating **Items** panel for chart, Bhava, Graha, and annotation actions — primary touch-friendly alternative to context menus.
 
 Key Responsibilities:
 - Opens from `#items-menu-btn` in the zoom bar (desktop and mobile)
-- Renders sections: **Chart**, **Bhavas**, **Grahas**, **Annotations**
+- Renders sections: **Chart**, **Canvas**, **Bhavas**, **Grahas**, **Annotations**
+- **Canvas**: **Clear Selection** (`app.clearCanvasSelection()`), **Disable Context Menu** / **Enable Context Menu**
+- Selected rows use `.items-row-selected`; `refreshSelectionHighlight()` syncs with `app.getCanvasSelection()`
+- South Indian Bhava rows show fixed Rashi names with zodiac symbols (`CitranaRashis`)
 - Reuses `context-menu.js` `handleAction()` for chart/Bhava/Graha actions where possible
 - Text/Heading rows: **Edit text** (`startInlineContentEdit`) and **Style** (`showEditUI`); other annotations: single **Edit** → `showEditUI`
 - **Presentation View** and chart management actions mirror context menu icons
 
 Key Methods:
-- `init()`, `open()`, `close()`, `render()`, `handleBodyClick()`
+- `init()`, `open()`, `close()`, `render()`, `handleBodyClick()`, `refreshSelectionHighlight()`
+- `isRowSelected()`, `renderUtilitySection()`, `getBhavaRowLabel()`
 - `getDrawingShapes()`, `getAnnotationDisplayName()`, `getAnnotationIcon()`
 
 ### Citrana Session (citrana-session.js - ~214 lines)
@@ -720,8 +745,9 @@ Technical Implementation:
 - Responsive Design: Optimised for desktop, tablet, and mobile viewports
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
 - Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
-- Context Menus: Right-click or long-press on canvas, bhava, or Graha (Select/Hand only; suppressed while drawing); chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
-- **Items Panel**: `#items-menu-btn` in zoom bar — chart/Bhava/Graha/annotation actions; primary mobile/touch workflow
+- Context Menus: Right-click or long-press on canvas, bhava, or Graha (Select/Hand when enabled; suppressed while drawing or when disabled via Items); chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
+- **Items Panel**: `#items-menu-btn` in zoom bar — chart/Bhava/Graha/annotation actions; **Clear Selection** and **Disable Context Menu**; row highlight syncs with canvas selection; primary mobile/touch workflow
+- **Graha Selection Pill**: **Selection Pill** behind Graha text when selected; Bhava highlight in light grey
 - Status Updates: Real-time feedback and notifications
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
 - Help Modal: Shortcuts and usage guide (Laser Pointer, Items panel, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
@@ -754,7 +780,7 @@ Mobile and touch:
 - Desktop is the primary supported experience
 - Mobile/touch layouts are tuned (safe areas, compact Graha library, toolbar scroll, drawing tools in toolbar)
 - Use the **Items** panel (`#items-menu-btn`) for chart/Bhava/Graha/annotation actions when context menus are awkward on touch
-- Laser pointer remains gated by `CitranaDevice.isLaserViewport()` even though the toolbar button may appear on mobile
+- Laser pointer is available on all viewports (`CitranaDevice.isLaserViewport()`)
 
 ## Performance Optimisation
 
@@ -1163,7 +1189,7 @@ Edit the Graha data objects in assets/js/planet-system.js:
 ### Data Management
 - Chart work lives in the browser tab for the current visit; refreshing starts fresh unless the user **Save Session** / **Open Session** (`.citrana.json`)
 - Export PNG or Save Session to keep a copy; chart data is not uploaded to a server
-- `localStorage` is used for preferences: welcome modal seen (`citrana_welcome_seen`), chart indicator toggles (`citrana_north_hide_indicators`, `citrana_south_hide_indicators`), Save Chart Only export (`citrana_save_chart_only`), optional `citrana_debug` opt-out
+- `localStorage` is used for preferences: welcome modal seen (`citrana_welcome_seen`), chart indicator toggles (`citrana_north_hide_indicators`, `citrana_south_hide_indicators`), Save Chart Only export (`citrana_save_chart_only`), context menu enable (`citrana_context_menu_enabled`), optional `citrana_debug` opt-out
 
 ## Support and Documentation
 
@@ -1188,7 +1214,7 @@ Edit the Graha data objects in assets/js/planet-system.js:
 - **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
 - **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
 - **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
-- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-items-menu`, `citrana-laser`, `citrana-rashis`, `citrana-session`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
+- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-graha-selection`, `citrana-items-menu`, `citrana-laser`, `citrana-rashis`, `citrana-session`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
 - **Not minified in CI:** `assets/vendor/*` (Konva, Lucide, JSColorPicker — already minified)
 
 ### Local development

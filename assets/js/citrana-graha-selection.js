@@ -2,7 +2,7 @@
  * citrana-graha-selection.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana
  * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
- * Graha selection pill — colour-independent halo behind planet labels
+ * Graha Selection Pill — colour-independent pill behind planet labels
  */
 const CitranaGrahaSelection = (() => {
     const PILL_NAME = 'planet-selection-pill';
@@ -42,9 +42,10 @@ const CitranaGrahaSelection = (() => {
 
         const pill = new Konva.Rect({
             name: PILL_NAME,
-            fill: 'rgba(255, 255, 255, 0.92)',
-            stroke: '#000000',
+            fill: 'transparent',
+            stroke: 'rgba(107, 114, 128, 0.75)',
             strokeWidth: 1.5,
+            dash: [4, 3],
             listening: false
         });
 
