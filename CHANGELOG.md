@@ -19,13 +19,14 @@
 - **Zoom lock** — on by default so scroll-wheel zoom does not catch you by surprise. Click the lock icon to zoom freely; **Reset Zoom** always works.
 - **Chart display options** — open **Options** (gear icon in the toolbar) to hide chart indicators per layout (North: bhava numbers in black corner boxes; South: lagna line, yellow bhava numbers, black rashi numbers), or enable **Save Chart Only** so the same Save button exports only the chart area — fits the chart, ignores zoom/pan, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, uses a transparent background, and omits the watermark. Preferences are saved in this browser, included when you **Save Session**, and are not tracked by undo/redo.
 - **Upagrahas in Graha Library** — Page 5 adds nine Upagrahas (Dhuma, Vyatipata, Parivesha, Indra Chapa, Upaketu, Kala, Mrityu, Ardha Prahara, Yama Ghantaka) before Uranus, Neptune, and Pluto — **60 Grahas** in total across five pages (12 per page).
-- **Laser Pointer** — draw a temporary red highlight over the chart for presentations (toolbar after Pen, shortcut **K**). The trail fades away over a few seconds; it is not saved, exported, or included in undo/redo. Hidden in the mobile toolbar layout.
+- **Laser Pointer** — draw a temporary red highlight over the chart for presentations (toolbar after Pen, shortcut **K**). The trail fades away over a few seconds; it is not saved, exported, or included in undo/redo.
 - **Presentation View** — right-click the canvas or a Bhava and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, About, and any open edit bars for a clean on-screen chart. Choose **Exit Presentation View** from the same menu to restore the interface. Not tracked by undo/redo.
+- **Items panel** — layers button in the zoom bar (after zoom lock) opens **Items**, intended for **mobile and touch devices**. Lists chart actions, all Bhavas, placed Grahas, and annotations in one panel — select, edit, delete, set Lagna, Presentation View, reset, and clear. Text and Heading annotations offer separate **Edit text** (inline wording and keyboard) and **Style** (colour, font, alignment) actions. Also available on desktop as an alternative to right-click menus.
 
 **🔧 Improvements:**
 - Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
 - South Indian Bhava menus show **Bhava** numbers based on where Lagna is set.
-- Help, Welcome, and README updated for Lagna setup, session files (`.citrana.json`), zoom lock, undo/redo, chart display options, Upagrahas, Laser Pointer, Presentation View, and drawing defaults.
+- Help, Welcome, and README updated for Lagna setup, session files (`.citrana.json`), zoom lock, undo/redo, chart display options, Upagrahas, Laser Pointer, Presentation View, Items panel, drawing defaults, and mobile/touch guidance.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied older code paths that are no longer used, including automatic chart restore on refresh.
 - README aligned with in-app Help for **Delete** key routing (Graha first, then drawing), auto-switch to Select after arrow/line/text/heading, and one-shot bhava drop targeting.
@@ -37,20 +38,18 @@
 - **Drawing stroke defaults** — Pen starts at 3px; Arrow and Line start at 4px.
 - **Help and About sizing** — corner buttons match the zoom bar at 48px; icons scaled for visual balance.
 - **More room on mobile** — extra space between the Graha library and the zoom bar so bottom controls are easier to use.
+- **Mobile toolbar scroll** — chevron buttons scroll the top toolbar when tools overflow on narrow screens.
+- **Drawing tools on mobile** — Arrow, Line, Pen, and Laser Pointer are available in the mobile toolbar; canvas long-press menus are suppressed while those tools are active so drawing is not interrupted.
 - Consistent use of **Bhava**, **Graha**, and **Rashi** across the app and documentation.
 - **Modal accessibility** — dialogs expose titles and descriptions to screen readers; press **Escape** to close an open modal (export progress excepted); **Tab** stays within the dialog; focus moves to the close control when a modal opens and returns to where you were when you dismiss it.
 - **Clearer page semantics** — the chart canvas and modal overlays use accessible roles and labels for assistive technology.
 
 **🐛 Bug Fixes:**
 - Fixed North Indian **Set Lagna as …** flyout submenu not appearing on Firefox desktop.
-- Fixed undo not covering some edits — centre label text, text and heading content, element drags, and arrow/line control-point adjustments now step correctly.
-- Fixed **Undo** and **Redo** jumping the chart to a different zoom or position — your current view stays put while the chart content is restored.
 - Fixed keyboard shortcuts (tools, undo, delete, zoom) still working while a dialog is open — for example Help or **Confirm Action** — so you do not change the chart by accident behind the modal.
-- Fixed **Presentation View** sometimes leaving the Graha or drawing edit bar on screen — entering presentation mode now gives you a clean chart.
 - Fixed a tapped Bhava still being targeted for the next library drop on touch devices after you tap empty canvas — same behaviour as desktop click-away.
 - Fixed the welcome screen’s loading animation continuing in the background after you close it early.
 - Fixed **Reset Zoom** sometimes using the wrong chart layout when switching between North and South Indian charts.
-- Fixed the laser pointer drawing one long smeared trail — each press-and-drag now fades on its own.
 - Fixed chart reset leaving stale drop targets or the Edit UI open after **Reset Chart**, **Reset Drawings**, or **Clear Canvas**.
 - Fixed Graha and Bhava menus sometimes opening the wrong chart menu, which blocked **Edit Graha** and **Delete Graha**.
 - Fixed **Set as First Bhava** on North Indian charts so the Rashi in the clicked Bhava becomes Lagna (for example, choosing Cancer correctly sets Cancer Ascendant).
@@ -65,7 +64,6 @@
 - Fixed touch drawing stacking duplicate tap handlers while drawing arrows, lines, or pen strokes.
 - Fixed **Delete** key — removes the selected Graha first, then the selected drawing when the Select tool is active (no duplicate per-chart listeners).
 - Fixed library drops still going to a Bhava you had clicked earlier — after one drop, the next Graha follows your pointer again unless you click a Bhava on purpose.
-- Fixed semi-transparent arrows looking like two separate pieces (line and head) — they now fade as one arrow.
 - Fixed Safari floating toolbar drift — the top toolbar now follows viewport resize events instead of a background timer.
 
 ---

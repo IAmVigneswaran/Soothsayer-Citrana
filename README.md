@@ -36,7 +36,8 @@ This codebase is developed using AI agents.
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
 - Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
-- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more)
+- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); suppressed while drawing tools are active so strokes are not interrupted
+- Items Panel: Intended for mobile and touch devices — layers button in the zoom bar opens chart actions, Bhavas, Grahas, and annotations with select, edit, and delete controls; Text and Heading annotations offer separate **Edit text** and **Style** actions (also available on desktop)
 - Keyboard Shortcuts: Tools (including **K** for Laser Pointer), undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; save a **`.citrana.json`** session file or export PNG to keep a copy
@@ -53,6 +54,7 @@ This codebase is developed using AI agents.
   - [Chart Types](#chart-types)
   - [Working with Grahas](#working-with-grahas)
   - [Drawing and Navigation](#drawing-and-navigation)
+  - [Items Panel](#items-panel)
   - [Export, Session, and Limitations](#export-session-and-limitations)
   - [Important Notes](#important-notes)
 - [Credits](#credits)
@@ -108,7 +110,7 @@ Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's inte
 
 ### Browser and Device Compatibility
 
-Citrana is designed exclusively for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+) and is not supported on mobile or touch devices. For optimal performance and full feature access, use a desktop environment. Note: Brave users must disable Brave Shields for full functionality.
+Citrana is designed for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). For optimal performance and full feature access, use a desktop environment. On mobile and touch devices, use the **Items** panel for chart, Bhava, Graha, and annotation actions. Note: Brave users must disable Brave Shields for full functionality.
 
 Screen Size: If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.
 
@@ -142,13 +144,26 @@ Custom Graha: There is also a "Custom" Graha available in the library. Drag and 
 
 ### Drawing and Navigation
 
-Drawing Tools: Use the toolbar to add arrows, lines, pen strokes, text, and headings. After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool and Laser Pointer stay active for continuous drawing. The Laser Pointer (**K**) draws a temporary highlight that fades away — it is not saved to the chart or included in undo/redo. Double-click text and heading elements to edit them. Use the Hand tool to pan around the chart.
+Drawing Tools: Use the toolbar to add arrows, lines, pen strokes, text, and headings. After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool and Laser Pointer stay active for continuous drawing. The Laser Pointer (**K**) draws a temporary highlight that fades away — it is not saved to the chart or included in undo/redo. Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or **Items** — see below) to change colour, font size, and alignment. Use the Hand tool to pan around the chart.
 
-Presentation View: Right-click the canvas (or a Bhava) and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again and choose **Exit Presentation View** to restore the interface.
+Presentation View: Right-click the canvas (or a Bhava), open **Items**, or use the chart context menu and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again, reopen **Items**, or choose **Exit Presentation View** to restore the interface.
 
 Undo and Redo: Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo to step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Zoom, pan, tool selection, laser pointer strokes, and Presentation View are not tracked.
 
-Navigation: Zoom is locked by default. Use the zoom bar to zoom in or out, or click the lock icon to unlock zoom and use the mouse wheel or `+` / `-` keys. Reset zoom refits the chart. The Hand tool allows you to pan around the canvas for detailed work. Press `?` or `/` in the app for the full keyboard shortcut list.
+Navigation: Zoom is locked by default. Use the zoom bar to zoom in or out, or click the lock icon to unlock zoom and use the mouse wheel or `+` / `-` keys. Reset zoom refits the chart. The Hand tool allows you to pan around the canvas for detailed work. On narrow screens, use the chevrons at the edges of the top toolbar to scroll through tools. Press `?` or `/` in the app for the full keyboard shortcut list.
+
+### Items Panel
+
+The **Items** panel is intended for **mobile and touch devices**, where right-click and long-press are less practical. Open it from the layers icon in the zoom bar (after the zoom lock). It is also shown on desktop if you prefer a single list over context menus.
+
+The panel lists chart actions, all Bhavas, placed Grahas, and annotations in one place.
+
+- **Chart:** create a chart, set Lagna (North Indian), Presentation View, Reset Chart, Reset Drawings, and Clear Canvas
+- **Bhavas:** select a Bhava, set as Lagna or First Bhava, or clear Grahas in that Bhava
+- **Grahas:** select, edit, or delete placed Grahas
+- **Annotations:** select, edit, or delete arrows, lines, pen strokes, text, and headings
+
+For **Text** and **Heading** annotations, use **Edit text** to change wording (opens the keyboard on touch devices) and **Style** to adjust colour, font size, bold, italic, and alignment. Canvas right-click and long-press menus work in Select and Hand; they are suppressed while Arrow, Line, Pen, Text, Heading, or Laser tools are active so drawing is not interrupted.
 
 ### Export, Session, and Limitations
 
