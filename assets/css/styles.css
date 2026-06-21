@@ -106,13 +106,56 @@ body.presentation-view .about-btn {
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   background: white;
   border: 1px solid #000000;
   padding: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   border-radius: 8px;
+}
+
+.toolbar-scroll-viewport {
+  display: flex;
+  min-width: 0;
+  overflow: visible;
+}
+
+.toolbar-scroll-track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-scroll-btn {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.toolbar-scroll-btn:hover:not(:disabled) {
+  background: #000000;
+  color: #ffffff;
+}
+
+.toolbar-scroll-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.toolbar-scroll-btn i {
+  width: 20px;
+  height: 20px;
 }
 
 .toolbar-group {
@@ -654,14 +697,49 @@ body.presentation-view .about-btn {
     --zoom-controls-block-height: 50px; /* include 1px border × 2 so Help/About match zoom bar */
     --corner-btn-size: 50px;
     --ui-bottom-stack: 62px;
+    --mobile-toolbar-width: min(288px, calc(100vw - 16px - var(--sal) - var(--sar)));
   }
 
   .floating-top-toolbar {
     top: calc(var(--ui-inset-sm) + var(--sat));
     left: 50%;
     transform: translateX(-50%);
-    padding: 6px;
+    padding: 6px 4px;
+    gap: 2px;
+    width: var(--mobile-toolbar-width);
+    max-width: var(--mobile-toolbar-width);
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .toolbar-scroll-btn {
+    display: flex;
+    width: 28px;
+    height: 28px;
+  }
+
+  .toolbar-scroll-btn i {
+    width: 18px;
+    height: 18px;
+  }
+
+  .toolbar-scroll-viewport {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+
+  .toolbar-scroll-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toolbar-scroll-track {
     gap: 4px;
+    width: max-content;
   }
 
   .toolbar-btn {
@@ -903,6 +981,12 @@ body.presentation-view .about-btn {
       left: 50% !important;
       transform: translateX(-50%) translateZ(0) !important;
       -webkit-transform: translateX(-50%) translateZ(0) !important;
+    }
+
+    .floating-top-toolbar {
+      width: var(--mobile-toolbar-width) !important;
+      max-width: var(--mobile-toolbar-width) !important;
+      overflow: hidden !important;
     }
   }
 

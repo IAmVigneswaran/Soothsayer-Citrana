@@ -94,6 +94,11 @@
          </button>
          <!-- Floating Top Toolbar -->
          <div class="floating-top-toolbar">
+            <button type="button" id="toolbar-scroll-prev" class="toolbar-scroll-btn" aria-label="Scroll toolbar left" hidden>
+               <i data-lucide="square-chevron-left"></i>
+            </button>
+            <div class="toolbar-scroll-viewport" id="toolbar-scroll-viewport">
+               <div class="toolbar-scroll-track" id="toolbar-scroll-track">
             <!-- History -->
             <div class="toolbar-group">
                <button id="undo-btn" class="toolbar-btn" title="Undo (Ctrl+Z)" disabled>
@@ -152,6 +157,11 @@
                <i data-lucide="settings"></i>
                </button>
             </div>
+               </div>
+            </div>
+            <button type="button" id="toolbar-scroll-next" class="toolbar-scroll-btn" aria-label="Scroll toolbar right" hidden>
+               <i data-lucide="square-chevron-right"></i>
+            </button>
          </div>
          <!-- Floating Graha Library -->
          <div class="floating-planet-library" id="graha-library">

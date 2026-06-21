@@ -338,6 +338,53 @@ class CitranaApp {
 
         // Confirmation Dialog
         this.setupConfirmationDialog();
+
+        this.setupToolbarScroll();
+    }
+
+    /**
+     * Mobile toolbar: horizontal scroll with chevron nudges when items overflow.
+     */
+    setupToolbarScroll() {
+        const viewport = document.getElementById('toolbar-scroll-viewport');
+        const prev = document.getElementById('toolbar-scroll-prev');
+        const next = document.getElementById('toolbar-scroll-next');
+        if (!viewport || !prev || !next) return;
+
+        this._toolbarScrollMQ = window.matchMedia('(max-width: 768px)');
+        const scrollStep = 140;
+
+        const updateToolbarScrollButtons = () => {
+            if (!this._toolbarScrollMQ.matches) {
+                prev.hidden = true;
+                next.hidden = true;
+                viewport.scrollLeft = 0;
+                return;
+            }
+
+            const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+            const hasOverflow = maxScroll > 1;
+
+            prev.hidden = !hasOverflow;
+            next.hidden = !hasOverflow;
+            prev.disabled = viewport.scrollLeft <= 1;
+            next.disabled = viewport.scrollLeft >= maxScroll - 1;
+        };
+
+        this.updateToolbarScrollButtons = updateToolbarScrollButtons;
+
+        prev.addEventListener('click', () => {
+            viewport.scrollBy({ left: -scrollStep, behavior: 'smooth' });
+        });
+
+        next.addEventListener('click', () => {
+            viewport.scrollBy({ left: scrollStep, behavior: 'smooth' });
+        });
+
+        viewport.addEventListener('scroll', updateToolbarScrollButtons, { passive: true });
+        this._toolbarScrollMQ.addEventListener('change', updateToolbarScrollButtons);
+        window.addEventListener('load', updateToolbarScrollButtons);
+        requestAnimationFrame(updateToolbarScrollButtons);
     }
 
     /**
@@ -1461,6 +1508,7 @@ class CitranaApp {
         this.stage.height(height);
         this.stage.batchDraw();
         CitranaLaser?.resize?.();
+        this.updateToolbarScrollButtons?.();
     }
 
     updateZoomLevel() {
