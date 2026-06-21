@@ -697,7 +697,7 @@ body.presentation-view .about-btn {
     --zoom-controls-block-height: 50px; /* include 1px border × 2 so Help/About match zoom bar */
     --corner-btn-size: 50px;
     --ui-bottom-stack: 62px;
-    --mobile-toolbar-width: min(288px, calc(100vw - 16px - var(--sal) - var(--sar)));
+    --mobile-toolbar-width: min(368px, calc(100vw - 16px - var(--sal) - var(--sar)));
   }
 
   .floating-top-toolbar {
@@ -929,15 +929,6 @@ body.presentation-view .about-btn {
     height: 22px;
     margin-top: 0;
     flex-shrink: 0;
-  }
-
-  /* Temporarily hide buggy drawing tools on mobile */
-  #arrow-tool,
-  #line-tool,
-  #pen-tool,
-  #laser-tool,
-  #laser-help-shortcut {
-    display: none !important;
   }
 
   .control-point-start,
