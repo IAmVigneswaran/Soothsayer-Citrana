@@ -9,7 +9,7 @@ const CitranaDevice = (() => {
         return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     }
 
-    /** Mobile / tablet UA (font weight, laser exclusion, etc.) */
+    /** Mobile / tablet UA (font weight, compact layout hints, etc.) */
     function isMobileUA() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
@@ -19,9 +19,9 @@ const CitranaDevice = (() => {
         return window.innerWidth <= 600;
     }
 
-    /** Desktop-wide viewport and non-mobile UA — laser pointer availability. */
+    /** Laser pointer — available on all viewports including mobile/touch. */
     function isLaserViewport() {
-        return window.matchMedia('(min-width: 769px)').matches && !isMobileUA();
+        return true;
     }
 
     /** True when the primary input supports hover (desktop mouse/trackpad). */

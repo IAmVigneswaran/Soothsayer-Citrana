@@ -70,7 +70,7 @@ class DrawingTools {
         }
     }
 
-    /** Laser pointer — hidden on narrow viewports / mobile UA */
+    /** Laser pointer — ephemeral overlay; available on desktop and mobile. */
     isLaserToolAvailable() {
         return typeof CitranaLaser !== 'undefined' && CitranaLaser.isAvailable();
     }

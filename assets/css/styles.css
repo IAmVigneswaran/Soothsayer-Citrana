@@ -673,8 +673,19 @@ body.presentation-view .about-btn {
 }
 
 .context-menu-item.has-submenu:hover > .context-submenu,
-.context-menu-item.has-submenu > .context-submenu:hover {
+.context-menu-item.has-submenu > .context-submenu:hover,
+.context-menu-item.has-submenu.submenu-open > .context-submenu {
   display: block;
+}
+
+/* Touch / coarse pointer: expand submenu below parent (tap toggles .submenu-open) */
+@media (hover: none), (pointer: coarse) {
+  .context-menu-item.has-submenu > .context-submenu {
+    left: 0;
+    top: 100%;
+    margin-left: 0;
+    min-width: 100%;
+  }
 }
 
 /* Installed PWA on mobile: safe-area already clears home indicator */

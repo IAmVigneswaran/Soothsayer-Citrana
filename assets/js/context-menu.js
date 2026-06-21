@@ -303,7 +303,6 @@ class ContextMenu {
 
     showExistingChartMenu(x, y, chartType) {
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
-        const useFlyoutSubmenu = CitranaDevice.hasFinePointer();
         const rashis = CitranaRashis.RASHIS;
         const lagnaMenuItems = rashis.map((rashi, i) =>
             `<div class='context-menu-item' data-action='set-lagna' data-house='${i + 1}'><span class='zodiac-symbol'>${rashi.symbol}</span> ${rashi.name}</div>`
@@ -315,14 +314,7 @@ class ContextMenu {
         `;
         // North Indian chart menu: Set Lagna as … (Rashi). South Indian Lagna is set via Bhava right-click only.
         if (chartType === 'north-indian') {
-            if (!useFlyoutSubmenu) {
-                menuHtml += `
-                <div class="context-menu-header">Set Lagna as …</div>
-                ${lagnaMenuItems}
-                <div class="context-menu-separator"></div>
-                `;
-            } else {
-                menuHtml += `
+            menuHtml += `
             <div class="context-menu-item has-submenu" data-action="set-lagna-parent"><i data-lucide="target"></i> Set Lagna as …
                 <div class="context-submenu context-menu">
                     ${lagnaMenuItems}
@@ -330,7 +322,6 @@ class ContextMenu {
             </div>
             <div class="context-menu-separator"></div>
             `;
-            }
         }
         // Add 'Reset Chart', 'Reset Drawings', and 'Clear Canvas' (renamed from 'Clear Chart')
         menuHtml += `
@@ -417,6 +408,32 @@ class ContextMenu {
         this.menu.style.zIndex = '9999';
     }
 
+    toggleSubmenuParent(item) {
+        if (!item) return;
+
+        const wasOpen = item.classList.contains('submenu-open');
+        this.menu.querySelectorAll('.has-submenu.submenu-open').forEach((el) => {
+            el.classList.remove('submenu-open');
+        });
+
+        if (!wasOpen) {
+            item.classList.add('submenu-open');
+        }
+    }
+
+    handleSubmenuParentAction(item, e) {
+        if (!item || item.dataset.action !== 'set-lagna-parent') {
+            return false;
+        }
+
+        if (!CitranaDevice.hasFinePointer()) {
+            e.preventDefault();
+            this.toggleSubmenuParent(item);
+        }
+
+        return true;
+    }
+
     setupMenuEventListeners() {
         // Desktop: replace onclick each time menu HTML is rebuilt
         this.menu.onclick = (e) => {
@@ -425,8 +442,8 @@ class ContextMenu {
             citranaDebug('Closest .context-menu-item:', item);
             if (!item) return;
             e.preventDefault();
+            if (this.handleSubmenuParentAction(item, e)) return;
             const action = item.dataset.action;
-            if (action === 'set-lagna-parent') return;
             const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
             const context = {
                 planetId: item.dataset.planetid,
@@ -454,8 +471,8 @@ class ContextMenu {
             if (item) {
                 e.preventDefault();
                 e.stopPropagation();
+                if (this.handleSubmenuParentAction(item, e)) return;
                 const action = item.dataset.action;
-                if (action === 'set-lagna-parent') return;
                 const houseNumber = item.dataset.house || item._houseNumber || this.currentHouseNumber;
                 const context = {
                     planetId: item.dataset.planetid,
