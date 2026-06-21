@@ -135,6 +135,13 @@
             </div>
             <!-- Export Actions -->
             <div class="toolbar-group">
+               <button id="save-session-btn" class="toolbar-btn" title="Save Session">
+               <i data-lucide="cloud-download"></i>
+               </button>
+               <button id="open-session-btn" class="toolbar-btn" title="Open Session">
+               <i data-lucide="cloud-upload"></i>
+               </button>
+               <input type="file" id="open-session-input" accept=".citrana.json,application/json" hidden>
                <button id="toggle-transparency-btn" class="toolbar-btn" title="Toggle Transparency">
                <i data-lucide="image-off"></i>
                </button>
@@ -327,7 +334,7 @@
                      <li><strong>Hide North Indian Chart Indicators</strong> — hides bhava numbers (black corner boxes).</li>
                      <li><strong>Hide South Indian Chart Indicators</strong> — hides the lagna diagonal line, yellow bhava numbers, and black rashi numbers.</li>
                      <li><strong>Save Chart Only</strong> — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark.</li>
-                     <li>Preferences are saved in this browser and are not included in undo/redo.</li>
+                     <li>Preferences are saved in this browser, included when you <strong>Save Session</strong>, and are not tracked by undo/redo.</li>
                   </ul>
                   <p><strong>Adding Grahas:</strong> Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times.</p>
                   <ul class="help-sublist">
@@ -357,7 +364,14 @@
                      <li>Reset zoom refits the chart.</li>
                      <li>The Hand tool allows you to pan around the canvas.</li>
                   </ul>
-                  <p><strong>Export Options:</strong> Click the save button to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image.</p>
+                  <p><strong>Save and Open Session:</strong> Use <strong>Save Session</strong> (cloud-download icon) and <strong>Open Session</strong> (cloud-upload icon) in the toolbar to download or restore a working file.</p>
+                  <ul class="help-sublist">
+                     <li>Session files use the <strong>.citrana.json</strong> extension only — other file types are rejected.</li>
+                     <li><strong>Included:</strong> chart layout, Grahas, annotations, and Options (indicator toggles and Save Chart Only).</li>
+                     <li><strong>Not included:</strong> undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan.</li>
+                     <li>Opening a session replaces your current chart and annotations; Citrana asks for confirmation if you already have work on the canvas.</li>
+                  </ul>
+                  <p><strong>Export PNG:</strong> Click the save icon to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image.</p>
                   <p><strong>Export Viewpoint:</strong> Exported images will always follow and inherit the browser's current viewpoint. If you resize the browser window, the exported image will reflect the visible area accordingly. Adjust your browser window size and zoom level before exporting to achieve the desired output.</p>
                   <p><strong>Single Chart Limitation:</strong> Citrana does not and will not support multiple charts in a single canvas.</p>
                   <ul class="help-sublist">
@@ -365,7 +379,7 @@
                      <li>Images can be saved with transparency enabled (Toggle Transparency Button) and imported into other canvas applications such as tldraw for advanced annotation and note-taking workflows.</li>
                   </ul>
                   <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
-                  <p><strong>Note:</strong> Your chart lives in this browser tab while you work (nothing is sent to a server). Refreshing the page starts a fresh session — your chart, Grahas, and drawings are not restored. Use <strong>Export PNG</strong> to keep a copy.</p>
+                  <p><strong>Note:</strong> Your chart lives in this browser tab while you work (nothing is sent to a server). Refreshing the page starts a fresh session — your chart, Grahas, and drawings are not restored automatically. Use <strong>Save Session</strong> to keep a working copy you can reopen with <strong>Open Session</strong>, or <strong>Export PNG</strong> for a shareable image.</p>
                   <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
                   <p><strong>Contact Information:</strong> Should you encounter an error or issue on this site, feel free to send a message with description and screenshot. Contact information is found in the About button (bottom right).</p>
                </div>
@@ -501,6 +515,7 @@
       <script src="assets/js/edit-ui.js"></script>
       <script src="assets/js/context-menu.js"></script>
       <script src="assets/js/history.js"></script>
+      <script src="assets/js/citrana-session.js"></script>
       <script src="assets/js/app.js"></script>
       <script>
          // Initialize Lucide icons

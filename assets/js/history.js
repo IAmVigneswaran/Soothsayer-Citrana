@@ -74,4 +74,21 @@ class CitranaHistory {
             this._restoring = false;
         }
     }
+
+    /**
+     * Replace the timeline with a single baseline entry (e.g. after importing a session).
+     * @param {object} state
+     * @param {string} label
+     */
+    resetToState(state, label = 'Start') {
+        if (!state) return;
+
+        this.entries = [{
+            label,
+            state: JSON.parse(JSON.stringify(state)),
+            timestamp: Date.now()
+        }];
+        this.index = 0;
+        citranaDebug('[history] reset →', label);
+    }
 }

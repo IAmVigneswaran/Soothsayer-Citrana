@@ -8,15 +8,16 @@
 **✨ Features:**
 - **Richer colour controls** — when editing a Graha or a drawing, pick from a **16-colour** rainbow palette, adjust **transparency**, or use the eyedropper. The same swatches appear in the Graha bar and the drawing Edit UI; the toolbar shows a compact colour chip instead of a hex code.
 - **Improved arrows** — arrow shaft and head render as one shape, with a straight (non-tapering) body and a clearer triangular head. Transparency applies evenly across the whole arrow.
-- **Fresh start on refresh** — your chart lives in this browser tab while you work. Reloading the page always begins with a blank canvas. Export a PNG when you want to keep a copy.
-- **Undo and redo** — step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Use the toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (and **Ctrl+Shift+Z** / **Cmd+Shift+Z** on Mac). Covers Graha placement and edits, Lagna, chart resets, annotations, and Edit UI sessions. Your zoom and pan stay where you left them while content is restored. Tool selection, laser pointer strokes, and Presentation View are not tracked.
+- **Fresh start on refresh** — reloading the page always begins with a blank canvas unless you **Open Session**.
+- **Save and Open Session** — toolbar **Save Session** and **Open Session** download or restore a **`.citrana.json`** working file (chart, Grahas, annotations, and Options). Undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan are not included. Only `.citrana.json` files are accepted.
+- **Undo and redo** — step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Use the toolbar buttons or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo. Covers Graha placement and edits, Lagna, chart resets, annotations, and Edit UI sessions. Your zoom and pan stay where you left them while content is restored. Tool selection, laser pointer strokes, and Presentation View are not tracked.
 - **Edit or delete Grahas from the menu** — right-click any Graha for **Edit Graha** or **Delete Graha** (same editor as double-click).
 - **Clearer Lagna setup** by chart type:
   - **South Indian** — right-click a Bhava and choose **Set as Lagna**.
   - **North Indian** — use **Set Lagna as …** on the chart menu (pick the Lagna), or **Set as First Bhava** on a Bhava menu.
 - **Clear Bhava** removes every Graha from the Bhava you selected.
 - **Zoom lock** — on by default so scroll-wheel zoom does not catch you by surprise. Click the lock icon to zoom freely; **Reset Zoom** always works.
-- **Chart display options** — open **Options** (gear icon in the toolbar) to hide chart indicators per layout (North: bhava numbers in black corner boxes; South: lagna line, yellow bhava numbers, black rashi numbers), or enable **Save Chart Only** so the same Save button exports only the chart area — fits the chart, ignores zoom/pan, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, uses a transparent background, and omits the watermark. Preferences are saved in this browser and apply immediately; they are not tracked by undo/redo.
+- **Chart display options** — open **Options** (gear icon in the toolbar) to hide chart indicators per layout (North: bhava numbers in black corner boxes; South: lagna line, yellow bhava numbers, black rashi numbers), or enable **Save Chart Only** so the same Save button exports only the chart area — fits the chart, ignores zoom/pan, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, uses a transparent background, and omits the watermark. Preferences are saved in this browser, included when you **Save Session**, and are not tracked by undo/redo.
 - **Upagrahas in Graha Library** — Page 5 adds nine Upagrahas (Dhuma, Vyatipata, Parivesha, Indra Chapa, Upaketu, Kala, Mrityu, Ardha Prahara, Yama Ghantaka) before Uranus, Neptune, and Pluto — **60 Grahas** in total across five pages (12 per page).
 - **Laser Pointer** — draw a temporary red highlight over the chart for presentations (toolbar after Pen, shortcut **K**). The trail fades away over a few seconds; it is not saved, exported, or included in undo/redo. Hidden in the mobile toolbar layout.
 - **Presentation View** — right-click the canvas or a Bhava and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, About, and any open edit bars for a clean on-screen chart. Choose **Exit Presentation View** from the same menu to restore the interface. Not tracked by undo/redo.
@@ -24,7 +25,7 @@
 **🔧 Improvements:**
 - Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
 - South Indian Bhava menus show **Bhava** numbers based on where Lagna is set.
-- Help, Welcome, and README updated for Lagna setup, session behaviour, zoom lock, undo/redo, chart display options, Upagrahas, Laser Pointer, Presentation View, and drawing defaults.
+- Help, Welcome, and README updated for Lagna setup, session files (`.citrana.json`), zoom lock, undo/redo, chart display options, Upagrahas, Laser Pointer, Presentation View, and drawing defaults.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied older code paths that are no longer used, including automatic chart restore on refresh.
 - README aligned with in-app Help for **Delete** key routing (Graha first, then drawing), auto-switch to Select after arrow/line/text/heading, and one-shot bhava drop targeting.
@@ -41,6 +42,7 @@
 - **Clearer page semantics** — the chart canvas and modal overlays use accessible roles and labels for assistive technology.
 
 **🐛 Bug Fixes:**
+- Fixed North Indian **Set Lagna as …** flyout submenu not appearing on Firefox desktop.
 - Fixed undo not covering some edits — centre label text, text and heading content, element drags, and arrow/line control-point adjustments now step correctly.
 - Fixed **Undo** and **Redo** jumping the chart to a different zoom or position — your current view stays put while the chart content is restored.
 - Fixed keyboard shortcuts (tools, undo, delete, zoom) still working while a dialog is open — for example Help or **Confirm Action** — so you do not change the chart by accident behind the modal.

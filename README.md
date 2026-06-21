@@ -28,17 +28,18 @@ This codebase is developed using AI agents.
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
 - Graha Library: 60 Grahas across 5 pages — traditional Grahas, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Upagrahas with outer Grahas
 - Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that Bhava on the **next** drop only (then the pointer takes over again)
-- Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Ctrl+Y** (zoom and pan are not tracked)
+- Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo (zoom and pan are not tracked)
+- Save and Open Session: Download or restore a **`.citrana.json`** working file (chart, Grahas, annotations, and Options) from the toolbar; only `.citrana.json` files are accepted
 - Comprehensive Drawing Tools: Select, arrow, line, pen, laser pointer, text, and heading tools
 - Laser Pointer: Temporary fading highlight for presentations; not saved or undoable
 - Presentation View: Right-click the canvas to hide toolbar, zoom bar, Graha library, Help, and About; choose **Exit Presentation View** to restore
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
-- Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark), from the toolbar **Options** modal; preferences persist in this browser
+- Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
 - Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more)
 - Keyboard Shortcuts: Tools (including **K** for Laser Pointer), undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
-- Privacy focused: Chart data is not uploaded to our servers; your work stays in this browser session
+- Privacy focused: Chart data is not uploaded to our servers; save a **`.citrana.json`** session file or export PNG to keep a copy
 
 ## Table of Contents
 
@@ -52,7 +53,7 @@ This codebase is developed using AI agents.
   - [Chart Types](#chart-types)
   - [Working with Grahas](#working-with-grahas)
   - [Drawing and Navigation](#drawing-and-navigation)
-  - [Export and Limitations](#export-and-limitations)
+  - [Export, Session, and Limitations](#export-session-and-limitations)
   - [Important Notes](#important-notes)
 - [Credits](#credits)
 - [License](#license)
@@ -121,7 +122,7 @@ Visit: [citrana.soothsayer.life](https://citrana.soothsayer.life)
 2. **Set Lagna**: South Indian — right-click a Bhava and select **Set as Lagna**. North Indian — right-click a Bhava and select **Set as First Bhava**, or right-click the chart and choose **Set Lagna as …** to pick a Lagna
 3. **Add Grahas**: Drag Grahas from the Graha Library onto the Bhava under your pointer. Click a Bhava first if you want the **next** drop to go to that Bhava specifically (subsequent drops follow the pointer again)
 4. **Add Annotations**: Use drawing tools to add notes and aspects
-5. **Export**: Click the save button to export your chart as a PNG
+5. **Save your work**: Use **Save Session** to download a `.citrana.json` file, or click the save icon to export a PNG
 
 ### Chart Types
 
@@ -129,7 +130,7 @@ South Indian Chart: Traditional 4x4 grid layout with centre empty. Right-click a
 
 North Indian Chart: Diamond layout with dynamic Rashi numbering. Right-click a Bhava and select **Set as First Bhava** to set the Rashi in that cell as Lagna, or right-click the chart and choose **Set Lagna as …** to pick a Lagna. Grahas reposition automatically when Lagna changes.
 
-Chart Display Options: Click the gear icon in the toolbar (after Save) to open **Options**. Toggle **Hide North Indian Chart Indicators** to hide bhava numbers (black corner boxes). Toggle **Hide South Indian Chart Indicators** to hide the lagna diagonal line, yellow bhava numbers, and black rashi numbers. Toggle **Save Chart Only** to export only the chart area when you click Save — Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out of the image. The export uses a transparent background and omits the watermark (Toggle Transparency is turned on automatically). Preferences are saved in this browser; they are not included in undo/redo.
+Chart Display Options: Click the gear icon in the toolbar (after Save) to open **Options**. Toggle **Hide North Indian Chart Indicators** to hide bhava numbers (black corner boxes). Toggle **Hide South Indian Chart Indicators** to hide the lagna diagonal line, yellow bhava numbers, and black rashi numbers. Toggle **Save Chart Only** to export only the chart area when you click Save — Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out of the image. The export uses a transparent background and omits the watermark (Toggle Transparency is turned on automatically). Preferences are saved in this browser, included when you **Save Session**, and are not tracked by undo/redo.
 
 ### Working with Grahas
 
@@ -145,13 +146,15 @@ Drawing Tools: Use the toolbar to add arrows, lines, pen strokes, text, and head
 
 Presentation View: Right-click the canvas (or a Bhava) and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again and choose **Exit Presentation View** to restore the interface.
 
-Undo and Redo: Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Ctrl+Y** to step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Zoom, pan, tool selection, laser pointer strokes, and Presentation View are not tracked.
+Undo and Redo: Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo to step backward and forward through chart, Graha, and drawing changes (up to 50 steps). Zoom, pan, tool selection, laser pointer strokes, and Presentation View are not tracked.
 
 Navigation: Zoom is locked by default. Use the zoom bar to zoom in or out, or click the lock icon to unlock zoom and use the mouse wheel or `+` / `-` keys. Reset zoom refits the chart. The Hand tool allows you to pan around the canvas for detailed work. Press `?` or `/` in the app for the full keyboard shortcut list.
 
-### Export and Limitations
+### Export, Session, and Limitations
 
-Export Options: Click the save button to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image. With **Save Chart Only** enabled in **Options**, Save exports only the chart area (transparent, no watermark) instead of the full canvas.
+Save and Open Session: Use **Save Session** (cloud-download icon) and **Open Session** (cloud-upload icon) in the toolbar to download or restore a **`.citrana.json`** working file. Session files include chart layout, Grahas, annotations, and Options. They do not include undo/redo history, active tool, laser pointer strokes, Presentation View, or zoom/pan. Only `.citrana.json` files are accepted. Opening a session replaces your current chart and annotations; Citrana asks for confirmation if you already have work on the canvas.
+
+Export PNG: Click the save icon to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image. With **Save Chart Only** enabled in **Options**, Save exports only the chart area (transparent, no watermark) instead of the full canvas.
 
 Export Viewpoint: By default, exported images follow the browser's current viewpoint — window size and zoom/pan affect the output. With **Save Chart Only** enabled, Save fits the chart and ignores your current zoom and pan; only the chart area is exported, and anything outside the chart boundary is left out of the image.
 
@@ -159,7 +162,7 @@ Single Chart Limitation: Citrana does not and will not support multiple charts i
 
 ### Important Notes
 
-Session management: Your chart lives in this browser tab while you work (nothing is sent to a server). Refreshing the page always starts a fresh session — chart, Grahas, and drawings are not restored. Export a PNG to keep a copy.
+Session management: Your chart lives in this browser tab while you work (nothing is sent to a server). Refreshing the page always starts a fresh session — your chart, Grahas, and drawings are not restored automatically. Use **Save Session** to keep a working copy you can reopen with **Open Session**, or **Export PNG** for a shareable image.
 
 ## Credits
 

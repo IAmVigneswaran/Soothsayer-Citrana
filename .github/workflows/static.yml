@@ -64,6 +64,7 @@ jobs:
           terser assets/js/citrana-rashis.js -o assets/js/citrana-rashis.min.js --compress --mangle
           terser assets/js/citrana-laser.js -o assets/js/citrana-laser.min.js --compress --mangle
           terser assets/js/context-menu.js -o assets/js/context-menu.min.js --compress --mangle
+          terser assets/js/citrana-session.js -o assets/js/citrana-session.min.js --compress --mangle
           terser assets/js/drawing-tools.js -o assets/js/drawing-tools.min.js --compress --mangle
           terser assets/js/edit-ui.js -o assets/js/edit-ui.min.js --compress --mangle
           terser assets/js/history.js -o assets/js/history.min.js --compress --mangle
@@ -86,6 +87,7 @@ jobs:
           sed -i 's|src="assets/js/citrana-rashis.js"|src="assets/js/citrana-rashis.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-laser.js"|src="assets/js/citrana-laser.min.js"|g' index.html
           sed -i 's|src="assets/js/context-menu.js"|src="assets/js/context-menu.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-session.js"|src="assets/js/citrana-session.min.js"|g' index.html
           sed -i 's|src="assets/js/drawing-tools.js"|src="assets/js/drawing-tools.min.js"|g' index.html
           sed -i 's|src="assets/js/edit-ui.js"|src="assets/js/edit-ui.min.js"|g' index.html
           sed -i 's|src="assets/js/history.js"|src="assets/js/history.min.js"|g' index.html

@@ -115,6 +115,28 @@ class CitranaApp {
         document.getElementById('redo-btn').addEventListener('click', () => this.redo());
         document.getElementById('export-btn').addEventListener('click', () => this.exportChart());
 
+        const saveSessionBtn = document.getElementById('save-session-btn');
+        const openSessionBtn = document.getElementById('open-session-btn');
+        const openSessionInput = document.getElementById('open-session-input');
+
+        if (saveSessionBtn) {
+            saveSessionBtn.addEventListener('click', () => this.saveSession());
+        }
+
+        if (openSessionBtn && openSessionInput) {
+            openSessionBtn.addEventListener('click', () => {
+                openSessionInput.click();
+            });
+
+            openSessionInput.addEventListener('change', (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                    this.openSessionFromFile(file);
+                }
+                e.target.value = '';
+            });
+        }
+
         // Toggle Transparency Button
         const toggleBtn = document.getElementById('toggle-transparency-btn');
         if (toggleBtn) {
@@ -1517,6 +1539,22 @@ class CitranaApp {
         this.applySaveChartOnlyTransparency();
     }
 
+    syncOptionsUI() {
+        const northHideIndicatorsToggle = document.getElementById('north-hide-indicators-toggle');
+        const southHideIndicatorsToggle = document.getElementById('south-hide-indicators-toggle');
+        const saveChartOnlyToggle = document.getElementById('save-chart-only-toggle');
+
+        if (northHideIndicatorsToggle) {
+            northHideIndicatorsToggle.checked = this.options.northHideIndicators;
+        }
+        if (southHideIndicatorsToggle) {
+            southHideIndicatorsToggle.checked = this.options.southHideIndicators;
+        }
+        if (saveChartOnlyToggle) {
+            saveChartOnlyToggle.checked = this.options.saveChartOnly;
+        }
+    }
+
     applySaveChartOnlyTransparency() {
         if (this.options.saveChartOnly) {
             this.exportWithWhiteBg = false;
@@ -1672,6 +1710,87 @@ class CitranaApp {
 
     restoreDrawings(drawingData) {
         this.drawingTools.restorePersistedDrawings(drawingData);
+    }
+
+    // --- SESSION (.citrana.json) ---
+    hasSessionContent() {
+        return !!(this.chartTemplates?.hasActiveChart()
+            || (this.serializeDrawings()?.length > 0));
+    }
+
+    saveSession() {
+        if (typeof CitranaSession === 'undefined') {
+            window.alert('Session save is unavailable.');
+            return;
+        }
+
+        try {
+            const session = CitranaSession.capture(this);
+            CitranaSession.download(session);
+        } catch (error) {
+            console.error('Error saving session:', error);
+            window.alert(error.message || 'Could not save session.');
+        }
+    }
+
+    openSessionFromFile(file) {
+        if (typeof CitranaSession === 'undefined') {
+            window.alert('Session open is unavailable.');
+            return;
+        }
+
+        CitranaSession.readFile(file)
+            .then((session) => {
+                const apply = () => {
+                    try {
+                        this.restoreSessionState(session);
+                        citranaDebug('Session imported successfully');
+                    } catch (error) {
+                        console.error('Error importing session:', error);
+                        window.alert(error.message || 'Could not open session.');
+                    }
+                };
+
+                if (this.hasSessionContent()) {
+                    this.showConfirmationDialog(
+                        'Opening a session will replace your current chart and annotations. Do you want to continue?',
+                        apply
+                    );
+                } else {
+                    apply();
+                }
+            })
+            .catch((error) => {
+                console.error('Error reading session:', error);
+                window.alert(error.message || 'Could not open session.');
+            });
+    }
+
+    restoreSessionState(session) {
+        if (!session) return;
+
+        this.drawingTools?.editUI?.hide();
+        this.drawingTools?.clearSelection?.();
+
+        this.chartTemplates.loadChartData(session.chartData);
+        this.restoreDrawings(session.drawingData || []);
+        CitranaSession.applyOptions(this, session.options);
+
+        if (this.chartTemplates?.hasActiveChart()) {
+            this.chartTemplates.zoomToFit();
+        } else {
+            this.stage.scale({ x: 1, y: 1 });
+            this.stage.position({ x: 0, y: 0 });
+            this.updateZoomLevel();
+        }
+
+        window.selectedBhavaSouth = null;
+        window.selectedBhavaNorth = null;
+        this.layer.batchDraw();
+
+        const baseline = this.captureHistoryState();
+        this.history?.resetToState(baseline, 'Imported session');
+        this.updateHistoryButtons();
     }
 
     undo() {
