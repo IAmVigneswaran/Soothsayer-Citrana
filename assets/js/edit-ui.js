@@ -139,6 +139,11 @@ class EditUI {
                 return;
             }
 
+            // Don't hide if touching inside JSColorPicker popup (rendered outside Edit UI)
+            if (typeof CitranaColorPicker !== 'undefined' && CitranaColorPicker.isPickerPopupTarget(e.target)) {
+                return;
+            }
+
             // Don't hide if touching on context menu items
             if (e.target.closest('.context-menu-item')) {
                 return;

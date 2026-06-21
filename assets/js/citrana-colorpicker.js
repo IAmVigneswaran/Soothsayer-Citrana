@@ -350,6 +350,18 @@ const CitranaColorPicker = (() => {
         return toggle;
     }
 
+    /**
+     * True when the event target is inside a JSColorPicker popup (portaled outside Edit UI).
+     * @param {EventTarget} target
+     * @returns {boolean}
+     */
+    function isPickerPopupTarget(target) {
+        if (!target || typeof target.closest !== 'function') {
+            return false;
+        }
+        return Boolean(target.closest('.cp_dialog'));
+    }
+
     return {
         SWATCHES,
         BASE_OPTIONS,
@@ -365,6 +377,7 @@ const CitranaColorPicker = (() => {
         setValue,
         initGrahaBar,
         setGrahaPickCallback,
-        createInput
+        createInput,
+        isPickerPopupTarget
     };
 })();

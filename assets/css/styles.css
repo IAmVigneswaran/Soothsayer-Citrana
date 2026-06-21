@@ -1583,14 +1583,21 @@ body.presentation-view .about-btn {
 .items-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+}
+
+.items-section {
+  margin-bottom: 24px;
+}
+
+.items-section:last-child {
+  margin-bottom: 0;
 }
 
 .items-section-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: #000000;
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
 }
 
 .items-list {
@@ -1613,6 +1620,28 @@ body.presentation-view .about-btn {
 
 .items-list .items-row:first-child {
   border-top: none;
+}
+
+.items-row-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.items-row-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #000000;
+}
+
+.items-row-icon i,
+.items-row-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .items-row-label-wrap {

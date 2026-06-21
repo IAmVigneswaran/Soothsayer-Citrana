@@ -70,14 +70,25 @@ class CitranaItemsMenu {
         });
     }
 
-    getAnnotationLabel(shape) {
+    getAnnotationDisplayName(shape) {
         const name = shape.name();
         if (name.includes('arrow')) return 'Arrow';
         if (name === 'drawing-line') return 'Line';
-        if (name.includes('pen')) return 'Pen stroke';
+        if (name.includes('pen')) return 'Pen';
         if (name === 'drawing-text') return shape.text() || 'Text';
         if (name === 'drawing-heading') return shape.text() || 'Heading';
         return 'Annotation';
+    }
+
+    getAnnotationIcon(shape) {
+        const icons = {
+            arrow: 'arrow-right',
+            line: 'minus',
+            pen: 'pen-tool',
+            text: 'type',
+            heading: 'heading'
+        };
+        return icons[this.getAnnotationToolType(shape)] || 'pen-line';
     }
 
     getAnnotationToolType(shape) {
@@ -123,13 +134,19 @@ class CitranaItemsMenu {
         `;
     }
 
-    renderRow(label, meta, actionsHtml) {
+    renderRow(label, meta, actionsHtml, rowIcon = '') {
         const metaHtml = meta ? `<span class="items-row-meta">${meta}</span>` : '';
+        const iconHtml = rowIcon
+            ? `<span class="items-row-icon" aria-hidden="true"><i data-lucide="${rowIcon}"></i></span>`
+            : '';
         return `
             <div class="items-row">
-                <div class="items-row-label-wrap">
-                    <span class="items-row-label">${label}</span>
-                    ${metaHtml}
+                <div class="items-row-main">
+                    ${iconHtml}
+                    <div class="items-row-label-wrap">
+                        <span class="items-row-label">${label}</span>
+                        ${metaHtml}
+                    </div>
                 </div>
                 <div class="items-row-actions">${actionsHtml}</div>
             </div>
@@ -142,10 +159,10 @@ class CitranaItemsMenu {
 
         if (!chartType) {
             const rows = [
-                this.renderRow('North Indian Chart', '', this.actionButton('create-north-indian', 'Create North Indian Chart', 'plus-circle')),
-                this.renderRow('South Indian Chart', '', this.actionButton('create-south-indian', 'Create South Indian Chart', 'plus-circle')),
-                this.renderRow(this.getPresentationLabel(), '', this.actionButton('toggle-presentation-view', this.getPresentationLabel(), this.getPresentationIcon())),
-                this.renderRow('Clear Canvas', '', this.actionButton('clear-chart', 'Clear Canvas', 'trash-2'))
+                this.renderRow('North Indian Chart', '', this.actionButton('create-north-indian', 'Create North Indian Chart', 'plus-circle'), 'plus-circle'),
+                this.renderRow('South Indian Chart', '', this.actionButton('create-south-indian', 'Create South Indian Chart', 'plus-circle'), 'plus-circle'),
+                this.renderRow(this.getPresentationLabel(), '', this.actionButton('toggle-presentation-view', this.getPresentationLabel(), 'presentation'), 'presentation'),
+                this.renderRow('Clear Canvas', '', this.actionButton('clear-chart', 'Clear Canvas', 'trash-2'), 'trash-2')
             ].join('');
 
             return this.renderSection('Chart', rows);
@@ -168,10 +185,10 @@ class CitranaItemsMenu {
         }
 
         const chartActions = [
-            this.renderRow(this.getPresentationLabel(), '', this.actionButton('toggle-presentation-view', this.getPresentationLabel(), this.getPresentationIcon())),
-            this.renderRow('Reset Chart', '', this.actionButton('reset-chart', 'Reset Chart', 'refresh-ccw')),
-            this.renderRow('Reset Drawings', '', this.actionButton('reset-drawings', 'Reset Drawings', 'eraser')),
-            this.renderRow('Clear Canvas', '', this.actionButton('clear-chart', 'Clear Canvas', 'trash-2'))
+            this.renderRow(this.getPresentationLabel(), '', this.actionButton('toggle-presentation-view', this.getPresentationLabel(), 'presentation'), 'presentation'),
+            this.renderRow('Reset Chart', '', this.actionButton('reset-chart', 'Reset Chart', 'trash-2'), 'trash-2'),
+            this.renderRow('Reset Drawings', '', this.actionButton('reset-drawings', 'Reset Drawings', 'trash-2'), 'trash-2'),
+            this.renderRow('Clear Canvas', '', this.actionButton('clear-chart', 'Clear Canvas', 'trash-2'), 'trash-2')
         ].join('');
 
         html += this.renderSection('Chart Actions', chartActions);
@@ -183,7 +200,7 @@ class CitranaItemsMenu {
     }
 
     getPresentationIcon() {
-        return window.app?.presentationView ? 'minimize-2' : 'maximize-2';
+        return 'presentation';
     }
 
     getBhavaLabel(chartType, houseNumber) {
@@ -246,7 +263,7 @@ class CitranaItemsMenu {
                     this.actionButton('delete-graha', 'Delete Graha', 'trash-2', `data-house="${houseNumber}" data-planet-id="${planet.id}"`)
                 ].join('');
 
-                rows.push(this.renderRow(label, `Bhava ${bhavaLabel}`, actions));
+                rows.push(this.renderRow(label, `Bhava ${bhavaLabel}`, actions, 'orbit'));
             });
         }
 
@@ -265,7 +282,8 @@ class CitranaItemsMenu {
         }
 
         const rows = this._shapes.map((shape, index) => {
-            const label = this.escapeHtml(this.getAnnotationLabel(shape));
+            const label = this.escapeHtml(this.getAnnotationDisplayName(shape));
+            const rowIcon = this.getAnnotationIcon(shape);
             const editBtn = this.canEditAnnotation(shape)
                 ? this.actionButton('edit-annotation', 'Edit annotation', 'pencil', `data-shape-index="${index}"`)
                 : '';
@@ -276,7 +294,7 @@ class CitranaItemsMenu {
                 this.actionButton('delete-annotation', 'Delete annotation', 'trash-2', `data-shape-index="${index}"`)
             ].filter(Boolean).join('');
 
-            return this.renderRow(label, '', actions);
+            return this.renderRow(label, '', actions, rowIcon);
         }).join('');
 
         return this.renderSection('Annotations', rows);
