@@ -950,6 +950,145 @@ class DrawingTools {
         this.controlPoints.endPoint?.moveToTop();
     }
 
+    getControlPointBaseRadius() {
+        return CitranaDevice.isMobileUA() ? 12 : 6;
+    }
+
+    restoreCanvasCursor() {
+        const container = document.getElementById('canvas-container');
+        const tool = window.app?.currentTool;
+        if (!container) {
+            return;
+        }
+
+        if (tool === 'hand') {
+            container.style.cursor = 'grab';
+        } else if (tool === 'select') {
+            container.style.cursor = 'default';
+        } else {
+            container.style.cursor = 'crosshair';
+        }
+    }
+
+    /**
+     * @param {Konva.Circle} circle
+     * @param {'idle'|'hover'|'active'} state
+     * @param {number} [baseRadius]
+     */
+    applyControlPointStyle(circle, state, baseRadius) {
+        if (!circle) {
+            return;
+        }
+
+        const radius = baseRadius ?? circle._cpBaseRadius ?? this.getControlPointBaseRadius();
+
+        if (state === 'hover') {
+            circle.fill('#000000');
+            circle.stroke('#ffffff');
+            circle.strokeWidth(2);
+            circle.radius(radius * 1.2);
+        } else if (state === 'active') {
+            circle.fill('#000000');
+            circle.stroke('#ffffff');
+            circle.strokeWidth(2);
+            circle.radius(radius * 1.15);
+        } else {
+            circle.fill('#ffffff');
+            circle.stroke('#000000');
+            circle.strokeWidth(2);
+            circle.radius(radius);
+        }
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {string} name
+     * @param {number} baseRadius
+     * @returns {Konva.Circle}
+     */
+    createControlPointCircle(x, y, name, baseRadius) {
+        const circle = new Konva.Circle({
+            x,
+            y,
+            radius: baseRadius,
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeWidth: 2,
+            name,
+            listening: true,
+            draggable: true,
+            hitStrokeWidth: CitranaDevice.isMobileUA() ? 0 : 10
+        });
+
+        circle._cpBaseRadius = baseRadius;
+        this.bindControlPointHover(circle);
+        return circle;
+    }
+
+    /**
+     * Desktop hover and drag feedback for arrow/line control points.
+     * @param {Konva.Circle} circle
+     */
+    bindControlPointHover(circle) {
+        const container = document.getElementById('canvas-container');
+        const supportsHover = typeof window !== 'undefined' &&
+            window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+        const resetToIdle = () => {
+            this.applyControlPointStyle(circle, 'idle');
+            this.restoreCanvasCursor();
+            this.layer?.batchDraw();
+        };
+
+        const setActive = () => {
+            this.applyControlPointStyle(circle, 'active');
+            if (container) {
+                container.style.cursor = 'grabbing';
+            }
+            this.layer?.batchDraw();
+        };
+
+        if (supportsHover) {
+            circle.on('mouseenter', () => {
+                if (this.isDraggingControlPoint) {
+                    return;
+                }
+
+                this.applyControlPointStyle(circle, 'hover');
+                if (container) {
+                    container.style.cursor = 'grab';
+                }
+                this.layer?.batchDraw();
+            });
+
+            circle.on('mouseleave', () => {
+                if (!this.isDraggingControlPoint) {
+                    resetToIdle();
+                }
+            });
+        }
+
+        circle.on('dragstart', setActive);
+        circle.on('dragend', () => {
+            requestAnimationFrame(() => {
+                const stage = circle.getStage();
+                const pointer = stage?.getPointerPosition();
+
+                if (supportsHover && pointer && stage.getIntersection(pointer) === circle) {
+                    this.applyControlPointStyle(circle, 'hover');
+                    if (container) {
+                        container.style.cursor = 'grab';
+                    }
+                    this.layer?.batchDraw();
+                    return;
+                }
+
+                resetToIdle();
+            });
+        });
+    }
+
     /**
      * Create control points for arrow or line shapes
      * @param {KonvaObject} shape - The shape to add control points to
@@ -962,36 +1101,26 @@ class DrawingTools {
             : shape.points();
         if (points.length < 4) return;
 
-        const cpRadius = CitranaDevice.isMobileUA() ? 12 : 6;
+        const cpRadius = this.getControlPointBaseRadius();
 
         // Clear existing control points
         this.clearControlPoints();
 
         // Create start control point
-        this.controlPoints.startPoint = new Konva.Circle({
-            x: points[0],
-            y: points[1],
-            radius: cpRadius,
-            fill: '#ffffff',
-            stroke: '#000000',
-            strokeWidth: 2,
-            name: 'control-point-start',
-            listening: true,
-            draggable: true
-        });
+        this.controlPoints.startPoint = this.createControlPointCircle(
+            points[0],
+            points[1],
+            'control-point-start',
+            cpRadius
+        );
 
         // Create end control point
-        this.controlPoints.endPoint = new Konva.Circle({
-            x: points[2],
-            y: points[3],
-            radius: cpRadius,
-            fill: '#ffffff',
-            stroke: '#000000',
-            strokeWidth: 2,
-            name: 'control-point-end',
-            listening: true,
-            draggable: true
-        });
+        this.controlPoints.endPoint = this.createControlPointCircle(
+            points[2],
+            points[3],
+            'control-point-end',
+            cpRadius
+        );
 
         // Add drag event handlers for start point
         this.controlPoints.startPoint.on('dragstart', () => {
