@@ -37,6 +37,7 @@
 - Documentation refreshed for contributors and AI assistants.
 - **Colour picker polish** — cleaner chips in the Edit UI and Graha bar; a simpler picker dialog without format labels; semi-transparent colours look consistent on arrows and Graha labels.
 - **Natural pen taper** — Pen strokes taper at the start and end and respond to drawing speed for a more handwritten feel; strokes stay at full opacity and save in session files.
+- **Pen stroke select and move** — With the Select tool, click or tap a pen stroke to select it (Selection Pill), click-and-drag or touch-and-drag to reposition it, and double-click or double-tap (or **Items** → **Edit**) to open colour and stroke controls on desktop and mobile.
 - **Drawing stroke defaults** — Pen starts at 4px; Arrow and Line start at 4px.
 - **Multi-line text and headings** — inline editors support multiple lines (**Shift+Enter** for a new line, **Enter** to finish); the heading editor is no longer capped at two lines.
 - **Text and heading style controls** — bold, italic, alignment, and font mode buttons in the Edit UI stay in sync with the canvas (including correct left alignment for new text annotations).
