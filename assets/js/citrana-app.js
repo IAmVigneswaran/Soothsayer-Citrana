@@ -1768,6 +1768,8 @@ class CitranaApp {
     applySaveChartOnlyTransparency() {
         if (this.options.saveChartOnly) {
             this.exportWithWhiteBg = false;
+        } else {
+            this.exportWithWhiteBg = true;
         }
         this.updateTransparencyToggleUI();
     }
