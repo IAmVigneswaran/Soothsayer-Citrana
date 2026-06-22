@@ -36,10 +36,10 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2654-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2681-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2020-lines)
+   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2031-lines)
    - [History Engine (citrana-history.js)](#history-engine-historyjs---94-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---334-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---984-lines)
@@ -50,12 +50,13 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
    - [Citrana Device](#citrana-device-citrana-devicejs---39-lines)
    - [Citrana Rashis](#citrana-rashis-citrana-rashisjs---41-lines)
    - [Citrana Selection](#citrana-selection-citrana-selectionjs---96-lines)
+   - [Citrana Annotation Fonts](#citrana-annotation-fonts-citrana-annotation-fontsjs---118-lines)
    - [Citrana Laser](#citrana-laser-citrana-laserjs---248-lines)
-   - [Drawing Tools](#drawing-tools-drawing-toolsjs---2134-lines)
-   - [Context Menu](#context-menu-context-menujs---717-lines)
+   - [Drawing Tools](#drawing-tools-citrana-drawing-toolsjs---2640-lines)
+   - [Context Menu](#context-menu-citrana-context-menujs---717-lines)
    - [Citrana Items Menu](#citrana-items-menu-citrana-items-menujs---635-lines)
    - [Citrana Session](#citrana-session-citrana-sessionjs---214-lines)
-   - [Edit UI](#edit-ui-edit-uijs---786-lines)
+   - [Edit UI](#edit-ui-citrana-edit-uijs---998-lines)
 6. [Core Features](#core-features)
    - [Undo / Redo](#undo--redo)
    - [Chart Types](#chart-types)
@@ -95,72 +96,53 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 - Safe-area CSS vars (`--sat` … `--sal`, `--ui-inset`, `--ui-bottom-pad`, `--ui-bottom-stack`)
 - `body { position: fixed; inset: 0 }` — avoids bottom gap on iOS
 - `viewport-fit=cover`; manifest `display: standalone`
-- Mobile: Graha library bottom stack; Help bottom-left; drawing tools visible in toolbar; toolbar horizontal scroll with chevrons when overflow; **Items** button in zoom bar
+- Mobile: Graha library bottom stack; Help bottom-left; drawing tools visible in toolbar; toolbar and Edit UI horizontal scroll with chevrons when controls overflow; **Items** button in zoom bar
 
 ## Complete Project Structure
 
-```
-Soothsayer-Citrana/
-├── index.html                    # Main entry (~567 lines); viewport-fit=cover; PWA meta; modal a11y; Items modal; toolbar scroll viewport
-├── robots.txt
-├── sitemap.xml
-├── assets/
-│   ├── css/
-│   │   └── styles.css            # Complete styling system (~2681 lines); primary mobile block + post-base mobile overrides; JSColorPicker `--cp-*` theme; `.items-*`; `.items-row-selected`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*`
-│   ├── js/
-│   │   ├── citrana-app.js                # Main application coordinator (~2020 lines)
-│   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
-│   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~383 lines)
-│   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
-│   │   ├── citrana-device.js     # Shared touch, mobile UA, and viewport helpers (~39 lines)
-│   │   ├── citrana-selection.js # Selection Pill (~96 lines)
-│   │   ├── citrana-items-menu.js # Items panel — chart/Bhava/Graha/annotation actions (~635 lines)
-│   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~248 lines)
-│   │   ├── citrana-rashis.js     # Shared Rashi names, Lucide zodiac icons, grid numbers (~49 lines)
-│   │   ├── citrana-session.js    # Save/open `.citrana.json` session files (~214 lines)
-│   │   ├── citrana-chart-coordinator.js  # Chart type management (~334 lines)
-│   │   ├── citrana-chart-templates-south.js  # South Indian chart logic (~984 lines)
-│   │   ├── citrana-chart-templates-north.js  # North Indian chart logic (~1011 lines)
-│   │   ├── citrana-planet-system.js      # Graha library and drag-drop (~880 lines)
-│   │   ├── citrana-drawing-tools.js      # Drawing tools implementation (~2134 lines)
-│   │   ├── citrana-context-menu.js       # Context menu system (~717 lines)
-│   │   ├── citrana-edit-ui.js            # Edit interface controls (~786 lines)
-│   │   └── citrana-history.js            # Unified undo/redo timeline (~94 lines)
-│   ├── vendor/
-│   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
-│   │   ├── lucide.min.js         # Lucide 0.576.0 (self-hosted)
-│   │   ├── colorpicker.iife.min.js  # JSColorPicker 1.1.0 (self-hosted)
-│   │   └── colorpicker.min.css   # JSColorPicker 1.1.0 stylesheet
-│   ├── images/                   # 14 files (logos, demo GIFs, browser screenshot)
-│   │   ├── soothsayer_citrana_social-preview.jpg
-│   │   ├── Soothsayer-Citrana-Full-Logo-Black.png / -White.png
-│   │   ├── Soothsayer-Logo-Black.png / Soothsayer-Logo-White.png
-│   │   ├── citrana-browser-screenshot.png
-│   │   └── demo-*.gif            # English, Tamil, Hindi, tldraw demos
-│   ├── svgs/
-│   │   ├── north-indian.svg
-│   │   └── south-indian.svg
-│   └── favicon/                  # 29 files
-│       ├── favicon.ico
-│       ├── manifest.json         # PWA manifest (display: standalone)
-│       ├── browserconfig.xml
-│       ├── apple-icon-*.png      # 12 variants
-│       ├── android-icon-*.png    # 6 variants
-│       ├── favicon-*.png         # 5 variants
-│       └── ms-icon-*.png         # 4 variants
-├── .github/
-│   └── workflows/
-│       ├── static.yml            # GitHub Pages deploy with minification (push to main)
-│       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # This comprehensive documentation (~1202 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~500 lines)
-├── .cursorrules                  # Cursor IDE configuration (~1232 lines)
-├── CHANGELOG.md                  # Version history and changes (~87 lines)
-├── README.md                     # Project readme (~199 lines)
-├── LICENSE                       # MIT License
-├── SECURITY.md                   # Security policy
-└── .gitignore                    # Git ignore rules
-```
+| Path | Lines | Description |
+|------|-------|-------------|
+| `index.html` | ~572 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Items modal; toolbar + Edit UI scroll viewports |
+| `robots.txt` | — | Search engine rules |
+| `sitemap.xml` | — | Sitemap |
+| `assets/css/styles.css` | ~2681 | Complete styling; primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` (toolbar + Edit UI) |
+| `assets/js/citrana-annotation-fonts.js` | ~118 | Normal and hand-written annotation fonts |
+| `assets/js/citrana-app.js` | ~2031 | Main application coordinator |
+| `assets/js/citrana-arrow.js` | ~185 | Unified filled-arrow geometry |
+| `assets/js/citrana-chart-coordinator.js` | ~334 | Chart type management |
+| `assets/js/citrana-chart-templates-north.js` | ~1011 | North Indian chart logic |
+| `assets/js/citrana-chart-templates-south.js` | ~984 | South Indian chart logic |
+| `assets/js/citrana-colorpicker.js` | ~383 | JSColorPicker theme and helpers |
+| `assets/js/citrana-context-menu.js` | ~717 | Context menu system |
+| `assets/js/citrana-debug.js` | ~13 | Contributor debug logging (on by default) |
+| `assets/js/citrana-device.js` | ~39 | Touch, mobile UA, and viewport helpers |
+| `assets/js/citrana-drawing-tools.js` | ~2640 | Drawing tools implementation |
+| `assets/js/citrana-edit-ui.js` | ~998 | Edit interface controls |
+| `assets/js/citrana-history.js` | ~94 | Unified undo/redo timeline |
+| `assets/js/citrana-items-menu.js` | ~635 | Items panel — chart/Bhava/Graha/annotation actions |
+| `assets/js/citrana-laser.js` | ~248 | Ephemeral laser pointer Canvas overlay |
+| `assets/js/citrana-planet-system.js` | ~880 | Graha library and drag-drop |
+| `assets/js/citrana-rashis.js` | ~49 | Rashi names, Lucide zodiac icons, grid numbers |
+| `assets/js/citrana-selection.js` | ~96 | Selection Pill |
+| `assets/js/citrana-session.js` | ~214 | Save/open `.citrana.json` session files |
+| `assets/vendor/konva.min.js` | — | Konva 9.3.20 (self-hosted; loaded in `<head>`) |
+| `assets/vendor/lucide.min.js` | — | Lucide 0.576.0 (self-hosted) |
+| `assets/vendor/colorpicker.iife.min.js` | — | JSColorPicker 1.1.0 (self-hosted) |
+| `assets/vendor/colorpicker.min.css` | — | JSColorPicker 1.1.0 stylesheet |
+| `assets/images/` | 14 files | Logos, demo GIFs, browser screenshot |
+| `assets/svgs/north-indian.svg` | — | North Indian chart template |
+| `assets/svgs/south-indian.svg` | — | South Indian chart template |
+| `assets/favicon/` | 29 files | Favicon set, `manifest.json` (PWA standalone), `browserconfig.xml` |
+| `.github/workflows/static.yml` | — | GitHub Pages deploy with minification (push to `main`) |
+| `.github/workflows/codeql.yml` | — | CodeQL security analysis |
+| `AGENT.md` | ~1254 | Comprehensive documentation |
+| `ARCHITECTURE.md` | ~512 | System architecture and data flows |
+| `.cursorrules` | ~1277 | Cursor IDE configuration |
+| `CHANGELOG.md` | ~88 | Version history |
+| `README.md` | ~199 | Project readme |
+| `LICENSE` | — | MIT License |
+| `SECURITY.md` | — | Security policy |
+| `.gitignore` | — | Git ignore rules |
 
 > Line counts are approximate; run `wc -l` after significant edits. Update About modal version in `index.html` on each release.
 
@@ -168,7 +150,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (citrana-app.js - ~2020 lines)
+### Main Application (citrana-app.js - ~2031 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -434,15 +416,16 @@ Key Methods:
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
 - `getPlanetInfo()`: Retrieve Graha data from paged structure
 
-### Drawing Tools (citrana-drawing-tools.js - ~2134 lines)
+### Drawing Tools (citrana-drawing-tools.js - ~2640 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
 - Implements all drawing tools (select, arrow, line, pen, laser, text, heading)
 - Creates arrows via `CitranaArrow.create()` (filled `Konva.Line`, not `Konva.Arrow`)
 - Delegates laser pointer to `CitranaLaser` (Canvas 2D overlay — not Konva, not serialised)
+- Converts completed pen strokes to tapered `Konva.Shape` nodes (`penTaper`, `penTaperPoints`, `penTaperWidths`, `penStrokeColor`, `penBaseWidth`)
 - Calls `window.app.recordHistory()` for drawing and Graha edit actions (laser excluded)
-- Handles shape selection and editing
+- Handles shape selection and editing; `CitranaSelection` for text/heading annotations
 - Provides precise positioning and hit detection
 - Manages Edit UI integration
 - Implements Graha text editing (`#text-edit-controls` bar; colour via `#text-edit-color` + `CitranaColorPicker`)
@@ -451,35 +434,35 @@ Available Tools:
 - Select Tool: Choose and modify existing elements
 - Arrow Tool: Create directional indicators with arrowheads and control points
 - Line Tool: Draw straight lines and connections with control points
-- Pen Tool: Freehand drawing for annotations (spline tension + point filtering for smooth curves)
+- Pen Tool: Freehand drawing — live uniform preview while drawing; on release, smoothed path with velocity-based width and end taper (default **4px** base, full opacity)
 - Laser Pointer: Ephemeral presentation highlight via `CitranaLaser`; stays active for continuous drawing like Pen
-- Text Tool: Add editable text boxes
-- Heading Tool: Create chart headings and titles
+- Text Tool: Add editable text boxes (multi-line inline editor)
+- Heading Tool: Create chart headings and titles (multi-line inline editor)
 
 Key Features:
 - Pixel-perfect positioning
 - Touch and mouse support
 - Shape selection and editing
 - Colour and stroke customisation
-- Default stroke widths: Pen **3px**, Line and Arrow **4px** (`citrana-edit-ui.js` defaults + tool `start*` methods)
-- Text editing with font controls
+- Default stroke widths: Pen **4px**, Line and Arrow **4px** (`PEN_DEFAULT_STROKE_WIDTH` + `citrana-edit-ui.js` defaults)
+- Text editing with font controls via Edit UI and `CitranaAnnotationFonts`
 - Graha text editing with retrograde underline support (Konva `textDecoration`)
 - Graha edit sessions: **Save** / click-away / Enter → `dismissPlanetEditing()` (commits if dirty); **Cancel** / Escape → `cancelPlanetEditing()` (discards)
 - Auto-switch to Select Tool after Arrow, Line, Text, and Heading creation; Pen and Laser stay active for continuous drawing
 - `makeShapeSelectable()` binds drag/selection once when a stroke completes (`stopDrawing`), not on every mousemove; touch double-tap guarded by `_editUiDoubleTapBound`
-- Control points for precise arrow and line adjustment; `Adjust drawing` on handle drag end
+- Control points for arrow/line adjustment with desktop hover feedback (colour invert, grab/grabbing cursor); `Adjust drawing` on handle drag end
 
 Key Methods:
-- `startDrawing()` / `draw()` / `stopDrawing()`: Drawing lifecycle
+- `startDrawing()` / `draw()` / `stopDrawing()`: Drawing lifecycle; pen finalisation via tapered `Konva.Shape`
 - `makeShapeSelectable()` / `bindMoveDragHistory()`: Selection and move undo
 - `editPlanetText()` / `dismissPlanetEditing()` / `cancelPlanetEditing()`: Graha label/colour/retrograde bar — dismiss commits if edited (click outside); cancel discards (Cancel / Escape)
-- `editText()` / `editHeading()`: Inline content editors with undo on commit; hide Edit UI before opening
+- `editText()` / `editHeading()`: Inline content editors with undo on commit; hide Edit UI before opening; **Shift+Enter** new line, **Enter** finish
 - `startInlineContentEdit()` / `focusInlineTextarea()`: Items **Edit text** and double-click path for Text/Heading
 - `showEditUIForShape()`: Edit interface integration
 - `setPlanetRetrogradeState()`: Persist retrograde underline on Graha text
 - `createControlPoints()` / `commitControlPointAdjust()`: Arrow/line endpoint handles
 - `updateControlPointsPosition()` / `clearControlPoints()`: Control point sync
-- `restorePersistedDrawings()`: Rebuild drawings from history snapshots; migrates legacy `Konva.Arrow` via `CitranaArrow.fromLegacyNode()`; calls `bindRestoredDrawingInteractions()`
+- `restorePersistedDrawings()`: Rebuild drawings from history snapshots; migrates legacy `Konva.Arrow` via `CitranaArrow.fromLegacyNode()`; restores tapered pen shapes; calls `bindRestoredDrawingInteractions()`
 - `bindRestoredDrawingInteractions()`: Re-bind selection/drag handlers after undo or session restore
 - `clearLaser()` / `isLaserToolAvailable()`: Laser overlay lifecycle; delegates to `CitranaDevice.isLaserViewport()`
 - Touch detection via `CitranaDevice.isTouchDevice()`; mobile font sizing via `CitranaDevice.isMobileUA()`
@@ -503,17 +486,32 @@ Key Exports:
 Used by `citrana-context-menu.js` (North **Set Lagna as …** submenu), chart templates, and `citrana-items-menu.js` (South Bhava row labels).
 
 ### Citrana Selection (citrana-selection.js - ~96 lines)
-Graha **Selection Pill** — colour-independent indicator behind Graha text.
+**Selection Pill** — colour-independent dashed outline behind selected Graha labels and text/heading annotations.
 
 Key Responsibilities:
-- Selection Pill — white rounded `Konva.Rect` (`planet-selection-pill`) behind selected Graha text
-- `listening: false` on pill; Graha text stays on top for hit-testing
+- Dashed transparent `Konva.Rect` (`selection-pill`) behind selected label text
+- `listening: false` on pill; label text stays on top for hit-testing
 - Extra padding on mobile (`CitranaDevice.isMobileUA()`)
 
 Key Methods:
-- `attach(planetText, parentGroup)`, `sync(planetText)`, `detach(planetText)`
+- `attach(labelText, parentContainer)`, `sync(labelText)`, `detach(labelText)`
 
-Wired from South/North `selectPlanet()` / `clearSelectedPlanet()` and on Graha `dragmove`.
+Wired from South/North `selectPlanet()` / `clearSelectedPlanet()`, annotation `selectShape()`, and on Graha `dragmove`.
+
+### Citrana Annotation Fonts (citrana-annotation-fonts.js - ~118 lines)
+Normal vs Hand-written typography for text and heading annotations.
+
+Key Responsibilities:
+- **Normal mode:** Arial / Arial Black + `fontWeight` for bold
+- **Hand-written mode:** Caveat / **Caveat Brush** (bold uses separate family — Konva has no real `fontWeight` slot for canvas fonts)
+- Italic via `fontStyle: 'italic'` in both modes
+- `ensureLoaded()` preloads Google Fonts (called from app init and Edit UI before hand-written bold)
+
+Key Methods:
+- `isHandwritten()`, `isBold()`, `isItalic()`, `setBold()`, `setItalic()`, `setMode()`, `ensureLoaded()`
+- Constants: `MODE_NORMAL`, `MODE_HANDWRITTEN`
+
+Consumed by `citrana-edit-ui.js` (**Normal** / **Hand-written** buttons, bold/italic toggles). Font families persist in session/undo via Konva `toObject()`.
 
 ### Citrana Laser (citrana-laser.js - ~248 lines)
 Ephemeral laser pointer for presentations — separate from Konva chart objects.
@@ -621,34 +619,36 @@ Key Methods:
 
 Wired from `app.saveSession()` / `app.openSessionFromFile()` / `app.restoreSessionState()`; import resets undo timeline via `history.resetToState()`.
 
-### Edit UI (citrana-edit-ui.js - ~786 lines)
+### Edit UI (citrana-edit-ui.js - ~998 lines)
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
-- Creates floating edit interface
+- Creates floating edit interface with mobile chevron scroll (`setupEditUIScroll`, reuses `.toolbar-scroll-*` pattern at ≤768px)
 - Provides tool-specific controls
 - Manages shape property editing
 - Handles colour and stroke customisation
-- Implements text editing controls
+- Implements text/heading style controls via `CitranaAnnotationFonts`
 - Records one undo step per edit session on `hide()` when properties changed
 - Touch-outside dismiss ignores colour picker popup (`.cp_dialog`) and Konva inline textarea (`.konva-textarea`)
 
 Edit Controls:
-- Stroke width and colour controls (pen, line, arrow) — defaults Pen 3px, Line/Arrow 4px; colour via `CitranaColorPicker.createInput()` chips
-- Font size, weight, style, alignment, and colour (text, heading)
+- Stroke width and colour controls (pen, line, arrow) — defaults Pen **4px**, Line/Arrow **4px**; tapered pen width via `penBaseWidth`; colour via `CitranaColorPicker.createInput()` chips
+- Font size, bold, italic, **Normal** / **Hand-written**, alignment, and colour (text, heading)
 - Retrograde toggle (Graha text only — records via `setPlanetRetrogradeState`, not session close)
 - Delete functionality
 
 Key Features:
 - Session-based undo: `markEditDirty()` on changes; `_commitEditHistoryIfNeeded()` on `hide()`
 - Delete sets `_skipHistoryOnHide` to avoid double steps with `Delete drawing`
-- Floating, bottom-centre positioning
+- Floating, bottom-centre positioning; `#edit-ui-scroll-prev` / `#edit-ui-scroll-viewport` / `#edit-ui-scroll-next` on mobile
 - Mobile-optimised touch targets
 
 Key Methods:
 - `show()` / `hide()`: Display/hide; commit history on hide when dirty
+- `setupEditUIScroll()`: Mobile overflow scroll for text style controls
 - `createToolControls()`: Build tool-specific controls
-- `updateStrokeWidth()` / `updateStrokeColor()` / `updateTextColor()`: Property updates (font size/weight/style are applied inline in `createTextControls()`)
+- `updateStrokeWidth()` / `updateStrokeColor()` / `updateTextColor()`: Property updates
+- `setAnnotationBold()` / `setAnnotationItalic()`: Delegate to `CitranaAnnotationFonts`
 - `markEditDirty()` / `_commitEditHistoryIfNeeded()`: Session undo integration
 
 ## Core Features
@@ -716,14 +716,15 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - Select Tool: Choose and modify existing elements with Edit UI
 - Arrow Tool: Unified filled arrow (`CitranaArrow`) with constant-width shaft, prominent head, and control points (default 4px)
 - Line Tool: Draw straight lines and connections with control points (default 4px)
-- Pen Tool: Freehand drawing with smoothed spline curves (default 3px)
+- Pen Tool: Freehand drawing with natural taper — velocity-based width, smoothed path, end taper (default **4px** base width, full opacity); stored as custom `Konva.Shape` with `penTaper` attrs
 - Laser Pointer: Temporary fading highlight for presentations (`CitranaLaser` Canvas overlay; shortcut **K**; not saved or undoable)
 - Presentation View: Context menu or **Items** panel toggle hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, and drawing Edit UI; dismisses active edit sessions on enter
-- Text Tool: Add editable text boxes anywhere on canvas
-- Heading Tool: Create chart headings and titles
+- Text Tool: Add editable multi-line text boxes anywhere on canvas (**Shift+Enter** new line)
+- Heading Tool: Create multi-line chart headings and titles
+- **Hand-written annotations:** optional Caveat script; bold uses Caveat Brush via Edit UI **Normal** / **Hand-written** toggles
 - Undo/Redo: Unified timeline via `app.recordHistory()` — see [Undo / Redo](#undo--redo)
 - Auto-Switch Behaviour: Arrow, Line, Text, and Heading automatically switch to Select Tool after creation; Pen and Laser remain active
-- Control Points: Draggable handles for adjusting start and end points of arrows and lines
+- Control Points: Draggable handles for arrow/line endpoints; desktop hover feedback (colour invert, grab cursor)
 
 ### Control Points Feature
 The control points system provides precise adjustment capabilities for arrow and line elements:
@@ -731,6 +732,7 @@ The control points system provides precise adjustment capabilities for arrow and
 Functionality:
 - Control points appear automatically when arrows or lines are selected
 - Two draggable handles at the start and end points of each element
+- Desktop hover inverts handle fill/stroke (black ↔ white) and shows **grab** / **grabbing** cursor; wider hit targets for easier picking
 - Real-time visual feedback during adjustment
 - Per-frame synchronisation ensures control points stay attached during shape movement
 - Works on both blank canvas and chart-loaded states
@@ -749,7 +751,8 @@ Technical Implementation:
 - Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha (Select/Hand when enabled; suppressed while drawing or when disabled via Items); chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
 - **Items Panel**: `#items-menu-btn` in zoom bar — chart/Bhava/Graha/annotation actions; **Clear Selection** and **Disable Context Menu**; row highlight syncs with canvas selection; primary mobile/touch workflow
-- **Graha Selection Pill**: **Selection Pill** behind Graha text when selected; Bhava highlight in light grey
+- **Selection Pill**: dashed outline behind selected Graha labels and text/heading annotations; Bhava highlight in light grey
+- **Edit UI mobile scroll**: chevron buttons scroll style controls when they overflow on narrow screens
 - Status Updates: Real-time feedback and notifications
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
 - Help Modal: Shortcuts and usage guide (Laser Pointer, Items panel, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
@@ -1216,7 +1219,7 @@ Edit the Graha data objects in assets/js/citrana-planet-system.js:
 - **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
 - **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
 - **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
-- **Minified local JS:** `citrana-app`, `citrana-chart-coordinator`, `citrana-chart-templates-north`, `citrana-chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-selection`, `citrana-items-menu`, `citrana-laser`, `citrana-rashis`, `citrana-session`, `citrana-context-menu`, `citrana-drawing-tools`, `citrana-edit-ui`, `citrana-history`, `citrana-planet-system`
+- **Minified local JS:** all 19 `citrana-*.js` modules (alphabetically in `static.yml`): `citrana-annotation-fonts`, `citrana-app`, `citrana-arrow`, `citrana-chart-coordinator`, `citrana-chart-templates-north`, `citrana-chart-templates-south`, `citrana-colorpicker`, `citrana-context-menu`, `citrana-debug`, `citrana-device`, `citrana-drawing-tools`, `citrana-edit-ui`, `citrana-history`, `citrana-items-menu`, `citrana-laser`, `citrana-planet-system`, `citrana-rashis`, `citrana-selection`, `citrana-session`
 - **Not minified in CI:** `assets/vendor/*` (Konva, Lucide, JSColorPicker — already minified)
 
 ### Local development
