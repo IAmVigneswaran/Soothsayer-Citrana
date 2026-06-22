@@ -1223,8 +1223,6 @@ class DrawingTools {
             shape.destroy();
         });
 
-        this.layer.find((node) => node.name() === 'pen-marker-bleed').forEach((node) => node.destroy());
-
         this.clearControlPoints();
         this.layer.batchDraw();
     }
