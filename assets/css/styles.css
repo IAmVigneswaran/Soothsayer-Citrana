@@ -1627,8 +1627,10 @@ body.presentation-view .about-btn {
   position: sticky;
   top: 0;
   z-index: 2;
+  display: flex;
+  align-items: center;
   background: #ffffff;
-  padding-bottom: 12px;
+  padding: 10px 0 12px;
   margin-bottom: 8px;
   border-bottom: 1px solid #e5e7eb;
 }
@@ -1640,8 +1642,13 @@ body.presentation-view .about-btn {
 .items-section-nav {
   display: flex;
   flex-wrap: nowrap;
+  align-items: center;
   gap: 6px;
+  width: 100%;
+  min-height: 30px;
+  padding: 2px 0 4px;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -1652,18 +1659,22 @@ body.presentation-view .about-btn {
 
 .items-section-chip {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #000000;
   border-radius: 999px;
   background: #ffffff;
   color: #000000;
   font-size: 12px;
   font-weight: 500;
-  line-height: 1.2;
-  padding: 5px 11px;
+  line-height: 1;
+  padding: 6px 12px;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  box-sizing: border-box;
 }
 
 .items-section-chip:hover,
@@ -1674,7 +1685,7 @@ body.presentation-view .about-btn {
 
 .items-section {
   margin-bottom: 24px;
-  scroll-margin-top: 52px;
+  scroll-margin-top: 56px;
 }
 
 .items-section:last-child {
