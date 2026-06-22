@@ -53,25 +53,25 @@ jobs:
       
       - name: Minify local JavaScript files
         run: |
+          terser assets/js/citrana-annotation-fonts.js -o assets/js/citrana-annotation-fonts.min.js --compress --mangle
           terser assets/js/citrana-app.js -o assets/js/citrana-app.min.js --compress --mangle
+          terser assets/js/citrana-arrow.js -o assets/js/citrana-arrow.min.js --compress --mangle
           terser assets/js/citrana-chart-coordinator.js -o assets/js/citrana-chart-coordinator.min.js --compress --mangle
           terser assets/js/citrana-chart-templates-north.js -o assets/js/citrana-chart-templates-north.min.js --compress --mangle
           terser assets/js/citrana-chart-templates-south.js -o assets/js/citrana-chart-templates-south.min.js --compress --mangle
-          terser assets/js/citrana-arrow.js -o assets/js/citrana-arrow.min.js --compress --mangle
           terser assets/js/citrana-colorpicker.js -o assets/js/citrana-colorpicker.min.js --compress --mangle
+          terser assets/js/citrana-context-menu.js -o assets/js/citrana-context-menu.min.js --compress --mangle
           terser assets/js/citrana-debug.js -o assets/js/citrana-debug.min.js --compress --mangle
           terser assets/js/citrana-device.js -o assets/js/citrana-device.min.js --compress --mangle
-          terser assets/js/citrana-rashis.js -o assets/js/citrana-rashis.min.js --compress --mangle
-          terser assets/js/citrana-selection.js -o assets/js/citrana-selection.min.js --compress --mangle
-          terser assets/js/citrana-annotation-fonts.js -o assets/js/citrana-annotation-fonts.min.js --compress --mangle
-          terser assets/js/citrana-laser.js -o assets/js/citrana-laser.min.js --compress --mangle
-          terser assets/js/citrana-context-menu.js -o assets/js/citrana-context-menu.min.js --compress --mangle
-          terser assets/js/citrana-items-menu.js -o assets/js/citrana-items-menu.min.js --compress --mangle
-          terser assets/js/citrana-session.js -o assets/js/citrana-session.min.js --compress --mangle
           terser assets/js/citrana-drawing-tools.js -o assets/js/citrana-drawing-tools.min.js --compress --mangle
           terser assets/js/citrana-edit-ui.js -o assets/js/citrana-edit-ui.min.js --compress --mangle
           terser assets/js/citrana-history.js -o assets/js/citrana-history.min.js --compress --mangle
+          terser assets/js/citrana-items-menu.js -o assets/js/citrana-items-menu.min.js --compress --mangle
+          terser assets/js/citrana-laser.js -o assets/js/citrana-laser.min.js --compress --mangle
           terser assets/js/citrana-planet-system.js -o assets/js/citrana-planet-system.min.js --compress --mangle
+          terser assets/js/citrana-rashis.js -o assets/js/citrana-rashis.min.js --compress --mangle
+          terser assets/js/citrana-selection.js -o assets/js/citrana-selection.min.js --compress --mangle
+          terser assets/js/citrana-session.js -o assets/js/citrana-session.min.js --compress --mangle
       
       - name: Update HTML to use minified local files only
         run: |
@@ -79,25 +79,25 @@ jobs:
           sed -i 's|href="assets/css/styles.css"|href="assets/css/styles.min.css"|g' index.html
           
           # Update only local JS files (not CDN or Vendor files)
+          sed -i 's|src="assets/js/citrana-annotation-fonts.js"|src="assets/js/citrana-annotation-fonts.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-app.js"|src="assets/js/citrana-app.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-arrow.js"|src="assets/js/citrana-arrow.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-chart-coordinator.js"|src="assets/js/citrana-chart-coordinator.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-chart-templates-north.js"|src="assets/js/citrana-chart-templates-north.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-chart-templates-south.js"|src="assets/js/citrana-chart-templates-south.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-arrow.js"|src="assets/js/citrana-arrow.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-colorpicker.js"|src="assets/js/citrana-colorpicker.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-context-menu.js"|src="assets/js/citrana-context-menu.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-debug.js"|src="assets/js/citrana-debug.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-device.js"|src="assets/js/citrana-device.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-rashis.js"|src="assets/js/citrana-rashis.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-selection.js"|src="assets/js/citrana-selection.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-annotation-fonts.js"|src="assets/js/citrana-annotation-fonts.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-laser.js"|src="assets/js/citrana-laser.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-context-menu.js"|src="assets/js/citrana-context-menu.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-items-menu.js"|src="assets/js/citrana-items-menu.min.js"|g' index.html
-          sed -i 's|src="assets/js/citrana-session.js"|src="assets/js/citrana-session.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-drawing-tools.js"|src="assets/js/citrana-drawing-tools.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-edit-ui.js"|src="assets/js/citrana-edit-ui.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-history.js"|src="assets/js/citrana-history.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-items-menu.js"|src="assets/js/citrana-items-menu.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-laser.js"|src="assets/js/citrana-laser.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-planet-system.js"|src="assets/js/citrana-planet-system.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-rashis.js"|src="assets/js/citrana-rashis.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-selection.js"|src="assets/js/citrana-selection.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-session.js"|src="assets/js/citrana-session.min.js"|g' index.html
       
       - name: Setup Pages
         uses: actions/configure-pages@v5
