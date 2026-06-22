@@ -28,7 +28,7 @@ This codebase is developed using AI agents.
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
 - Graha Library: 60 Grahas across 5 pages — traditional Grahas, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Upagrahas with outer Grahas
 - Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that Bhava on the **next** drop only (then the pointer takes over again)
-- Graha Selection Pill: Click or tap a placed Graha to select it; a **Selection Pill** appears behind the Graha text
+- Selection Pill: Click or tap a placed Graha, or select a text or heading annotation with the Select tool; a dashed **Selection Pill** appears behind the label
 - Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo (zoom and pan are not tracked)
 - Save and Open Session: Download or restore a **`.citrana.json`** working file (chart, Grahas, annotations, and Options) from the toolbar; only `.citrana.json` files are accepted
 - Comprehensive Drawing Tools: Select, arrow, line, pen, laser pointer, text, and heading tools
@@ -137,7 +137,7 @@ Chart Display Options: Click the gear icon in the toolbar (after Save) to open *
 
 ### Working with Grahas
 
-Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Click or tap a placed Graha to select it; a **Selection Pill** appears behind the Graha text. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it, or press **Delete** when a Graha is selected.
+Adding Grahas: Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Click or tap a placed Graha to select it; a dashed **Selection Pill** appears behind the Graha text. Double-click any Graha, or right-click and choose **Edit Graha**, to open a floating editing panel where you can modify text and set it as retrograde (the Graha text will be underlined). Right-click a Graha and choose **Delete Graha** to remove it, or press **Delete** when a Graha is selected.
 
 Clear Bhava: Right-click a Bhava and choose **Clear Bhava** to remove every Graha from that Bhava.
 
@@ -145,7 +145,7 @@ Custom Graha: There is also a "Custom" Graha available in the library. Drag and 
 
 ### Drawing and Navigation
 
-Drawing Tools: Use the toolbar to add arrows, lines, pen strokes, text, and headings. After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool and Laser Pointer stay active for continuous drawing. The Laser Pointer (**K**) draws a temporary highlight that fades away — it is not saved to the chart or included in undo/redo. Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or **Items** — see below) to change colour, font size, and alignment. Use the Hand tool to pan around the chart.
+Drawing Tools: Use the toolbar to add arrows, lines, pen strokes, text, and headings. After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool and Laser Pointer stay active for continuous drawing. The Laser Pointer (**K**) draws a temporary highlight that fades away — it is not saved to the chart or included in undo/redo. Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or **Items** — see below) to change colour, font size, bold, italic, and alignment. Text and headings support multiple lines: press **Shift+Enter** for a new line while editing; press **Enter** to finish. Select text or heading annotations with the Select tool to show the same dashed **Selection Pill** behind the label. Use the Hand tool to pan around the chart.
 
 Presentation View: Right-click the canvas (or a Bhava), open **Items**, or use the chart context menu and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again, reopen **Items**, or choose **Exit Presentation View** to restore the interface.
 
