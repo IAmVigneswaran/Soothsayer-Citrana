@@ -1,11 +1,11 @@
 /**
- * citrana-graha-selection.js
+ * citrana-selection.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana
  * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
- * Graha Selection Pill — colour-independent pill behind planet labels
+ * Selection Pill — colour-independent pill behind Graha labels and annotations
  */
-const CitranaGrahaSelection = (() => {
-    const PILL_NAME = 'planet-selection-pill';
+const CitranaSelection = (() => {
+    const PILL_NAME = 'selection-pill';
     const PADDING_DESKTOP = 4;
     const PADDING_MOBILE = 7;
 
@@ -15,8 +15,8 @@ const CitranaGrahaSelection = (() => {
             : PADDING_DESKTOP;
     }
 
-    function positionPill(pill, planetText, relativeTo) {
-        const rect = planetText.getClientRect({ relativeTo });
+    function positionPill(pill, labelText, relativeTo) {
+        const rect = labelText.getClientRect({ relativeTo });
         const pad = getPadding();
 
         pill.setAttrs({
@@ -29,16 +29,16 @@ const CitranaGrahaSelection = (() => {
     }
 
     /**
-     * @param {Konva.Text} planetText
-     * @param {Konva.Group} parentGroup
+     * @param {Konva.Text} labelText
+     * @param {Konva.Container} parentContainer
      * @returns {Konva.Rect|null}
      */
-    function attach(planetText, parentGroup) {
-        if (!planetText || !parentGroup || typeof Konva === 'undefined') {
+    function attach(labelText, parentContainer) {
+        if (!labelText || !parentContainer || typeof Konva === 'undefined') {
             return null;
         }
 
-        detach(planetText);
+        detach(labelText);
 
         const pill = new Konva.Rect({
             name: PILL_NAME,
@@ -49,41 +49,41 @@ const CitranaGrahaSelection = (() => {
             listening: false
         });
 
-        positionPill(pill, planetText, parentGroup);
-        parentGroup.add(pill);
-        planetText._selectionPill = pill;
+        positionPill(pill, labelText, parentContainer);
+        parentContainer.add(pill);
+        labelText._selectionPill = pill;
         pill.moveToTop();
-        planetText.moveToTop();
+        labelText.moveToTop();
 
         return pill;
     }
 
     /**
-     * @param {Konva.Text} planetText
+     * @param {Konva.Text} labelText
      */
-    function sync(planetText) {
-        const pill = planetText?._selectionPill;
-        const parent = planetText?.getParent();
+    function sync(labelText) {
+        const pill = labelText?._selectionPill;
+        const parent = labelText?.getParent();
         if (!pill || !parent) {
             return;
         }
 
-        positionPill(pill, planetText, parent);
+        positionPill(pill, labelText, parent);
         pill.moveToTop();
-        planetText.moveToTop();
+        labelText.moveToTop();
     }
 
     /**
-     * @param {Konva.Text} planetText
+     * @param {Konva.Text} labelText
      */
-    function detach(planetText) {
-        const pill = planetText?._selectionPill;
+    function detach(labelText) {
+        const pill = labelText?._selectionPill;
         if (!pill) {
             return;
         }
 
         pill.destroy();
-        planetText._selectionPill = null;
+        labelText._selectionPill = null;
     }
 
     return {

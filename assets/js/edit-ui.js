@@ -116,6 +116,121 @@ class EditUI {
     }
 
     /**
+     * Whether a text/heading annotation is visually bold (weight or Arial Black family).
+     * @param {Konva.Text} element
+     * @returns {boolean}
+     */
+    isAnnotationBold(element) {
+        if (!element) {
+            return false;
+        }
+
+        const weight = element.fontWeight?.() ?? 'normal';
+        const family = element.fontFamily?.() ?? '';
+        const weightBold = weight === 'bold' || weight === 700 || weight === '700';
+        const familyBold = /Arial Black/i.test(family);
+
+        return weightBold || familyBold;
+    }
+
+    /**
+     * Apply or remove bold styling on a text/heading annotation.
+     * @param {Konva.Text} element
+     * @param {boolean} bold
+     */
+    setAnnotationBold(element, bold) {
+        if (!element) {
+            return;
+        }
+
+        if (bold) {
+            element.fontFamily('Arial Black, Arial, sans-serif');
+            element.fontWeight('bold');
+        } else {
+            element.fontFamily('Arial, sans-serif');
+            element.fontWeight('normal');
+        }
+    }
+
+    /**
+     * Whether a text/heading annotation is italic.
+     * @param {Konva.Text} element
+     * @returns {boolean}
+     */
+    isAnnotationItalic(element) {
+        if (!element) {
+            return false;
+        }
+
+        const style = element.fontStyle?.() ?? 'normal';
+        return style === 'italic' || style === 'oblique';
+    }
+
+    /**
+     * Apply or remove italic styling on a text/heading annotation.
+     * @param {Konva.Text} element
+     * @param {boolean} italic
+     */
+    setAnnotationItalic(element, italic) {
+        if (!element) {
+            return;
+        }
+
+        element.fontStyle(italic ? 'italic' : 'normal');
+    }
+
+    /**
+     * Current horizontal alignment for a text/heading annotation.
+     * @param {Konva.Text} element
+     * @returns {'left'|'center'|'right'}
+     */
+    getAnnotationAlign(element) {
+        if (!element) {
+            return 'left';
+        }
+
+        const align = element.align?.();
+        if (align === 'left' || align === 'center' || align === 'right') {
+            return align;
+        }
+
+        return 'left';
+    }
+
+    /**
+     * Set horizontal alignment and sync Konva offset for text/heading annotations.
+     * @param {Konva.Text} element
+     * @param {'left'|'center'|'right'} align
+     */
+    setAnnotationAlign(element, align) {
+        if (!element) {
+            return;
+        }
+
+        element.align(align);
+
+        if (align === 'center') {
+            element.offsetX(element.width() / 2);
+        } else if (align === 'right') {
+            element.offsetX(element.width());
+        } else {
+            element.offsetX(0);
+        }
+    }
+
+    /**
+     * @param {'left'|'center'|'right'} activeAlign
+     * @param {HTMLButtonElement} alignLeftBtn
+     * @param {HTMLButtonElement} alignCenterBtn
+     * @param {HTMLButtonElement} alignRightBtn
+     */
+    updateAlignButtonStates(activeAlign, alignLeftBtn, alignCenterBtn, alignRightBtn) {
+        alignLeftBtn.classList.toggle('active', activeAlign === 'left');
+        alignCenterBtn.classList.toggle('active', activeAlign === 'center');
+        alignRightBtn.classList.toggle('active', activeAlign === 'right');
+    }
+
+    /**
      * Setup touch outside to dismiss functionality for mobile
      */
     setupTouchOutsideToDismiss() {
@@ -426,9 +541,10 @@ class EditUI {
 
         // Get current values from the element with proper fallbacks
         const currentFontSize = this.currentElement.fontSize ? this.currentElement.fontSize() : this.defaultProperties.text.fontSize;
-        const currentFontWeight = this.currentElement.fontWeight ? this.currentElement.fontWeight() : this.defaultProperties.text.fontWeight;
-        const currentFontStyle = this.currentElement.fontStyle ? this.currentElement.fontStyle() : this.defaultProperties.text.fontStyle;
         const currentFill = this.currentElement.fill ? this.currentElement.fill() : this.defaultProperties.text.fill;
+        const isBold = this.isAnnotationBold(this.currentElement);
+        const isItalic = this.isAnnotationItalic(this.currentElement);
+        const currentAlign = this.getAnnotationAlign(this.currentElement);
 
         // Create controls container
         const controlsDiv = document.createElement('div');
@@ -487,77 +603,32 @@ class EditUI {
         // Font Style Controls
         const boldBtn = document.createElement('button');
         boldBtn.innerHTML = '<i data-lucide="bold"></i>';
-        boldBtn.className = `edit-btn ${currentFontWeight === 'bold' ? 'active' : ''}`;
+        boldBtn.className = `edit-btn ${isBold ? 'active' : ''}`;
         boldBtn.title = 'Bold';
 
         const italicBtn = document.createElement('button');
         italicBtn.innerHTML = '<i data-lucide="italic"></i>';
-        italicBtn.className = `edit-btn ${currentFontStyle === 'italic' ? 'active' : ''}`;
+        italicBtn.className = `edit-btn ${isItalic ? 'active' : ''}`;
         italicBtn.title = 'Italic';
 
         // Style event listeners
-        boldBtn.addEventListener('click', () => {
-            // Get current font weight from the element with safe fallback
-            let currentWeight = 400; // Default to normal
-            if (this.currentElement.fontWeight && typeof this.currentElement.fontWeight === 'function') {
-                currentWeight = this.currentElement.fontWeight();
-            }
+        this.addTouchSupport(boldBtn, () => {
+            const nextBold = !this.isAnnotationBold(this.currentElement);
+            citranaDebug('[EDIT UI] Bold button clicked - nextBold:', nextBold);
 
-            const isBold = currentWeight === 'bold' || currentWeight === 700 || currentWeight === '700';
-            const newWeight = isBold ? 'normal' : 'bold';
-            citranaDebug('[EDIT UI] Bold button clicked - currentWeight:', currentWeight, 'isBold:', isBold, 'newWeight:', newWeight);
-
-            // Set font weight and ensure it works
-            if (newWeight === 'bold') {
-                // For bold, try setting both font family and weight
-                this.currentElement.fontFamily('Arial Black, Arial, sans-serif');
-                if (typeof this.currentElement.fontWeight === 'function') {
-                    this.currentElement.fontWeight('bold');
-                } else {
-                    this.currentElement.attrs.fontWeight = 'bold';
-                }
-                citranaDebug('[EDIT UI] Set to bold with Arial Black');
-            } else {
-                // For normal, reset to regular font family
-                this.currentElement.fontFamily('Arial, sans-serif');
-                if (typeof this.currentElement.fontWeight === 'function') {
-                    this.currentElement.fontWeight('normal');
-                } else {
-                    this.currentElement.attrs.fontWeight = 'normal';
-                }
-                citranaDebug('[EDIT UI] Set to normal with Arial');
-            }
-
-            // Force a redraw to ensure the change is applied
+            this.setAnnotationBold(this.currentElement, nextBold);
             this.currentElement.getLayer().batchDraw();
-
-            this.currentElement.getLayer().batchDraw();
-            boldBtn.classList.toggle('active');
+            boldBtn.classList.toggle('active', nextBold);
             this.markEditDirty();
         });
 
-        italicBtn.addEventListener('click', () => {
-            // Get current font style from the element with safe fallback
-            let currentStyle = 'normal'; // Default to normal
-            if (this.currentElement.fontStyle && typeof this.currentElement.fontStyle === 'function') {
-                currentStyle = this.currentElement.fontStyle();
-            }
+        this.addTouchSupport(italicBtn, () => {
+            const nextItalic = !this.isAnnotationItalic(this.currentElement);
+            citranaDebug('[EDIT UI] Italic button clicked - nextItalic:', nextItalic);
 
-            const newStyle = currentStyle === 'italic' ? 'normal' : 'italic';
-            citranaDebug('[EDIT UI] Italic button clicked - currentStyle:', currentStyle, 'newStyle:', newStyle);
-
-            // Set font style safely
-            if (typeof this.currentElement.fontStyle === 'function') {
-                this.currentElement.fontStyle(newStyle);
-                citranaDebug('[EDIT UI] Set fontStyle to', newStyle);
-            } else {
-                // If fontStyle function doesn't exist, try setting it as a property
-                this.currentElement.attrs.fontStyle = newStyle;
-                citranaDebug('[EDIT UI] Set fontStyle as property to', newStyle);
-            }
-
+            this.setAnnotationItalic(this.currentElement, nextItalic);
             this.currentElement.getLayer().batchDraw();
-            italicBtn.classList.toggle('active');
+            italicBtn.classList.toggle('active', nextItalic);
             this.markEditDirty();
         });
 
@@ -588,39 +659,20 @@ class EditUI {
         alignRightBtn.innerHTML = '<i data-lucide="align-right"></i>';
         alignRightBtn.className = 'edit-btn';
         alignRightBtn.title = 'Align Right';
-        // Set initial active state
-        const currentAlign = this.currentElement.align ? this.currentElement.align() : 'center';
-        if (currentAlign === 'left') alignLeftBtn.classList.add('active');
-        else if (currentAlign === 'right') alignRightBtn.classList.add('active');
-        else alignCenterBtn.classList.add('active');
-        // Alignment event listeners
-        alignLeftBtn.addEventListener('click', () => {
-            this.currentElement.align('left');
-            this.currentElement.offsetX(0);
+
+        this.updateAlignButtonStates(currentAlign, alignLeftBtn, alignCenterBtn, alignRightBtn);
+
+        const applyAlign = (align) => {
+            this.setAnnotationAlign(this.currentElement, align);
             this.currentElement.getLayer().batchDraw();
-            alignLeftBtn.classList.add('active');
-            alignCenterBtn.classList.remove('active');
-            alignRightBtn.classList.remove('active');
+            this.updateAlignButtonStates(align, alignLeftBtn, alignCenterBtn, alignRightBtn);
             this.markEditDirty();
-        });
-        alignCenterBtn.addEventListener('click', () => {
-            this.currentElement.align('center');
-            this.currentElement.offsetX(this.currentElement.width() / 2);
-            this.currentElement.getLayer().batchDraw();
-            alignLeftBtn.classList.remove('active');
-            alignCenterBtn.classList.add('active');
-            alignRightBtn.classList.remove('active');
-            this.markEditDirty();
-        });
-        alignRightBtn.addEventListener('click', () => {
-            this.currentElement.align('right');
-            this.currentElement.offsetX(this.currentElement.width());
-            this.currentElement.getLayer().batchDraw();
-            alignLeftBtn.classList.remove('active');
-            alignCenterBtn.classList.remove('active');
-            alignRightBtn.classList.add('active');
-            this.markEditDirty();
-        });
+        };
+
+        this.addTouchSupport(alignLeftBtn, () => applyAlign('left'));
+        this.addTouchSupport(alignCenterBtn, () => applyAlign('center'));
+        this.addTouchSupport(alignRightBtn, () => applyAlign('right'));
+
         controlsDiv.appendChild(alignLeftBtn);
         controlsDiv.appendChild(alignCenterBtn);
         controlsDiv.appendChild(alignRightBtn);
@@ -753,6 +805,7 @@ class EditUI {
 
     markEditDirty() {
         this._sessionDirty = true;
+        window.app?.drawingTools?.syncAnnotationSelectionPill?.();
     }
 
     _commitEditHistoryIfNeeded() {

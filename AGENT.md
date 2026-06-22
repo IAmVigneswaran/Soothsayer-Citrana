@@ -49,7 +49,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
    - [Citrana Color Picker](#citrana-color-picker-citrana-colorpickerjs---370-lines)
    - [Citrana Device](#citrana-device-citrana-devicejs---39-lines)
    - [Citrana Rashis](#citrana-rashis-citrana-rashisjs---41-lines)
-   - [Citrana Graha Selection](#citrana-graha-selection-citrana-graha-selectionjs---96-lines)
+   - [Citrana Selection](#citrana-selection-citrana-selectionjs---96-lines)
    - [Citrana Laser](#citrana-laser-citrana-laserjs---248-lines)
    - [Drawing Tools](#drawing-tools-drawing-toolsjs---2134-lines)
    - [Context Menu](#context-menu-context-menujs---717-lines)
@@ -113,7 +113,7 @@ Soothsayer-Citrana/
 │   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~383 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
 │   │   ├── citrana-device.js     # Shared touch, mobile UA, and viewport helpers (~39 lines)
-│   │   ├── citrana-graha-selection.js # Graha Selection Pill (~96 lines)
+│   │   ├── citrana-selection.js # Selection Pill (~96 lines)
 │   │   ├── citrana-items-menu.js # Items panel — chart/Bhava/Graha/annotation actions (~635 lines)
 │   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~248 lines)
 │   │   ├── citrana-rashis.js     # Shared Rashi names, Lucide zodiac icons, grid numbers (~49 lines)
@@ -288,7 +288,7 @@ Key Methods:
 - `getBhavaNumberForHouse()`: Get Bhava number (1–12 from Lagna) for a fixed grid cell
 - `findHouseAtChartPoint()`: Rectangle hit-test (with nearest-Bhava fallback) for library drops
 - `highlightHouse()` / `clearHighlight()`: Visual Bhava selection (`#f3f4f6`)
-- `selectPlanet()` / `clearSelectedPlanet()`: Graha selection via `CitranaGrahaSelection`
+- `selectPlanet()` / `clearSelectedPlanet()`: Graha selection via `CitranaSelection`
 - Rashi number boxes use `CitranaRashis.getNumberForHouseIndex()`; mobile fit uses `CitranaDevice.isCompactViewport()` / `isMobileUA()`
 - `setSouthIndicatorsVisible(visible)` / `applySouthIndicatorsPreference()`: Show or hide lagna line and bhava/rashi boxes per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (immune to current zoom/pan)
@@ -321,7 +321,7 @@ Key Methods:
 - `getRashiNumberForHouse()`: Rashi calculation
 - `findHouseAtChartPoint()`: Polygon hit-test (with nearest-centroid fallback) for library drops
 - `highlightHouse()` / `clearHighlight()`: Visual Bhava selection (`#f3f4f6`)
-- `selectPlanet()` / `clearSelectedPlanet()`: Graha selection via `CitranaGrahaSelection`
+- `selectPlanet()` / `clearSelectedPlanet()`: Graha selection via `CitranaSelection`
 - `raiseDrawingsAboveChart()` / `syncNorthChartLayerOrder()`: Keep annotations above chart layer
 - Lagna logging uses `CitranaRashis.getName()`; mobile fit uses `CitranaDevice.isCompactViewport()`
 - `setNorthIndicatorsVisible(visible)` / `applyNorthIndicatorsPreference()`: Show or hide `tinyBoxGroupNorth` (bhava numbers in black corner boxes) per `app.options`
@@ -502,7 +502,7 @@ Key Exports:
 
 Used by `context-menu.js` (North **Set Lagna as …** submenu), chart templates, and `citrana-items-menu.js` (South Bhava row labels).
 
-### Citrana Graha Selection (citrana-graha-selection.js - ~96 lines)
+### Citrana Selection (citrana-selection.js - ~96 lines)
 Graha **Selection Pill** — colour-independent indicator behind Graha text.
 
 Key Responsibilities:
@@ -1216,7 +1216,7 @@ Edit the Graha data objects in assets/js/planet-system.js:
 - **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
 - **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
 - **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
-- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-graha-selection`, `citrana-items-menu`, `citrana-laser`, `citrana-rashis`, `citrana-session`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
+- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-selection`, `citrana-items-menu`, `citrana-laser`, `citrana-rashis`, `citrana-session`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
 - **Not minified in CI:** `assets/vendor/*` (Konva, Lucide, JSColorPicker — already minified)
 
 ### Local development

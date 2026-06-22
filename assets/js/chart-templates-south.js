@@ -603,7 +603,7 @@ class SouthIndianChartTemplate {
 
                 planetText.opacity(0.5);
                 if (this.selectedPlanet?.planetText === planetText) {
-                    CitranaGrahaSelection?.sync?.(planetText);
+                    CitranaSelection?.sync?.(planetText);
                 }
                 planetText.moveToTop();
                 hitRect.moveToTop();
@@ -613,7 +613,7 @@ class SouthIndianChartTemplate {
 
             const dragMoveHandler = () => {
                 if (this.selectedPlanet?.planetText === planetText) {
-                    CitranaGrahaSelection?.sync?.(planetText);
+                    CitranaSelection?.sync?.(planetText);
                     hitRect.moveToTop();
                     planetText.moveToTop();
                     this.layer.batchDraw();
@@ -693,8 +693,8 @@ class SouthIndianChartTemplate {
         this.clearSelectedPlanet({ notify: false });
 
         const parent = planetText.getParent();
-        if (typeof CitranaGrahaSelection !== 'undefined' && parent) {
-            CitranaGrahaSelection.attach(planetText, parent);
+        if (typeof CitranaSelection !== 'undefined' && parent) {
+            CitranaSelection.attach(planetText, parent);
             const hitRect = parent.findOne((node) => node.name() === `planet-hit-${id}`);
             hitRect?.moveToTop();
             planetText.moveToTop();
@@ -711,7 +711,7 @@ class SouthIndianChartTemplate {
     }
     clearSelectedPlanet({ notify = true } = {}) {
         if (this.selectedPlanet?.planetText) {
-            CitranaGrahaSelection?.detach?.(this.selectedPlanet.planetText);
+            CitranaSelection?.detach?.(this.selectedPlanet.planetText);
         }
         this.selectedPlanet = null;
         this.layer.batchDraw();

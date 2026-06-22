@@ -266,6 +266,7 @@ class DrawingTools {
         }
 
         this.bindMoveDragHistory(shape);
+        this.bindAnnotationPillSync(shape);
 
         // Touch double-tap for Edit UI — bind once per shape
         if (this.isTouchDevice && !shape._editUiDoubleTapBound) {
@@ -282,6 +283,53 @@ class DrawingTools {
             this.applyDrawingHitTarget(shape, resolvedTool);
         }
         this.syncBoundingBoxListening();
+    }
+
+    /**
+     * Whether a drawing shape uses the shared Selection Pill.
+     * @param {KonvaShape} shape
+     * @returns {boolean}
+     */
+    supportsAnnotationSelectionPill(shape) {
+        const name = shape?.name?.() || '';
+        return name === 'drawing-text' || name === 'drawing-heading';
+    }
+
+    syncAnnotationSelectionPill() {
+        const shape = this.selectedShape;
+        if (shape && this.supportsAnnotationSelectionPill(shape)) {
+            CitranaSelection?.sync?.(shape);
+        }
+    }
+
+    attachAnnotationSelectionPill(shape) {
+        if (!this.supportsAnnotationSelectionPill(shape)) {
+            return;
+        }
+
+        const parent = shape.getParent();
+        if (parent && typeof CitranaSelection !== 'undefined') {
+            CitranaSelection.attach(shape, parent);
+        }
+    }
+
+    detachAnnotationSelectionPill(shape) {
+        if (shape && this.supportsAnnotationSelectionPill(shape)) {
+            CitranaSelection?.detach?.(shape);
+        }
+    }
+
+    bindAnnotationPillSync(shape) {
+        if (!shape || shape._annotationPillSyncBound || !this.supportsAnnotationSelectionPill(shape)) {
+            return;
+        }
+
+        shape._annotationPillSyncBound = true;
+        shape.on('dragmove', () => {
+            if (this.selectedShape === shape) {
+                CitranaSelection?.sync?.(shape);
+            }
+        });
     }
 
     /**
@@ -619,7 +667,7 @@ class DrawingTools {
         const scaledFontSize = text.fontSize() * scale;
         textarea.style.fontSize = '16px'; // Prevent mobile zoom
         textarea.style.lineHeight = scaledFontSize + 'px';
-        textarea.style.height = (scaledFontSize + 4) + 'px';
+        textarea.style.minHeight = (scaledFontSize + 4) + 'px';
         textarea.style.fontFamily = text.fontFamily();
         textarea.style.color = text.fill();
         textarea.style.border = 'none';
@@ -637,7 +685,10 @@ class DrawingTools {
         textarea.style.touchAction = 'manipulation';
         textarea.style.WebkitTouchAction = 'manipulation';
 
+        this.syncInlineTextareaHeight(textarea, scaledFontSize + 4);
         this.focusInlineTextarea(textarea);
+
+        this.detachAnnotationSelectionPill(text);
 
         // Disable dragging while editing and hide the original text
         text.setAttrs({
@@ -665,11 +716,16 @@ class DrawingTools {
             });
             this.layer.batchDraw();
 
+            if (this.selectedShape === text) {
+                this.attachAnnotationSelectionPill(text);
+            }
+
             if (save && committedText !== initialText) {
                 window.app?.recordHistory('Edit text');
             }
 
             textarea.removeEventListener('blur', handleBlur);
+            textarea.removeEventListener('input', handleLivePreview);
             document.removeEventListener('click', handleOutsideClick);
             document.removeEventListener('keydown', handleKeyDown);
         };
@@ -692,7 +748,15 @@ class DrawingTools {
 
         const handleBlur = () => finishEditing(true);
 
+        const handleLivePreview = () => {
+            text.text(textarea.value || 'Double-click to edit');
+            textarea.style.width = Math.max(100, text.width()) + 'px';
+            this.syncInlineTextareaHeight(textarea, scaledFontSize + 4);
+            this.layer.batchDraw();
+        };
+
         textarea.addEventListener('blur', handleBlur);
+        textarea.addEventListener('input', handleLivePreview);
         document.addEventListener('keydown', handleKeyDown);
 
         setTimeout(() => {
@@ -702,17 +766,21 @@ class DrawingTools {
 
     clearAll() {
         this.clearLaser();
+        this.clearSelection();
 
         const drawingObjects = this.layer.find(node => {
             const name = node.name();
-            return name && (name.startsWith('drawing-') || name.startsWith('bounding-box-'));
+            return name && (
+                name.startsWith('drawing-') ||
+                name.startsWith('bounding-box-') ||
+                name === CitranaSelection?.PILL_NAME
+            );
         });
 
         drawingObjects.forEach(shape => {
             shape.destroy();
         });
 
-        this.clearSelection();
         this.clearControlPoints();
         this.layer.batchDraw();
     }
@@ -872,6 +940,7 @@ class DrawingTools {
             const name = node.name() || '';
             return name.startsWith('drawing-') ||
                 name.startsWith('bounding-box-') ||
+                name === CitranaSelection?.PILL_NAME ||
                 name === 'control-point-start' ||
                 name === 'control-point-end';
         });
@@ -1159,6 +1228,7 @@ class DrawingTools {
     clearSelection() {
         this.stopControlPointSyncLoop();
         if (this.selectedShape) {
+            this.detachAnnotationSelectionPill(this.selectedShape);
             this.selectedShape = null;
         }
         this.clearControlPoints();
@@ -1185,7 +1255,10 @@ class DrawingTools {
                 this.startControlPointSyncLoop(shape); // Per-frame sync
             }
 
-            // No visual selection indicator - just track the selected shape
+            if (this.supportsAnnotationSelectionPill(shape)) {
+                this.attachAnnotationSelectionPill(shape);
+            }
+
             this.syncBoundingBoxListening();
             this.layer.batchDraw();
         }
@@ -1377,6 +1450,7 @@ class DrawingTools {
         if (!this.selectedShape) return;
 
         this.clearControlPoints();
+        this.detachAnnotationSelectionPill(this.selectedShape);
 
         // Remove bounding box if it exists
         if (this.selectedShape.boundingBox) {
@@ -1765,8 +1839,22 @@ class DrawingTools {
     }
 
     /**
+     * Match inline textarea height to its content (multi-line headings).
+     * @param {HTMLTextAreaElement} textarea
+     * @param {number} minHeightPx
+     */
+    syncInlineTextareaHeight(textarea, minHeightPx) {
+        if (!textarea) {
+            return;
+        }
+
+        textarea.style.height = '0px';
+        textarea.style.height = Math.max(minHeightPx, textarea.scrollHeight) + 'px';
+    }
+
+    /**
      * Show floating Edit UI for style controls (stroke, font, colour, delete).
-     * Content edits use inline editors; heading line count is limited in editHeading().
+     * Content edits use inline editors (editText / editHeading).
      * @param {Object} element - The Konva element to edit
      * @param {string} tool - The tool type
      */
@@ -1922,7 +2010,7 @@ class DrawingTools {
     }
 
     /**
-     * Inline heading editor (double-click / double-tap). Enforces a 2-line limit.
+     * Inline heading editor (double-click / double-tap). Supports multiple lines (Shift+Enter).
      * @param {Konva.Text} heading
      */
     editHeading(heading) {
@@ -1958,7 +2046,7 @@ class DrawingTools {
         const scaledFontSize = heading.fontSize() * scale;
         textarea.style.fontSize = '16px'; // Prevent mobile zoom
         textarea.style.lineHeight = scaledFontSize + 'px';
-        textarea.style.height = (scaledFontSize * 2 + 8) + 'px'; // 2 lines
+        textarea.style.minHeight = (scaledFontSize + 8) + 'px';
         textarea.style.fontFamily = heading.fontFamily();
         textarea.style.color = heading.fill();
         textarea.style.fontWeight = 'bold';
@@ -1976,15 +2064,11 @@ class DrawingTools {
         textarea.style.transformOrigin = '';
         textarea.style.touchAction = 'manipulation';
         textarea.style.WebkitTouchAction = 'manipulation';
-        textarea.rows = 2;
         textarea.maxLength = 200;
-        textarea.addEventListener('input', function() {
-            const lines = textarea.value.split('\n');
-            if (lines.length > 2) {
-                textarea.value = lines.slice(0, 2).join('\n');
-            }
-        });
+        this.syncInlineTextareaHeight(textarea, scaledFontSize + 8);
         this.focusInlineTextarea(textarea);
+        this.detachAnnotationSelectionPill(heading);
+
         // Disable dragging while editing and hide the original heading
         heading.setAttrs({
             draggable: false,
@@ -2007,6 +2091,10 @@ class DrawingTools {
                 visible: true
             });
             this.layer.batchDraw();
+
+            if (this.selectedShape === heading) {
+                this.attachAnnotationSelectionPill(heading);
+            }
 
             if (save && committedText !== initialText) {
                 window.app?.recordHistory('Edit heading');
@@ -2038,6 +2126,8 @@ class DrawingTools {
 
         const handleLivePreview = () => {
             heading.text(textarea.value);
+            textarea.style.width = Math.max(150, heading.width()) + 'px';
+            this.syncInlineTextareaHeight(textarea, scaledFontSize + 8);
             this.layer.batchDraw();
         };
 
