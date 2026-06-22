@@ -1423,6 +1423,16 @@ class DrawingTools {
                 this.updateBoundingBox(shape.boundingBox, shape);
             }
         });
+
+        this.raiseControlPointsAbovePickRects();
+    }
+
+    /**
+     * Keep arrow/line endpoint handles above invisible pick rects so they stay draggable.
+     */
+    raiseControlPointsAbovePickRects() {
+        this.controlPoints.startPoint?.moveToTop();
+        this.controlPoints.endPoint?.moveToTop();
     }
 
     /**
@@ -1634,6 +1644,8 @@ class DrawingTools {
         }).forEach((shape) => {
             shape.boundingBox?.moveToTop();
         });
+
+        this.raiseControlPointsAbovePickRects();
     }
 
     getControlPointBaseRadius() {
@@ -1927,8 +1939,6 @@ class DrawingTools {
         this.updateControlPointsPosition(shape);
         this.layer.add(this.controlPoints.startPoint);
         this.layer.add(this.controlPoints.endPoint);
-        this.controlPoints.startPoint.moveToTop();
-        this.controlPoints.endPoint.moveToTop();
         this.syncBoundingBoxListening();
         this.layer.batchDraw();
     }
