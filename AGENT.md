@@ -17,7 +17,7 @@ Citrana uses consistent Vedic terms in all user-facing text and documentation:
 | **Graha** / **Grahas** | Planet / Planets |
 | **Rashi** / **Rashis** | Sign / Signs / zodiac sign |
 
-Internal code identifiers (e.g. `planet-system.js`, `addPlanetToHouse()`, Konva names `house-*` / `planet-*`, data keys `planetsByHouse`) are unchanged for implementation stability.
+Internal code identifiers (e.g. `citrana-planet-system.js`, `addPlanetToHouse()`, Konva names `house-*` / `planet-*`, data keys `planetsByHouse`) are unchanged for implementation stability.
 
 ## Technology Stack
 
@@ -39,8 +39,8 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 3. [CSS and Layout](#css-and-layout-stylescss---2654-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (app.js)](#main-application-appjs---2020-lines)
-   - [History Engine (history.js)](#history-engine-historyjs---94-lines)
+   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2020-lines)
+   - [History Engine (citrana-history.js)](#history-engine-historyjs---94-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---334-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---984-lines)
    - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---1011-lines)
@@ -108,7 +108,7 @@ Soothsayer-Citrana/
 │   ├── css/
 │   │   └── styles.css            # Complete styling system (~2681 lines); primary mobile block + post-base mobile overrides; JSColorPicker `--cp-*` theme; `.items-*`; `.items-row-selected`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*`
 │   ├── js/
-│   │   ├── app.js                # Main application coordinator (~2020 lines)
+│   │   ├── citrana-app.js                # Main application coordinator (~2020 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
 │   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~383 lines)
 │   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
@@ -118,14 +118,14 @@ Soothsayer-Citrana/
 │   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~248 lines)
 │   │   ├── citrana-rashis.js     # Shared Rashi names, Lucide zodiac icons, grid numbers (~49 lines)
 │   │   ├── citrana-session.js    # Save/open `.citrana.json` session files (~214 lines)
-│   │   ├── chart-coordinator.js  # Chart type management (~334 lines)
-│   │   ├── chart-templates-south.js  # South Indian chart logic (~984 lines)
-│   │   ├── chart-templates-north.js  # North Indian chart logic (~1011 lines)
-│   │   ├── planet-system.js      # Graha library and drag-drop (~880 lines)
-│   │   ├── drawing-tools.js      # Drawing tools implementation (~2134 lines)
-│   │   ├── context-menu.js       # Context menu system (~717 lines)
-│   │   ├── edit-ui.js            # Edit interface controls (~786 lines)
-│   │   └── history.js            # Unified undo/redo timeline (~94 lines)
+│   │   ├── citrana-chart-coordinator.js  # Chart type management (~334 lines)
+│   │   ├── citrana-chart-templates-south.js  # South Indian chart logic (~984 lines)
+│   │   ├── citrana-chart-templates-north.js  # North Indian chart logic (~1011 lines)
+│   │   ├── citrana-planet-system.js      # Graha library and drag-drop (~880 lines)
+│   │   ├── citrana-drawing-tools.js      # Drawing tools implementation (~2134 lines)
+│   │   ├── citrana-context-menu.js       # Context menu system (~717 lines)
+│   │   ├── citrana-edit-ui.js            # Edit interface controls (~786 lines)
+│   │   └── citrana-history.js            # Unified undo/redo timeline (~94 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
 │   │   ├── lucide.min.js         # Lucide 0.576.0 (self-hosted)
@@ -168,7 +168,7 @@ Soothsayer-Citrana/
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (app.js - ~2020 lines)
+### Main Application (citrana-app.js - ~2020 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -176,7 +176,7 @@ Key Responsibilities:
 - Coordinates all component interactions
 - Manages tool selection and drawing state
 - Handles keyboard shortcuts and event listeners
-- Manages unified undo/redo via `CitranaHistory` (`history.js`)
+- Manages unified undo/redo via `CitranaHistory` (`citrana-history.js`)
 - Handles chart export (full viewport or chart-only crop via Options)
 - Manages chart display options modal and `localStorage` preferences (indicators, Save Chart Only)
 - **Save/Open Session** via `CitranaSession` (`.citrana.json` files)
@@ -221,7 +221,7 @@ Key Methods:
 
 Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `K` Laser Pointer (when available), `T` Text, `H` Hand, `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` remove selected Graha or delete selected drawing (Select tool), `?`/`/` Help, **Escape** close modal. No Heading shortcut. Ignored when a modal is open (except Escape/Tab for modal UX) or Graha/text inline editor is focused.
 
-### History Engine (history.js - ~94 lines)
+### History Engine (citrana-history.js - ~94 lines)
 Unified undo/redo timeline for the entire session.
 
 Key Responsibilities:
@@ -236,7 +236,7 @@ Key Methods:
 
 Wired in `app.setupComponents()` with `captureState` → `captureHistoryState()` and `restoreState` → `restoreHistoryState()`.
 
-### Chart Coordinator (chart-coordinator.js - ~334 lines)
+### Chart Coordinator (citrana-chart-coordinator.js - ~334 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -260,7 +260,7 @@ Key Methods:
 
 **Removed:** `setFirstHouse()`, `getDropZones()`, `highlightHouse()`, `clearHighlight()`, `renumberHouses()` (use template methods directly).
 
-### South Indian Chart Template (chart-templates-south.js - ~984 lines)
+### South Indian Chart Template (citrana-chart-templates-south.js - ~984 lines)
 Handles the traditional South Indian chart layout with 4x4 grid structure.
 
 Key Responsibilities:
@@ -293,7 +293,7 @@ Key Methods:
 - `setSouthIndicatorsVisible(visible)` / `applySouthIndicatorsPreference()`: Show or hide lagna line and bhava/rashi boxes per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (immune to current zoom/pan)
 
-### North Indian Chart Template (chart-templates-north.js - ~1011 lines)
+### North Indian Chart Template (citrana-chart-templates-north.js - ~1011 lines)
 Handles the diamond-shaped North Indian chart layout with polygon-based Bhavas.
 
 Key Responsibilities:
@@ -327,7 +327,7 @@ Key Methods:
 - `setNorthIndicatorsVisible(visible)` / `applyNorthIndicatorsPreference()`: Show or hide `tinyBoxGroupNorth` (bhava numbers in black corner boxes) per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (desktop `extraTopMargin=-50`)
 
-### Graha System (planet-system.js - ~880 lines)
+### Graha System (citrana-planet-system.js - ~880 lines)
 Manages the floating Graha library and drag-and-drop functionality with paging system.
 
 Key Responsibilities:
@@ -434,7 +434,7 @@ Key Methods:
 - `findHouseAtPosition()`: Delegates to `ChartCoordinator.findHouseAtClientPoint()` (viewport coords for touch / drop fallback)
 - `getPlanetInfo()`: Retrieve Graha data from paged structure
 
-### Drawing Tools (drawing-tools.js - ~2134 lines)
+### Drawing Tools (citrana-drawing-tools.js - ~2134 lines)
 Comprehensive drawing system with multiple tools and editing capabilities.
 
 Key Responsibilities:
@@ -461,7 +461,7 @@ Key Features:
 - Touch and mouse support
 - Shape selection and editing
 - Colour and stroke customisation
-- Default stroke widths: Pen **3px**, Line and Arrow **4px** (`edit-ui.js` defaults + tool `start*` methods)
+- Default stroke widths: Pen **3px**, Line and Arrow **4px** (`citrana-edit-ui.js` defaults + tool `start*` methods)
 - Text editing with font controls
 - Graha text editing with retrograde underline support (Konva `textDecoration`)
 - Graha edit sessions: **Save** / click-away / Enter → `dismissPlanetEditing()` (commits if dirty); **Cancel** / Escape → `cancelPlanetEditing()` (discards)
@@ -490,7 +490,7 @@ Shared touch, mobile UA, and viewport helpers.
 Key Methods:
 - `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()` (`innerWidth <= 600`), `isLaserViewport()` (all viewports), `hasFinePointer()`
 
-Used by `app.js`, chart templates, `drawing-tools.js`, `context-menu.js`, and `citrana-laser.js`.
+Used by `citrana-app.js`, chart templates, `citrana-drawing-tools.js`, `citrana-context-menu.js`, and `citrana-laser.js`.
 
 ### Citrana Rashis (citrana-rashis.js - ~49 lines)
 Shared Rashi names, Lucide zodiac icons (`zodiac-aries`, …), and South Indian grid numbers (1–12).
@@ -500,7 +500,7 @@ Key Exports:
 - `NAMES`, `NUMBERS`: Derived arrays
 - `getName(rashiNumber)`, `getNumberForHouseIndex(houseIndex0to11)`, `iconHtml(icon)`
 
-Used by `context-menu.js` (North **Set Lagna as …** submenu), chart templates, and `citrana-items-menu.js` (South Bhava row labels).
+Used by `citrana-context-menu.js` (North **Set Lagna as …** submenu), chart templates, and `citrana-items-menu.js` (South Bhava row labels).
 
 ### Citrana Selection (citrana-selection.js - ~96 lines)
 Graha **Selection Pill** — colour-independent indicator behind Graha text.
@@ -556,7 +556,7 @@ Key Methods:
 
 Vendor: `assets/vendor/colorpicker.iife.min.js`, `colorpicker.min.css`. Theme overrides: `--cp-*` in `styles.css`.
 
-### Context Menu (context-menu.js - ~717 lines)
+### Context Menu (citrana-context-menu.js - ~717 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:
@@ -598,7 +598,7 @@ Key Responsibilities:
 - **Canvas**: **Clear Selection** (`app.clearCanvasSelection()`), **Disable Context Menu** / **Enable Context Menu**
 - Selected rows use `.items-row-selected`; `refreshSelectionHighlight()` syncs with `app.getCanvasSelection()`
 - South Indian Bhava rows show fixed Rashi names with Lucide zodiac icons (`CitranaRashis.iconHtml`)
-- Reuses `context-menu.js` `handleAction()` for chart/Bhava/Graha actions where possible
+- Reuses `citrana-context-menu.js` `handleAction()` for chart/Bhava/Graha actions where possible
 - Text/Heading rows: **Edit text** (`startInlineContentEdit`) and **Style** (`showEditUI`); other annotations: single **Edit** → `showEditUI`
 - **Presentation View** and chart management actions mirror context menu icons
 
@@ -621,7 +621,7 @@ Key Methods:
 
 Wired from `app.saveSession()` / `app.openSessionFromFile()` / `app.restoreSessionState()`; import resets undo timeline via `history.resetToState()`.
 
-### Edit UI (edit-ui.js - ~786 lines)
+### Edit UI (citrana-edit-ui.js - ~786 lines)
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
@@ -655,7 +655,7 @@ Key Methods:
 
 ### Undo / Redo
 
-Unified **50-step** timeline via `CitranaHistory` (`history.js`). Toolbar **Undo** / **Redo** buttons (`#undo-btn`, `#redo-btn`) and keyboard shortcuts.
+Unified **50-step** timeline via `CitranaHistory` (`citrana-history.js`). Toolbar **Undo** / **Redo** buttons (`#undo-btn`, `#redo-btn`) and keyboard shortcuts.
 
 | Control | Action |
 |---------|--------|
@@ -834,7 +834,7 @@ All JavaScript and CSS files use a standardised comment header format:
 ## Customisation Guidelines
 
 ### Adding New Grahas
-Edit the Graha data objects in assets/js/planet-system.js:
+Edit the Graha data objects in assets/js/citrana-planet-system.js:
 ```javascript
 // Graha data - Page 1 (Traditional Grahas)
         this.planetsPage1 = {
@@ -1216,7 +1216,7 @@ Edit the Graha data objects in assets/js/planet-system.js:
 - **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
 - **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
 - **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
-- **Minified local JS:** `app`, `chart-coordinator`, `chart-templates-north`, `chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-selection`, `citrana-items-menu`, `citrana-laser`, `citrana-rashis`, `citrana-session`, `context-menu`, `drawing-tools`, `edit-ui`, `history`, `planet-system`
+- **Minified local JS:** `citrana-app`, `citrana-chart-coordinator`, `citrana-chart-templates-north`, `citrana-chart-templates-south`, `citrana-arrow`, `citrana-colorpicker`, `citrana-debug`, `citrana-device`, `citrana-selection`, `citrana-items-menu`, `citrana-laser`, `citrana-rashis`, `citrana-session`, `citrana-context-menu`, `citrana-drawing-tools`, `citrana-edit-ui`, `citrana-history`, `citrana-planet-system`
 - **Not minified in CI:** `assets/vendor/*` (Konva, Lucide, JSColorPicker — already minified)
 
 ### Local development

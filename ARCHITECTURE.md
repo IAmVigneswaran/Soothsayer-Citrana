@@ -27,36 +27,36 @@ index.html  (viewport-fit=cover; Konva + colorpicker CSS in <head>)
   ├── citrana-device.js                 → CitranaDevice (touch, mobile UA, viewport)
   ├── citrana-rashis.js                 → CitranaRashis (Rashi names, Lucide zodiac icons, grid numbers)
   ├── citrana-selection.js        → CitranaSelection (Selection Pill)
-  ├── chart-templates-south.js          → SouthIndianChartTemplate
-  ├── chart-templates-north.js          → NorthIndianChartTemplate
-  ├── chart-coordinator.js              → ChartCoordinator
-  ├── planet-system.js                  → GrahaSystem (`PlanetSystem` class)
+  ├── citrana-chart-templates-south.js          → SouthIndianChartTemplate
+  ├── citrana-chart-templates-north.js          → NorthIndianChartTemplate
+  ├── citrana-chart-coordinator.js              → ChartCoordinator
+  ├── citrana-planet-system.js                  → GrahaSystem (`PlanetSystem` class)
   ├── citrana-arrow.js                  → CitranaArrow (unified filled arrows)
   ├── citrana-colorpicker.js            → CitranaColorPicker (JSColorPicker theme)
   ├── citrana-laser.js                  → CitranaLaser (ephemeral laser pointer overlay)
-  ├── drawing-tools.js                  → DrawingTools (+ EditUI instance)
-  ├── edit-ui.js                        → EditUI
-  ├── context-menu.js                   → ContextMenu
+  ├── citrana-drawing-tools.js                  → DrawingTools (+ EditUI instance)
+  ├── citrana-edit-ui.js                        → EditUI
+  ├── citrana-context-menu.js                   → ContextMenu
   ├── citrana-items-menu.js             → CitranaItemsMenu (Items panel)
-  ├── history.js                        → CitranaHistory (undo/redo timeline)
+  ├── citrana-history.js                        → CitranaHistory (undo/redo timeline)
   ├── citrana-session.js                → CitranaSession (save/open `.citrana.json`)
-  └── app.js                            → CitranaApp (window.app on DOMContentLoaded)
+  └── citrana-app.js                            → CitranaApp (window.app on DOMContentLoaded)
 ```
 
-Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-device.js` and `citrana-rashis.js` before `citrana-selection.js` and chart templates; `citrana-arrow.js` before `citrana-colorpicker.js`; `citrana-laser.js` before `drawing-tools.js`; `context-menu.js` before `citrana-items-menu.js`; `history.js` and `citrana-session.js` immediately before `app.js`.
+Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-device.js` and `citrana-rashis.js` before `citrana-selection.js` and chart templates; `citrana-arrow.js` before `citrana-colorpicker.js`; `citrana-laser.js` before `citrana-drawing-tools.js`; `citrana-context-menu.js` before `citrana-items-menu.js`; `citrana-history.js` and `citrana-session.js` immediately before `citrana-app.js`.
 
 ## High-Level Component Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        CitranaApp (app.js)                  │
+│                        CitranaApp (citrana-app.js)                  │
 │  Stage/Layer · Tools · Zoom · Export · Modals · Undo/Redo   │
 │  getCanvasSelection() · clearCanvasSelection()              │
 └────┬───────────────────────────────┬────────────────────────┘
      │                               │
 ┌────▼──────────┐              ┌─────▼──────────┐
 │ CitranaHistory│              │  PlanetSystem  │
-│  (history.js) │              └───────┬────────┘
+│  (citrana-history.js) │              └───────┬────────┘
 └───────────────┘                      │ drag/drop
                              ┌────────▼─────────┐
                              │ ChartCoordinator │
@@ -90,27 +90,27 @@ Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-devic
   CitranaSession · CitranaDevice · CitranaRashis · CitranaSelection · citranaDebug
 ```
 
-`CitranaDevice` and `CitranaRashis` are used across `app.js`, chart templates, `drawing-tools.js`, `context-menu.js`, and `citrana-laser.js`. `CitranaSelection` is used by South/North templates on Graha select/drag. `app.getCanvasSelection()` / `notifyCanvasSelectionChanged()` keep the Items panel in sync. `CitranaHistory` is wired in `app.setupComponents()` for undo/redo snapshots.
+`CitranaDevice` and `CitranaRashis` are used across `citrana-app.js`, chart templates, `citrana-drawing-tools.js`, `citrana-context-menu.js`, and `citrana-laser.js`. `CitranaSelection` is used by South/North templates on Graha select/drag. `app.getCanvasSelection()` / `notifyCanvasSelectionChanged()` keep the Items panel in sync. `CitranaHistory` is wired in `app.setupComponents()` for undo/redo snapshots.
 
 ## Module Responsibilities
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `app.js` | ~2020 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser when available; centralised **Delete** for Grahas and drawings; **Escape** modal dismiss; **Tab** focus trap), zoom lock, export (full viewport or chart-only crop), modals (`openModal`/`closeModal`, `aria-hidden`, focus stack), chart display preferences, history coordinator, undo/redo toolbar, **Presentation View**, **Save/Open Session**, **Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open; `setupSafariToolbarFix()` via `visualViewport`; `serializeDrawings()` includes `arrowAnchors` for unified arrows |
-| `history.js` | ~94 | Unified undo/redo timeline (`CitranaHistory`) |
-| `chart-coordinator.js` | ~334 | Unified API over South/North templates; zoom (`zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
-| `chart-templates-south.js` | ~984 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `CitranaRashis` / `CitranaDevice` |
-| `chart-templates-north.js` | ~1011 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `raiseDrawingsAboveChart()` / `syncNorthChartLayerOrder()`; `CitranaRashis` / `CitranaDevice` |
-| `planet-system.js` | ~880 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
+| `citrana-app.js` | ~2020 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser when available; centralised **Delete** for Grahas and drawings; **Escape** modal dismiss; **Tab** focus trap), zoom lock, export (full viewport or chart-only crop), modals (`openModal`/`closeModal`, `aria-hidden`, focus stack), chart display preferences, history coordinator, undo/redo toolbar, **Presentation View**, **Save/Open Session**, **Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open; `setupSafariToolbarFix()` via `visualViewport`; `serializeDrawings()` includes `arrowAnchors` for unified arrows |
+| `citrana-history.js` | ~94 | Unified undo/redo timeline (`CitranaHistory`) |
+| `citrana-chart-coordinator.js` | ~334 | Unified API over South/North templates; zoom (`zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
+| `citrana-chart-templates-south.js` | ~984 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `CitranaRashis` / `CitranaDevice` |
+| `citrana-chart-templates-north.js` | ~1011 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `raiseDrawingsAboveChart()` / `syncNorthChartLayerOrder()`; `CitranaRashis` / `CitranaDevice` |
+| `citrana-planet-system.js` | ~880 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `citrana-arrow.js` | ~185 | Unified filled-arrow geometry (`Konva.Line` polygon); `arrowAnchors`; legacy `Konva.Arrow` migration |
 | `citrana-colorpicker.js` | ~383 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()`; `isPickerPopupTarget()` for touch-outside dismiss |
 | `citrana-device.js` | ~39 | Shared `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()`, `isLaserViewport()` (all viewports), `hasFinePointer()` |
 | `citrana-rashis.js` | ~49 | Shared `RASHIS` (`icon`: Lucide `zodiac-*`), `NAMES`, `NUMBERS`, `getName()`, `getNumberForHouseIndex()`, `iconHtml()` |
 | `citrana-selection.js` | ~96 | Selection Pill — dashed `Konva.Rect` (`selection-pill`) behind selected Graha and annotation text; `attach()` / `sync()` / `detach()`; extra padding on mobile |
 | `citrana-laser.js` | ~248 | Ephemeral laser pointer — Canvas 2D overlay above stage; independent strokes per gesture; ~3s fade; `isAvailable()` → `CitranaDevice.isLaserViewport()`; not serialised or undoable |
-| `drawing-tools.js` | ~2134 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, `startInlineContentEdit()`, `bindRestoredDrawingInteractions()`; history `recordHistory()` calls (laser excluded); notifies `app.notifyCanvasSelectionChanged()` on select/clear; `CitranaDevice` for touch/mobile |
-| `edit-ui.js` | ~786 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close); touch-outside dismiss excludes picker popup and `.konva-textarea` |
-| `context-menu.js` | ~717 | Right-click / long-press menus; `shouldBlockCanvasContextMenu()` (Select/Hand only, not while drawing, respects user disable); unified hit-test routing; **Presentation View** toggle; North **Set Lagna as …** flyout from `CitranaRashis.RASHIS` (tap to expand on touch); `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()` persisted in `localStorage` |
+| `citrana-drawing-tools.js` | ~2134 | Drawing tools, selection, control points, Graha text editing, `CitranaArrow.create()`, `CitranaLaser` delegation, `startInlineContentEdit()`, `bindRestoredDrawingInteractions()`; history `recordHistory()` calls (laser excluded); notifies `app.notifyCanvasSelectionChanged()` on select/clear; `CitranaDevice` for touch/mobile |
+| `citrana-edit-ui.js` | ~786 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close); touch-outside dismiss excludes picker popup and `.konva-textarea` |
+| `citrana-context-menu.js` | ~717 | Right-click / long-press menus; `shouldBlockCanvasContextMenu()` (Select/Hand only, not while drawing, respects user disable); unified hit-test routing; **Presentation View** toggle; North **Set Lagna as …** flyout from `CitranaRashis.RASHIS` (tap to expand on touch); `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()` persisted in `localStorage` |
 | `citrana-items-menu.js` | ~635 | **Items** panel (`#items-menu-btn`); Chart/**Canvas**/Bhava/Graha/Annotation sections; **Clear Selection**, **Disable Context Menu**; `.items-row-selected` sync with `app.getCanvasSelection()`; South Bhava rows show fixed Rashi names; reuses `ContextMenu.handleAction()`; Text/Heading **Edit text** + **Style** actions |
 | `citrana-session.js` | ~214 | Save/open `.citrana.json` (`format: citrana-session`, `version: 1`); `capture()`, `validate()`, `download()`, `applyOptions()` |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
@@ -180,7 +180,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 1. User drags from Graha library → `PlanetSystem.handleDrop()` (desktop) or `handleMobileDrop()` (touch)
 2. Target bhava resolution (first match wins):
-   - **Selected bhava** (one-shot): `window.selectedBhavaSouth` or `window.selectedBhavaNorth` if the user clicked a Bhava first — cleared after the next successful drop (`PlanetSystem.clearSelectedBhavaDropTarget()`), when clicking empty canvas (`app.js` `mousedown`/`tap`), or on mobile tap on empty stage
+   - **Selected bhava** (one-shot): `window.selectedBhavaSouth` or `window.selectedBhavaNorth` if the user clicked a Bhava first — cleared after the next successful drop (`PlanetSystem.clearSelectedBhavaDropTarget()`), when clicking empty canvas (`citrana-app.js` `mousedown`/`tap`), or on mobile tap on empty stage
    - **Pointer hit-test**: `ChartCoordinator.findHouseAtPointer()` or `findHouseAtClientPoint()`
 3. Coordinator converts coords with `stagePointerToChartCoords()` / `clientToChartCoords()`, then delegates to template `findHouseAtChartPoint()`:
    - **South**: axis-aligned rectangle test; nearest-centre fallback
@@ -361,7 +361,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 ## Debug logging
 
-`citranaDebug()` from `citrana-debug.js` — **enabled by default** for open-source contributors. Trace logs in `app.js`, chart templates, `chart-coordinator.js`, `context-menu.js`, `drawing-tools.js`, and `planet-system.js` route through `citranaDebug()` (not `console.log`).
+`citranaDebug()` from `citrana-debug.js` — **enabled by default** for open-source contributors. Trace logs in `citrana-app.js`, chart templates, `citrana-chart-coordinator.js`, `citrana-context-menu.js`, `citrana-drawing-tools.js`, and `citrana-planet-system.js` route through `citranaDebug()` (not `console.log`).
 
 - **Silence:** `localStorage.setItem('citrana_debug', '0')` then refresh
 - **Re-enable:** remove key or set to `'1'`
@@ -402,7 +402,7 @@ Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-gr
 
 Modals: Welcome, Help, **Options**, About, **Items**, Confirmation, Export Progress.
 
-**Modal accessibility (`index.html` + `app.js`):**
+**Modal accessibility (`index.html` + `citrana-app.js`):**
 - Overlays: `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`; `aria-hidden` toggled on open/close
 - Canvas: `#canvas-container` has `role="application"` and descriptive `aria-label`
 - **Escape** → `dismissActiveModalOnEscape()` (export progress not dismissible)
@@ -424,7 +424,7 @@ Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit fa
 
 ## Undo / redo
 
-Single unified timeline via `CitranaHistory` (`history.js`), wired in `app.setupComponents()`.
+Single unified timeline via `CitranaHistory` (`citrana-history.js`), wired in `app.setupComponents()`.
 
 | Aspect | Detail |
 |--------|--------|
@@ -460,19 +460,19 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 
 | Goal | Where to change |
 |------|-----------------|
-| Add Graha to library | `planetsPage1`–`planetsPage5` in `planet-system.js` (Page 5: Upagrahas before outer Grahas) |
+| Add Graha to library | `planetsPage1`–`planetsPage5` in `citrana-planet-system.js` (Page 5: Upagrahas before outer Grahas) |
 | Graha library layout | `.floating-planet-library`, `.planet-library-header`, `.planet-grid`, `.planet-item` in `styles.css`; markup in `index.html` |
 | Add drawing tool | `DrawingTools.startDrawing()` switch, toolbar in `index.html`, `app.setTool()` |
 | Laser pointer overlay | `citrana-laser.js` (`init`, fade loop, `pruneStrokes`, `isAvailable` → `CitranaDevice.isLaserViewport()`); CSS `.citrana-laser-canvas`; exclude from `recordHistory` / `serializeDrawings` |
 | Device / viewport helpers | `citrana-device.js` (`isTouchDevice`, `isMobileUA`, `isCompactViewport`, `isLaserViewport`) |
-| Rashi data | `citrana-rashis.js` (`RASHIS`, `getName`, `getNumberForHouseIndex`); North Lagna submenu in `context-menu.js` |
-| Presentation View | `app.togglePresentationView()`; `body.presentation-view` in `styles.css` (includes edit bars); `getPresentationViewMenuHtml()` in `context-menu.js`; Items panel chart actions |
+| Rashi data | `citrana-rashis.js` (`RASHIS`, `getName`, `getNumberForHouseIndex`); North Lagna submenu in `citrana-context-menu.js` |
+| Presentation View | `app.togglePresentationView()`; `body.presentation-view` in `styles.css` (includes edit bars); `getPresentationViewMenuHtml()` in `citrana-context-menu.js`; Items panel chart actions |
 | Items panel action | `citrana-items-menu.js` (`render`, `handleBodyClick`); reuse `ContextMenu.handleAction()` where possible |
 | Graha Selection Pill | `citrana-selection.js` (`attach`, `sync`, `detach`); wired from template `selectPlanet()` / `clearSelectedPlanet()` |
 | Canvas selection API | `app.clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()` |
-| Context menu enable/disable | `context-menu.js` `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()`; `localStorage.citrana_context_menu_enabled` |
+| Context menu enable/disable | `citrana-context-menu.js` `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()`; `localStorage.citrana_context_menu_enabled` |
 | Save/open session | `citrana-session.js` (`capture`, `validate`, `download`); `app.saveSession()` / `restoreSessionState()` |
-| Context menu gating | `context-menu.js` `shouldBlockCanvasContextMenu()` — Select/Hand only, not while `app.isDrawing` |
+| Context menu gating | `citrana-context-menu.js` `shouldBlockCanvasContextMenu()` — Select/Hand only, not while `app.isDrawing` |
 | Arrow geometry / transparency | `citrana-arrow.js` (`buildOutlinePoints`, `create`); colour via `CitranaColorPicker.applyToKonvaArrow()` |
 | Colour picker theme / swatches | `citrana-colorpicker.js` (`SWATCHES`, `BASE_OPTIONS`); `--cp-*` in `styles.css` |
 | New chart type | New template class + routes in `ChartCoordinator` (include `findHouseAtChartPoint()`) |
@@ -487,7 +487,7 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
 | Save Chart Only export | `app.setSaveChartOnly()`, `applySaveChartOnlyTransparency()`, `#save-chart-only-toggle` in `index.html` |
 | Modal accessibility | `index.html` dialog `aria-*`; `app.openModal()` / `closeModal()`, `trapModalFocus()`, `dismissActiveModalOnEscape()`, export progress focus in `showExportProgress()` / `hideExportProgress()` |
-| Undo/redo | `history.js`, `app.recordHistory()` / `captureHistoryState()` / `updateHistoryButtons()` |
+| Undo/redo | `citrana-history.js`, `app.recordHistory()` / `captureHistoryState()` / `updateHistoryButtons()` |
 
 ## Known Limitations
 

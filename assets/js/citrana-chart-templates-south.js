@@ -1,5 +1,5 @@
 /**
- * chart-templates-south.js
+ * citrana-chart-templates-south.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
  * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * Handles South Indian chart layout and functionality

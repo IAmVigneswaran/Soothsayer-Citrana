@@ -1,5 +1,5 @@
 /**
- * drawing-tools.js
+ * citrana-drawing-tools.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
  * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * Handles all drawing functionality with precise mouse positioning and control points
@@ -218,7 +218,7 @@ class DrawingTools {
         // Initialize Edit UI
         this.editUI = new EditUI();
 
-        // Do NOT call setupTouchEvents(); let app.js handle all mobile touch events
+        // Do NOT call setupTouchEvents(); let citrana-app.js handle all mobile touch events
     }
 
     // Start per-frame sync for control points

@@ -1,5 +1,5 @@
 /**
- * history.js
+ * citrana-history.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana
  * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * Unified undo/redo timeline for chart and drawing state
