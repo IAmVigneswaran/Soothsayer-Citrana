@@ -8,7 +8,7 @@ class ContextMenu {
     constructor() {
         this.menu = null;
         this._menuTouchBound = false;
-        this._canvasContextMenuEnabled = true;
+        this._canvasContextMenuEnabled = ContextMenu.resolveDefaultCanvasContextMenuEnabled();
 
         try {
             const stored = localStorage.getItem('citrana_context_menu_enabled');
@@ -18,6 +18,14 @@ class ContextMenu {
         } catch (_) {
             // localStorage unavailable
         }
+    }
+
+    /** Touch-primary devices default off; desktop mouse/trackpad defaults on. */
+    static resolveDefaultCanvasContextMenuEnabled() {
+        if (typeof CitranaDevice !== 'undefined' && !CitranaDevice.hasFinePointer()) {
+            return false;
+        }
+        return true;
     }
 
     init() {
@@ -193,7 +201,24 @@ class ContextMenu {
     }
 
     getContextMenuToggleLabel() {
-        return this.isCanvasContextMenuEnabled() ? 'Disable Context Menu' : 'Enable Context Menu';
+        return this.getContextMenuToggleActionLabel();
+    }
+
+    getContextMenuItemsTitle() {
+        return 'Context Menu';
+    }
+
+    getContextMenuItemsMeta() {
+        const enabled = this.isCanvasContextMenuEnabled();
+        const useClick = typeof CitranaDevice !== 'undefined' && CitranaDevice.hasFinePointer();
+        const verb = useClick ? 'click' : 'tap';
+        return enabled ? `On · ${verb} to disable` : `Off · ${verb} to enable`;
+    }
+
+    getContextMenuToggleActionLabel() {
+        return this.isCanvasContextMenuEnabled()
+            ? 'Disable context menu'
+            : 'Enable context menu';
     }
 
     getShapeAtClientPoint(clientX, clientY) {

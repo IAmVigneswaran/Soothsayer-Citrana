@@ -1148,6 +1148,20 @@ class CitranaApp {
                 return;
             }
 
+            if ((e.key === 'i' || e.key === 'I') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                const itemsModal = document.getElementById('items-modal');
+                if (itemsModal?.classList.contains('active')) {
+                    e.preventDefault();
+                    this.itemsMenu?.close();
+                    return;
+                }
+                if (!this.isModalBlockingShortcuts()) {
+                    e.preventDefault();
+                    this.itemsMenu?.open();
+                }
+                return;
+            }
+
             if (this.isModalBlockingShortcuts()) {
                 return;
             }

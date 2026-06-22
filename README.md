@@ -30,7 +30,7 @@ This codebase is developed using AI agents.
 - Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that Bhava on the **next** drop only (then the pointer takes over again)
 - Selection Pill: Click or tap a placed Graha, or select a text, heading, or pen stroke annotation with the Select tool; a dashed **Selection Pill** appears behind the label or stroke
 - Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo (zoom and pan are not tracked)
-- Save and Open Session: Download or restore a **`.citrana.json`** working file (chart, Grahas, annotations, and Options) from the toolbar; only `.citrana.json` files are accepted
+- Save and Open Session: Download or restore a `.citrana.json` working file (chart, Grahas, annotations, and Options) from the toolbar; only `.citrana.json` files are accepted
 - Comprehensive Drawing Tools: Select, arrow, line, pen, laser pointer, text, and heading tools
 - Laser Pointer: Temporary fading highlight for presentations; not saved or undoable
 - Presentation View: Right-click the canvas to hide toolbar, zoom bar, Graha library, Help, and About; choose **Exit Presentation View** to restore
@@ -41,7 +41,7 @@ This codebase is developed using AI agents.
 - Items Panel: Intended for mobile and touch devices — layers button in the zoom bar opens chart actions, Bhavas, Grahas, and annotations with select, edit, and delete controls; **Clear Selection** and **Disable Context Menu** in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading annotations offer separate **Edit text** and **Style** actions (also available on desktop)
 - Keyboard Shortcuts: Tools (including **K** for Laser Pointer), undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
-- Privacy focused: Chart data is not uploaded to our servers; save a **`.citrana.json`** session file or export PNG to keep a copy
+- Privacy focused: Chart data is not uploaded to our servers; save a `.citrana.json` session file or export PNG to keep a copy
 
 ## Table of Contents
 
@@ -252,9 +252,9 @@ The **Items** panel is intended for **mobile and touch devices**, where right-cl
 
 #### Save and Open Session
 
-Use **Save Session** and **Open Session** in the toolbar to download or restore a **`.citrana.json`** working file.
+Use **Save Session** and **Open Session** in the toolbar to download or restore a `.citrana.json` working file.
 
-- Session files use the **`.citrana.json`** extension only — other file types are rejected
+- Session files use the `.citrana.json` extension only — other file types are rejected
 - **Included:** chart layout, Grahas, annotations, and Options (indicator toggles and Save Chart Only)
 - **Not included:** undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan
 - Opening a session replaces your current chart and annotations; Citrana asks for confirmation if you already have work on the canvas

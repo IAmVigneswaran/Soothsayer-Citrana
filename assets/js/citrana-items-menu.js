@@ -243,7 +243,9 @@ class CitranaItemsMenu {
             return '';
         }
 
-        const contextMenuLabel = cm.getContextMenuToggleLabel();
+        const contextMenuTitle = cm.getContextMenuItemsTitle();
+        const contextMenuMeta = cm.getContextMenuItemsMeta();
+        const contextMenuActionLabel = cm.getContextMenuToggleActionLabel();
         const contextMenuIcon = cm.isCanvasContextMenuEnabled() ? 'circle-off' : 'circle';
 
         const rows = [
@@ -254,9 +256,9 @@ class CitranaItemsMenu {
                 'mouse-pointer-2'
             ),
             this.renderRow(
-                contextMenuLabel,
-                'Long-press and right-click menu',
-                this.actionButton('toggle-context-menu', contextMenuLabel, contextMenuIcon),
+                contextMenuTitle,
+                contextMenuMeta,
+                this.actionButton('toggle-context-menu', contextMenuActionLabel, contextMenuIcon),
                 contextMenuIcon
             )
         ].join('');
