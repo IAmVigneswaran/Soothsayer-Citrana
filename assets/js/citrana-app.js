@@ -16,6 +16,7 @@ class CitranaApp {
         this.currentTool = 'select';
         this.isDrawing = false;
         this.lastPoint = null;
+        this._selectPointerDownOnDrawing = false; // Select tool: mousedown on a drawing (prevents tap-clear when mouseup is elsewhere)
         this.exportWithWhiteBg = true; // Default: white background
         this.isExporting = false; // Prevent multiple concurrent exports
         this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
@@ -431,6 +432,13 @@ class CitranaApp {
 
         // Canvas events
         this.stage.on('mousedown', (e) => {
+            if (this.currentTool === 'select') {
+                const hit = this.drawingTools?.resolveDrawingHitTarget?.(e);
+                this._selectPointerDownOnDrawing = !!(hit?.name?.()?.startsWith('drawing-'));
+            } else {
+                this._selectPointerDownOnDrawing = false;
+            }
+
             if (this.isEmptyCanvasTarget(e.target)) {
                 this.clearCanvasSelection();
             } else {
@@ -466,11 +474,14 @@ class CitranaApp {
         this.stage.on('touchmove', (e) => this.handleTouchMove(e));
         this.stage.on('touchend', (e) => this.handleTouchEnd(e));
 
-        // Tap-outside-to-deselect for mobile
+        // Tap-outside-to-deselect for mobile (and Konva tap after mouseup)
         this.stage.on('tap', (e) => {
-            if (this.isEmptyCanvasTarget(e.target)) {
+            if (this.currentTool === 'select' &&
+                this.isEmptyCanvasTarget(e.target) &&
+                !this._selectPointerDownOnDrawing) {
                 this.clearCanvasSelection();
             }
+            this._selectPointerDownOnDrawing = false;
         });
 
         // Safari-specific fix for toolbar visibility

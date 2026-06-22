@@ -1305,6 +1305,7 @@ class DrawingTools {
 
         this.selectShape(shape);
         this.showEditUI(shape, 'pen');
+        this.raiseDrawingsAboveChart();
     }
 
     applyDrawingHitTarget(shape, toolType) {
@@ -1318,6 +1319,8 @@ class DrawingTools {
     }
 
     syncBoundingBoxListening() {
+        this.repairPenPickRects();
+
         const enablePick = this.currentTool === 'select' || window.app?.currentTool === 'select';
 
         this.layer.find((node) => {
@@ -1401,6 +1404,11 @@ class DrawingTools {
 
         for (let i = boxes.length - 1; i >= 0; i--) {
             const box = boxes[i];
+            const shape = box.actualShape;
+            if (!shape?.getParent?.()) {
+                continue;
+            }
+
             const x = box.x();
             const y = box.y();
             const w = box.width();
@@ -1408,11 +1416,44 @@ class DrawingTools {
             if (w > 0 && h > 0 &&
                 pos.x >= x && pos.x <= x + w &&
                 pos.y >= y && pos.y <= y + h) {
-                return box.actualShape || null;
+                return shape;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Remove orphan pen pick rects and refresh links/sizes for tapered strokes.
+     */
+    repairPenPickRects() {
+        if (!this.layer) {
+            return;
+        }
+
+        this.layer.find((node) => {
+            const name = node.name() || '';
+            return name.startsWith('bounding-box-pen');
+        }).forEach((box) => {
+            const shape = box.actualShape;
+            if (!shape?.getParent?.()) {
+                box.destroy();
+            }
+        });
+
+        this.layer.find((node) => {
+            const name = node.name() || '';
+            return name.includes('drawing-pen');
+        }).forEach((shape) => {
+            if (shape.boundingBox && !shape.boundingBox.getParent()) {
+                shape.boundingBox = null;
+            }
+
+            if (shape.boundingBox) {
+                shape.boundingBox.actualShape = shape;
+                this.updateBoundingBox(shape.boundingBox, shape);
+            }
+        });
     }
 
     resolveDrawingHitTarget(e) {
@@ -1999,6 +2040,11 @@ class DrawingTools {
         const resolved = this.resolveDrawingHitTarget(e);
         if (resolved) {
             clickedShape = resolved;
+        } else if ((e.target?.name?.() || '').startsWith('bounding-box-')) {
+            const fromBox = this.normalizeDrawingShape(e.target);
+            if (fromBox) {
+                clickedShape = fromBox;
+            }
         }
 
         // Check if clicked on a drawing object or its bounding box
@@ -2033,6 +2079,11 @@ class DrawingTools {
         const resolved = this.resolveDrawingHitTarget(e);
         if (resolved) {
             clickedShape = resolved;
+        } else if ((e.target?.name?.() || '').startsWith('bounding-box-')) {
+            const fromBox = this.normalizeDrawingShape(e.target);
+            if (fromBox) {
+                clickedShape = fromBox;
+            }
         }
 
         if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
@@ -2152,6 +2203,7 @@ class DrawingTools {
         // Remove bounding box if it exists
         if (this.selectedShape.boundingBox) {
             this.selectedShape.boundingBox.destroy();
+            this.selectedShape.boundingBox = null;
         }
 
         // Remove the shape
@@ -2164,6 +2216,9 @@ class DrawingTools {
             this.editUI.hide();
         }
 
+        this.repairPenPickRects();
+        this.syncBoundingBoxListening();
+        this.raiseDrawingsAboveChart();
         this.layer.batchDraw();
 
         // Trigger snapshot for undo/redo
