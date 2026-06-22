@@ -19,6 +19,7 @@ class CitranaApp {
         this._selectPointerDownOnDrawing = false; // Select tool: mousedown on a drawing (prevents tap-clear when mouseup is elsewhere)
         this.exportWithWhiteBg = true; // Default: white background
         this.isExporting = false; // Prevent multiple concurrent exports
+        this.isSessionBusy = false; // Prevent concurrent save/open session operations
         this.zoomLocked = true; // Block wheel and +/- zoom until user unlocks
         this.presentationView = false;
         this.welcomeLoadingInterval = null;
@@ -760,7 +761,7 @@ class CitranaApp {
 
     exportChart() {
         // Prevent multiple concurrent exports
-        if (this.isExporting) {
+        if (this.isExporting || this.isSessionBusy) {
             citranaDebug('Export already in progress, ignoring duplicate request');
             return;
         }
@@ -953,15 +954,19 @@ class CitranaApp {
         img.src = dataURL;
     }
 
-    showExportProgress() {
+    showProgressModal(title, message) {
         const modal = document.getElementById('export-progress-modal');
         const progressFill = document.getElementById('export-progress-fill');
         const progressText = document.getElementById('export-progress-text');
+        const progressTitle = document.getElementById('export-progress-modal-title');
 
         if (modal && progressFill && progressText) {
             const wasVisible = modal.style.display === 'block';
+            if (progressTitle && title) {
+                progressTitle.textContent = title;
+            }
             progressFill.style.width = '0%';
-            progressText.textContent = 'Preparing chart for export...';
+            progressText.textContent = message || '';
             modal.style.display = 'block';
             modal.setAttribute('aria-hidden', 'false');
             modal.setAttribute('aria-busy', 'true');
@@ -972,7 +977,11 @@ class CitranaApp {
         }
     }
 
-    updateExportProgress(percentage, message) {
+    showExportProgress() {
+        this.showProgressModal('Exporting Chart', 'Preparing chart for export...');
+    }
+
+    updateProgressModal(percentage, message) {
         const progressFill = document.getElementById('export-progress-fill');
         const progressText = document.getElementById('export-progress-text');
 
@@ -982,7 +991,11 @@ class CitranaApp {
         }
     }
 
-    hideExportProgress() {
+    updateExportProgress(percentage, message) {
+        this.updateProgressModal(percentage, message);
+    }
+
+    hideProgressModal() {
         const modal = document.getElementById('export-progress-modal');
         if (modal) {
             const wasVisible = modal.style.display === 'block';
@@ -993,6 +1006,26 @@ class CitranaApp {
                 this.popModalFocus();
             }
         }
+    }
+
+    hideExportProgress() {
+        this.hideProgressModal();
+    }
+
+    failProgressModal(message, onComplete) {
+        this.updateProgressModal(0, message);
+        setTimeout(() => {
+            this.hideProgressModal();
+            onComplete?.();
+        }, 1000);
+    }
+
+    completeProgressModal(message, onComplete) {
+        this.updateProgressModal(100, message);
+        setTimeout(() => {
+            this.hideProgressModal();
+            onComplete?.();
+        }, 400);
     }
 
     downloadFile(dataURL, filename) {
@@ -1969,18 +2002,34 @@ class CitranaApp {
     }
 
     saveSession() {
+        if (this.isExporting || this.isSessionBusy) {
+            return;
+        }
+
         if (typeof CitranaSession === 'undefined') {
             window.alert('Session save is unavailable.');
             return;
         }
 
-        try {
-            const session = CitranaSession.capture(this);
-            CitranaSession.download(session);
-        } catch (error) {
-            console.error('Error saving session:', error);
-            window.alert(error.message || 'Could not save session.');
-        }
+        this.isSessionBusy = true;
+        this.showProgressModal('Saving Session', 'Capturing chart data...');
+
+        requestAnimationFrame(() => {
+            try {
+                this.updateProgressModal(40, 'Serialising chart and annotations...');
+                const session = CitranaSession.capture(this);
+                this.updateProgressModal(75, 'Preparing download...');
+                CitranaSession.download(session);
+                this.completeProgressModal('Session saved successfully!', () => {
+                    this.isSessionBusy = false;
+                });
+            } catch (error) {
+                console.error('Error saving session:', error);
+                this.failProgressModal(error.message || 'Could not save session.', () => {
+                    this.isSessionBusy = false;
+                });
+            }
+        });
     }
 
     openSessionFromFile(file) {
@@ -1991,15 +2040,7 @@ class CitranaApp {
 
         CitranaSession.readFile(file)
             .then((session) => {
-                const apply = () => {
-                    try {
-                        this.restoreSessionState(session);
-                        citranaDebug('Session imported successfully');
-                    } catch (error) {
-                        console.error('Error importing session:', error);
-                        window.alert(error.message || 'Could not open session.');
-                    }
-                };
+                const apply = () => this.applyImportedSession(session);
 
                 if (this.hasSessionContent()) {
                     this.showConfirmationDialog(
@@ -2014,6 +2055,31 @@ class CitranaApp {
                 console.error('Error reading session:', error);
                 window.alert(error.message || 'Could not open session.');
             });
+    }
+
+    applyImportedSession(session) {
+        if (this.isExporting || this.isSessionBusy) {
+            return;
+        }
+
+        this.isSessionBusy = true;
+        this.showProgressModal('Opening Session', 'Restoring chart...');
+
+        requestAnimationFrame(() => {
+            try {
+                this.updateProgressModal(45, 'Restoring chart and Grahas...');
+                this.restoreSessionState(session);
+                this.completeProgressModal('Session opened successfully!', () => {
+                    this.isSessionBusy = false;
+                    citranaDebug('Session imported successfully');
+                });
+            } catch (error) {
+                console.error('Error importing session:', error);
+                this.failProgressModal(error.message || 'Could not open session.', () => {
+                    this.isSessionBusy = false;
+                });
+            }
+        });
     }
 
     restoreSessionState(session) {
