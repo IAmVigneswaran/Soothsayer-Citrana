@@ -200,7 +200,6 @@ class DrawingTools {
         this.lastPoint = null;
         this.isTouchDevice = CitranaDevice.isTouchDevice();
         this.selectedShape = null;
-        this.isDragging = false;
         this._penSelectClick = null;
 
         // Track editing state to prevent conflicts
@@ -2141,7 +2140,6 @@ class DrawingTools {
         // Check if clicked on a drawing object or its bounding box
         if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
             this.selectShape(clickedShape);
-            this.isDragging = true;
         } else {
             // Clicked on empty space, clear selection
             this.clearSelection();
@@ -2179,7 +2177,6 @@ class DrawingTools {
 
         if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
             this.selectShape(clickedShape);
-            this.isDragging = true;
 
             // Add double-tap detection for Edit UI
             this.setupDoubleTapForEditUI(clickedShape);
@@ -2193,7 +2190,6 @@ class DrawingTools {
      * Handle touch up for select tool
      */
     handleSelectTouchUp() {
-        this.isDragging = false;
     }
 
     /**
@@ -2284,7 +2280,6 @@ class DrawingTools {
      * Handle mouse up for select tool
      */
     handleSelectMouseUp() {
-        this.isDragging = false;
     }
 
     /**
