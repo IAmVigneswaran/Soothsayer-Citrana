@@ -8,13 +8,19 @@ class CitranaItemsMenu {
     constructor() {
         this.modal = null;
         this.bodyEl = null;
+        this.navEl = null;
+        this.scrollContainer = null;
         this.openBtn = null;
         this._shapes = [];
+        this._sectionNav = [];
+        this._navObserver = null;
     }
 
     init() {
         this.modal = document.getElementById('items-modal');
         this.bodyEl = document.getElementById('items-modal-body');
+        this.navEl = document.getElementById('items-modal-nav');
+        this.scrollContainer = this.modal?.querySelector('.options-modal-content') || null;
         this.openBtn = document.getElementById('items-menu-btn');
 
         if (!this.modal || !this.bodyEl || !this.openBtn) {
@@ -24,6 +30,7 @@ class CitranaItemsMenu {
 
         this.openBtn.addEventListener('click', () => this.open());
         document.getElementById('items-modal-close')?.addEventListener('click', () => this.close());
+        this.navEl?.addEventListener('click', (e) => this.handleNavClick(e));
 
         this.modal.addEventListener('click', (e) => {
             if (e.target === this.modal) {
@@ -39,6 +46,12 @@ class CitranaItemsMenu {
     open() {
         this.render();
         window.app?.openModal(this.modal);
+        if (this.scrollContainer) {
+            this.scrollContainer.scrollTop = 0;
+        }
+        if (this._sectionNav.length > 0) {
+            this.setActiveSectionChip(this._sectionNav[0].id);
+        }
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
@@ -124,14 +137,105 @@ class CitranaItemsMenu {
         return `<button type="button" class="items-action-btn" data-action="${action}" title="${title}" aria-label="${title}" ${extraAttrs}><i data-lucide="${icon}"></i></button>`;
     }
 
-    renderSection(title, content) {
+    renderSection(title, content, sectionId = '', navLabel = '') {
         if (!content) return '';
+
+        const id = sectionId || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const label = navLabel || title;
+        this._sectionNav.push({ id, label });
+
         return `
-            <section class="items-section">
+            <section class="items-section" id="items-section-${id}">
                 <h3 class="items-section-title">${title}</h3>
                 <div class="items-list">${content}</div>
             </section>
         `;
+    }
+
+    renderSectionNav() {
+        if (!this.navEl) {
+            return;
+        }
+
+        if (this._sectionNav.length < 2) {
+            this.navEl.innerHTML = '';
+            this.navEl.hidden = true;
+            this.teardownSectionNavObserver();
+            return;
+        }
+
+        const chips = this._sectionNav.map(({ id, label }) => (
+            `<button type="button" class="items-section-chip" data-items-section="${id}">${this.escapeHtml(label)}</button>`
+        )).join('');
+
+        this.navEl.hidden = false;
+        this.navEl.innerHTML = `<div class="items-section-nav">${chips}</div>`;
+        this.setupSectionNavObserver();
+    }
+
+    handleNavClick(e) {
+        const chip = e.target.closest('[data-items-section]');
+        if (!chip || !this.navEl?.contains(chip)) {
+            return;
+        }
+
+        e.preventDefault();
+        this.scrollToSection(chip.dataset.itemsSection);
+        this.setActiveSectionChip(chip.dataset.itemsSection);
+    }
+
+    scrollToSection(sectionId) {
+        const section = document.getElementById(`items-section-${sectionId}`);
+        if (!section) {
+            return;
+        }
+
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    setActiveSectionChip(sectionId) {
+        if (!this.navEl) {
+            return;
+        }
+
+        this.navEl.querySelectorAll('.items-section-chip').forEach((chip) => {
+            chip.classList.toggle('active', chip.dataset.itemsSection === sectionId);
+        });
+    }
+
+    setupSectionNavObserver() {
+        this.teardownSectionNavObserver();
+
+        if (!this.scrollContainer || !this.navEl || this.navEl.hidden) {
+            return;
+        }
+
+        const sections = this.bodyEl.querySelectorAll('.items-section[id]');
+        if (!sections.length) {
+            return;
+        }
+
+        this._navObserver = new IntersectionObserver((entries) => {
+            const visible = entries
+                .filter((entry) => entry.isIntersecting)
+                .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+            if (visible.length > 0) {
+                const sectionId = visible[0].target.id.replace('items-section-', '');
+                this.setActiveSectionChip(sectionId);
+            }
+        }, {
+            root: this.scrollContainer,
+            rootMargin: '-20% 0px -60% 0px',
+            threshold: 0
+        });
+
+        sections.forEach((section) => this._navObserver.observe(section));
+    }
+
+    teardownSectionNavObserver() {
+        this._navObserver?.disconnect();
+        this._navObserver = null;
     }
 
     renderRow(label, meta, actionsHtml, rowIcon = '', options = {}) {
@@ -167,13 +271,13 @@ class CitranaItemsMenu {
                 this.renderRow('Clear Canvas', '', this.actionButton('clear-chart', 'Clear Canvas', 'trash-2'), 'trash-2')
             ].join('');
 
-            return this.renderSection('Chart', rows);
+            return this.renderSection('Chart', rows, 'chart');
         }
 
         const chartName = chartType === 'south-indian' ? 'South Indian' : 'North Indian';
         let html = this.renderSection('Chart', `
             <p class="items-chart-type">${chartName} Chart</p>
-        `);
+        `, 'chart');
 
         if (chartType === 'north-indian') {
             const lagnaButtons = CitranaRashis.RASHIS.map((rashi, i) => (
@@ -183,7 +287,7 @@ class CitranaItemsMenu {
                 </button>`
             )).join('');
 
-            html += this.renderSection('Set Lagna as …', `<div class="items-lagna-grid">${lagnaButtons}</div>`);
+            html += this.renderSection('Set Lagna as …', `<div class="items-lagna-grid">${lagnaButtons}</div>`, 'set-lagna', 'Lagna');
         }
 
         const chartActions = [
@@ -193,7 +297,7 @@ class CitranaItemsMenu {
             this.renderRow('Clear Canvas', '', this.actionButton('clear-chart', 'Clear Canvas', 'trash-2'), 'trash-2')
         ].join('');
 
-        html += this.renderSection('Chart Actions', chartActions);
+        html += this.renderSection('Chart Actions', chartActions, 'chart-actions', 'Actions');
         return html;
     }
 
@@ -269,7 +373,7 @@ class CitranaItemsMenu {
             )
         ].join('');
 
-        return this.renderSection('Canvas', rows);
+        return this.renderSection('Canvas', rows, 'canvas');
     }
 
     getBhavaLabel(chartType, houseNumber) {
@@ -341,7 +445,7 @@ class CitranaItemsMenu {
             ));
         }
 
-        return this.renderSection('Bhavas', rows.join(''));
+        return this.renderSection('Bhavas', rows.join(''), 'bhavas');
     }
 
     renderGrahasSection(chartType, template) {
@@ -375,17 +479,17 @@ class CitranaItemsMenu {
         }
 
         if (rows.length === 0) {
-            return this.renderSection('Grahas', '<p class="items-empty">No Grahas placed yet.</p>');
+            return this.renderSection('Grahas', '<p class="items-empty">No Grahas placed yet.</p>', 'grahas');
         }
 
-        return this.renderSection('Grahas', rows.join(''));
+        return this.renderSection('Grahas', rows.join(''), 'grahas');
     }
 
     renderAnnotationsSection() {
         this._shapes = this.getDrawingShapes();
 
         if (this._shapes.length === 0) {
-            return this.renderSection('Annotations', '<p class="items-empty">No annotations yet.</p>');
+            return this.renderSection('Annotations', '<p class="items-empty">No annotations yet.</p>', 'annotations');
         }
 
         const rows = this._shapes.map((shape, index) => {
@@ -418,10 +522,11 @@ class CitranaItemsMenu {
             );
         }).join('');
 
-        return this.renderSection('Annotations', rows);
+        return this.renderSection('Annotations', rows, 'annotations');
     }
 
     render() {
+        this._sectionNav = [];
         const chartType = this.getChartTemplates()?.currentChartType || null;
         const template = this.getActiveTemplate();
 
@@ -432,6 +537,8 @@ class CitranaItemsMenu {
             this.renderGrahasSection(chartType, template),
             this.renderAnnotationsSection()
         ].join('');
+
+        this.renderSectionNav();
     }
 
     handleBodyClick(e) {
