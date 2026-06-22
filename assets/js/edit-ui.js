@@ -121,6 +121,10 @@ class EditUI {
      * @returns {boolean}
      */
     isAnnotationBold(element) {
+        if (typeof CitranaAnnotationFonts !== 'undefined') {
+            return CitranaAnnotationFonts.isBold(element);
+        }
+
         if (!element) {
             return false;
         }
@@ -139,6 +143,11 @@ class EditUI {
      * @param {boolean} bold
      */
     setAnnotationBold(element, bold) {
+        if (typeof CitranaAnnotationFonts !== 'undefined') {
+            CitranaAnnotationFonts.setBold(element, bold);
+            return;
+        }
+
         if (!element) {
             return;
         }
@@ -544,6 +553,8 @@ class EditUI {
         const currentFill = this.currentElement.fill ? this.currentElement.fill() : this.defaultProperties.text.fill;
         const isBold = this.isAnnotationBold(this.currentElement);
         const isItalic = this.isAnnotationItalic(this.currentElement);
+        const isHandwritten = typeof CitranaAnnotationFonts !== 'undefined' &&
+            CitranaAnnotationFonts.isHandwritten(this.currentElement);
         const currentAlign = this.getAnnotationAlign(this.currentElement);
 
         // Create controls container
@@ -632,6 +643,42 @@ class EditUI {
             this.markEditDirty();
         });
 
+        const normalFontBtn = document.createElement('button');
+        normalFontBtn.innerHTML = '<i data-lucide="case-sensitive"></i>';
+        normalFontBtn.className = `edit-btn ${isHandwritten ? '' : 'active'}`.trim();
+        normalFontBtn.title = 'Normal font';
+
+        const handFontBtn = document.createElement('button');
+        handFontBtn.innerHTML = '<i data-lucide="pen-line"></i>';
+        handFontBtn.className = `edit-btn ${isHandwritten ? 'active' : ''}`.trim();
+        handFontBtn.title = 'Hand-written font';
+
+        const applyFontMode = (mode) => {
+            const apply = () => {
+                CitranaAnnotationFonts.setMode(this.currentElement, mode);
+                this.currentElement.getLayer().batchDraw();
+                const handwritten = CitranaAnnotationFonts.isHandwritten(this.currentElement);
+                normalFontBtn.classList.toggle('active', !handwritten);
+                handFontBtn.classList.toggle('active', handwritten);
+                boldBtn.classList.toggle('active', this.isAnnotationBold(this.currentElement));
+                this.markEditDirty();
+            };
+
+            if (mode === CitranaAnnotationFonts.MODE_HANDWRITTEN) {
+                CitranaAnnotationFonts.ensureLoaded().then(apply);
+            } else {
+                apply();
+            }
+        };
+
+        this.addTouchSupport(normalFontBtn, () => {
+            applyFontMode(CitranaAnnotationFonts.MODE_NORMAL);
+        });
+
+        this.addTouchSupport(handFontBtn, () => {
+            applyFontMode(CitranaAnnotationFonts.MODE_HANDWRITTEN);
+        });
+
         // Text Color Control
         const colorInput = this.createColorControl(
             currentFill,
@@ -645,6 +692,8 @@ class EditUI {
         controlsDiv.appendChild(increaseSize);
         controlsDiv.appendChild(boldBtn);
         controlsDiv.appendChild(italicBtn);
+        controlsDiv.appendChild(normalFontBtn);
+        controlsDiv.appendChild(handFontBtn);
         controlsDiv.appendChild(colorInput);
         // --- Add text alignment buttons ---
         const alignLeftBtn = document.createElement('button');

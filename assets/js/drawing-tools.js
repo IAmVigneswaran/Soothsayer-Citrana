@@ -557,7 +557,7 @@ class DrawingTools {
             fontFamily: 'Arial, sans-serif',
             fontWeight: 400,
             fontStyle: 'normal',
-            fill: '#374151',
+            fill: '#000000',
             draggable: true,
             name: 'drawing-text',
             listening: true,

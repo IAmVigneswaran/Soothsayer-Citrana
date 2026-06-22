@@ -37,6 +37,9 @@
       <!-- stylesheets -->
       <link rel="stylesheet" href="assets/css/styles.css">
       <link rel="stylesheet" href="assets/vendor/colorpicker.min.css">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
       <!-- favicon -->
       <link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon/apple-icon-57x57.png">
       <link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon/apple-icon-60x60.png">
@@ -370,7 +373,7 @@
                   <ul class="help-sublist">
                      <li>After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool and Laser Pointer stay active for continuous drawing.</li>
                      <li>The Laser Pointer (<strong>K</strong>) draws a temporary highlight that fades away — it is not saved to the chart or included in undo/redo.</li>
-                     <li>Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or the Items panel — see below) to change colour, font size, bold, italic, and alignment.</li>
+                     <li>Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or the Items panel — see below) to change colour, font size, bold, italic, alignment, and font style (<strong>Normal</strong> or <strong>Hand-written</strong>).</li>
                      <li>Text and headings support multiple lines: press <strong>Shift+Enter</strong> for a new line while editing; press <strong>Enter</strong> to finish.</li>
                      <li>Select text or heading annotations with the Select tool to show the same dashed <strong>Selection Pill</strong> behind the label.</li>
                      <li>Use the Hand tool to pan around the chart.</li>
@@ -384,7 +387,7 @@
                      <li><strong>Bhavas:</strong> select a Bhava, set as Lagna or First Bhava, or clear Grahas in that Bhava.</li>
                      <li><strong>Grahas:</strong> select, edit, or delete placed Grahas.</li>
                      <li><strong>Annotations:</strong> select, edit, or delete arrows, lines, pen strokes, text, and headings.</li>
-                     <li>For <strong>Text</strong> and <strong>Heading</strong> annotations, use <strong>Edit text</strong> to change wording (opens the keyboard on touch devices) and <strong>Style</strong> to adjust colour, font size, bold, italic, and alignment.</li>
+                     <li>For <strong>Text</strong> and <strong>Heading</strong> annotations, use <strong>Edit text</strong> to change wording (opens the keyboard on touch devices) and <strong>Style</strong> to adjust colour, font size, bold, italic, alignment, and Normal or Hand-written font.</li>
                      <li>Canvas right-click and long-press menus work in Select and Hand; they are suppressed while Arrow, Line, Pen, Text, Heading, or Laser tools are active so drawing is not interrupted.</li>
                   </ul>
                   <p><strong>Presentation View:</strong> Right-click the canvas (or a Bhava), open <strong>Items</strong>, or use the chart context menu and choose <strong>Presentation View</strong> to hide the toolbar, zoom bar, Graha library, Help, and About for a clean chart on screen. Right-click again, reopen <strong>Items</strong>, or choose <strong>Exit Presentation View</strong> to restore the interface.</p>
@@ -541,6 +544,7 @@
       <script src="assets/js/citrana-device.js"></script>
       <script src="assets/js/citrana-rashis.js"></script>
       <script src="assets/js/citrana-selection.js"></script>
+      <script src="assets/js/citrana-annotation-fonts.js"></script>
       <script src="assets/js/chart-templates-south.js"></script>
       <script src="assets/js/chart-templates-north.js"></script>
       <script src="assets/js/chart-coordinator.js"></script>

@@ -82,6 +82,7 @@ class CitranaApp {
         this.planetSystem.init();
         this.contextMenu.init();
         this.itemsMenu.init();
+        CitranaAnnotationFonts?.ensureLoaded?.();
 
         if (typeof CitranaColorPicker !== 'undefined') {
             CitranaColorPicker.initGrahaBar();
