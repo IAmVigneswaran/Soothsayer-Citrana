@@ -23,11 +23,12 @@
 - **Presentation View** — right-click the canvas or a Bhava and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, About, and any open edit bars for a clean on-screen chart. Choose **Exit Presentation View** from the same menu to restore the interface. Not tracked by undo/redo.
 - **Items panel** — layers button in the zoom bar (after zoom lock) opens **Items**, intended for **mobile and touch devices**. Lists chart actions, all Bhavas, placed Grahas, and annotations in one panel — select, edit, delete, set Lagna, Presentation View, reset, and clear. **Canvas** section offers **Clear Selection** and **Disable Context Menu** (saved in this browser). Selected rows stay in sync with the canvas. Text and Heading annotations offer separate **Edit text** (inline wording and keyboard) and **Style** (colour, font, alignment) actions. Also available on desktop as an alternative to right-click menus.
 - **Graha Selection Pill** — click or tap a placed Graha or a text/heading annotation to select it; a dashed **Selection Pill** appears behind the label so coloured Grahas (e.g. Ju) and annotations stay readable.
+- **Hand-written annotations** — optional **Caveat** script style for text and headings, with **Normal** and **Hand-written** toggles in the Edit UI.
 
 **🔧 Improvements:**
 - Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
 - South Indian Bhava menus show **Bhava** numbers based on where Lagna is set.
-- Help, Welcome, and README updated for Lagna setup, session files (`.citrana.json`), zoom lock, undo/redo, chart display options, Upagrahas, Laser Pointer, Presentation View, Items panel, Selection Pill, multi-line text/heading editing, drawing defaults, and mobile/touch guidance.
+- Help, Welcome, and README updated for Lagna setup, session files (`.citrana.json`), zoom lock, undo/redo, chart display options, Upagrahas, Laser Pointer, Presentation View, Items panel, Selection Pill, multi-line text/heading editing, hand-written fonts, drawing defaults, and mobile/touch guidance.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied older code paths that are no longer used, including automatic chart restore on refresh.
 - README aligned with in-app Help for **Delete** key routing (Graha first, then drawing), auto-switch to Select after arrow/line/text/heading, and one-shot bhava drop targeting.
@@ -35,15 +36,17 @@
 - Browser chrome aligned to the white UI theme.
 - Documentation refreshed for contributors and AI assistants.
 - **Colour picker polish** — cleaner chips in the Edit UI and Graha bar; a simpler picker dialog without format labels; semi-transparent colours look consistent on arrows and Graha labels.
-- **Smoother pen strokes** — freehand curves look less jagged and more natural when you draw with the Pen tool.
-- **Drawing stroke defaults** — Pen starts at 3px; Arrow and Line start at 4px.
+- **Natural pen taper** — Pen strokes taper at the start and end and respond to drawing speed for a more handwritten feel; strokes stay at full opacity and save in session files.
+- **Drawing stroke defaults** — Pen starts at 4px; Arrow and Line start at 4px.
 - **Multi-line text and headings** — inline editors support multiple lines (**Shift+Enter** for a new line, **Enter** to finish); the heading editor is no longer capped at two lines.
-- **Text and heading style controls** — bold, italic, and alignment buttons in the Edit UI stay in sync with the canvas (including correct left alignment for new text annotations).
+- **Text and heading style controls** — bold, italic, alignment, and font mode buttons in the Edit UI stay in sync with the canvas (including correct left alignment for new text annotations).
+- **Hand-written bold** — bold in Hand-written mode uses **Caveat Brush** so script annotations keep a natural weight (saved with the annotation).
 - **Arrow and line control points** — endpoint handles give hover and drag feedback on desktop (black/white invert on hover, **grab** / **grabbing** cursor, wider hit targets).
 - **Rashi zodiac icons** — Lucide zodiac icons replace Unicode symbols in **Set Lagna as …** menus and South Indian Bhava rows in the **Items** panel for consistent rendering across browsers.
 - **Help and About sizing** — corner buttons match the zoom bar at 48px; icons scaled for visual balance.
 - **More room on mobile** — extra space between the Graha library and the zoom bar so bottom controls are easier to use.
 - **Mobile toolbar scroll** — chevron buttons scroll the top toolbar when tools overflow on narrow screens.
+- **Edit UI mobile scroll** — chevron buttons scroll the Edit UI when text and heading style controls overflow on narrow screens.
 - **Drawing tools on mobile** — Arrow, Line, Pen, and Laser Pointer are available in the mobile toolbar; canvas long-press menus are suppressed while those tools are active so drawing is not interrupted.
 - South Indian Bhava rows in the **Items** panel show each cell's fixed **Rashi** name with a Lucide zodiac icon.
 - North Indian **Set Lagna as …** uses the same flyout submenu on desktop and touch (tap to expand on mobile).
