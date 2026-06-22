@@ -5,10 +5,184 @@
  * Handles all drawing functionality with precise mouse positioning and control points
  */
 
-/** Minimum px between sampled pen points (reduces jitter while drawing) */
-const PEN_MIN_POINT_DISTANCE = 3;
-/** Konva spline tension — 0 is straight segments; ~0.5 gives smooth curves */
-const PEN_TENSION = 0.5;
+/** Minimum px between sampled pen points when drawing slowly (more detail) */
+const PEN_MIN_POINT_DISTANCE = 2;
+/** Wider spacing on fast strokes — avoids dense jitter and keeps curves natural */
+const PEN_MIN_POINT_DISTANCE_FAST = 5;
+/** px/ms above which pen sampling uses the fast spacing */
+const PEN_SPEED_FAST_THRESHOLD = 0.85;
+/** Konva spline tension — 0 is straight segments; ~0.5–0.6 gives smooth marker curves */
+const PEN_TENSION = 0.55;
+const PEN_DEFAULT_STROKE_WIDTH = 4;
+
+function isTaperedPen(shape) {
+    return shape?.getAttr?.('penTaper') === true;
+}
+
+function getPenStrokeWidth(shape) {
+    if (isTaperedPen(shape)) {
+        return shape.getAttr('penBaseWidth') || PEN_DEFAULT_STROKE_WIDTH;
+    }
+
+    return shape?.strokeWidth?.() || PEN_DEFAULT_STROKE_WIDTH;
+}
+
+function getPenStrokeColor(shape) {
+    if (isTaperedPen(shape)) {
+        return shape.getAttr('penStrokeColor') || '#FF0000';
+    }
+
+    return shape?.stroke?.() || '#FF0000';
+}
+
+function smoothPenWidths(widths) {
+    if (!widths || widths.length < 3) {
+        return widths;
+    }
+
+    const smoothed = [widths[0]];
+    for (let i = 1; i < widths.length - 1; i++) {
+        smoothed.push(0.25 * widths[i - 1] + 0.5 * widths[i] + 0.25 * widths[i + 1]);
+    }
+    smoothed.push(widths[widths.length - 1]);
+    return smoothed;
+}
+
+/**
+ * Per-vertex width from stroke tips and drawing speed.
+ * @param {number[]} flatPoints
+ * @param {number[]} sampleTimes
+ * @param {number} baseWidth
+ * @returns {number[]}
+ */
+function computePenTaperWidths(flatPoints, sampleTimes, baseWidth) {
+    const count = flatPoints.length / 2;
+    if (count < 2) {
+        return [baseWidth];
+    }
+
+    if (count === 2) {
+        const tip = Math.max(0.6, baseWidth * 0.45);
+        return [tip, tip];
+    }
+
+    const minWidth = Math.max(0.45, baseWidth * 0.12);
+    const widths = new Array(count);
+
+    for (let i = 0; i < count; i++) {
+        const t = i / (count - 1);
+        const endFactor = Math.pow(Math.sin(Math.PI * t), 0.82);
+
+        let velocityFactor = 1;
+        if (i > 0) {
+            const dx = flatPoints[i * 2] - flatPoints[i * 2 - 2];
+            const dy = flatPoints[i * 2 + 1] - flatPoints[i * 2 - 1];
+            const dist = Math.hypot(dx, dy);
+            const dt = Math.max(8, (sampleTimes[i] ?? sampleTimes[sampleTimes.length - 1] ?? 0)
+                - (sampleTimes[i - 1] ?? 0));
+            const speed = dist / dt;
+            velocityFactor = Math.max(0.42, Math.min(1.12, 1.1 - speed * 0.42));
+        }
+
+        widths[i] = Math.max(minWidth, baseWidth * endFactor * velocityFactor);
+    }
+
+    return smoothPenWidths(widths);
+}
+
+function drawTaperedPenPath(context, points, widths, color) {
+    if (!points || points.length < 4 || !widths?.length) {
+        return;
+    }
+
+    context.save();
+    context.strokeStyle = color;
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+    context.globalAlpha = 1;
+
+    for (let i = 0; i < points.length - 2; i += 2) {
+        const index = i / 2;
+        const width = Math.max(0.35, (widths[index] + widths[index + 1]) / 2);
+        context.lineWidth = width;
+        context.beginPath();
+        context.moveTo(points[i], points[i + 1]);
+        context.lineTo(points[i + 2], points[i + 3]);
+        context.stroke();
+    }
+
+    context.restore();
+}
+
+function configureTaperedPenShape(shape) {
+    shape.sceneFunc((context, node) => {
+        drawTaperedPenPath(
+            context,
+            node.getAttr('penTaperPoints'),
+            node.getAttr('penTaperWidths'),
+            node.getAttr('penStrokeColor') || '#FF0000'
+        );
+    });
+
+    shape.hitFunc((context, node) => {
+        const points = node.getAttr('penTaperPoints');
+        const widths = node.getAttr('penTaperWidths');
+        if (!points || points.length < 4 || !widths?.length) {
+            return;
+        }
+
+        const hitPad = CitranaDevice.isMobileUA() ? 14 : 10;
+        context.lineCap = 'round';
+        context.lineJoin = 'round';
+
+        for (let i = 0; i < points.length - 2; i += 2) {
+            const index = i / 2;
+            const width = Math.max(0.35, (widths[index] + widths[index + 1]) / 2) + hitPad;
+            context.beginPath();
+            context.lineWidth = width;
+            context.moveTo(points[i], points[i + 1]);
+            context.lineTo(points[i + 2], points[i + 3]);
+            context.strokeShape(node);
+        }
+    });
+}
+
+function toLocalPenPoints(flatPoints, offsetX, offsetY) {
+    const local = [];
+    for (let i = 0; i < flatPoints.length; i += 2) {
+        local.push(flatPoints[i] - offsetX, flatPoints[i + 1] - offsetY);
+    }
+    return local;
+}
+
+/**
+ * Chaikin corner-cutting — one pass yields smoother, more natural curves.
+ * @param {number[]} flatPoints
+ * @returns {number[]}
+ */
+function chaikinPenPoints(flatPoints) {
+    if (!flatPoints || flatPoints.length < 8) {
+        return flatPoints;
+    }
+
+    const next = [flatPoints[0], flatPoints[1]];
+
+    for (let i = 0; i < flatPoints.length - 4; i += 2) {
+        const x0 = flatPoints[i];
+        const y0 = flatPoints[i + 1];
+        const x1 = flatPoints[i + 2];
+        const y1 = flatPoints[i + 3];
+        next.push(
+            0.75 * x0 + 0.25 * x1,
+            0.75 * y0 + 0.25 * y1,
+            0.25 * x0 + 0.75 * x1,
+            0.25 * y0 + 0.75 * y1
+        );
+    }
+
+    next.push(flatPoints[flatPoints.length - 2], flatPoints[flatPoints.length - 1]);
+    return next;
+}
 
 class DrawingTools {
     constructor(stage, layer) {
@@ -152,10 +326,23 @@ class DrawingTools {
             return;
         }
 
-        const minDistance = tool === 'pen'
-            ? PEN_MIN_POINT_DISTANCE
-            : (tool === 'laser' ? CitranaLaser.MIN_POINT_DISTANCE : 1);
-        if (this.lastPoint && this.getDistance(pos, this.lastPoint) < minDistance) {
+        const minDistance = tool === 'laser' ? CitranaLaser.MIN_POINT_DISTANCE : 1;
+
+        if (tool === 'pen' && this.lastPoint) {
+            const dist = this.getDistance(pos, this.lastPoint);
+            const now = performance.now();
+            const dt = Math.max(8, now - (this.penLastSampleTime || now));
+            const speed = dist / dt;
+            const penMinDistance = speed > PEN_SPEED_FAST_THRESHOLD
+                ? PEN_MIN_POINT_DISTANCE_FAST
+                : PEN_MIN_POINT_DISTANCE;
+
+            if (dist < penMinDistance) {
+                return;
+            }
+
+            this.penLastSampleTime = now;
+        } else if (this.lastPoint && this.getDistance(pos, this.lastPoint) < minDistance) {
             return;
         }
 
@@ -194,11 +381,12 @@ class DrawingTools {
         }
 
         // Bind selection/drag handlers once when the stroke is complete (not per mousemove)
-        if (completedShape && completedTool === 'pen') {
-            this.finishPenStroke(completedShape);
+        let finishedShape = completedShape;
+        if (finishedShape && completedTool === 'pen') {
+            finishedShape = this.finishPenStroke(finishedShape) || finishedShape;
         }
-        if (completedShape && (completedTool === 'arrow' || completedTool === 'line' || completedTool === 'pen')) {
-            this.makeShapeSelectable(completedShape, completedTool);
+        if (finishedShape && (completedTool === 'arrow' || completedTool === 'line' || completedTool === 'pen')) {
+            this.makeShapeSelectable(finishedShape, completedTool);
         }
 
         // Ensure the layer is updated
@@ -441,18 +629,22 @@ class DrawingTools {
     }
 
     startPen(pos) {
+        this.penLastSampleTime = performance.now();
+
         const line = new Konva.Line({
             points: [pos.x, pos.y],
             stroke: '#FF0000',
-            strokeWidth: 3,
+            strokeWidth: PEN_DEFAULT_STROKE_WIDTH,
             lineCap: 'round',
             lineJoin: 'round',
             name: 'drawing-pen',
+            opacity: 1,
             perfectDrawEnabled: false,
             listening: true,
             draggable: false, // Will be enabled when select tool is active
             tension: PEN_TENSION
         });
+        line.setAttr('penSampleTimes', [this.penLastSampleTime]);
 
         // Create invisible bounding box for easier selection
         const boundingBox = this.createBoundingBox(line, 'pen');
@@ -467,6 +659,7 @@ class DrawingTools {
         this.applyDrawingHitTarget(line, 'pen');
         this.layer.add(line);
         this.layer.add(boundingBox);
+        this.raiseDrawingsAboveChart();
         this.layer.batchDraw();
     }
 
@@ -476,6 +669,10 @@ class DrawingTools {
         const points = this.currentShape.points();
         points.push(pos.x, pos.y);
         this.currentShape.points(points);
+
+        const sampleTimes = this.currentShape.getAttr('penSampleTimes') || [];
+        sampleTimes.push(performance.now());
+        this.currentShape.setAttr('penSampleTimes', sampleTimes);
 
         // Update bounding box if it exists
         if (this.currentShape.boundingBox) {
@@ -529,22 +726,106 @@ class DrawingTools {
     }
 
     /**
-     * Finalise a pen stroke: smooth sampled points and apply spline tension.
-     * @param {Konva.Line} line
+     * Finalise a pen stroke: smooth, taper width, and render as a custom shape.
+     * @param {Konva.Line|Konva.Shape} line
+     * @returns {Konva.Shape|Konva.Line}
      */
     finishPenStroke(line) {
         if (!line || typeof line.points !== 'function') {
+            return line;
+        }
+
+        let points = this.smoothPenPoints(line.points());
+        points = chaikinPenPoints(points);
+
+        if (points.length < 4) {
+            line.opacity(1);
+            line.tension(PEN_TENSION);
+            if (line.boundingBox) {
+                this.updateBoundingBox(line.boundingBox, line);
+            }
+            return line;
+        }
+
+        const sampleTimes = line.getAttr('penSampleTimes') || [];
+        const baseWidth = line.strokeWidth() || PEN_DEFAULT_STROKE_WIDTH;
+        const color = line.stroke();
+        const widths = computePenTaperWidths(points, sampleTimes, baseWidth);
+
+        return this.replaceWithTaperedPen(line, points, widths, color, baseWidth);
+    }
+
+    /**
+     * @param {Konva.Line} line
+     * @param {number[]} points
+     * @param {number[]} widths
+     * @param {string} color
+     * @param {number} baseWidth
+     * @returns {Konva.Shape}
+     */
+    replaceWithTaperedPen(line, points, widths, color, baseWidth) {
+        const layer = this.layer;
+        const zIndex = line.zIndex();
+        const boundingBox = line.boundingBox;
+        const offsetX = line.x();
+        const offsetY = line.y();
+
+        const shape = new Konva.Shape({
+            name: 'drawing-pen',
+            x: offsetX,
+            y: offsetY,
+            rotation: line.rotation(),
+            scaleX: line.scaleX(),
+            scaleY: line.scaleY(),
+            draggable: line.draggable(),
+            listening: line.listening(),
+            opacity: 1,
+            perfectDrawEnabled: false
+        });
+
+        shape.setAttr('penTaper', true);
+        shape.setAttr('penTaperPoints', toLocalPenPoints(points, offsetX, offsetY));
+        shape.setAttr('penTaperWidths', widths);
+        shape.setAttr('penStrokeColor', color);
+        shape.setAttr('penBaseWidth', baseWidth);
+        configureTaperedPenShape(shape);
+
+        shape.on('click', (e) => {
+            e.cancelBubble = true;
+            this.showEditUI(shape, 'pen');
+        });
+
+        layer.add(shape);
+        shape.zIndex(zIndex);
+
+        if (boundingBox) {
+            boundingBox.actualShape = shape;
+            shape.boundingBox = boundingBox;
+            this.updateBoundingBox(boundingBox, shape);
+        }
+
+        line.destroy();
+        return shape;
+    }
+
+    syncPenTaperWidth(shape, newBaseWidth) {
+        if (!isTaperedPen(shape)) {
             return;
         }
 
-        const points = this.smoothPenPoints(line.points());
-        if (points.length >= 4) {
-            line.points(points);
+        const oldBase = shape.getAttr('penBaseWidth') || PEN_DEFAULT_STROKE_WIDTH;
+        if (!oldBase) {
+            return;
         }
-        line.tension(PEN_TENSION);
 
-        if (line.boundingBox) {
-            this.updateBoundingBox(line.boundingBox, line);
+        const ratio = newBaseWidth / oldBase;
+        const widths = shape.getAttr('penTaperWidths') || [];
+        shape.setAttr('penBaseWidth', newBaseWidth);
+        shape.setAttr('penTaperWidths', widths.map((width) => width * ratio));
+        shape.getLayer()?.batchDraw();
+
+        if (shape.boundingBox) {
+            this.updateBoundingBox(shape.boundingBox, shape);
         }
     }
 
@@ -781,6 +1062,8 @@ class DrawingTools {
             shape.destroy();
         });
 
+        this.layer.find((node) => node.name() === 'pen-marker-bleed').forEach((node) => node.destroy());
+
         this.clearControlPoints();
         this.layer.batchDraw();
     }
@@ -887,6 +1170,9 @@ class DrawingTools {
             });
         } else if (shapeName.includes('drawing-pen')) {
             toolType = 'pen';
+            if (isTaperedPen(shape)) {
+                configureTaperedPenShape(shape);
+            }
             shape.on('click', () => {
                 this.showEditUI(shape, 'pen');
             });
@@ -913,7 +1199,7 @@ class DrawingTools {
             return;
         }
 
-        if (toolType === 'line' || toolType === 'pen') {
+        if (toolType === 'line' || (toolType === 'pen' && !isTaperedPen(shape))) {
             shape.hitStrokeWidth(this.getDrawingHitStrokeWidth());
         }
     }

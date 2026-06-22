@@ -1850,6 +1850,17 @@ class CitranaApp {
                     y: node.y(),
                     text: node.text()
                 };
+            } else if (className === 'Shape' && node.getAttr('penTaper')) {
+                obj.attrs = {
+                    ...obj.attrs,
+                    penTaper: true,
+                    penTaperPoints: node.getAttr('penTaperPoints')?.slice(),
+                    penTaperWidths: node.getAttr('penTaperWidths')?.slice(),
+                    penStrokeColor: node.getAttr('penStrokeColor'),
+                    penBaseWidth: node.getAttr('penBaseWidth'),
+                    x: node.x(),
+                    y: node.y()
+                };
             }
 
             return obj;
