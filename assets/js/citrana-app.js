@@ -1810,6 +1810,15 @@ class CitranaApp {
     }
 
     clearChart() {
+        // Tear down selection and edit UI while Konva nodes still exist (same pattern as undo restore).
+        this.clearCanvasSelection();
+        this.drawingTools?.clearLaser?.();
+        if (this.drawingTools) {
+            this.drawingTools.isDrawing = false;
+        }
+        this.isDrawing = false;
+        document.querySelector('.konva-textarea')?.remove();
+
         this.layer.destroyChildren();
         this.stage.batchDraw();
         this.chartTemplates.clearChart();

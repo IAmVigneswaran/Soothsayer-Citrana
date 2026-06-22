@@ -2218,7 +2218,12 @@ class DrawingTools {
                 if (tapCount === 2) {
                     clearTimeout(tapTimer);
                     tapCount = 0;
-                    this.showEditUIForShape(shape);
+                    const target = this.normalizeDrawingShape(shape);
+                    if (target?.name?.()?.includes('drawing-pen')) {
+                        this.editPenAnnotation(target, e);
+                    } else {
+                        this.showEditUIForShape(shape);
+                    }
                 }
             } else {
                 tapCount = 1;
@@ -2761,7 +2766,12 @@ class DrawingTools {
 
                     // Small delay to ensure drawing is complete
                     setTimeout(() => {
-                        this.showEditUIForShape(shape);
+                        const target = this.normalizeDrawingShape(shape);
+                        if (target?.name?.()?.includes('drawing-pen')) {
+                            this.editPenAnnotation(target, e);
+                        } else {
+                            this.showEditUIForShape(shape);
+                        }
                         isProcessingTap = false;
                     }, 50);
                 }
