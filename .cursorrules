@@ -22,49 +22,71 @@ Use **Bhava/Bhavas**, **Graha/Grahas**, and **Rashi/Rashis** in all user-facing 
 
 ## Complete Project Structure
 
-| Path | Lines | Description |
-|------|-------|-------------|
-| `index.html` | ~572 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; JSColorPicker CSS; modal a11y (`role`, `aria-*`); Items modal; toolbar + Edit UI scroll viewports |
-| `robots.txt` | — | Search engine rules |
-| `sitemap.xml` | — | Sitemap |
-| `assets/css/styles.css` | ~2681 | Complete styling; primary `@media (max-width: 768px)` block + post-base mobile overrides; JSColorPicker `--cp-*` theme; `.items-*` panel; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` (toolbar + Edit UI) |
-| `assets/js/citrana-annotation-fonts.js` | ~118 | Normal and hand-written annotation fonts |
-| `assets/js/citrana-app.js` | ~2031 | Main application coordinator |
-| `assets/js/citrana-arrow.js` | ~185 | Unified filled-arrow geometry |
-| `assets/js/citrana-chart-coordinator.js` | ~334 | Chart type management |
-| `assets/js/citrana-chart-templates-north.js` | ~1011 | North Indian chart logic |
-| `assets/js/citrana-chart-templates-south.js` | ~984 | South Indian chart logic |
-| `assets/js/citrana-colorpicker.js` | ~383 | JSColorPicker theme and helpers |
-| `assets/js/citrana-context-menu.js` | ~717 | Context menu system |
-| `assets/js/citrana-debug.js` | ~13 | Contributor debug logging (on by default) |
-| `assets/js/citrana-device.js` | ~39 | Touch, mobile UA, and viewport helpers |
-| `assets/js/citrana-drawing-tools.js` | ~2640 | Drawing tools implementation |
-| `assets/js/citrana-edit-ui.js` | ~998 | Edit interface controls |
-| `assets/js/citrana-history.js` | ~94 | Unified undo/redo timeline |
-| `assets/js/citrana-items-menu.js` | ~635 | Items panel — chart/Bhava/Graha/annotation actions |
-| `assets/js/citrana-laser.js` | ~248 | Ephemeral laser pointer Canvas overlay |
-| `assets/js/citrana-planet-system.js` | ~880 | Graha library and drag-drop |
-| `assets/js/citrana-rashis.js` | ~49 | Rashi names, Lucide zodiac icons, grid numbers |
-| `assets/js/citrana-selection.js` | ~96 | Selection Pill |
-| `assets/js/citrana-session.js` | ~214 | Save/open `.citrana.json` session files |
-| `assets/vendor/konva.min.js` | — | Konva 9.3.20 (self-hosted; loaded in `<head>`) |
-| `assets/vendor/lucide.min.js` | — | Lucide 0.576.0 (self-hosted) |
-| `assets/vendor/colorpicker.iife.min.js` | — | JSColorPicker 1.1.0 (self-hosted) |
-| `assets/vendor/colorpicker.min.css` | — | JSColorPicker 1.1.0 stylesheet |
-| `assets/images/` | 14 files | Logos, demo GIFs, browser screenshot |
-| `assets/svgs/north-indian.svg` | — | North Indian chart template |
-| `assets/svgs/south-indian.svg` | — | South Indian chart template |
-| `assets/favicon/` | 29 files | Favicon set, `manifest.json` (PWA standalone), `browserconfig.xml` |
-| `.github/workflows/static.yml` | — | GitHub Pages deploy with minification (push to `main`) |
-| `.github/workflows/codeql.yml` | — | CodeQL security analysis |
-| `AGENT.md` | ~1254 | Comprehensive documentation |
-| `ARCHITECTURE.md` | ~512 | System architecture and data flows |
-| `.cursorrules` | ~1277 | This Cursor IDE configuration |
-| `CHANGELOG.md` | ~88 | Version history |
-| `README.md` | ~199 | Project readme |
-| `LICENSE` | — | MIT License |
-| `SECURITY.md` | — | Security policy |
-| `.gitignore` | — | Git ignore rules |
+Classic tree view for Cursor rules context (see [AGENT.md](AGENT.md) for a markdown table version).
+
+```
+Soothsayer-Citrana/
+├── index.html                    # Main entry (~572 lines); viewport-fit=cover; PWA meta; Google Fonts Caveat; JSColorPicker CSS; modal a11y (role, aria-*); Items modal; toolbar + Edit UI scroll viewports
+├── robots.txt
+├── sitemap.xml
+├── assets/
+│   ├── css/
+│   │   └── styles.css            # Complete styling system (~2681 lines); primary @media (max-width: 768px) block + post-base mobile overrides; JSColorPicker --cp-* theme; .items-* panel; .citrana-laser-canvas; body.presentation-view; .toolbar-scroll-* (toolbar + Edit UI)
+│   ├── js/                       # 19 modules — all citrana-* prefixed
+│   │   ├── citrana-annotation-fonts.js # Normal and hand-written annotation fonts (~118 lines)
+│   │   ├── citrana-app.js                # Main application coordinator (~2031 lines)
+│   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
+│   │   ├── citrana-chart-coordinator.js  # Chart type management (~334 lines)
+│   │   ├── citrana-chart-templates-north.js  # North Indian chart logic (~1011 lines)
+│   │   ├── citrana-chart-templates-south.js  # South Indian chart logic (~984 lines)
+│   │   ├── citrana-colorpicker.js # JSColorPicker theme and helpers (~383 lines)
+│   │   ├── citrana-context-menu.js       # Context menu system (~717 lines)
+│   │   ├── citrana-debug.js      # Contributor debug logging (~13 lines; on by default)
+│   │   ├── citrana-device.js     # Shared touch, mobile UA, and viewport helpers (~39 lines)
+│   │   ├── citrana-drawing-tools.js      # Drawing tools implementation (~2640 lines)
+│   │   ├── citrana-edit-ui.js            # Edit interface controls (~998 lines)
+│   │   ├── citrana-history.js            # Unified undo/redo timeline (~94 lines)
+│   │   ├── citrana-items-menu.js # Items panel — chart/Bhava/Graha/annotation actions (~635 lines)
+│   │   ├── citrana-laser.js      # Ephemeral laser pointer Canvas overlay (~248 lines)
+│   │   ├── citrana-planet-system.js      # Graha library and drag-drop (~880 lines)
+│   │   ├── citrana-rashis.js     # Shared Rashi names, Lucide zodiac icons, grid numbers (~49 lines)
+│   │   ├── citrana-selection.js # Selection Pill (~96 lines)
+│   │   └── citrana-session.js    # Save/open .citrana.json session files (~214 lines)
+│   ├── vendor/
+│   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
+│   │   ├── lucide.min.js         # Lucide 0.576.0 (self-hosted)
+│   │   ├── colorpicker.iife.min.js  # JSColorPicker 1.1.0 (self-hosted)
+│   │   └── colorpicker.min.css   # JSColorPicker 1.1.0 stylesheet
+│   ├── images/                   # 14 files (logos, demo GIFs, browser screenshot)
+│   │   ├── soothsayer_citrana_social-preview.jpg
+│   │   ├── Soothsayer-Citrana-Full-Logo-Black.png / -White.png
+│   │   ├── Soothsayer-Logo-Black.png / Soothsayer-Logo-White.png
+│   │   ├── citrana-browser-screenshot.png
+│   │   └── demo-*.gif            # English, Tamil, Hindi, tldraw demos
+│   ├── svgs/
+│   │   ├── north-indian.svg
+│   │   └── south-indian.svg
+│   └── favicon/                  # 29 files
+│       ├── favicon.ico
+│       ├── manifest.json         # PWA manifest (display: standalone)
+│       ├── browserconfig.xml
+│       ├── apple-icon-*.png      # 12 variants
+│       ├── android-icon-*.png    # 6 variants
+│       ├── favicon-*.png         # 5 variants
+│       └── ms-icon-*.png         # 4 variants
+├── .github/
+│   └── workflows/
+│       ├── static.yml            # GitHub Pages deploy with minification (push to main)
+│       └── codeql.yml            # CodeQL security analysis
+├── AGENT.md                      # Comprehensive documentation (~1254 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~527 lines)
+├── .cursorrules                  # This Cursor IDE configuration (~1257 lines)
+├── CHANGELOG.md                  # Version history and changes (~88 lines)
+├── README.md                     # Project readme (~199 lines)
+├── LICENSE                       # MIT License
+├── SECURITY.md                   # Security policy
+└── .gitignore                    # Git ignore rules
+```
 
 > Line counts are approximate; run `wc -l` after significant edits. Update About modal version in `index.html` on each release.
 
