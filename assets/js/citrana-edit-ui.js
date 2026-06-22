@@ -43,21 +43,95 @@ class EditUI {
      * Initialize the Edit UI container in the DOM
      */
     initEditUIContainer() {
-        // Create the main Edit UI container
         const editUIContainer = document.createElement('div');
         editUIContainer.id = 'edit-ui-container';
         editUIContainer.className = 'floating-edit-ui';
         editUIContainer.style.display = 'none';
 
-        // Create the content area
+        const prev = document.createElement('button');
+        prev.type = 'button';
+        prev.id = 'edit-ui-scroll-prev';
+        prev.className = 'toolbar-scroll-btn';
+        prev.setAttribute('aria-label', 'Scroll edit controls left');
+        prev.hidden = true;
+        prev.innerHTML = '<i data-lucide="square-chevron-left"></i>';
+
+        const viewport = document.createElement('div');
+        viewport.id = 'edit-ui-scroll-viewport';
+        viewport.className = 'toolbar-scroll-viewport';
+
         const contentArea = document.createElement('div');
         contentArea.id = 'edit-ui-content';
-        contentArea.className = 'edit-ui-content';
+        contentArea.className = 'edit-ui-content toolbar-scroll-track';
 
-        editUIContainer.appendChild(contentArea);
+        viewport.appendChild(contentArea);
 
-        // Add to the body
+        const next = document.createElement('button');
+        next.type = 'button';
+        next.id = 'edit-ui-scroll-next';
+        next.className = 'toolbar-scroll-btn';
+        next.setAttribute('aria-label', 'Scroll edit controls right');
+        next.hidden = true;
+        next.innerHTML = '<i data-lucide="square-chevron-right"></i>';
+
+        editUIContainer.appendChild(prev);
+        editUIContainer.appendChild(viewport);
+        editUIContainer.appendChild(next);
+
         document.body.appendChild(editUIContainer);
+
+        this.setupEditUIScroll();
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    /**
+     * Mobile Edit UI: horizontal scroll with chevron nudges when controls overflow.
+     */
+    setupEditUIScroll() {
+        const viewport = document.getElementById('edit-ui-scroll-viewport');
+        const prev = document.getElementById('edit-ui-scroll-prev');
+        const next = document.getElementById('edit-ui-scroll-next');
+        if (!viewport || !prev || !next) {
+            return;
+        }
+
+        this._editUIScrollMQ = window.matchMedia('(max-width: 768px)');
+        const scrollStep = 120;
+
+        const updateEditUIScrollButtons = () => {
+            if (!this._editUIScrollMQ.matches) {
+                prev.hidden = true;
+                next.hidden = true;
+                viewport.scrollLeft = 0;
+                return;
+            }
+
+            const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+            const hasOverflow = maxScroll > 1;
+
+            prev.hidden = !hasOverflow;
+            next.hidden = !hasOverflow;
+            prev.disabled = viewport.scrollLeft <= 1;
+            next.disabled = viewport.scrollLeft >= maxScroll - 1;
+        };
+
+        this.updateEditUIScrollButtons = updateEditUIScrollButtons;
+
+        prev.addEventListener('click', () => {
+            viewport.scrollBy({ left: -scrollStep, behavior: 'smooth' });
+        });
+
+        next.addEventListener('click', () => {
+            viewport.scrollBy({ left: scrollStep, behavior: 'smooth' });
+        });
+
+        viewport.addEventListener('scroll', updateEditUIScrollButtons, { passive: true });
+        this._editUIScrollMQ.addEventListener('change', updateEditUIScrollButtons);
+        window.addEventListener('resize', updateEditUIScrollButtons);
+        requestAnimationFrame(updateEditUIScrollButtons);
     }
 
     /**
@@ -93,6 +167,10 @@ class EditUI {
 
         // Position the Edit UI
         this.positionEditUI();
+
+        requestAnimationFrame(() => {
+            this.updateEditUIScrollButtons?.();
+        });
 
         // Add touch outside to dismiss for mobile
         this.setupTouchOutsideToDismiss();

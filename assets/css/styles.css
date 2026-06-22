@@ -830,11 +830,43 @@ body.presentation-view .about-btn {
     top: calc(72px + var(--sat));
     bottom: auto;
     flex-wrap: nowrap;
-    max-width: 100vw;
-    overflow-x: auto;
-    gap: 4px;
+    width: var(--mobile-toolbar-width);
+    max-width: var(--mobile-toolbar-width);
+    box-sizing: border-box;
+    overflow: hidden;
+    gap: 2px;
     padding: 4px;
     height: 40px;
+  }
+
+  .floating-edit-ui .toolbar-scroll-btn {
+    display: flex;
+    width: 28px;
+    height: 28px;
+  }
+
+  .floating-edit-ui .toolbar-scroll-btn i {
+    width: 18px;
+    height: 18px;
+  }
+
+  .floating-edit-ui .toolbar-scroll-viewport {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+
+  .floating-edit-ui .toolbar-scroll-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .floating-edit-ui .edit-ui-content.toolbar-scroll-track {
+    gap: 4px;
+    width: max-content;
   }
 
   .edit-btn {
