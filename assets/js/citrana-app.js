@@ -1326,14 +1326,9 @@ class CitranaApp {
      * @param {KonvaEvent} e - Konva touch event
      */
     handleTouchStart(e) {
-        const target = e.target;
-        const targetName = target?.name?.() || '';
-        const preserveTouchDrag = targetName === 'control-point-start' ||
-            targetName === 'control-point-end' ||
-            targetName.startsWith('planet-') ||
-            targetName.startsWith('planet-hit-');
+        const preserveTouchDrag = this.drawingTools?.shouldPreserveTouchDrag(e.target);
 
-        // Allow Konva drag on Grahas and arrow/line control points; block scroll elsewhere
+        // Allow Konva drag on Grahas, drawings, and pen pick rects; block scroll elsewhere
         if (!preserveTouchDrag) {
             e.evt.preventDefault();
         }
@@ -1367,13 +1362,7 @@ class CitranaApp {
      * @param {KonvaEvent} e - Konva touch event
      */
     handleTouchMove(e) {
-        const target = e.target;
-        const targetName = target?.name?.() || '';
-        const preserveTouchDrag = targetName === 'control-point-start' ||
-            targetName === 'control-point-end' ||
-            targetName.startsWith('planet-') ||
-            targetName.startsWith('planet-hit-') ||
-            this.drawingTools?.isDraggingControlPoint;
+        const preserveTouchDrag = this.drawingTools?.shouldPreserveTouchDrag(e.target);
 
         if (!preserveTouchDrag) {
             e.evt.preventDefault();

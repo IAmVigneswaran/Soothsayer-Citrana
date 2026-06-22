@@ -213,6 +213,7 @@ class DrawingTools {
             endPoint: null
         };
         this.isDraggingControlPoint = false;
+        this.isPenDragActive = false;
         this.draggedControlPoint = null;
 
         // Animation frame for bulletproof control point sync
@@ -639,6 +640,86 @@ class DrawingTools {
         const dx = pos1.x - pos2.x;
         const dy = pos1.y - pos2.y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    /**
+     * Client coordinates from mouse or touch DOM events.
+     * @param {MouseEvent|TouchEvent} domEvt
+     * @returns {{ x: number, y: number }}
+     */
+    getDomEventClientXY(domEvt) {
+        const touch = domEvt?.touches?.[0] || domEvt?.changedTouches?.[0];
+        if (touch) {
+            return { x: touch.clientX, y: touch.clientY };
+        }
+
+        return { x: domEvt.clientX, y: domEvt.clientY };
+    }
+
+    /**
+     * Whether touch handlers should skip preventDefault so Konva drag can run.
+     * @param {Konva.Node|null} target
+     * @returns {boolean}
+     */
+    shouldPreserveTouchDrag(target) {
+        const name = target?.name?.() || '';
+
+        if (name === 'control-point-start' ||
+            name === 'control-point-end' ||
+            name.startsWith('planet-') ||
+            name.startsWith('planet-hit-')) {
+            return true;
+        }
+
+        if (this.isDraggingControlPoint || this.isPenDragActive) {
+            return true;
+        }
+
+        if (window.app?.currentTool === 'select') {
+            return name.startsWith('bounding-box-') || name.startsWith('drawing-');
+        }
+
+        return false;
+    }
+
+    /**
+     * Move a pen stroke by pointer delta on touch (Konva startDrag is unreliable after touchmove).
+     * @param {Konva.Node} penShape
+     * @param {Konva.Rect} boundingBox
+     * @param {Konva.KonvaEventObject} startEvt
+     */
+    beginManualPenDrag(penShape, boundingBox, startEvt) {
+        const stage = penShape.getStage();
+        if (!stage || !startEvt?.evt) {
+            return;
+        }
+
+        let last = this.getDomEventClientXY(startEvt.evt);
+        this.isPenDragActive = true;
+        penShape.fire('dragstart', { evt: startEvt.evt });
+
+        const onDragMove = (moveEvt) => {
+            const cur = this.getDomEventClientXY(moveEvt.evt);
+            const scale = stage.scaleX() || 1;
+            penShape.position({
+                x: penShape.x() + (cur.x - last.x) / scale,
+                y: penShape.y() + (cur.y - last.y) / scale
+            });
+            last = cur;
+            this.updateBoundingBox(boundingBox, penShape);
+            penShape.fire('dragmove', { evt: moveEvt.evt });
+            this.layer.batchDraw();
+        };
+
+        const onDragEnd = (upEvt) => {
+            stage.off('mousemove.penManual touchmove.penManual', onDragMove);
+            stage.off('mouseup.penManual touchend.penManual touchcancel.penManual', onDragEnd);
+            this.isPenDragActive = false;
+            penShape.fire('dragend', { evt: upEvt?.evt });
+        };
+
+        stage.on('mousemove.penManual touchmove.penManual', onDragMove);
+        stage.on('mouseup.penManual touchend.penManual touchcancel.penManual', onDragEnd);
     }
 
     startArrow(pos) {
@@ -2994,8 +3075,15 @@ class DrawingTools {
         boundingBox._penPickInteractionBound = true;
 
         const dblClickMs = 450;
-        const dragThreshold = 6;
+        const dragThreshold = CitranaDevice.isMobileUA() ? 10 : 6;
         let activeDragCleanup = null;
+
+        if (!shape._penDragEndBound) {
+            shape._penDragEndBound = true;
+            shape.on('dragend.penPickClear', () => {
+                this.isPenDragActive = false;
+            });
+        }
 
         const cancelPendingDrag = () => {
             if (activeDragCleanup) {
@@ -3057,12 +3145,11 @@ class DrawingTools {
 
             cancelPendingDrag();
 
-            const originX = evt.evt.clientX;
-            const originY = evt.evt.clientY;
+            const origin = this.getDomEventClientXY(evt.evt);
 
             const cleanup = () => {
                 stage.off('mousemove.penPick touchmove.penPick', onMove);
-                stage.off('mouseup.penPick touchend.penPick', onUp);
+                stage.off('mouseup.penPick touchend.penPick touchcancel.penPick', onUp);
                 if (activeDragCleanup === cleanup) {
                     activeDragCleanup = null;
                 }
@@ -3075,18 +3162,24 @@ class DrawingTools {
                     return;
                 }
 
-                const dx = moveEvt.evt.clientX - originX;
-                const dy = moveEvt.evt.clientY - originY;
+                const pointer = this.getDomEventClientXY(moveEvt.evt);
+                const dx = pointer.x - origin.x;
+                const dy = pointer.y - origin.y;
                 if (Math.hypot(dx, dy) >= dragThreshold) {
                     cleanup();
-                    penShape.startDrag(evt);
+                    if (this.isTouchDevice && evt.type === 'touchstart') {
+                        this.beginManualPenDrag(penShape, boundingBox, evt);
+                    } else {
+                        this.isPenDragActive = true;
+                        penShape.startDrag(evt);
+                    }
                 }
             };
 
             const onUp = () => cleanup();
 
             stage.on('mousemove.penPick touchmove.penPick', onMove);
-            stage.on('mouseup.penPick touchend.penPick', onUp);
+            stage.on('mouseup.penPick touchend.penPick touchcancel.penPick', onUp);
         });
     }
 
