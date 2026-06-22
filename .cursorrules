@@ -117,7 +117,7 @@ The application uses a floating UI system with absolute positioning for all inte
 - White background with black border
 - Box shadow for depth (0 4px 12px rgba(0, 0, 0, 0.15))
 - Rounded corners (8px border-radius)
-- Button groups (left to right): **Undo/Redo** (`#undo-btn`, `#redo-btn`), Select/Hand, drawing tools, **Save Session** / **Open Session** (`#save-session-btn`, `#open-session-btn`, `#open-session-input`), export/transparency/**Options** (`#options-btn`)
+- Button groups (left to right): **Undo/Redo** (`#undo-btn`, `#redo-btn`), Select/Hand, drawing tools, export/transparency/**Export** (`#export-btn`), **Save Session** / **Open Session** (`#save-session-btn`, `#open-session-btn`, `#open-session-input`), **Options** (`#options-btn`)
 - Mobile `≤768px`: horizontal scroll viewport (`#toolbar-scroll-viewport`) with chevron nudges (`#toolbar-scroll-prev`, `#toolbar-scroll-next`) when tools overflow
 - Responsive design with smaller buttons on mobile
 

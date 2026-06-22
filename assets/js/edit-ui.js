@@ -167,6 +167,10 @@ class EditUI {
      * @returns {boolean}
      */
     isAnnotationItalic(element) {
+        if (typeof CitranaAnnotationFonts !== 'undefined') {
+            return CitranaAnnotationFonts.isItalic(element);
+        }
+
         if (!element) {
             return false;
         }
@@ -181,6 +185,11 @@ class EditUI {
      * @param {boolean} italic
      */
     setAnnotationItalic(element, italic) {
+        if (typeof CitranaAnnotationFonts !== 'undefined') {
+            CitranaAnnotationFonts.setItalic(element, italic);
+            return;
+        }
+
         if (!element) {
             return;
         }
@@ -627,10 +636,18 @@ class EditUI {
             const nextBold = !this.isAnnotationBold(this.currentElement);
             citranaDebug('[EDIT UI] Bold button clicked - nextBold:', nextBold);
 
-            this.setAnnotationBold(this.currentElement, nextBold);
-            this.currentElement.getLayer().batchDraw();
-            boldBtn.classList.toggle('active', nextBold);
-            this.markEditDirty();
+            const applyBold = () => {
+                this.setAnnotationBold(this.currentElement, nextBold);
+                this.currentElement.getLayer().batchDraw();
+                boldBtn.classList.toggle('active', nextBold);
+                this.markEditDirty();
+            };
+
+            if (nextBold && CitranaAnnotationFonts?.isHandwritten?.(this.currentElement)) {
+                CitranaAnnotationFonts.ensureLoaded().then(applyBold);
+            } else {
+                applyBold();
+            }
         });
 
         this.addTouchSupport(italicBtn, () => {

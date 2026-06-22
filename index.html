@@ -39,7 +39,7 @@
       <link rel="stylesheet" href="assets/vendor/colorpicker.min.css">
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Caveat:ital,wght@0,400;1,400&family=Caveat+Brush&display=swap" rel="stylesheet">
       <!-- favicon -->
       <link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon/apple-icon-57x57.png">
       <link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon/apple-icon-60x60.png">
@@ -143,19 +143,19 @@
             </div>
             <!-- Export Actions -->
             <div class="toolbar-group">
-               <button id="save-session-btn" class="toolbar-btn" title="Save Session">
-               <i data-lucide="cloud-download"></i>
-               </button>
-               <button id="open-session-btn" class="toolbar-btn" title="Open Session">
-               <i data-lucide="cloud-upload"></i>
-               </button>
-               <input type="file" id="open-session-input" accept=".citrana.json,application/json" hidden>
                <button id="toggle-transparency-btn" class="toolbar-btn" title="Toggle Transparency">
                <i data-lucide="image-off"></i>
                </button>
-               <button id="export-btn" class="toolbar-btn" title="Export">
+               <button id="export-btn" class="toolbar-btn" title="Export PNG">
                <i data-lucide="save"></i>
                </button>
+               <button id="save-session-btn" class="toolbar-btn" title="Save Session">
+               <i data-lucide="save-all"></i>
+               </button>
+               <button id="open-session-btn" class="toolbar-btn" title="Open Session">
+               <i data-lucide="folder-open"></i>
+               </button>
+               <input type="file" id="open-session-input" accept=".citrana.json,application/json" hidden>
                <button id="options-btn" class="toolbar-btn" title="Options">
                <i data-lucide="settings"></i>
                </button>
@@ -403,7 +403,7 @@
                      <li>The Hand tool allows you to pan around the canvas.</li>
                      <li>On narrow screens, use the chevrons at the edges of the top toolbar to scroll through tools.</li>
                   </ul>
-                  <p><strong>Save and Open Session:</strong> Use <strong>Save Session</strong> (cloud-download icon) and <strong>Open Session</strong> (cloud-upload icon) in the toolbar to download or restore a working file.</p>
+                  <p><strong>Save and Open Session:</strong> Use <strong>Save Session</strong> and <strong>Open Session</strong> in the toolbar to download or restore a working file.</p>
                   <ul class="help-sublist">
                      <li>Session files use the <strong>.citrana.json</strong> extension only — other file types are rejected.</li>
                      <li><strong>Included:</strong> chart layout, Grahas, annotations, and Options (indicator toggles and Save Chart Only).</li>

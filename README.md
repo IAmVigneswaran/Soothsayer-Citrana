@@ -171,7 +171,7 @@ For **Text** and **Heading** annotations, use **Edit text** to change wording (o
 
 ### Export, Session, and Limitations
 
-Save and Open Session: Use **Save Session** (cloud-download icon) and **Open Session** (cloud-upload icon) in the toolbar to download or restore a **`.citrana.json`** working file. Session files include chart layout, Grahas, annotations, and Options. They do not include undo/redo history, active tool, laser pointer strokes, Presentation View, or zoom/pan. Only `.citrana.json` files are accepted. Opening a session replaces your current chart and annotations; Citrana asks for confirmation if you already have work on the canvas.
+Save and Open Session: Use **Save Session** and **Open Session** in the toolbar to download or restore a **`.citrana.json`** working file. Session files include chart layout, Grahas, annotations, and Options. They do not include undo/redo history, active tool, laser pointer strokes, Presentation View, or zoom/pan. Only `.citrana.json` files are accepted. Opening a session replaces your current chart and annotations; Citrana asks for confirmation if you already have work on the canvas.
 
 Export PNG: Click the save icon to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image. With **Save Chart Only** enabled in **Options**, Save exports only the chart area (transparent, no watermark) instead of the full canvas.
 
