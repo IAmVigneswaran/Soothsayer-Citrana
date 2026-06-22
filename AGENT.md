@@ -36,10 +36,10 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2687-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2757-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2098-lines)
+   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2122-lines)
    - [History Engine (citrana-history.js)](#history-engine-citrana-historyjs---94-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---334-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---984-lines)
@@ -53,8 +53,8 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
    - [Citrana Annotation Fonts](#citrana-annotation-fonts-citrana-annotation-fontsjs---118-lines)
    - [Citrana Laser](#citrana-laser-citrana-laserjs---248-lines)
    - [Drawing Tools](#drawing-tools-citrana-drawing-toolsjs---3218-lines)
-   - [Context Menu](#context-menu-citrana-context-menujs---717-lines)
-   - [Citrana Items Menu](#citrana-items-menu-citrana-items-menujs---635-lines)
+   - [Context Menu](#context-menu-citrana-context-menujs---743-lines)
+   - [Citrana Items Menu](#citrana-items-menu-citrana-items-menujs---756-lines)
    - [Citrana Session](#citrana-session-citrana-sessionjs---214-lines)
    - [Edit UI](#edit-ui-citrana-edit-uijs---1020-lines)
 6. [Core Features](#core-features)
@@ -76,7 +76,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2687 lines)
+## CSS and Layout (styles.css - ~2757 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome; `role="dialog"` + `aria-*`), responsive breakpoints (769px desktop, 768px tablet, 600px mobile). Most tablet/mobile rules live in one `@media (max-width: 768px)` block; **post-base mobile overrides** (Help/About position, modal compact sizing) use separate `@media` blocks **after** base component selectors so cascade order is correct.
 
@@ -102,24 +102,24 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 | Path | Lines | Description |
 |------|-------|-------------|
-| `index.html` | ~574 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Items modal; toolbar + Edit UI scroll viewports; Help usage guide with pen select/drag/edit |
+| `index.html` | ~579 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Items modal (`#items-modal-nav` sticky section chips, `#items-modal-description`); toolbar + Edit UI scroll viewports; Help usage guide with pen select/drag/edit |
 | `robots.txt` | — | Search engine rules |
 | `sitemap.xml` | — | Sitemap |
-| `assets/css/styles.css` | ~2687 | Complete styling; primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` (toolbar + Edit UI) |
+| `assets/css/styles.css` | ~2757 | Complete styling; primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` (`.items-section-nav-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`); `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` (toolbar + Edit UI) |
 | `assets/js/citrana-annotation-fonts.js` | ~118 | Normal and hand-written annotation fonts |
-| `assets/js/citrana-app.js` | ~2098 | Main application coordinator |
+| `assets/js/citrana-app.js` | ~2122 | Main application coordinator |
 | `assets/js/citrana-arrow.js` | ~185 | Unified filled-arrow geometry |
 | `assets/js/citrana-chart-coordinator.js` | ~334 | Chart type management |
 | `assets/js/citrana-chart-templates-north.js` | ~1011 | North Indian chart logic |
 | `assets/js/citrana-chart-templates-south.js` | ~984 | South Indian chart logic |
 | `assets/js/citrana-colorpicker.js` | ~383 | JSColorPicker theme and helpers |
-| `assets/js/citrana-context-menu.js` | ~717 | Context menu system |
+| `assets/js/citrana-context-menu.js` | ~743 | Context menu system |
 | `assets/js/citrana-debug.js` | ~13 | Contributor debug logging (on by default) |
 | `assets/js/citrana-device.js` | ~39 | Touch, mobile UA, and viewport helpers |
 | `assets/js/citrana-drawing-tools.js` | ~3218 | Drawing tools implementation |
 | `assets/js/citrana-edit-ui.js` | ~1020 | Edit interface controls |
 | `assets/js/citrana-history.js` | ~94 | Unified undo/redo timeline |
-| `assets/js/citrana-items-menu.js` | ~635 | Items panel — chart/Bhava/Graha/annotation actions |
+| `assets/js/citrana-items-menu.js` | ~756 | Items panel — chart/Bhava/Graha/annotation actions; sticky section chips |
 | `assets/js/citrana-laser.js` | ~248 | Ephemeral laser pointer Canvas overlay |
 | `assets/js/citrana-planet-system.js` | ~880 | Graha library and drag-drop |
 | `assets/js/citrana-rashis.js` | ~49 | Rashi names, Lucide zodiac icons, grid numbers |
@@ -150,7 +150,7 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (citrana-app.js - ~2098 lines)
+### Main Application (citrana-app.js - ~2122 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -171,7 +171,7 @@ Key Methods:
 - `init()`: Application initialisation; loads `this.options` from `localStorage`
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
 - `setupToolbarScroll()`: Horizontal toolbar overflow with `#toolbar-scroll-prev` / `#toolbar-scroll-next`
-- `setupKeyboardShortcuts()`: Tool/action shortcuts; **Escape** → `dismissActiveModalOnEscape()`; **Tab** → `trapModalFocus()` when a modal is open; otherwise blocked while inline Graha/text editors are focused or `isModalBlockingShortcuts()` (Help, Options, About, Welcome, Confirmation, Items, export progress)
+- `setupKeyboardShortcuts()`: Tool/action shortcuts; **I** toggles **Items** panel (open/close); **Escape** → `dismissActiveModalOnEscape()`; **Tab** → `trapModalFocus()` when a modal is open; otherwise blocked while inline Graha/text editors are focused or `isModalBlockingShortcuts()` (Help, Options, About, Welcome, Confirmation, Items, export progress)
 - `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop `_modalFocusStack`; focus close button on open
 - `closeWelcomeModal()`: Welcome close + `localStorage.citrana_welcome_seen`
 - `getActiveModal()` / `dismissActiveModalOnEscape()`: Topmost modal; Escape dismiss (export progress not dismissible)
@@ -187,7 +187,7 @@ Key Methods:
 - `handleWheel()`: Desktop wheel zoom about pointer when unlocked; early return when locked (no `preventDefault`)
 - `exportChart()` / `finalizeExportImage()`: PNG export (`pixelRatio: 2`); full stage or chart-only crop when `options.saveChartOnly`
 - `setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)`: Persist indicator toggles; apply to active chart template
-- `setSaveChartOnly(enabled)` / `applySaveChartOnlyTransparency()` / `updateTransparencyToggleUI()`: Chart-only export preference; forces transparent export and locks `#toggle-transparency-btn`
+- `setSaveChartOnly(enabled)` / `applySaveChartOnlyTransparency()` / `updateTransparencyToggleUI()`: Chart-only export preference; when enabled forces transparent export and locks `#toggle-transparency-btn`; when disabled restores `exportWithWhiteBg = true`
 - `recordHistory()` / `captureHistoryState()` / `restoreHistoryState()`: Undo timeline integration; `restoreHistoryState()` saves/restores stage scale and position (chart reload via `loadChartData()` calls `clearChart()`, which resets the viewport — restored after reload); templates use `skipZoomToFit: true` on history restore
 - `undo()` / `redo()` / `updateHistoryButtons()`: Delegate to `this.history`; sync `#undo-btn` / `#redo-btn` disabled state
 - `clearChart()` / `resetChart()` / `resetDrawings()`
@@ -202,7 +202,7 @@ Key Methods:
 - `saveSession()` / `openSessionFromFile()` / `restoreSessionState()`: `.citrana.json` export/import via `CitranaSession`; confirms before replacing existing work; `history.resetToState()` on import
 - `hasSessionContent()`: Whether chart or drawings exist before session replace prompt
 
-Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `K` Laser Pointer (when available), `T` Text, `H` Hand, `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` remove selected Graha or delete selected drawing (Select tool), `?`/`/` Help, **Escape** close modal. No Heading shortcut. Ignored when a modal is open (except Escape/Tab for modal UX) or Graha/text inline editor is focused.
+Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `K` Laser Pointer (when available), `T` Text, `H` Hand, `I` Items (toggle open/close), `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` remove selected Graha or delete selected drawing (Select tool), `?`/`/` Help, **Escape** close modal. No Heading shortcut. Ignored when a modal is open (except **Escape**/**Tab** for modal UX, and **I** to close Items when open) or Graha/text inline editor is focused.
 
 ### History Engine (citrana-history.js - ~94 lines)
 Unified undo/redo timeline for the entire session.
@@ -562,12 +562,13 @@ Key Methods:
 
 Vendor: `assets/vendor/colorpicker.iife.min.js`, `colorpicker.min.css`. Theme overrides: `--cp-*` in `styles.css`.
 
-### Context Menu (citrana-context-menu.js - ~717 lines)
+### Context Menu (citrana-context-menu.js - ~743 lines)
 Provides right-click and long-press context menus for chart, bhava, and Graha interaction.
 
 Key Responsibilities:
 - Unified hit-test routing via `openContextMenuAtClientPoint()` (desktop right-click and mobile 500ms long-press)
 - **`shouldBlockCanvasContextMenu()`**: Suppresses canvas menus when disabled by user, while drawing, or when active tool is not Select/Hand
+- **Default enablement**: `resolveDefaultCanvasContextMenuEnabled()` — on when `CitranaDevice.hasFinePointer()`; **off** on touch-primary devices until enabled via Items
 - Creates context-sensitive menus with chart-type-specific items
 - **Presentation View** on create chart, existing chart, and Bhava menus via `getPresentationViewMenuHtml()`
 - Prevents chart menu from overriding Graha or bhava menus
@@ -593,15 +594,17 @@ Key Methods:
 - `showChartMenu()`, `showHouseMenu()`, `showPlanetMenu()`, `showExistingChartMenu()`, `showCreateChartMenu()`
 - `handleAction()`, `setupMenuEventListeners()`, `setupSubmenuHover()`, `shouldBlockCanvasContextMenu()`
 - `isCanvasContextMenuEnabled()` / `setCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()` — persisted in `localStorage.citrana_context_menu_enabled`
+- `getContextMenuItemsTitle()` / `getContextMenuItemsMeta()` / `getContextMenuToggleActionLabel()` — Items panel **Context Menu** row copy
 - `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
-### Citrana Items Menu (citrana-items-menu.js - ~635 lines)
-Floating **Items** panel for chart, Bhava, Graha, and annotation actions — primary touch-friendly alternative to context menus.
+### Citrana Items Menu (citrana-items-menu.js - ~756 lines)
+Floating **Items** panel for chart, Bhava, Graha, and annotation actions — primary workflow on touch; also available on desktop.
 
 Key Responsibilities:
-- Opens from `#items-menu-btn` in the zoom bar (desktop and mobile)
-- Renders sections: **Chart**, **Canvas**, **Bhavas**, **Grahas**, **Annotations**
-- **Canvas**: **Clear Selection** (`app.clearCanvasSelection()`), **Disable Context Menu** / **Enable Context Menu**
+- Opens from `#items-menu-btn` in the zoom bar or keyboard **I** (`title="Items (I)"`)
+- **`#items-modal-nav`**: Sticky section chip bar — jump to Canvas, Chart, Bhavas, Grahas, Annotations, Lagna, Actions; swipe/scroll horizontally when pills overflow; active chip via `IntersectionObserver`
+- Sections use `id="items-section-{id}"`; `renderSectionNav()`, `scrollToSection()`, `handleNavClick()`
+- **Canvas**: **Clear Selection** (`app.clearCanvasSelection()`), **Context Menu** toggle (On/Off meta; `square-menu` / `power` / `power-off` icons; `.items-row-context-menu-on` / `.items-row-context-menu-off`)
 - Selected rows use `.items-row-selected`; `refreshSelectionHighlight()` syncs with `app.getCanvasSelection()`
 - South Indian Bhava rows show fixed Rashi names with Lucide zodiac icons (`CitranaRashis.iconHtml`)
 - Reuses `citrana-context-menu.js` `handleAction()` for chart/Bhava/Graha actions where possible
@@ -609,7 +612,7 @@ Key Responsibilities:
 - **Presentation View** and chart management actions mirror context menu icons
 
 Key Methods:
-- `init()`, `open()`, `close()`, `render()`, `handleBodyClick()`, `refreshSelectionHighlight()`
+- `init()`, `open()`, `close()`, `render()`, `renderSectionNav()`, `scrollToSection()`, `setupSectionNavObserver()`, `handleNavClick()`, `handleBodyClick()`, `refreshSelectionHighlight()`
 - `isRowSelected()`, `renderUtilitySection()`, `getBhavaRowLabel()`
 - `getDrawingShapes()`, `getAnnotationDisplayName()`, `getAnnotationIcon()`
 
@@ -694,7 +697,7 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - **Options modal**: `#options-btn` (gear icon in toolbar export group, after Save) opens `#options-modal`
 - **Hide North Indian Chart Indicators**: Hides bhava numbers in black corner boxes (`tinyBoxGroupNorth`)
 - **Hide South Indian Chart Indicators**: Hides lagna diagonal line, yellow bhava boxes, and black rashi boxes
-- **Save Chart Only**: Same `#export-btn` exports only the chart area — saves/restores zoom/pan, calls `zoomToFit()`, crops via `getExportCropRect()`, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, transparent background, no padding or watermark; locks `#toggle-transparency-btn` on. Falls back to full viewport export when no chart is loaded
+- **Save Chart Only**: Same `#export-btn` exports only the chart area — saves/restores zoom/pan, calls `zoomToFit()`, crops via `getExportCropRect()`, includes Grahas and on-chart annotations, leaves out anything outside the chart boundary, transparent background, no padding or watermark; locks `#toggle-transparency-btn` on; turning the option off restores white-background export. Falls back to full viewport export when no chart is loaded
 - **Persistence**: `localStorage.citrana_north_hide_indicators`, `citrana_south_hide_indicators`, and `citrana_save_chart_only` (`'1'` when enabled; keys removed when off); defaults are indicators visible and full viewport export
 - **Application**: `app.setNorthHideIndicators()` / `setSouthHideIndicators()` / `setSaveChartOnly()`; indicator prefs reapply on chart create and Lagna changes via `apply*IndicatorsPreference()`
 - **Undo**: Options preferences are not tracked in the undo timeline
@@ -758,13 +761,13 @@ Technical Implementation:
 - Responsive Design: Optimised for desktop, tablet, and mobile viewports
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
 - Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
-- Context Menus: Right-click or long-press on canvas, bhava, or Graha (Select/Hand when enabled; suppressed while drawing or when disabled via Items); chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
-- **Items Panel**: `#items-menu-btn` in zoom bar — chart/Bhava/Graha/annotation actions; **Clear Selection** and **Disable Context Menu**; row highlight syncs with canvas selection; primary mobile/touch workflow
+- Context Menus: Right-click or long-press on canvas, bhava, or Graha (Select/Hand when enabled; off by default on touch-primary devices; suppressed while drawing or when disabled via Items); chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
+- **Items Panel**: `#items-menu-btn` or **I** — chart/Bhava/Graha/annotation actions; sticky section chip bar; **Clear Selection** and **Context Menu** (On/Off); row highlight syncs with canvas selection; desktop and touch workflow
 - **Selection Pill**: dashed outline behind selected Graha labels and text/heading/pen stroke annotations; Bhava highlight in light grey
 - **Edit UI mobile scroll**: chevron buttons scroll style controls when they overflow on narrow screens
 - Status Updates: Real-time feedback and notifications
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
-- Help Modal: Shortcuts and usage guide (Laser Pointer, Items panel, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
+- Help Modal: Shortcuts and usage guide (Laser Pointer, Items panel with sticky chip bar, **I** shortcut, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
 - About Modal: Information about Citrana with creator details and links; mobile compact layout without scroll
 - Welcome Modal: First-time user experience; `closeWelcomeModal()` marks seen in `localStorage`; mobile compact layout without scroll
 - Options Modal: Chart indicator toggles and **Save Chart Only** export; shared modal width with Help (`width: min(600px, 90vw)`)
@@ -793,7 +796,7 @@ Technical Implementation:
 Mobile and touch:
 - Desktop is the primary supported experience
 - Mobile/touch layouts are tuned (safe areas, compact Graha library, toolbar scroll, drawing tools in toolbar)
-- Use the **Items** panel (`#items-menu-btn`) for chart/Bhava/Graha/annotation actions when context menus are awkward on touch
+- Use the **Items** panel (`#items-menu-btn` or **I**) for chart/Bhava/Graha/annotation actions when context menus are awkward on touch
 - Laser pointer is available on all viewports (`CitranaDevice.isLaserViewport()`)
 
 ## Performance Optimisation
@@ -1203,7 +1206,7 @@ Edit the Graha data objects in assets/js/citrana-planet-system.js:
 ### Data Management
 - Chart work lives in the browser tab for the current visit; refreshing starts fresh unless the user **Save Session** / **Open Session** (`.citrana.json`)
 - Export PNG or Save Session to keep a copy; chart data is not uploaded to a server
-- `localStorage` is used for preferences: welcome modal seen (`citrana_welcome_seen`), chart indicator toggles (`citrana_north_hide_indicators`, `citrana_south_hide_indicators`), Save Chart Only export (`citrana_save_chart_only`), context menu enable (`citrana_context_menu_enabled`), optional `citrana_debug` opt-out
+- `localStorage` is used for preferences: welcome modal seen (`citrana_welcome_seen`), chart indicator toggles (`citrana_north_hide_indicators`, `citrana_south_hide_indicators`), Save Chart Only export (`citrana_save_chart_only`), context menu enable (`citrana_context_menu_enabled` — touch-primary default off until set), optional `citrana_debug` opt-out
 
 ## Support and Documentation
 
