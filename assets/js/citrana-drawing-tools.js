@@ -14,6 +14,8 @@ const PEN_SPEED_FAST_THRESHOLD = 0.85;
 /** Konva spline tension — 0 is straight segments; ~0.5–0.6 gives smooth marker curves */
 const PEN_TENSION = 0.55;
 const PEN_DEFAULT_STROKE_WIDTH = 4;
+/** Shared double-click window for pen edit gesture detectors (bbox click, stage click). */
+const PEN_EDIT_ACTIVATION_MS = 450;
 
 function getPenHitMinWidth() {
     return typeof CitranaDevice !== 'undefined' && CitranaDevice.isMobileUA() ? 28 : 18;
@@ -200,7 +202,6 @@ class DrawingTools {
         this.lastPoint = null;
         this.isTouchDevice = CitranaDevice.isTouchDevice();
         this.selectedShape = null;
-        this._penSelectClick = null;
 
         // Track editing state to prevent conflicts
         this.isEditingPlanet = false;
@@ -541,6 +542,8 @@ class DrawingTools {
             return;
         }
 
+        pill.fillEnabled(false);
+
         const bounds = this.getTaperedPenBoundsInLayer(shape);
         const pad = (CitranaSelection?.getPadding?.() || 4) + this.getAnnotationSelectionExtraPadding(shape);
 
@@ -570,7 +573,7 @@ class DrawingTools {
             if (!shape._selectionPill) {
                 const pill = new Konva.Rect({
                     name: CitranaSelection.PILL_NAME,
-                    fill: 'transparent',
+                    fillEnabled: false,
                     stroke: 'rgba(107, 114, 128, 0.75)',
                     strokeWidth: 1.5,
                     dash: [4, 3],
@@ -579,6 +582,8 @@ class DrawingTools {
                 });
                 parent.add(pill);
                 shape._selectionPill = pill;
+            } else {
+                shape._selectionPill.fillEnabled(false);
             }
             this.syncPenSelectionPill(shape);
             return;
@@ -1354,6 +1359,57 @@ class DrawingTools {
     }
 
     /**
+     * Track double-click / double-tap activation for pen edit (click-based detectors).
+     * @param {number|string} shapeId
+     * @param {number} [windowMs]
+     * @returns {boolean} True when this event completes a double-activation.
+     */
+    trackPenEditActivation(shapeId, windowMs = PEN_EDIT_ACTIVATION_MS) {
+        const now = Date.now();
+
+        if (this._penEditActivation?.id === shapeId && now - this._penEditActivation.time < windowMs) {
+            this._penEditActivation = null;
+            return true;
+        }
+
+        this._penEditActivation = { id: shapeId, time: now };
+        return false;
+    }
+
+    /**
+     * True while waiting for a second click/tap to open pen edit (suppresses drag start).
+     * @param {number|string} shapeId
+     * @param {number} [windowMs]
+     * @returns {boolean}
+     */
+    isPenEditActivationPending(shapeId, windowMs = PEN_EDIT_ACTIVATION_MS) {
+        const activation = this._penEditActivation;
+        if (!activation || activation.id !== shapeId) {
+            return false;
+        }
+
+        return Date.now() - activation.time < windowMs;
+    }
+
+    /**
+     * Single gesture entry for pen edit — all double-click/tap detectors funnel here.
+     * @param {Konva.Node} shape
+     * @param {Konva.KonvaEventObject} [evt]
+     * @param {{ cancelPendingDrag?: () => void }} [options]
+     */
+    requestPenEdit(shape, evt, options = {}) {
+        if (evt) {
+            evt.cancelBubble = true;
+        }
+
+        options.cancelPendingDrag?.();
+
+        const penShape = this.normalizeDrawingShape(shape);
+        penShape?.stopDrag?.();
+        this.editPenAnnotation(penShape, evt);
+    }
+
+    /**
      * Open pen style controls — same path as Items menu → Edit.
      * @param {Konva.Node} shape
      * @param {Konva.KonvaEventObject} [e]
@@ -1405,6 +1461,25 @@ class DrawingTools {
             const name = node.name();
             return name && name.startsWith('bounding-box-');
         }).forEach((box) => {
+            // Invisible on canvas (opacity 0) but hittable — avoids faint grey from rgba(0,0,0,0.01).
+            const fill = box.fill?.();
+            if (box.opacity?.() !== 0 ||
+                fill === 'rgba(0,0,0,0.01)' ||
+                fill === 'rgba(0,0,0,0)' ||
+                box.fillEnabled?.() === false) {
+                box.fill('#000000');
+                box.opacity(0);
+                box.fillEnabled(true);
+            }
+            if (!box._pickHitFuncBound) {
+                box._pickHitFuncBound = true;
+                box.hitFunc((context, node) => {
+                    context.beginPath();
+                    context.rect(0, 0, node.width(), node.height());
+                    context.closePath();
+                    context.fillStrokeShape(node);
+                });
+            }
             // Invisible pick rects block Graha drag when listening — only enable in Select tool.
             box.listening(enablePick);
             if (enablePick) {
@@ -1582,7 +1657,7 @@ class DrawingTools {
 
         const shape = this.resolveDrawingHitTarget(e);
         if (shape?.name?.()?.includes('drawing-pen')) {
-            this.editPenAnnotation(shape, e);
+            this.requestPenEdit(shape, e);
         }
     }
 
@@ -1597,20 +1672,13 @@ class DrawingTools {
 
         const shape = this.resolveDrawingHitTarget(e) || this.selectedShape;
         if (!shape?.name?.()?.includes('drawing-pen')) {
-            this._penSelectClick = null;
+            this._penEditActivation = null;
             return;
         }
 
-        const now = Date.now();
-        const id = shape._id;
-
-        if (this._penSelectClick?.id === id && now - this._penSelectClick.time < 450) {
-            this.editPenAnnotation(shape, e);
-            this._penSelectClick = null;
-            return;
+        if (this.trackPenEditActivation(shape._id)) {
+            this.requestPenEdit(shape, e);
         }
-
-        this._penSelectClick = { id, time: now };
     }
 
     /**
@@ -2089,6 +2157,10 @@ class DrawingTools {
         if (shape && shape.name() && shape.name().startsWith('drawing-')) {
             this.selectedShape = shape;
 
+            if (window.app?.currentTool === 'select' && shape.name().includes('drawing-pen')) {
+                shape.draggable(true);
+            }
+
             // Show control points for arrow and line shapes
             if (this.supportsControlPoints(shape)) {
                 this.createControlPoints(shape);
@@ -2214,7 +2286,7 @@ class DrawingTools {
                     tapCount = 0;
                     const target = this.normalizeDrawingShape(shape);
                     if (target?.name?.()?.includes('drawing-pen')) {
-                        this.editPenAnnotation(target, e);
+                        this.requestPenEdit(target, e);
                     } else {
                         this.showEditUIForShape(shape);
                     }
@@ -2761,7 +2833,7 @@ class DrawingTools {
                     setTimeout(() => {
                         const target = this.normalizeDrawingShape(shape);
                         if (target?.name?.()?.includes('drawing-pen')) {
-                            this.editPenAnnotation(target, e);
+                            this.requestPenEdit(target, e);
                         } else {
                             this.showEditUIForShape(shape);
                         }
@@ -3022,7 +3094,8 @@ class DrawingTools {
             y: bounds.y - padding,
             width: Math.max(8, bounds.width + (padding * 2)),
             height: Math.max(8, bounds.height + (padding * 2)),
-            fill: 'rgba(0,0,0,0.01)',
+            fill: '#000000',
+            opacity: 0,
             stroke: 'transparent',
             strokeWidth: 0,
             name: `bounding-box-${toolType}`,
@@ -3087,7 +3160,6 @@ class DrawingTools {
 
         boundingBox._penPickInteractionBound = true;
 
-        const dblClickMs = 450;
         const dragThreshold = CitranaDevice.isMobileUA() ? 10 : 6;
         let activeDragCleanup = null;
 
@@ -3105,17 +3177,6 @@ class DrawingTools {
             }
         };
 
-        const openPenEdit = (evt) => {
-            if (evt) {
-                evt.cancelBubble = true;
-            }
-
-            cancelPendingDrag();
-            boundingBox.actualShape?.stopDrag?.();
-            this.clearControlPoints();
-            this.editPenAnnotation(shape, evt);
-        };
-
         boundingBox.on('click', (evt) => {
             if (window.app?.currentTool !== 'select') {
                 return;
@@ -3123,16 +3184,13 @@ class DrawingTools {
 
             evt.cancelBubble = true;
 
-            const now = Date.now();
             const id = shape._id;
 
-            if (boundingBox._penLastClick?.id === id && now - boundingBox._penLastClick.time < dblClickMs) {
-                boundingBox._penLastClick = null;
-                openPenEdit(evt);
+            if (this.trackPenEditActivation(id)) {
+                this.requestPenEdit(shape, evt, { cancelPendingDrag });
                 return;
             }
 
-            boundingBox._penLastClick = { id, time: now };
             this.selectShape(shape);
         });
 
@@ -3142,12 +3200,7 @@ class DrawingTools {
             }
 
             const penShape = boundingBox.actualShape;
-            if (!penShape?.draggable()) {
-                return;
-            }
-
-            const now = Date.now();
-            if (boundingBox._penLastClick && now - boundingBox._penLastClick.time < dblClickMs) {
+            if (!penShape) {
                 return;
             }
 
@@ -3180,12 +3233,9 @@ class DrawingTools {
                 const dy = pointer.y - origin.y;
                 if (Math.hypot(dx, dy) >= dragThreshold) {
                     cleanup();
-                    if (this.isTouchDevice && evt.type === 'touchstart') {
-                        this.beginManualPenDrag(penShape, boundingBox, evt);
-                    } else {
-                        this.isPenDragActive = true;
-                        penShape.startDrag(evt);
-                    }
+                    this._penEditActivation = null;
+                    penShape.draggable(true);
+                    this.beginManualPenDrag(penShape, boundingBox, evt);
                 }
             };
 

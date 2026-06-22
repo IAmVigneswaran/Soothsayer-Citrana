@@ -30,7 +30,7 @@ const CitranaSelection = (() => {
 
         const pill = new Konva.Rect({
             name: PILL_NAME,
-            fill: 'transparent',
+            fillEnabled: false,
             stroke: 'rgba(107, 114, 128, 0.75)',
             strokeWidth: 1.5,
             dash: [4, 3],
@@ -58,6 +58,7 @@ const CitranaSelection = (() => {
         }
 
         positionPill(pill, targetNode, parent, extraPadding);
+        pill.fillEnabled(false);
         pill.moveToTop();
         targetNode.moveToTop();
     }
