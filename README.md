@@ -36,10 +36,10 @@ This codebase is developed using AI agents.
 - Presentation View: Right-click the canvas to hide toolbar, zoom bar, Graha library, Help, and About; choose **Exit Presentation View** to restore
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
-- Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
-- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); can be disabled from the Items panel; suppressed while drawing tools are active so strokes are not interrupted
-- Items Panel: Intended for mobile and touch devices — layers button in the zoom bar opens chart actions, Bhavas, Grahas, and annotations with select, edit, and delete controls; **Clear Selection** and **Disable Context Menu** in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading annotations offer separate **Edit text** and **Style** actions (also available on desktop)
-- Keyboard Shortcuts: Tools (including **K** for Laser Pointer), undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
+- Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark; transparency toolbar locks on and restores a white background when turned off), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
+- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); off by default on touch devices (enable from **Items** → **Canvas** → **Context Menu**); suppressed while drawing tools are active so strokes are not interrupted
+- Items Panel: Layers button in the zoom bar or shortcut **I** opens chart actions, Bhavas, Grahas, and annotations on desktop and touch devices; **sticky chip bar** jumps between sections (swipe or scroll left and right when pills overflow); **Clear Selection** and **Context Menu** (On/Off) in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading annotations offer separate **Edit text** and **Style** actions
+- Keyboard Shortcuts: Tools (including **K** for Laser Pointer and **I** for Items), undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; save a `.citrana.json` session file or export PNG to keep a copy
 
@@ -128,7 +128,7 @@ Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's inte
 
 ### Browser and Device Compatibility
 
-Citrana is designed for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). For optimal performance and full feature access, use a desktop environment. On mobile and touch devices, use the **Items** panel for chart, Bhava, Graha, and annotation actions. Note: Brave users must disable Brave Shields for full functionality.
+Citrana is designed for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). For optimal performance and full feature access, use a desktop environment. On mobile and touch devices, the **Items** panel (layers icon or **I**) is the primary way to run chart, Bhava, Graha, and annotation actions. Note: Brave users must disable Brave Shields for full functionality.
 
 Screen Size: If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.
 
@@ -168,7 +168,7 @@ Click the gear icon in the toolbar (after Save) to open **Options**.
 
 - **Hide North Indian Chart Indicators** — hides bhava numbers (black corner boxes)
 - **Hide South Indian Chart Indicators** — hides the lagna diagonal line, yellow bhava numbers, and black rashi numbers
-- **Save Chart Only** — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark (Toggle Transparency is turned on automatically)
+- **Save Chart Only** — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark (transparency toolbar turns on automatically; turning **Save Chart Only** off restores a white background export)
 - Preferences are saved in this browser, included when you **Save Session**, and are not tracked by undo/redo
 
 ### Working with Grahas
@@ -236,10 +236,11 @@ Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Cmd+Z** undo and **Ct
 
 ### Items Panel
 
-The **Items** panel is intended for **mobile and touch devices**, where right-click and long-press are less practical. Open it from the layers icon in the zoom bar (after the zoom lock). It is also available on desktop when you prefer a single list over right-click menus.
+Open **Items** from the layers icon in the zoom bar (after the zoom lock) or press **I**. It works on desktop and touch devices when you want one list instead of right-click or long-press menus.
 
-- Lists chart actions, all Bhavas, placed Grahas, and annotations in one panel — an alternative to right-click and long-press on touch screens
-- **Canvas:** **Clear Selection** and **Disable Context Menu** (saved in this browser)
+- Lists chart actions, all Bhavas, placed Grahas, and annotations in one panel
+- **Sticky chip bar:** pill buttons at the top jump to **Canvas**, **Chart**, **Bhavas**, **Grahas**, **Annotations**, and other sections without scrolling the full list. Swipe or scroll left and right along the chip bar when not all pills fit on screen. The bar stays visible while you scroll; the active section is highlighted
+- **Canvas:** **Clear Selection** and **Context Menu** (On/Off — saved in this browser; off by default on touch devices)
 - Selected Bhavas, Grahas, and annotations are highlighted in the list and stay in sync with the canvas
 - **Chart:** create a chart, set Lagna (North Indian), Presentation View, Reset Chart, Reset Drawings, and Clear Canvas
 - **Bhavas:** select a Bhava, set as Lagna or First Bhava, or clear Grahas in that Bhava; South Indian rows show each cell's fixed Rashi name with its zodiac symbol
