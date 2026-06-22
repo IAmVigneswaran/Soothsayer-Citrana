@@ -15,30 +15,18 @@ const CitranaSelection = (() => {
             : PADDING_DESKTOP;
     }
 
-    function positionPill(pill, labelText, relativeTo) {
-        const rect = labelText.getClientRect({ relativeTo });
-        const pad = getPadding();
-
-        pill.setAttrs({
-            x: rect.x - pad,
-            y: rect.y - pad,
-            width: Math.max(8, rect.width + pad * 2),
-            height: Math.max(8, rect.height + pad * 2),
-            cornerRadius: 3
-        });
-    }
-
     /**
-     * @param {Konva.Text} labelText
+     * @param {Konva.Node} targetNode — text, heading, or stroke annotation
      * @param {Konva.Container} parentContainer
+     * @param {number} [extraPadding=0]
      * @returns {Konva.Rect|null}
      */
-    function attach(labelText, parentContainer) {
-        if (!labelText || !parentContainer || typeof Konva === 'undefined') {
+    function attach(targetNode, parentContainer, extraPadding = 0) {
+        if (!targetNode || !parentContainer || typeof Konva === 'undefined') {
             return null;
         }
 
-        detach(labelText);
+        detach(targetNode);
 
         const pill = new Konva.Rect({
             name: PILL_NAME,
@@ -49,41 +37,55 @@ const CitranaSelection = (() => {
             listening: false
         });
 
-        positionPill(pill, labelText, parentContainer);
+        positionPill(pill, targetNode, parentContainer, extraPadding);
         parentContainer.add(pill);
-        labelText._selectionPill = pill;
+        targetNode._selectionPill = pill;
         pill.moveToTop();
-        labelText.moveToTop();
+        targetNode.moveToTop();
 
         return pill;
     }
 
     /**
-     * @param {Konva.Text} labelText
+     * @param {Konva.Node} targetNode
+     * @param {number} [extraPadding=0]
      */
-    function sync(labelText) {
-        const pill = labelText?._selectionPill;
-        const parent = labelText?.getParent();
+    function sync(targetNode, extraPadding = 0) {
+        const pill = targetNode?._selectionPill;
+        const parent = targetNode?.getParent();
         if (!pill || !parent) {
             return;
         }
 
-        positionPill(pill, labelText, parent);
+        positionPill(pill, targetNode, parent, extraPadding);
         pill.moveToTop();
-        labelText.moveToTop();
+        targetNode.moveToTop();
     }
 
     /**
-     * @param {Konva.Text} labelText
+     * @param {Konva.Node} targetNode
      */
-    function detach(labelText) {
-        const pill = labelText?._selectionPill;
+    function detach(targetNode) {
+        const pill = targetNode?._selectionPill;
         if (!pill) {
             return;
         }
 
         pill.destroy();
-        labelText._selectionPill = null;
+        targetNode._selectionPill = null;
+    }
+
+    function positionPill(pill, targetNode, relativeTo, extraPadding = 0) {
+        const rect = targetNode.getClientRect({ relativeTo });
+        const pad = getPadding() + extraPadding;
+
+        pill.setAttrs({
+            x: rect.x - pad,
+            y: rect.y - pad,
+            width: Math.max(8, rect.width + pad * 2),
+            height: Math.max(8, rect.height + pad * 2),
+            cornerRadius: 3
+        });
     }
 
     return {

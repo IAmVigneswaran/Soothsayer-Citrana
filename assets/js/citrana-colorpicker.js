@@ -362,6 +362,10 @@ const CitranaColorPicker = (() => {
         return Boolean(target.closest('.cp_dialog'));
     }
 
+    function isPickerDialogOpen() {
+        return Boolean(document.querySelector('.cp_dialog'));
+    }
+
     return {
         SWATCHES,
         BASE_OPTIONS,
@@ -378,6 +382,7 @@ const CitranaColorPicker = (() => {
         initGrahaBar,
         setGrahaPickCallback,
         createInput,
-        isPickerPopupTarget
+        isPickerPopupTarget,
+        isPickerDialogOpen
     };
 })();

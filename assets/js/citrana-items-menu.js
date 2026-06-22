@@ -576,10 +576,15 @@ class CitranaItemsMenu {
         }
 
         this.close();
-        window.app?.setTool('select');
         const drawingTools = window.app?.drawingTools;
         if (!drawingTools) return;
 
+        if (toolType === 'pen') {
+            drawingTools.editPenAnnotation(shape);
+            return;
+        }
+
+        window.app?.setTool('select');
         drawingTools.selectShape(shape);
         drawingTools.showEditUI(shape, toolType);
     }

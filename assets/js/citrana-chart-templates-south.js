@@ -663,6 +663,7 @@ class SouthIndianChartTemplate {
         });
 
         this.restorePlanetSelectionInHouse(houseNumber);
+        window.app?.drawingTools?.raiseDrawingsAboveChart?.();
         this.layer.batchDraw();
     }
 

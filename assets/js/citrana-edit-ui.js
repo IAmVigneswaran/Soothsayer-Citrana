@@ -12,6 +12,8 @@ class EditUI {
         this.onDelete = null; // Callback for delete action
         this._sessionDirty = false;
         this._skipHistoryOnHide = false;
+        /** Stable Konva target for the open edit session (survives brief currentElement clears). */
+        this._editSessionTarget = null;
 
         // Initialize the Edit UI container
         this.initEditUIContainer();
@@ -143,6 +145,7 @@ class EditUI {
         citranaDebug(`[EDIT UI] show() called with tool: ${tool}, element:`, element);
 
         this.currentElement = element;
+        this._editSessionTarget = element;
         this.currentTool = tool;
         this.isVisible = true;
         this._sessionDirty = false;
@@ -385,6 +388,7 @@ class EditUI {
 
         this.isVisible = false;
         this.currentElement = null;
+        this._editSessionTarget = null;
         this.currentTool = null;
         this._sessionDirty = false;
         this._skipHistoryOnHide = false;
@@ -454,14 +458,24 @@ class EditUI {
      * Create stroke controls for pen and line tools
      * @param {HTMLElement} container - The container to add controls to
      */
+    getEditTarget() {
+        const target = this._editSessionTarget || this.currentElement;
+        return target?.getLayer?.() ? target : null;
+    }
+
     createStrokeControls(container) {
-        const isTapered = this.currentElement?.getAttr?.('penTaper') === true;
+        const editTarget = this.getEditTarget();
+        if (!editTarget) {
+            return;
+        }
+
+        const isTapered = editTarget.getAttr?.('penTaper') === true;
         const currentStrokeWidth = isTapered
-            ? (this.currentElement.getAttr('penBaseWidth') || this.defaultProperties.pen.strokeWidth)
-            : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : this.defaultProperties.pen.strokeWidth);
+            ? (editTarget.getAttr('penBaseWidth') || this.defaultProperties.pen.strokeWidth)
+            : (editTarget.strokeWidth ? editTarget.strokeWidth() : this.defaultProperties.pen.strokeWidth);
         const currentStrokeColor = isTapered
-            ? (this.currentElement.getAttr('penStrokeColor') || this.defaultProperties.pen.strokeColor)
-            : (this.currentElement.stroke ? this.currentElement.stroke() : this.defaultProperties.pen.strokeColor);
+            ? (editTarget.getAttr('penStrokeColor') || this.defaultProperties.pen.strokeColor)
+            : (editTarget.stroke ? editTarget.stroke() : this.defaultProperties.pen.strokeColor);
 
         // Create controls container
         const controlsDiv = document.createElement('div');
@@ -484,20 +498,22 @@ class EditUI {
 
         // Width event listeners
         decreaseWidth.addEventListener('click', () => {
-            const isPenTapered = this.currentElement?.getAttr?.('penTaper') === true;
+            const target = this.getEditTarget();
+            const isPenTapered = target?.getAttr?.('penTaper') === true;
             const currentWidth = isPenTapered
-                ? (this.currentElement.getAttr('penBaseWidth') || this.defaultProperties.pen.strokeWidth)
-                : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : this.defaultProperties.pen.strokeWidth);
+                ? (target.getAttr('penBaseWidth') || this.defaultProperties.pen.strokeWidth)
+                : (target.strokeWidth ? target.strokeWidth() : this.defaultProperties.pen.strokeWidth);
             const newWidth = Math.max(1, currentWidth - 1);
             this.updateStrokeWidth(newWidth);
             widthValue.textContent = newWidth;
         });
 
         increaseWidth.addEventListener('click', () => {
-            const isPenTapered = this.currentElement?.getAttr?.('penTaper') === true;
+            const target = this.getEditTarget();
+            const isPenTapered = target?.getAttr?.('penTaper') === true;
             const currentWidth = isPenTapered
-                ? (this.currentElement.getAttr('penBaseWidth') || this.defaultProperties.pen.strokeWidth)
-                : (this.currentElement.strokeWidth ? this.currentElement.strokeWidth() : this.defaultProperties.pen.strokeWidth);
+                ? (target.getAttr('penBaseWidth') || this.defaultProperties.pen.strokeWidth)
+                : (target.strokeWidth ? target.strokeWidth() : this.defaultProperties.pen.strokeWidth);
             const newWidth = Math.min(10, currentWidth + 1);
             this.updateStrokeWidth(newWidth);
             widthValue.textContent = newWidth;
@@ -917,17 +933,21 @@ class EditUI {
      * @param {number} width - New stroke width
      */
     updateStrokeWidth(width) {
-        if (this.currentElement) {
-            if (CitranaArrow.isArrow(this.currentElement)) {
-                CitranaArrow.setStrokeWidth(this.currentElement, width);
-            } else if (this.currentElement.getAttr?.('penTaper') === true) {
-                window.app?.drawingTools?.syncPenTaperWidth?.(this.currentElement, width);
-            } else {
-                this.currentElement.strokeWidth(width);
-            }
-            this.currentElement.getLayer().batchDraw();
-            this.markEditDirty();
+        const target = this.getEditTarget();
+        if (!target) {
+            return;
         }
+
+        if (CitranaArrow.isArrow(target)) {
+            CitranaArrow.setStrokeWidth(target, width);
+        } else if (target.getAttr?.('penTaper') === true) {
+            window.app?.drawingTools?.syncPenTaperWidth?.(target, width);
+        } else {
+            target.strokeWidth(width);
+        }
+
+        target.getLayer()?.batchDraw();
+        this.markEditDirty();
     }
 
     /**
@@ -935,18 +955,21 @@ class EditUI {
      * @param {string} color - New stroke color
      */
     updateStrokeColor(color) {
-        if (this.currentElement) {
-            if (CitranaArrow.isArrow(this.currentElement)) {
-                CitranaColorPicker.applyToKonvaArrow(this.currentElement, color);
-            } else if (this.currentElement.getAttr?.('penTaper') === true) {
-                this.currentElement.setAttr('penStrokeColor', color);
-            } else {
-                this.currentElement.stroke(color);
-            }
-
-            this.currentElement.getLayer().batchDraw();
-            this.markEditDirty();
+        const target = this.getEditTarget();
+        if (!target) {
+            return;
         }
+
+        if (CitranaArrow.isArrow(target)) {
+            CitranaColorPicker.applyToKonvaArrow(target, color);
+        } else if (target.getAttr?.('penTaper') === true) {
+            target.setAttr('penStrokeColor', color);
+        } else {
+            target.stroke(color);
+        }
+
+        target.getLayer()?.batchDraw();
+        this.markEditDirty();
     }
 
     /**

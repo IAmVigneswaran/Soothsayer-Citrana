@@ -15,6 +15,10 @@ const PEN_SPEED_FAST_THRESHOLD = 0.85;
 const PEN_TENSION = 0.55;
 const PEN_DEFAULT_STROKE_WIDTH = 4;
 
+function getPenHitMinWidth() {
+    return typeof CitranaDevice !== 'undefined' && CitranaDevice.isMobileUA() ? 28 : 18;
+}
+
 function isTaperedPen(shape) {
     return shape?.getAttr?.('penTaper') === true;
 }
@@ -131,13 +135,15 @@ function configureTaperedPenShape(shape) {
             return;
         }
 
-        const hitPad = CitranaDevice.isMobileUA() ? 14 : 10;
+        const hitPad = 4;
+        const minHit = getPenHitMinWidth();
         context.lineCap = 'round';
         context.lineJoin = 'round';
 
         for (let i = 0; i < points.length - 2; i += 2) {
             const index = i / 2;
-            const width = Math.max(0.35, (widths[index] + widths[index + 1]) / 2) + hitPad;
+            const segmentWidth = Math.max(0.35, (widths[index] + widths[index + 1]) / 2);
+            const width = Math.max(minHit, segmentWidth + hitPad);
             context.beginPath();
             context.lineWidth = width;
             context.moveTo(points[i], points[i + 1]);
@@ -195,6 +201,7 @@ class DrawingTools {
         this.isTouchDevice = CitranaDevice.isTouchDevice();
         this.selectedShape = null;
         this.isDragging = false;
+        this._penSelectClick = null;
 
         // Track editing state to prevent conflicts
         this.isEditingPlanet = false;
@@ -471,6 +478,30 @@ class DrawingTools {
             this.applyDrawingHitTarget(shape, resolvedTool);
         }
         this.syncBoundingBoxListening();
+        this.raiseDrawingsAboveChart();
+    }
+
+    /**
+     * Resolve a pick target to the real drawing node (never an invisible bounding box).
+     * @param {Konva.Node|null} node
+     * @returns {Konva.Node|null}
+     */
+    normalizeDrawingShape(node) {
+        if (!node) {
+            return null;
+        }
+
+        const name = node.name?.() || '';
+
+        if (name.startsWith('bounding-box-')) {
+            return node.actualShape || null;
+        }
+
+        if (name.startsWith('drawing-')) {
+            return node;
+        }
+
+        return null;
     }
 
     /**
@@ -480,14 +511,49 @@ class DrawingTools {
      */
     supportsAnnotationSelectionPill(shape) {
         const name = shape?.name?.() || '';
-        return name === 'drawing-text' || name === 'drawing-heading';
+        return name === 'drawing-text' ||
+            name === 'drawing-heading' ||
+            name.includes('drawing-pen');
+    }
+
+    getAnnotationSelectionExtraPadding(shape) {
+        return shape?.name?.()?.includes('drawing-pen') ? 8 : 0;
     }
 
     syncAnnotationSelectionPill() {
         const shape = this.selectedShape;
-        if (shape && this.supportsAnnotationSelectionPill(shape)) {
-            CitranaSelection?.sync?.(shape);
+        if (!shape || !this.supportsAnnotationSelectionPill(shape)) {
+            return;
         }
+
+        if (isTaperedPen(shape)) {
+            this.syncPenSelectionPill(shape);
+            return;
+        }
+
+        CitranaSelection?.sync?.(shape, this.getAnnotationSelectionExtraPadding(shape));
+    }
+
+    syncPenSelectionPill(shape) {
+        const pill = shape?._selectionPill;
+        const parent = shape?.getParent();
+        if (!pill || !parent || !isTaperedPen(shape)) {
+            return;
+        }
+
+        const bounds = this.getTaperedPenBoundsInLayer(shape);
+        const pad = (CitranaSelection?.getPadding?.() || 4) + this.getAnnotationSelectionExtraPadding(shape);
+
+        pill.setAttrs({
+            x: bounds.x - pad,
+            y: bounds.y - pad,
+            width: Math.max(8, bounds.width + pad * 2),
+            height: Math.max(8, bounds.height + pad * 2),
+            cornerRadius: 3
+        });
+        pill.moveToTop();
+        shape.moveToTop();
+        this.layer?.batchDraw();
     }
 
     attachAnnotationSelectionPill(shape) {
@@ -496,9 +562,29 @@ class DrawingTools {
         }
 
         const parent = shape.getParent();
-        if (parent && typeof CitranaSelection !== 'undefined') {
-            CitranaSelection.attach(shape, parent);
+        if (!parent || typeof CitranaSelection === 'undefined') {
+            return;
         }
+
+        if (isTaperedPen(shape)) {
+            if (!shape._selectionPill) {
+                const pill = new Konva.Rect({
+                    name: CitranaSelection.PILL_NAME,
+                    fill: 'transparent',
+                    stroke: 'rgba(107, 114, 128, 0.75)',
+                    strokeWidth: 1.5,
+                    dash: [4, 3],
+                    listening: false,
+                    cornerRadius: 3
+                });
+                parent.add(pill);
+                shape._selectionPill = pill;
+            }
+            this.syncPenSelectionPill(shape);
+            return;
+        }
+
+        CitranaSelection.attach(shape, parent, this.getAnnotationSelectionExtraPadding(shape));
     }
 
     detachAnnotationSelectionPill(shape) {
@@ -515,7 +601,11 @@ class DrawingTools {
         shape._annotationPillSyncBound = true;
         shape.on('dragmove', () => {
             if (this.selectedShape === shape) {
-                CitranaSelection?.sync?.(shape);
+                if (isTaperedPen(shape)) {
+                    this.syncPenSelectionPill(shape);
+                } else {
+                    CitranaSelection?.sync?.(shape, this.getAnnotationSelectionExtraPadding(shape));
+                }
             }
         });
     }
@@ -649,11 +739,6 @@ class DrawingTools {
         // Create invisible bounding box for easier selection
         const boundingBox = this.createBoundingBox(line, 'pen');
         line.boundingBox = boundingBox;
-
-        line.on('click', (e) => {
-            e.cancelBubble = true;
-            this.showEditUI(line, 'pen');
-        });
 
         this.currentShape = line;
         this.applyDrawingHitTarget(line, 'pen');
@@ -790,11 +875,6 @@ class DrawingTools {
         shape.setAttr('penBaseWidth', baseWidth);
         configureTaperedPenShape(shape);
 
-        shape.on('click', (e) => {
-            e.cancelBubble = true;
-            this.showEditUI(shape, 'pen');
-        });
-
         layer.add(shape);
         shape.zIndex(zIndex);
 
@@ -802,6 +882,7 @@ class DrawingTools {
             boundingBox.actualShape = shape;
             shape.boundingBox = boundingBox;
             this.updateBoundingBox(boundingBox, shape);
+            boundingBox.moveToTop();
         }
 
         line.destroy();
@@ -1173,9 +1254,9 @@ class DrawingTools {
             if (isTaperedPen(shape)) {
                 configureTaperedPenShape(shape);
             }
-            shape.on('click', () => {
-                this.showEditUI(shape, 'pen');
-            });
+            if (shape.boundingBox) {
+                this.updateBoundingBox(shape.boundingBox, shape);
+            }
         } else {
             shape.on('click tap', (e) => {
                 e.cancelBubble = true;
@@ -1194,6 +1275,38 @@ class DrawingTools {
         return CitranaDevice.isMobileUA() ? 28 : 18;
     }
 
+    /**
+     * Open pen style controls — same path as Items menu → Edit.
+     * @param {Konva.Node} shape
+     * @param {Konva.KonvaEventObject} [e]
+     */
+    editPenAnnotation(shape, e) {
+        shape = this.normalizeDrawingShape(shape);
+        if (!shape?.name?.()?.includes('drawing-pen')) {
+            return;
+        }
+
+        const now = Date.now();
+        if (this._penEditLast?.id === shape._id && now - this._penEditLast.time < 120) {
+            return;
+        }
+        this._penEditLast = { id: shape._id, time: now };
+
+        if (e) {
+            e.cancelBubble = true;
+        }
+
+        this.clearControlPoints();
+        shape.stopDrag?.();
+
+        if (window.app?.currentTool !== 'select') {
+            window.app?.setTool?.('select');
+        }
+
+        this.selectShape(shape);
+        this.showEditUI(shape, 'pen');
+    }
+
     applyDrawingHitTarget(shape, toolType) {
         if (!shape) {
             return;
@@ -1205,13 +1318,170 @@ class DrawingTools {
     }
 
     syncBoundingBoxListening() {
+        const enablePick = this.currentTool === 'select' || window.app?.currentTool === 'select';
+
         this.layer.find((node) => {
             const name = node.name();
             return name && name.startsWith('bounding-box-');
         }).forEach((box) => {
-            // Invisible pick rects sit above the chart and block Graha drag when listening.
-            box.listening(false);
+            // Invisible pick rects block Graha drag when listening — only enable in Select tool.
+            box.listening(enablePick);
+            if (enablePick) {
+                box.moveToTop();
+            }
         });
+
+        this.layer.find((node) => {
+            const name = node.name() || '';
+            return name.includes('drawing-pen');
+        }).forEach((shape) => {
+            if (shape.boundingBox) {
+                this.updateBoundingBox(shape.boundingBox, shape);
+            }
+        });
+    }
+
+    /**
+     * Resolve a drawing node under the pointer when the event target is the stage/chart.
+     * @param {Konva.KonvaEventObject} e
+     * @returns {Konva.Node|null}
+     */
+    /**
+     * Layer-space bounds for tapered pen shapes (getClientRect is empty on custom Konva.Shape).
+     * @param {Konva.Shape} shape
+     * @returns {{ x: number, y: number, width: number, height: number }}
+     */
+    getTaperedPenBoundsInLayer(shape) {
+        const points = shape.getAttr('penTaperPoints') || [];
+        if (points.length < 4) {
+            return shape.getClientRect({ relativeTo: this.layer });
+        }
+
+        const widths = shape.getAttr('penTaperWidths') || [];
+        const ox = shape.x();
+        const oy = shape.y();
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+
+        for (let i = 0; i < points.length; i += 2) {
+            const index = i / 2;
+            const half = Math.max(2, ((widths[index] || 0) + (widths[index + 1] || widths[index] || 0)) / 2);
+            const px = points[i] + ox;
+            const py = points[i + 1] + oy;
+            minX = Math.min(minX, px - half);
+            minY = Math.min(minY, py - half);
+            maxX = Math.max(maxX, px + half);
+            maxY = Math.max(maxY, py + half);
+        }
+
+        return {
+            x: minX,
+            y: minY,
+            width: Math.max(8, maxX - minX),
+            height: Math.max(8, maxY - minY)
+        };
+    }
+
+    /**
+     * Find the topmost drawing pick-rect or stroke under a layer-space point.
+     * @param {{ x: number, y: number }} pos
+     * @returns {Konva.Node|null}
+     */
+    findDrawingAtLayerPoint(pos) {
+        if (!pos || !this.layer) {
+            return null;
+        }
+
+        const boxes = this.layer.find((node) => {
+            const name = node.name() || '';
+            return name.startsWith('bounding-box-');
+        });
+
+        for (let i = boxes.length - 1; i >= 0; i--) {
+            const box = boxes[i];
+            const x = box.x();
+            const y = box.y();
+            const w = box.width();
+            const h = box.height();
+            if (w > 0 && h > 0 &&
+                pos.x >= x && pos.x <= x + w &&
+                pos.y >= y && pos.y <= y + h) {
+                return box.actualShape || null;
+            }
+        }
+
+        return null;
+    }
+
+    resolveDrawingHitTarget(e) {
+        const direct = e?.target;
+        const directName = direct?.name?.() || '';
+
+        if (directName.startsWith('bounding-box-')) {
+            return this.normalizeDrawingShape(direct);
+        }
+
+        if (directName.startsWith('drawing-')) {
+            return direct;
+        }
+
+        const pos = this.getPrecisePositionFromKonva(e);
+        const byPoint = pos ? this.findDrawingAtLayerPoint(pos) : null;
+        if (byPoint) {
+            return this.normalizeDrawingShape(byPoint) || byPoint;
+        }
+
+        const pointer = this.stage?.getPointerPosition?.();
+        if (!pointer) {
+            return null;
+        }
+
+        const hit = this.stage.getIntersection(pointer);
+        return this.normalizeDrawingShape(hit);
+    }
+
+    /**
+     * Select tool: double-click a pen stroke to open Edit UI (stage-level fallback).
+     * @param {Konva.KonvaEventObject} e
+     */
+    handleSelectDoubleClick(e) {
+        if (window.app?.currentTool !== 'select') {
+            return;
+        }
+
+        const shape = this.resolveDrawingHitTarget(e);
+        if (shape?.name?.()?.includes('drawing-pen')) {
+            this.editPenAnnotation(shape, e);
+        }
+    }
+
+    /**
+     * Manual double-click detection for pen strokes (Konva dblclick is unreliable).
+     * @param {Konva.KonvaEventObject} e
+     */
+    handleSelectPenClick(e) {
+        if (window.app?.currentTool !== 'select' || !e) {
+            return;
+        }
+
+        const shape = this.resolveDrawingHitTarget(e) || this.selectedShape;
+        if (!shape?.name?.()?.includes('drawing-pen')) {
+            this._penSelectClick = null;
+            return;
+        }
+
+        const now = Date.now();
+        const id = shape._id;
+
+        if (this._penSelectClick?.id === id && now - this._penSelectClick.time < 450) {
+            this.editPenAnnotation(shape, e);
+            this._penSelectClick = null;
+            return;
+        }
+
+        this._penSelectClick = { id, time: now };
     }
 
     /**
@@ -1234,6 +1504,14 @@ class DrawingTools {
         drawingNodes.forEach((node) => node.moveToTop());
         this.controlPoints.startPoint?.moveToTop();
         this.controlPoints.endPoint?.moveToTop();
+
+        // Pick rects must sit above tapered pen Konva.Shape nodes for reliable hit testing.
+        this.layer.find((node) => {
+            const name = node.name() || '';
+            return name.startsWith('drawing-');
+        }).forEach((shape) => {
+            shape.boundingBox?.moveToTop();
+        });
     }
 
     getControlPointBaseRadius() {
@@ -1241,8 +1519,19 @@ class DrawingTools {
     }
 
     restoreCanvasCursor() {
-        const container = document.getElementById('canvas-container');
         const tool = window.app?.currentTool;
+        if (window.app?.setCanvasCursor) {
+            if (tool === 'hand') {
+                window.app.setCanvasCursor('grab');
+            } else if (tool === 'select') {
+                window.app.setCanvasCursor('default');
+            } else {
+                window.app.setCanvasCursor('crosshair');
+            }
+            return;
+        }
+
+        const container = document.getElementById('canvas-container');
         if (!container) {
             return;
         }
@@ -1582,7 +1871,13 @@ class DrawingTools {
         if (!shape || !shape.name()) {
             return false;
         }
-        return shape.name().includes('drawing-arrow') || shape.name().includes('drawing-line');
+
+        const name = shape.name();
+        if (name.includes('drawing-pen')) {
+            return false;
+        }
+
+        return name.includes('drawing-arrow') || name.includes('drawing-line');
     }
 
     pointsChanged(before, after) {
@@ -1619,6 +1914,7 @@ class DrawingTools {
 
         // Enable/disable dragging for all drawing objects based on tool
         this.updateDrawingObjectsDraggable(tool === 'select');
+        this.syncBoundingBoxListening();
     }
 
     /**
@@ -1657,6 +1953,7 @@ class DrawingTools {
      * @param {KonvaObject} shape - The shape to select
      */
     selectShape(shape) {
+        shape = this.normalizeDrawingShape(shape);
         window.app?.clearPlanetSelection?.();
         this.clearSelection();
 
@@ -1688,7 +1985,7 @@ class DrawingTools {
     handleSelectMouseDown(pos, e) {
         if (!pos) return;
 
-        const clickedShape = e.target;
+        let clickedShape = e.target;
 
         // Check if clicked on a control point
         if (clickedShape && (
@@ -1699,22 +1996,15 @@ class DrawingTools {
             return;
         }
 
-        // Check if clicked on a drawing object or its bounding box
-        if (clickedShape && (
-                (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
-                (clickedShape.name() && clickedShape.name().startsWith('bounding-box-'))
-            )) {
-            // If clicked on bounding box, get the actual shape
-            let actualShape = clickedShape;
-            if (clickedShape.name().startsWith('bounding-box-')) {
-                // Use the direct relationship instead of searching
-                actualShape = clickedShape.actualShape;
-            }
+        const resolved = this.resolveDrawingHitTarget(e);
+        if (resolved) {
+            clickedShape = resolved;
+        }
 
-            if (actualShape) {
-                this.selectShape(actualShape);
-                this.isDragging = true;
-            }
+        // Check if clicked on a drawing object or its bounding box
+        if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
+            this.selectShape(clickedShape);
+            this.isDragging = true;
         } else {
             // Clicked on empty space, clear selection
             this.clearSelection();
@@ -1729,7 +2019,7 @@ class DrawingTools {
     handleSelectTouchDown(pos, e) {
         if (!pos) return;
 
-        const clickedShape = e.target;
+        let clickedShape = e.target;
 
         // Check if clicked on a control point
         if (clickedShape && (
@@ -1740,25 +2030,17 @@ class DrawingTools {
             return;
         }
 
-        // Check if clicked on a drawing object or its bounding box
-        if (clickedShape && (
-                (clickedShape.name() && clickedShape.name().startsWith('drawing-')) ||
-                (clickedShape.name() && clickedShape.name().startsWith('bounding-box-'))
-            )) {
-            // If clicked on bounding box, get the actual shape
-            let actualShape = clickedShape;
-            if (clickedShape.name().startsWith('bounding-box-')) {
-                // Use the direct relationship instead of searching
-                actualShape = clickedShape.actualShape;
-            }
+        const resolved = this.resolveDrawingHitTarget(e);
+        if (resolved) {
+            clickedShape = resolved;
+        }
 
-            if (actualShape) {
-                this.selectShape(actualShape);
-                this.isDragging = true;
+        if (clickedShape && clickedShape.name() && clickedShape.name().startsWith('drawing-')) {
+            this.selectShape(clickedShape);
+            this.isDragging = true;
 
-                // Add double-tap detection for Edit UI
-                this.setupDoubleTapForEditUI(actualShape);
-            }
+            // Add double-tap detection for Edit UI
+            this.setupDoubleTapForEditUI(clickedShape);
         } else {
             // Clicked on empty space, clear selection
             this.clearSelection();
@@ -2274,6 +2556,11 @@ class DrawingTools {
      * @param {string} tool - The tool type
      */
     showEditUI(element, tool) {
+        element = this.normalizeDrawingShape(element);
+        if (!element) {
+            return;
+        }
+
         citranaDebug(`[EDIT UI] Showing Edit UI for ${tool} tool, element:`, element);
 
         // Dismiss any open Graha edit bar before showing drawing Edit UI (commits if edited)
@@ -2560,6 +2847,10 @@ class DrawingTools {
      * @returns {{ x: number, y: number, width: number, height: number }}
      */
     getShapeBoundsInLayer(shape) {
+        if (isTaperedPen(shape)) {
+            return this.getTaperedPenBoundsInLayer(shape);
+        }
+
         return shape.getClientRect({ relativeTo: this.layer });
     }
 
@@ -2580,9 +2871,9 @@ class DrawingTools {
         const boundingBox = new Konva.Rect({
             x: bounds.x - padding,
             y: bounds.y - padding,
-            width: bounds.width + (padding * 2),
-            height: bounds.height + (padding * 2),
-            fill: 'transparent',
+            width: Math.max(8, bounds.width + (padding * 2)),
+            height: Math.max(8, bounds.height + (padding * 2)),
+            fill: 'rgba(0,0,0,0.01)',
             stroke: 'transparent',
             strokeWidth: 0,
             name: `bounding-box-${toolType}`,
@@ -2591,19 +2882,38 @@ class DrawingTools {
             perfectDrawEnabled: false
         });
 
+        boundingBox.hitFunc((context, node) => {
+            context.beginPath();
+            context.rect(0, 0, node.width(), node.height());
+            context.closePath();
+            context.fillStrokeShape(node);
+        });
+
         // Establish two-way relationship
         shape.boundingBox = boundingBox;
         boundingBox.actualShape = shape;
 
-        // Add event handlers to the bounding box that delegate to the shape
-        boundingBox.on('click', () => {
-            this.showEditUI(shape, toolType);
-        });
+        const delegateEdit = (evt) => {
+            if (evt) {
+                evt.cancelBubble = true;
+            }
 
-        boundingBox.on('tap', (e) => {
+            this.selectShape(shape);
+            this.showEditUI(shape, toolType);
+        };
+
+        if (toolType !== 'pen') {
+            boundingBox.on('click', delegateEdit);
+            boundingBox.on('dblclick', delegateEdit);
+            boundingBox.on('dbltap', delegateEdit);
+        } else {
+            this.bindPenPickRectInteraction(boundingBox, shape);
+        }
+
+        boundingBox.on('tap', (evt) => {
             // Delegate tap events to the shape
             if (shape._tapHandler) {
-                shape._tapHandler(e);
+                shape._tapHandler(evt);
             }
         });
 
@@ -2613,6 +2923,116 @@ class DrawingTools {
         });
 
         return boundingBox;
+    }
+
+    /**
+     * Pen pick-rect: double-click opens Edit UI; drag starts only after a small move
+     * so click / double-click are not swallowed by Konva drag.
+     * @param {Konva.Rect} boundingBox
+     * @param {Konva.Node} shape
+     */
+    bindPenPickRectInteraction(boundingBox, shape) {
+        if (!boundingBox || !shape || boundingBox._penPickInteractionBound) {
+            return;
+        }
+
+        boundingBox._penPickInteractionBound = true;
+
+        const dblClickMs = 450;
+        const dragThreshold = 6;
+        let activeDragCleanup = null;
+
+        const cancelPendingDrag = () => {
+            if (activeDragCleanup) {
+                activeDragCleanup();
+                activeDragCleanup = null;
+            }
+        };
+
+        const openPenEdit = (evt) => {
+            if (evt) {
+                evt.cancelBubble = true;
+            }
+
+            cancelPendingDrag();
+            boundingBox.actualShape?.stopDrag?.();
+            this.clearControlPoints();
+            this.editPenAnnotation(shape, evt);
+        };
+
+        boundingBox.on('click', (evt) => {
+            if (window.app?.currentTool !== 'select') {
+                return;
+            }
+
+            evt.cancelBubble = true;
+
+            const now = Date.now();
+            const id = shape._id;
+
+            if (boundingBox._penLastClick?.id === id && now - boundingBox._penLastClick.time < dblClickMs) {
+                boundingBox._penLastClick = null;
+                openPenEdit(evt);
+                return;
+            }
+
+            boundingBox._penLastClick = { id, time: now };
+            this.selectShape(shape);
+        });
+
+        boundingBox.on('mousedown touchstart', (evt) => {
+            if (window.app?.currentTool !== 'select') {
+                return;
+            }
+
+            const penShape = boundingBox.actualShape;
+            if (!penShape?.draggable()) {
+                return;
+            }
+
+            const now = Date.now();
+            if (boundingBox._penLastClick && now - boundingBox._penLastClick.time < dblClickMs) {
+                return;
+            }
+
+            const stage = boundingBox.getStage();
+            if (!stage || !evt?.evt) {
+                return;
+            }
+
+            cancelPendingDrag();
+
+            const originX = evt.evt.clientX;
+            const originY = evt.evt.clientY;
+
+            const cleanup = () => {
+                stage.off('mousemove.penPick touchmove.penPick', onMove);
+                stage.off('mouseup.penPick touchend.penPick', onUp);
+                if (activeDragCleanup === cleanup) {
+                    activeDragCleanup = null;
+                }
+            };
+            activeDragCleanup = cleanup;
+
+            const onMove = (moveEvt) => {
+                if (window.app?.currentTool !== 'select') {
+                    cleanup();
+                    return;
+                }
+
+                const dx = moveEvt.evt.clientX - originX;
+                const dy = moveEvt.evt.clientY - originY;
+                if (Math.hypot(dx, dy) >= dragThreshold) {
+                    cleanup();
+                    penShape.startDrag(evt);
+                }
+            };
+
+            const onUp = () => cleanup();
+
+            stage.on('mousemove.penPick touchmove.penPick', onMove);
+            stage.on('mouseup.penPick touchend.penPick', onUp);
+        });
     }
 
     /**
@@ -2631,8 +3051,8 @@ class DrawingTools {
         boundingBox.setAttrs({
             x: bounds.x - padding,
             y: bounds.y - padding,
-            width: bounds.width + (padding * 2),
-            height: bounds.height + (padding * 2)
+            width: Math.max(8, bounds.width + (padding * 2)),
+            height: Math.max(8, bounds.height + (padding * 2))
         });
 
         this.layer.batchDraw();

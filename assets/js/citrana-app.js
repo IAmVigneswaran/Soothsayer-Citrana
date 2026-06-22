@@ -37,6 +37,7 @@ class CitranaApp {
         this.setupComponents();
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
+        this.drawingTools.syncBoundingBoxListening();
         // Each visit starts fresh; clear any legacy chart data from older builds.
         localStorage.removeItem('citranaChartData');
 
@@ -69,6 +70,28 @@ class CitranaApp {
         this.stage.on('scaleXChange scaleYChange', () => this.updateZoomLevel());
 
         citranaDebug('Canvas setup complete');
+    }
+
+    /**
+     * Apply a cursor to the canvas container and Konva stage canvases (inherit alone is unreliable in some browsers).
+     * @param {string} cursor
+     */
+    setCanvasCursor(cursor) {
+        const container = document.getElementById('canvas-container');
+        if (!container) {
+            return;
+        }
+
+        container.style.cursor = cursor;
+
+        const content = this.stage?.content;
+        if (content) {
+            content.style.cursor = cursor;
+        }
+
+        container.querySelectorAll('canvas').forEach((canvas) => {
+            canvas.style.cursor = cursor;
+        });
     }
 
     setupComponents() {
@@ -126,6 +149,25 @@ class CitranaApp {
         }
 
         return true;
+    }
+
+    /**
+     * True when the pointer hit an existing annotation (not chart content).
+     * Used by the pen tool to avoid starting a stroke on top of another drawing.
+     * @param {Konva.Node|null} target
+     * @returns {boolean}
+     */
+    isAnnotationTarget(target) {
+        if (!target || typeof target.name !== 'function') {
+            return false;
+        }
+
+        const name = target.name() || '';
+        return name.startsWith('drawing-') ||
+            name.startsWith('bounding-box-') ||
+            name === CitranaSelection?.PILL_NAME ||
+            name === 'control-point-start' ||
+            name === 'control-point-end';
     }
 
     clearPlanetSelection() {
@@ -392,9 +434,13 @@ class CitranaApp {
             if (this.isEmptyCanvasTarget(e.target)) {
                 this.clearCanvasSelection();
             } else {
-                // Dismiss edit bars when tapping another canvas element
-                if (this.drawingTools.editUI && this.drawingTools.editUI.isEditUIVisible()) {
-                    this.drawingTools.editUI.hide();
+                const editUI = this.drawingTools?.editUI;
+                if (editUI?.isEditUIVisible()) {
+                    const pickerOpen = typeof CitranaColorPicker !== 'undefined' &&
+                        CitranaColorPicker.isPickerDialogOpen();
+                    if (!pickerOpen) {
+                        editUI.hide();
+                    }
                 }
                 if (this.drawingTools.isEditingPlanet) {
                     this.drawingTools.dismissPlanetEditing();
@@ -402,6 +448,14 @@ class CitranaApp {
             }
 
             this.handleMouseDown(e);
+        });
+        this.stage.on('dblclick', (e) => {
+            this.drawingTools.handleSelectDoubleClick(e);
+        });
+        this.stage.on('click', (e) => {
+            if (this.currentTool === 'select') {
+                this.drawingTools.handleSelectPenClick(e);
+            }
         });
         this.stage.on('mousemove', (e) => this.handleMouseMove(e));
         this.stage.on('mouseup', (e) => this.handleMouseUp(e));
@@ -1193,16 +1247,15 @@ class CitranaApp {
         if (mainBtn) mainBtn.classList.add('active');
 
         // Update cursor and touch behavior
-        const container = document.getElementById('canvas-container');
         if (tool === 'hand') {
-            container.style.cursor = 'grab';
+            this.setCanvasCursor('grab');
             // Don't enable draggable here - only enable it during touch/mouse down
         } else if (tool === 'select') {
-            container.style.cursor = 'default';
+            this.setCanvasCursor('default');
             // Ensure stage is not draggable when switching to select tool
             this.stage.draggable(false);
         } else {
-            container.style.cursor = 'crosshair';
+            this.setCanvasCursor('crosshair');
             // Ensure stage is not draggable for drawing tools
             this.stage.draggable(false);
         }
@@ -1216,10 +1269,19 @@ class CitranaApp {
         if (this.currentTool === 'hand') {
             // Safari-specific: Ensure stage is draggable for hand tool
             this.stage.draggable(true);
-            document.getElementById('canvas-container').style.cursor = 'grabbing';
+            this.setCanvasCursor('grabbing');
         } else if (this.currentTool === 'select') {
             this.drawingTools.handleSelectMouseDown(pos, e);
         } else if (pos) {
+            // Pen stays active after a stroke — do not start on top of an existing annotation
+            if (this.currentTool === 'pen' && this.isAnnotationTarget(e.target)) {
+                return;
+            }
+
+            if (this.currentTool === 'pen' && !this.isEmptyCanvasTarget(e.target)) {
+                e.cancelBubble = true;
+            }
+
             this.lastPoint = pos;
             this.drawingTools.startDrawing(pos, this.currentTool);
             this.isDrawing = this.drawingTools.isDrawing;
@@ -1239,7 +1301,7 @@ class CitranaApp {
         if (this.currentTool === 'hand') {
             // Safari-specific: Disable stage dragging when hand tool is released
             this.stage.draggable(false);
-            document.getElementById('canvas-container').style.cursor = 'grab';
+            this.setCanvasCursor('grab');
         } else if (this.currentTool === 'select') {
             this.drawingTools.handleSelectMouseUp();
         } else {
@@ -1268,7 +1330,7 @@ class CitranaApp {
         if (this.currentTool === 'hand') {
             // Enable stage dragging for hand tool
             this.stage.draggable(true);
-            document.getElementById('canvas-container').style.cursor = 'grabbing';
+            this.setCanvasCursor('grabbing');
         } else if (this.currentTool === 'select') {
             const pos = this.drawingTools.getPrecisePositionFromKonva(e);
             if (this.isEmptyCanvasTarget(e.target)) {
@@ -1278,6 +1340,9 @@ class CitranaApp {
         } else {
             // For drawing tools, use the existing touch handling
             const pos = this.drawingTools.getPrecisePositionFromKonva(e);
+            if (this.currentTool === 'pen' && this.isAnnotationTarget(e.target)) {
+                return;
+            }
             if (pos) {
                 this.lastPoint = pos;
                 this.drawingTools.startDrawing(pos, this.currentTool);
@@ -1324,7 +1389,7 @@ class CitranaApp {
         if (this.currentTool === 'hand') {
             // Disable stage dragging when hand tool is released
             this.stage.draggable(false);
-            document.getElementById('canvas-container').style.cursor = 'grab';
+            this.setCanvasCursor('grab');
         } else if (this.currentTool === 'select') {
             this.drawingTools.handleSelectTouchUp();
         } else {
@@ -1811,6 +1876,7 @@ class CitranaApp {
         this.restoreDrawings(state.drawingData);
 
         this.drawingTools?.updateDrawingObjectsDraggable(this.currentTool === 'select');
+        this.drawingTools?.syncBoundingBoxListening?.();
 
         // loadChartData → clearChart() resets stage to 1× at origin; restore user's zoom/pan
         this.stage.scale({ x: savedViewport.scaleX, y: savedViewport.scaleY });

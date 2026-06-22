@@ -78,6 +78,12 @@ body {
   cursor: crosshair;
 }
 
+/* Konva injects canvases above the container — inherit tool cursor (Brave/Safari need explicit inherit) */
+.canvas-container canvas,
+.canvas-container .konvajs-content {
+  cursor: inherit;
+}
+
 /* Ephemeral laser pointer — Canvas 2D overlay above Konva stage */
 .citrana-laser-canvas {
   position: absolute;
