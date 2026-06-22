@@ -40,7 +40,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
    - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2098-lines)
-   - [History Engine (citrana-history.js)](#history-engine-historyjs---94-lines)
+   - [History Engine (citrana-history.js)](#history-engine-citrana-historyjs---94-lines)
    - [Chart Coordinator](#chart-coordinator-chart-coordinatorjs---334-lines)
    - [South Indian Chart Template](#south-indian-chart-template-chart-templates-southjs---984-lines)
    - [North Indian Chart Template](#north-indian-chart-template-chart-templates-northjs---1011-lines)

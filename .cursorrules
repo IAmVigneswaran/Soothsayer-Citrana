@@ -229,7 +229,7 @@ The application uses a mobile-first approach with three main breakpoints:
 - `body { position: fixed; inset: 0 }` and `.app-container { position: absolute; inset: 0 }` — avoids iOS `100dvh` bottom gap
 - Floating UI uses `calc(inset + safe-area)`; Graha library repositions to bottom stack on mobile (`--ui-bottom-stack`)
 - `app.handleResize()` uses `visualViewport` when available
-- Mobile (`≤768px`): arrow, line, pen, and laser toolbar buttons hidden; `#laser-help-shortcut` hidden in Help; Help moves to bottom-left
+- Mobile (`≤768px`): arrow, line, pen, and laser toolbar buttons visible with horizontal scroll chevrons when tools overflow; Help moves to bottom-left; Items button in zoom bar
 
 **CSS responsive note:** Most tablet/mobile rules are in one `@media (max-width: 768px)` block near the top of the responsive section. Overrides that must beat later base component rules (Help/About position, About/Welcome/Confirmation/Export modal sizing) use **additional** `@media (max-width: 768px)` blocks placed **after** those base selectors in `styles.css`.
 
