@@ -140,8 +140,9 @@ class CitranaItemsMenu {
             ? `<span class="items-row-icon" aria-hidden="true"><i data-lucide="${rowIcon}"></i></span>`
             : '';
         const selectedClass = options.selected ? ' items-row-selected' : '';
+        const extraClass = options.extraClass ? ` ${options.extraClass}` : '';
         return `
-            <div class="items-row${selectedClass}">
+            <div class="items-row${selectedClass}${extraClass}">
                 <div class="items-row-main">
                     ${iconHtml}
                     <div class="items-row-label-wrap">
@@ -246,7 +247,11 @@ class CitranaItemsMenu {
         const contextMenuTitle = cm.getContextMenuItemsTitle();
         const contextMenuMeta = cm.getContextMenuItemsMeta();
         const contextMenuActionLabel = cm.getContextMenuToggleActionLabel();
-        const contextMenuIcon = cm.isCanvasContextMenuEnabled() ? 'circle-off' : 'circle';
+        const contextMenuEnabled = cm.isCanvasContextMenuEnabled();
+        const contextMenuActionIcon = contextMenuEnabled ? 'power-off' : 'power';
+        const contextMenuRowClass = contextMenuEnabled
+            ? 'items-row-context-menu-on'
+            : 'items-row-context-menu-off';
 
         const rows = [
             this.renderRow(
@@ -258,8 +263,9 @@ class CitranaItemsMenu {
             this.renderRow(
                 contextMenuTitle,
                 contextMenuMeta,
-                this.actionButton('toggle-context-menu', contextMenuActionLabel, contextMenuIcon),
-                contextMenuIcon
+                this.actionButton('toggle-context-menu', contextMenuActionLabel, contextMenuActionIcon),
+                'square-menu',
+                { extraClass: contextMenuRowClass }
             )
         ].join('');
 

@@ -1716,6 +1716,14 @@ body.presentation-view .about-btn {
   background: #f3f4f6;
 }
 
+.items-row-context-menu-on {
+  background: #f0fdf4;
+}
+
+.items-row-context-menu-off {
+  background: #fef2f2;
+}
+
 .items-row-actions {
   display: flex;
   align-items: center;
