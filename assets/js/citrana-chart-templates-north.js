@@ -612,12 +612,16 @@ class NorthIndianChartTemplate {
 
         // Detect mobile vs desktop
         const isMobile = CitranaDevice.isCompactViewport();
-        const scaleFactor = isMobile ? 0.95 : 0.7;
         const extraTopMargin = isMobile ? 20 : -50;
-
-        const scaleX = (stageWidth * scaleFactor) / localBounds.width;
-        const scaleY = (stageHeight * scaleFactor) / localBounds.height;
-        const newScale = Math.min(scaleX, scaleY, 2); // Max scale of 2
+        let newScale;
+        if (isMobile) {
+            newScale = 0.82;
+        } else {
+            const scaleFactor = 0.7;
+            const scaleX = (stageWidth * scaleFactor) / localBounds.width;
+            const scaleY = (stageHeight * scaleFactor) / localBounds.height;
+            newScale = Math.min(scaleX, scaleY, 2);
+        }
 
         this.stage.scale({
             x: newScale,
