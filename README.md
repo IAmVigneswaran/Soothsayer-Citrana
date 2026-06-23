@@ -36,7 +36,7 @@ This codebase is developed using AI agents.
 - Presentation View: Right-click the canvas to hide toolbar, zoom bar, Graha library, Help, and About; choose **Exit Presentation View** to restore
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
-- Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark; transparency toolbar locks on and restores a white background when turned off), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
+- Chart Display Options: Choose **Zoom Step** (**Fine (1%)** default, **Small (~10%)**, **Medium (~20%)**, or **Large (~25%)**) for zoom buttons, keyboard **+**/**−**, and scroll wheel; hide North or South chart indicators; or enable **Save Chart Only** (transparent chart-area export with no watermark; transparency toolbar locks on and restores a white background when turned off), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
 - Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); off by default on touch devices (enable from **Canvas Items** → **Canvas** → **Context Menu**); suppressed while drawing tools are active so strokes are not interrupted
 - Canvas Items: Layers button in the zoom bar or shortcut **I** opens chart actions, Bhavas, Grahas, and Annotations on desktop and touch devices; **Section Anchors** jump between sections (pinned below the description while the list scrolls; swipe or scroll left and right when they overflow); **Clear Selection**, **Context Menu**, and **Graha Library** (On/Off with green/red row tint) in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading Annotations offer separate **Edit text** and **Style** actions
 - Keyboard Shortcuts: Tools (including **K** for Laser Pointer and **I** for Canvas Items), Graha Library pages **1**–**5**, undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
@@ -166,6 +166,7 @@ Diamond layout with dynamic Rashi numbering. Grahas reposition automatically whe
 
 Click the gear icon in the toolbar (after Save) to open **Options**.
 
+- **Zoom Step** — **Fine (1%)** (default) moves one percent at a time; **Small (~10%)**, **Medium (~20%)**, and **Large (~25%)** use larger steps for zoom buttons, keyboard **+**/**−**, and scroll wheel when zoom is unlocked
 - **Hide North Indian Chart Indicators** — hides bhava numbers (black corner boxes)
 - **Hide South Indian Chart Indicators** — hides the lagna diagonal line, yellow bhava numbers, and black rashi numbers
 - **Save Chart Only** — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and Annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark (transparency toolbar turns on automatically; turning **Save Chart Only** off restores a white background export)
@@ -228,7 +229,7 @@ Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Cmd+Z** undo and **Ct
 
 #### Navigation
 
-- Zoom is locked by default. Click the lock icon in the zoom bar to unlock zoom, then use the zoom bar or mouse wheel to zoom in/out
+- Zoom is locked by default. Click the lock icon in the zoom bar to unlock zoom, then use the zoom bar, mouse wheel, or keyboard **+**/**−** to zoom in/out. Step size is set in **Options** → **Zoom Step** (default **Fine (1%)**)
 - Reset zoom refits the chart
 - The Hand tool allows you to pan around the canvas
 - On narrow screens, use the chevrons at the edges of the top toolbar and Edit UI to scroll through controls; subtle edge fades indicate when more tools are off-screen
@@ -256,7 +257,7 @@ Open **Canvas Items** from the layers icon in the zoom bar (after the zoom lock)
 Use **Save Session** and **Open Session** in the toolbar to download or restore a `.citrana.json` working file. A progress dialog appears while the file is prepared or loaded.
 
 - Session files use the `.citrana.json` extension only — other file types are rejected
-- **Included:** chart layout, Grahas, Annotations, and Options (indicator toggles and Save Chart Only)
+- **Included:** chart layout, Grahas, Annotations, and Options (indicator toggles, zoom step, and Save Chart Only)
 - **Not included:** undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan
 - Opening a session replaces your current chart and Annotations; Citrana asks for confirmation if you already have work on the canvas
 

@@ -133,70 +133,56 @@ class ChartCoordinator {
         this.currentChartType = null;
     }
 
+    getZoomStep() {
+        return CitranaZoom.resolveZoomStep(window.app?.options?.zoomStep);
+    }
+
+    applyZoomAtAnchor(oldScale, newScale, anchor) {
+        if (!this.stage || newScale === oldScale) {
+            return;
+        }
+
+        const mousePointTo = {
+            x: (anchor.x - this.stage.x()) / oldScale,
+            y: (anchor.y - this.stage.y()) / oldScale
+        };
+
+        this.stage.scale({
+            x: newScale,
+            y: newScale
+        });
+
+        this.stage.position({
+            x: anchor.x - mousePointTo.x * newScale,
+            y: anchor.y - mousePointTo.y * newScale
+        });
+        this.stage.batchDraw();
+    }
+
     zoomIn() {
         if (!this.stage) return;
 
-        const scaleBy = 1.2;
         const oldScale = this.stage.scaleX();
-        const newScale = oldScale * scaleBy;
+        const newScale = CitranaZoom.computeNextScale(oldScale, 'in', this.getZoomStep());
+        const stageCenter = {
+            x: this.stage.width() / 2,
+            y: this.stage.height() / 2
+        };
 
-        if (newScale <= 5) { // Max zoom limit
-            // Get the center of the stage
-            const stageCenter = {
-                x: this.stage.width() / 2,
-                y: this.stage.height() / 2
-            };
-
-            const mousePointTo = {
-                x: (stageCenter.x - this.stage.x()) / oldScale,
-                y: (stageCenter.y - this.stage.y()) / oldScale
-            };
-
-            this.stage.scale({
-                x: newScale,
-                y: newScale
-            });
-
-            const newPos = {
-                x: stageCenter.x - mousePointTo.x * newScale,
-                y: stageCenter.y - mousePointTo.y * newScale
-            };
-            this.stage.position(newPos);
-            this.stage.batchDraw();
-        }
+        this.applyZoomAtAnchor(oldScale, newScale, stageCenter);
     }
 
     zoomOut() {
         if (!this.stage) return;
 
-        const scaleBy = 0.8;
         const oldScale = this.stage.scaleX();
-        const newScale = oldScale * scaleBy;
+        const newScale = CitranaZoom.computeNextScale(oldScale, 'out', this.getZoomStep());
+        const stageCenter = {
+            x: this.stage.width() / 2,
+            y: this.stage.height() / 2
+        };
 
-        if (newScale >= 0.1) { // Min zoom limit
-            // Get the center of the stage
-            const stageCenter = {
-                x: this.stage.width() / 2,
-                y: this.stage.height() / 2
-            };
-
-            const mousePointTo = {
-                x: (stageCenter.x - this.stage.x()) / oldScale,
-                y: (stageCenter.y - this.stage.y()) / oldScale
-            };
-
-            this.stage.scale({
-                x: newScale,
-                y: newScale
-            });
-
-            const newPos = {
-                x: stageCenter.x - mousePointTo.x * newScale,
-                y: stageCenter.y - mousePointTo.y * newScale
-            };
-            this.stage.position(newPos);
-            this.stage.batchDraw();
-        }
+        this.applyZoomAtAnchor(oldScale, newScale, stageCenter);
     }
 
     zoomToFit() {

@@ -72,6 +72,7 @@ jobs:
           terser assets/js/citrana-rashis.js -o assets/js/citrana-rashis.min.js --compress --mangle
           terser assets/js/citrana-selection.js -o assets/js/citrana-selection.min.js --compress --mangle
           terser assets/js/citrana-session.js -o assets/js/citrana-session.min.js --compress --mangle
+          terser assets/js/citrana-zoom.js -o assets/js/citrana-zoom.min.js --compress --mangle
       
       - name: Update HTML to use minified local files only
         run: |
@@ -98,6 +99,7 @@ jobs:
           sed -i 's|src="assets/js/citrana-rashis.js"|src="assets/js/citrana-rashis.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-selection.js"|src="assets/js/citrana-selection.min.js"|g' index.html
           sed -i 's|src="assets/js/citrana-session.js"|src="assets/js/citrana-session.min.js"|g' index.html
+          sed -i 's|src="assets/js/citrana-zoom.js"|src="assets/js/citrana-zoom.min.js"|g' index.html
       
       - name: Setup Pages
         uses: actions/configure-pages@v5

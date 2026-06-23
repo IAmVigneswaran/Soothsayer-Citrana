@@ -32,20 +32,23 @@ User-facing copy and docs use **Bhava**, **Graha**, and **Rashi** (with correct 
 | 8 | `assets/js/citrana-annotation-fonts.js` | `CitranaAnnotationFonts` (Normal / Hand-written) |
 | 9 | `assets/js/citrana-chart-templates-south.js` | `SouthIndianChartTemplate` |
 | 10 | `assets/js/citrana-chart-templates-north.js` | `NorthIndianChartTemplate` |
-| 11 | `assets/js/citrana-chart-coordinator.js` | `ChartCoordinator` |
-| 12 | `assets/js/citrana-planet-system.js` | `GrahaSystem` (`PlanetSystem` class) |
-| 13 | `assets/js/citrana-arrow.js` | `CitranaArrow` |
-| 14 | `assets/js/citrana-colorpicker.js` | `CitranaColorPicker` |
-| 15 | `assets/js/citrana-laser.js` | `CitranaLaser` |
-| 16 | `assets/js/citrana-drawing-tools.js` | `DrawingTools` |
-| 17 | `assets/js/citrana-edit-ui.js` | `EditUI` |
-| 18 | `assets/js/citrana-context-menu.js` | `ContextMenu` |
-| 19 | `assets/js/citrana-items-menu.js` | `CitranaItemsMenu` |
-| 20 | `assets/js/citrana-history.js` | `CitranaHistory` |
-| 21 | `assets/js/citrana-session.js` | `CitranaSession` |
-| 22 | `assets/js/citrana-app.js` | `CitranaApp` → `window.app` on `DOMContentLoaded` |
+| 11 | `assets/js/citrana-zoom.js` | `CitranaZoom` (zoom step presets) |
+| 12 | `assets/js/citrana-chart-coordinator.js` | `ChartCoordinator` |
+| 13 | `assets/js/citrana-planet-system.js` | `GrahaSystem` (`PlanetSystem` class) |
+| 14 | `assets/js/citrana-arrow.js` | `CitranaArrow` |
+| 15 | `assets/js/citrana-colorpicker.js` | `CitranaColorPicker` |
+| 16 | `assets/js/citrana-laser.js` | `CitranaLaser` |
+| 17 | `assets/js/citrana-drawing-tools.js` | `DrawingTools` |
+| 18 | `assets/js/citrana-edit-ui.js` | `EditUI` |
+| 19 | `assets/js/citrana-context-menu.js` | `ContextMenu` |
+| 20 | `assets/js/citrana-items-menu.js` | `CitranaItemsMenu` |
+| 21 | `assets/js/citrana-history.js` | `CitranaHistory` |
+| 22 | `assets/js/citrana-session.js` | `CitranaSession` |
+| 23 | `assets/js/citrana-app.js` | `CitranaApp` → `window.app` on `DOMContentLoaded` |
 
-Script order matters: vendor libs first; `citrana-debug.js`, then `citrana-device.js` and `citrana-rashis.js` before `citrana-selection.js` and `citrana-annotation-fonts.js`; chart templates and coordinator before `citrana-planet-system.js`; `citrana-arrow.js` before `citrana-colorpicker.js`; `citrana-laser.js` before `citrana-drawing-tools.js`; `citrana-context-menu.js` before `citrana-items-menu.js`; `citrana-history.js` and `citrana-session.js` immediately before `citrana-app.js`.
+**Script order is dependency order, not alphabetical.** Classic `<script>` tags expose globals; each file must load after its dependencies. `citrana-app.js` is always last. Do not reorder `index.html` scripts A–Z — see [AGENT.md](AGENT.md) — Script load order for the full list and rules when adding modules.
+
+Script order summary: vendor libs first; `citrana-debug.js`, then `citrana-device.js` and `citrana-rashis.js` before `citrana-selection.js` and `citrana-annotation-fonts.js`; chart templates, then `citrana-zoom.js`, then coordinator before `citrana-planet-system.js`; `citrana-arrow.js` before `citrana-colorpicker.js`; `citrana-laser.js` before `citrana-drawing-tools.js`; `citrana-context-menu.js` before `citrana-items-menu.js`; `citrana-history.js` and `citrana-session.js` immediately before `citrana-app.js`.
 
 ## High-Level Component Diagram
 

@@ -52,6 +52,11 @@ const CitranaSession = (() => {
             throw new Error('Session file contains invalid options.');
         }
 
+        if (options.zoomStep !== undefined
+            && (typeof options.zoomStep !== 'string' || !CitranaZoom.VALID_STEPS.has(options.zoomStep))) {
+            throw new Error('Session file contains invalid options.');
+        }
+
         return true;
     }
 
@@ -88,7 +93,8 @@ const CitranaSession = (() => {
             options: {
                 northHideIndicators: data.options.northHideIndicators,
                 southHideIndicators: data.options.southHideIndicators,
-                saveChartOnly: data.options.saveChartOnly
+                saveChartOnly: data.options.saveChartOnly,
+                zoomStep: CitranaZoom.resolveZoomStep(data.options.zoomStep)
             }
         };
     }
@@ -112,7 +118,8 @@ const CitranaSession = (() => {
             options: {
                 northHideIndicators: !!app.options?.northHideIndicators,
                 southHideIndicators: !!app.options?.southHideIndicators,
-                saveChartOnly: !!app.options?.saveChartOnly
+                saveChartOnly: !!app.options?.saveChartOnly,
+                zoomStep: CitranaZoom.resolveZoomStep(app.options?.zoomStep)
             }
         };
     }
@@ -132,6 +139,9 @@ const CitranaSession = (() => {
         }
         if (typeof app.setSaveChartOnly === 'function') {
             app.setSaveChartOnly(!!options.saveChartOnly);
+        }
+        if (typeof app.setZoomStep === 'function') {
+            app.setZoomStep(CitranaZoom.resolveZoomStep(options.zoomStep));
         }
         if (typeof app.syncOptionsUI === 'function') {
             app.syncOptionsUI();

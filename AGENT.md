@@ -112,7 +112,7 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 | Path | Lines | Description |
 |------|-------|-------------|
-| `index.html` | ~586 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Canvas Items modal (`#items-modal-nav` Section Anchors, pinned header/description, `#items-modal-body` scroll); toolbar + Edit UI scroll wraps; Help usage guide |
+| `index.html` | ~600 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Canvas Items modal; Options modal (zoom step); script tags at bottom in **dependency order** (see below) |
 | `robots.txt` | — | Search engine rules |
 | `sitemap.xml` | — | Sitemap |
 | `assets/css/styles.css` | ~2964 | Complete styling; primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`); `#graha-library.graha-library-hidden`; `.page-dots-chevron`; `#items-modal` pinned layout; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` (toolbar + Edit UI edge fades) |
@@ -134,7 +134,8 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 | `assets/js/citrana-planet-system.js` | ~962 | Graha library and drag-drop; visibility toggle; dots-bar swipe; chevron hints |
 | `assets/js/citrana-rashis.js` | ~49 | Rashi names, Lucide zodiac icons, grid numbers |
 | `assets/js/citrana-selection.js` | ~98 | Selection Pill |
-| `assets/js/citrana-session.js` | ~214 | Save/open `.citrana.json` session files |
+| `assets/js/citrana-session.js` | ~225 | Save/open `.citrana.json` session files |
+| `assets/js/citrana-zoom.js` | ~59 | Zoom step presets (`CitranaZoom`) for buttons, keyboard, and scroll wheel |
 | `assets/vendor/konva.min.js` | — | Konva 9.3.20 (self-hosted; loaded in `<head>`) |
 | `assets/vendor/lucide.min.js` | — | Lucide 0.576.0 (self-hosted) |
 | `assets/vendor/colorpicker.iife.min.js` | — | JSColorPicker 1.1.0 (self-hosted) |
@@ -155,6 +156,39 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 | `.gitignore` | — | Git ignore rules |
 
 > Line counts are approximate; run `wc -l` after significant edits. Update About modal version in `index.html` on each release.
+
+## Script load order (`index.html`)
+
+Citrana uses classic `<script>` tags (no bundler). Each file expects globals from scripts **above** it. **Do not sort alphabetically** — that would load `citrana-app.js` before `ChartCoordinator`, `PlanetSystem`, `CitranaZoom`, etc., and break init.
+
+**Vendor and head:** Konva loads in `<head>`; Lucide and JSColorPicker load at the bottom before local modules.
+
+**Local `citrana-*.js` order** (must match `index.html`):
+
+1. `citrana-debug.js` — logging helper
+2. `citrana-device.js` — `CitranaDevice`
+3. `citrana-rashis.js` — `CitranaRashis`
+4. `citrana-selection.js` — `CitranaSelection` (uses `CitranaDevice`)
+5. `citrana-annotation-fonts.js`
+6. `citrana-chart-templates-south.js` — uses `CitranaRashis`, `CitranaDevice`
+7. `citrana-chart-templates-north.js` — same
+8. `citrana-zoom.js` — `CitranaZoom` (before coordinator and session)
+9. `citrana-chart-coordinator.js` — templates + `CitranaZoom`
+10. `citrana-planet-system.js` — coordinator
+11. `citrana-arrow.js` — before color picker
+12. `citrana-colorpicker.js`
+13. `citrana-laser.js` — before drawing tools
+14. `citrana-drawing-tools.js`
+15. `citrana-edit-ui.js`
+16. `citrana-context-menu.js` — before Canvas Items menu
+17. `citrana-items-menu.js`
+18. `citrana-history.js`
+19. `citrana-session.js` — uses `CitranaZoom`
+20. `citrana-app.js` — **always last**; creates `window.app`
+
+**When adding a module:** insert it after everything it depends on and before anything that depends on it; update `index.html`, `.github/workflows/static.yml` (minify + `sed` rewrite), and this list. CI minifies files in alphabetical order for convenience — that order is **not** the browser load order.
+
+See also [ARCHITECTURE.md](ARCHITECTURE.md) — Runtime Composition table.
 
 ## Core Components Architecture
 
@@ -1248,7 +1282,7 @@ Edit the Graha data objects in assets/js/citrana-planet-system.js:
 - **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
 - **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
 - **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
-- **Minified local JS:** all 19 `citrana-*.js` modules (alphabetically in `static.yml`): `citrana-annotation-fonts`, `citrana-app`, `citrana-arrow`, `citrana-chart-coordinator`, `citrana-chart-templates-north`, `citrana-chart-templates-south`, `citrana-colorpicker`, `citrana-context-menu`, `citrana-debug`, `citrana-device`, `citrana-drawing-tools`, `citrana-edit-ui`, `citrana-history`, `citrana-items-menu`, `citrana-laser`, `citrana-planet-system`, `citrana-rashis`, `citrana-selection`, `citrana-session`
+- **Minified local JS:** all 20 `citrana-*.js` modules (alphabetically in `static.yml` terser step only — **not** browser load order): `citrana-annotation-fonts`, `citrana-app`, `citrana-arrow`, `citrana-chart-coordinator`, `citrana-chart-templates-north`, `citrana-chart-templates-south`, `citrana-colorpicker`, `citrana-context-menu`, `citrana-debug`, `citrana-device`, `citrana-drawing-tools`, `citrana-edit-ui`, `citrana-history`, `citrana-items-menu`, `citrana-laser`, `citrana-planet-system`, `citrana-rashis`, `citrana-selection`, `citrana-session`, `citrana-zoom`
 - **Not minified in CI:** `assets/vendor/*` (Konva, Lucide, JSColorPicker — already minified)
 
 ### Local development

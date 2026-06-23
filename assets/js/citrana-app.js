@@ -27,7 +27,8 @@ class CitranaApp {
         this.options = {
             northHideIndicators: localStorage.getItem('citrana_north_hide_indicators') === '1',
             southHideIndicators: localStorage.getItem('citrana_south_hide_indicators') === '1',
-            saveChartOnly: localStorage.getItem('citrana_save_chart_only') === '1'
+            saveChartOnly: localStorage.getItem('citrana_save_chart_only') === '1',
+            zoomStep: CitranaZoom.resolveZoomStep(localStorage.getItem('citrana_zoom_step'))
         };
         this.init();
     }
@@ -338,6 +339,7 @@ class CitranaApp {
         const southHideIndicatorsToggle = document.getElementById('south-hide-indicators-toggle');
         const northHideIndicatorsToggle = document.getElementById('north-hide-indicators-toggle');
         const saveChartOnlyToggle = document.getElementById('save-chart-only-toggle');
+        const zoomStepSelect = document.getElementById('zoom-step-select');
 
         if (northHideIndicatorsToggle) {
             northHideIndicatorsToggle.checked = this.options.northHideIndicators;
@@ -360,6 +362,13 @@ class CitranaApp {
             });
         }
 
+        if (zoomStepSelect) {
+            zoomStepSelect.value = this.options.zoomStep;
+            zoomStepSelect.addEventListener('change', (e) => {
+                this.setZoomStep(e.target.value);
+            });
+        }
+
         if (optionsBtn && optionsModal && optionsModalClose) {
             optionsBtn.addEventListener('click', () => {
                 if (northHideIndicatorsToggle) {
@@ -370,6 +379,9 @@ class CitranaApp {
                 }
                 if (saveChartOnlyToggle) {
                     saveChartOnlyToggle.checked = this.options.saveChartOnly;
+                }
+                if (zoomStepSelect) {
+                    zoomStepSelect.value = this.options.zoomStep;
                 }
                 this.openModal(optionsModal);
             });
@@ -1483,35 +1495,15 @@ class CitranaApp {
 
         e.evt.preventDefault();
 
-        const scaleBy = 1.1;
         const oldScale = this.stage.scaleX();
-        const MIN_ZOOM = 0.1;
-        const MAX_ZOOM = 5;
-
-        let newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
-        newScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newScale));
+        const direction = e.evt.deltaY > 0 ? 'out' : 'in';
+        const newScale = CitranaZoom.computeNextScale(oldScale, direction, this.options.zoomStep);
 
         if (newScale === oldScale) {
             return;
         }
 
-        const mousePointTo = {
-            x: (pointer.x - this.stage.x()) / oldScale,
-            y: (pointer.y - this.stage.y()) / oldScale
-        };
-
-        this.stage.scale({
-            x: newScale,
-            y: newScale
-        });
-
-        const newPos = {
-            x: pointer.x - mousePointTo.x * newScale,
-            y: pointer.y - mousePointTo.y * newScale
-        };
-
-        this.stage.position(newPos);
-        this.stage.batchDraw();
+        this.chartTemplates?.applyZoomAtAnchor(oldScale, newScale, pointer);
     }
 
     isTouchDevice() {
@@ -1806,10 +1798,26 @@ class CitranaApp {
         this.applySaveChartOnlyTransparency();
     }
 
+    /**
+     * Zoom step for buttons, keyboard +/-, and scroll wheel (saved in localStorage).
+     * @param {string} step - fine | small | medium | large
+     */
+    setZoomStep(step) {
+        const resolved = CitranaZoom.resolveZoomStep(step);
+        this.options.zoomStep = resolved;
+        localStorage.setItem('citrana_zoom_step', resolved);
+
+        const zoomStepSelect = document.getElementById('zoom-step-select');
+        if (zoomStepSelect) {
+            zoomStepSelect.value = resolved;
+        }
+    }
+
     syncOptionsUI() {
         const northHideIndicatorsToggle = document.getElementById('north-hide-indicators-toggle');
         const southHideIndicatorsToggle = document.getElementById('south-hide-indicators-toggle');
         const saveChartOnlyToggle = document.getElementById('save-chart-only-toggle');
+        const zoomStepSelect = document.getElementById('zoom-step-select');
 
         if (northHideIndicatorsToggle) {
             northHideIndicatorsToggle.checked = this.options.northHideIndicators;
@@ -1819,6 +1827,9 @@ class CitranaApp {
         }
         if (saveChartOnlyToggle) {
             saveChartOnlyToggle.checked = this.options.saveChartOnly;
+        }
+        if (zoomStepSelect) {
+            zoomStepSelect.value = this.options.zoomStep;
         }
     }
 

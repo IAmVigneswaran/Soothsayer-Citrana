@@ -224,8 +224,20 @@
                <i data-lucide="x"></i>
                </button>
             </div>
-            <p id="options-modal-description" class="help-modal-description">Chart display and export preferences saved in this browser.</p>
+            <p id="options-modal-description" class="help-modal-description">Chart display, zoom, and export preferences saved in this browser.</p>
             <div class="options-list">
+               <div class="options-select-row">
+                  <label class="options-select-text" for="zoom-step-select">
+                     <span class="options-toggle-label">Zoom Step</span>
+                     <span class="options-toggle-hint">Fine: 1%, Small: ~10%, Medium: ~20%, Large: ~25%</span>
+                  </label>
+                  <select id="zoom-step-select" class="options-select-input" aria-label="Zoom step">
+                     <option value="fine" selected>Fine (1%)</option>
+                     <option value="small">Small (~10%)</option>
+                     <option value="medium">Medium (~20%)</option>
+                     <option value="large">Large (~25%)</option>
+                  </select>
+               </div>
                <label class="options-toggle-row" for="north-hide-indicators-toggle">
                   <span class="options-toggle-text">
                      <span class="options-toggle-label">Hide North Indian Chart Indicators</span>
@@ -365,6 +377,7 @@
                   </ul>
                   <p><strong>Chart Display Options:</strong> Click the gear icon in the toolbar (after Save) to open <strong>Options</strong>.</p>
                   <ul class="help-sublist">
+                     <li><strong>Zoom Step</strong> — <strong>Fine (1%)</strong> is the default and moves one percent at a time; <strong>Small (~10%)</strong>, <strong>Medium (~20%)</strong>, and <strong>Large (~25%)</strong> use larger steps for zoom buttons, keyboard <strong>+</strong>/<strong>−</strong>, and scroll wheel (when zoom is unlocked).</li>
                      <li><strong>Hide North Indian Chart Indicators</strong> — hides bhava numbers (black corner boxes).</li>
                      <li><strong>Hide South Indian Chart Indicators</strong> — hides the lagna diagonal line, yellow bhava numbers, and black rashi numbers.</li>
                      <li><strong>Save Chart Only</strong> — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and Annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark.</li>
@@ -419,7 +432,7 @@
                   <p><strong>Save and Open Session:</strong> Use <strong>Save Session</strong> and <strong>Open Session</strong> in the toolbar to download or restore a working file. A progress dialog appears while the file is prepared or loaded.</p>
                   <ul class="help-sublist">
                      <li>Session files use the <strong>.citrana.json</strong> extension only — other file types are rejected.</li>
-                     <li><strong>Included:</strong> chart layout, Grahas, Annotations, and Options (indicator toggles and Save Chart Only).</li>
+                     <li><strong>Included:</strong> chart layout, Grahas, Annotations, and Options (indicator toggles, zoom step, and Save Chart Only).</li>
                      <li><strong>Not included:</strong> undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan.</li>
                      <li>Opening a session replaces your current chart and Annotations; Citrana asks for confirmation if you already have work on the canvas.</li>
                   </ul>
@@ -560,6 +573,7 @@
       <script src="assets/js/citrana-annotation-fonts.js"></script>
       <script src="assets/js/citrana-chart-templates-south.js"></script>
       <script src="assets/js/citrana-chart-templates-north.js"></script>
+      <script src="assets/js/citrana-zoom.js"></script>
       <script src="assets/js/citrana-chart-coordinator.js"></script>
       <script src="assets/js/citrana-planet-system.js"></script>
       <script src="assets/js/citrana-arrow.js"></script>
