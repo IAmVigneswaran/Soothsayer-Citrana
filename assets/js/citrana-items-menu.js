@@ -14,6 +14,9 @@ class CitranaItemsMenu {
         this._shapes = [];
         this._sectionNav = [];
         this._navObserver = null;
+        this._sectionNavScrollHandler = null;
+        this._sectionNavResizeHandler = null;
+        this._sectionNavScrollMQ = null;
     }
 
     init() {
@@ -157,6 +160,8 @@ class CitranaItemsMenu {
             return;
         }
 
+        this.teardownSectionNavScrollFades();
+
         if (this._sectionNav.length < 2) {
             this.navEl.innerHTML = '';
             this.navEl.hidden = true;
@@ -169,8 +174,9 @@ class CitranaItemsMenu {
         )).join('');
 
         this.navEl.hidden = false;
-        this.navEl.innerHTML = `<div class="items-section-nav">${chips}</div>`;
+        this.navEl.innerHTML = `<div class="items-section-nav-scroll-wrap"><div class="items-section-nav">${chips}</div></div>`;
         this.setupSectionNavObserver();
+        this.setupSectionNavScrollFades();
     }
 
     handleNavClick(e) {
@@ -236,6 +242,62 @@ class CitranaItemsMenu {
     teardownSectionNavObserver() {
         this._navObserver?.disconnect();
         this._navObserver = null;
+    }
+
+    setupSectionNavScrollFades() {
+        const scrollEl = this.navEl?.querySelector('.items-section-nav');
+        const wrapEl = this.navEl?.querySelector('.items-section-nav-scroll-wrap');
+        if (!scrollEl || !wrapEl) {
+            return;
+        }
+
+        this._sectionNavScrollMQ = window.matchMedia('(max-width: 768px)');
+
+        const updateSectionNavFades = () => {
+            if (!this._sectionNavScrollMQ.matches) {
+                wrapEl.classList.remove('items-section-nav-fade-start', 'items-section-nav-fade-end');
+                return;
+            }
+
+            const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+            const hasOverflow = maxScroll > 1;
+
+            wrapEl.classList.toggle('items-section-nav-fade-start', hasOverflow && scrollEl.scrollLeft > 1);
+            wrapEl.classList.toggle('items-section-nav-fade-end', hasOverflow && scrollEl.scrollLeft < maxScroll - 1);
+        };
+
+        this._sectionNavScrollHandler = updateSectionNavFades;
+        scrollEl.addEventListener('scroll', updateSectionNavFades, { passive: true });
+
+        this._sectionNavResizeHandler = () => {
+            requestAnimationFrame(updateSectionNavFades);
+        };
+        window.addEventListener('resize', this._sectionNavResizeHandler);
+        this._sectionNavScrollMQ.addEventListener('change', updateSectionNavFades);
+
+        requestAnimationFrame(updateSectionNavFades);
+    }
+
+    teardownSectionNavScrollFades() {
+        const scrollEl = this.navEl?.querySelector('.items-section-nav');
+        if (scrollEl && this._sectionNavScrollHandler) {
+            scrollEl.removeEventListener('scroll', this._sectionNavScrollHandler);
+        }
+
+        if (this._sectionNavResizeHandler) {
+            window.removeEventListener('resize', this._sectionNavResizeHandler);
+        }
+
+        if (this._sectionNavScrollMQ && this._sectionNavScrollHandler) {
+            this._sectionNavScrollMQ.removeEventListener('change', this._sectionNavScrollHandler);
+        }
+
+        this.navEl?.querySelector('.items-section-nav-scroll-wrap')
+            ?.classList.remove('items-section-nav-fade-start', 'items-section-nav-fade-end');
+
+        this._sectionNavScrollHandler = null;
+        this._sectionNavResizeHandler = null;
+        this._sectionNavScrollMQ = null;
     }
 
     renderRow(label, meta, actionsHtml, rowIcon = '', options = {}) {
