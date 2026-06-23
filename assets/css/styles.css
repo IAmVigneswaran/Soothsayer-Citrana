@@ -1931,11 +1931,19 @@ body.presentation-view .about-btn {
 }
 
 .items-row-context-menu-on {
-  background: #f0fdf4;
+  background: #e6f7ef;
+}
+
+.items-row-context-menu-on .items-row-meta {
+  color: #059669;
 }
 
 .items-row-context-menu-off {
-  background: #fef2f2;
+  background: #fde8ea;
+}
+
+.items-row-context-menu-off .items-row-meta {
+  color: #dc2626;
 }
 
 .items-row-actions {
