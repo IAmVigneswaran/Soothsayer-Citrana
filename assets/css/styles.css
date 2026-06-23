@@ -245,6 +245,10 @@ body.presentation-view .about-btn {
   overflow: visible;
 }
 
+#graha-library.graha-library-hidden {
+  display: none !important;
+}
+
 .planet-library-header {
   padding: 12px 16px;
   border-bottom: 1px solid #000000;

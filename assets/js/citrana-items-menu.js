@@ -68,6 +68,10 @@ class CitranaItemsMenu {
         return window.app?.contextMenu;
     }
 
+    getPlanetSystem() {
+        return window.app?.planetSystem;
+    }
+
     getChartTemplates() {
         return window.app?.chartTemplates;
     }
@@ -419,6 +423,16 @@ class CitranaItemsMenu {
             ? 'items-row-context-menu-on'
             : 'items-row-context-menu-off';
 
+        const planetSystem = this.getPlanetSystem();
+        const grahaLibraryTitle = planetSystem?.getGrahaLibraryItemsTitle?.() || 'Graha Library';
+        const grahaLibraryMeta = planetSystem?.getGrahaLibraryItemsMeta?.() || 'On';
+        const grahaLibraryActionLabel = planetSystem?.getGrahaLibraryToggleActionLabel?.() || 'Disable Graha Library';
+        const grahaLibraryEnabled = planetSystem?.isGrahaLibraryEnabled?.() !== false;
+        const grahaLibraryActionIcon = grahaLibraryEnabled ? 'power-off' : 'power';
+        const grahaLibraryRowClass = grahaLibraryEnabled
+            ? 'items-row-context-menu-on'
+            : 'items-row-context-menu-off';
+
         const rows = [
             this.renderRow(
                 'Clear Selection',
@@ -432,6 +446,13 @@ class CitranaItemsMenu {
                 this.actionButton('toggle-context-menu', contextMenuActionLabel, contextMenuActionIcon),
                 'square-menu',
                 { extraClass: contextMenuRowClass }
+            ),
+            this.renderRow(
+                grahaLibraryTitle,
+                grahaLibraryMeta,
+                this.actionButton('toggle-graha-library', grahaLibraryActionLabel, grahaLibraryActionIcon),
+                'orbit',
+                { extraClass: grahaLibraryRowClass }
             )
         ].join('');
 
@@ -650,6 +671,14 @@ class CitranaItemsMenu {
 
             case 'toggle-context-menu':
                 this.getContextMenu()?.toggleCanvasContextMenu();
+                this.render();
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+                break;
+
+            case 'toggle-graha-library':
+                this.getPlanetSystem()?.toggleGrahaLibrary();
                 this.render();
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();

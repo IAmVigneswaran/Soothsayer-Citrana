@@ -14,6 +14,15 @@ class PlanetSystem {
         // Graha Library UI state
         this.grahaLibrary = null;
         this.planetGrid = null;
+        this._grahaLibraryEnabled = true;
+        try {
+            const stored = localStorage.getItem('citrana_graha_library_enabled');
+            if (stored !== null) {
+                this._grahaLibraryEnabled = stored === 'true';
+            }
+        } catch (_) {
+            // localStorage unavailable
+        }
         this.isDraggingLibrary = false;
         this.dragStartX = 0;
         this.dragStartY = 0;
@@ -364,7 +373,51 @@ class PlanetSystem {
         this.setupLibraryEventListeners();
         this.createPlanetLibrary();
         this.setupDragAndDrop();
+        this.applyGrahaLibraryVisibility();
         citranaDebug('Graha system initialized');
+    }
+
+    isGrahaLibraryEnabled() {
+        return this._grahaLibraryEnabled !== false;
+    }
+
+    setGrahaLibraryEnabled(enabled) {
+        this._grahaLibraryEnabled = !!enabled;
+
+        try {
+            localStorage.setItem('citrana_graha_library_enabled', String(this._grahaLibraryEnabled));
+        } catch (_) {
+            // localStorage unavailable
+        }
+
+        this.applyGrahaLibraryVisibility();
+    }
+
+    toggleGrahaLibrary() {
+        this.setGrahaLibraryEnabled(!this.isGrahaLibraryEnabled());
+        return this.isGrahaLibraryEnabled();
+    }
+
+    applyGrahaLibraryVisibility() {
+        if (!this.grahaLibrary) return;
+        this.grahaLibrary.classList.toggle('graha-library-hidden', !this.isGrahaLibraryEnabled());
+    }
+
+    getGrahaLibraryItemsTitle() {
+        return 'Graha Library';
+    }
+
+    getGrahaLibraryItemsMeta() {
+        const enabled = this.isGrahaLibraryEnabled();
+        const useClick = typeof CitranaDevice !== 'undefined' && CitranaDevice.hasFinePointer();
+        const verb = useClick ? 'Click' : 'Tap';
+        return enabled ? `On · ${verb} to Disable` : `Off · ${verb} to Enable`;
+    }
+
+    getGrahaLibraryToggleActionLabel() {
+        return this.isGrahaLibraryEnabled()
+            ? 'Disable Graha Library'
+            : 'Enable Graha Library';
     }
 
     // --- Graha Library Floating UI ---
