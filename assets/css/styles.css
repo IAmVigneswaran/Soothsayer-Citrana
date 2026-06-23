@@ -844,8 +844,11 @@ body.presentation-view .about-btn {
 
   /* Mobile page dots adjustments */
   .page-dots {
-    padding: 4px 6px;
+    padding: 8px 6px;
     gap: 6px;
+    min-height: 28px;
+    touch-action: pan-x;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .page-dot {

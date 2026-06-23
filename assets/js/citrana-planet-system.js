@@ -349,6 +349,7 @@ class PlanetSystem {
         this.swipeStartX = 0;
         this.swipeStartY = 0;
         this.isSwiping = false;
+        this.pageDotsEl = null;
         this.draggedPlanet = null;
     }
 
@@ -795,6 +796,8 @@ class PlanetSystem {
         // Create page dots container
         const dotsContainer = document.createElement('div');
         dotsContainer.className = 'page-dots';
+        dotsContainer.setAttribute('role', 'tablist');
+        dotsContainer.setAttribute('aria-label', 'Graha Library pages — swipe left or right to change page');
 
         // Create dots for each page
         for (let i = 1; i <= this.totalPages; i++) {
@@ -810,15 +813,17 @@ class PlanetSystem {
     }
 
     setupSwipeEvents() {
-        const library = document.getElementById('graha-library');
-        if (!library) return;
+        if (this.pageDotsEl) {
+            this.pageDotsEl.removeEventListener('touchstart', this.handleSwipeStart);
+            this.pageDotsEl.removeEventListener('touchmove', this.handleSwipeMove);
+            this.pageDotsEl.removeEventListener('touchend', this.handleSwipeEnd);
+        }
 
-        // Remove existing swipe listeners
-        library.removeEventListener('touchstart', this.handleSwipeStart);
-        library.removeEventListener('touchmove', this.handleSwipeMove);
-        library.removeEventListener('touchend', this.handleSwipeEnd);
+        this.pageDotsEl = document.querySelector('#graha-library .page-dots');
+        if (!this.pageDotsEl) {
+            return;
+        }
 
-        // Add new swipe listeners
         this.handleSwipeStart = (e) => {
             this.swipeStartX = e.touches[0].clientX;
             this.swipeStartY = e.touches[0].clientY;
@@ -826,30 +831,34 @@ class PlanetSystem {
         };
 
         this.handleSwipeMove = (e) => {
-            if (!this.swipeStartX) return;
+            if (!this.swipeStartX) {
+                return;
+            }
 
             const deltaX = e.touches[0].clientX - this.swipeStartX;
             const deltaY = e.touches[0].clientY - this.swipeStartY;
 
-            // Check if it's a horizontal swipe
-            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
                 this.isSwiping = true;
-                e.preventDefault(); // Prevent default scroll
+                e.preventDefault();
             }
         };
 
         this.handleSwipeEnd = (e) => {
-            if (!this.isSwiping || !this.swipeStartX) return;
+            if (!this.isSwiping || !this.swipeStartX) {
+                this.swipeStartX = 0;
+                this.swipeStartY = 0;
+                this.isSwiping = false;
+                return;
+            }
 
             const deltaX = e.changedTouches[0].clientX - this.swipeStartX;
-            const threshold = 100; // Minimum swipe distance
+            const threshold = 40;
 
             if (Math.abs(deltaX) > threshold) {
                 if (deltaX > 0 && this.currentPage > 1) {
-                    // Swipe right - go to previous page
                     this.goToPage(this.currentPage - 1);
                 } else if (deltaX < 0 && this.currentPage < this.totalPages) {
-                    // Swipe left - go to next page
                     this.goToPage(this.currentPage + 1);
                 }
             }
@@ -859,14 +868,14 @@ class PlanetSystem {
             this.isSwiping = false;
         };
 
-        library.addEventListener('touchstart', this.handleSwipeStart, {
+        this.pageDotsEl.addEventListener('touchstart', this.handleSwipeStart, {
+            passive: true
+        });
+        this.pageDotsEl.addEventListener('touchmove', this.handleSwipeMove, {
             passive: false
         });
-        library.addEventListener('touchmove', this.handleSwipeMove, {
-            passive: false
-        });
-        library.addEventListener('touchend', this.handleSwipeEnd, {
-            passive: false
+        this.pageDotsEl.addEventListener('touchend', this.handleSwipeEnd, {
+            passive: true
         });
     }
 
