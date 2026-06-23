@@ -36,7 +36,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---2757-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---2960-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Core Components Architecture](#core-components-architecture)
    - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2189-lines)
@@ -54,7 +54,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
    - [Citrana Laser](#citrana-laser-citrana-laserjs---248-lines)
    - [Drawing Tools](#drawing-tools-citrana-drawing-toolsjs---3218-lines)
    - [Context Menu](#context-menu-citrana-context-menujs---743-lines)
-   - [Citrana Items Menu](#citrana-items-menu-citrana-items-menujs---756-lines)
+   - [Citrana Items Menu](#citrana-items-menu-citrana-items-menujs---818-lines)
    - [Citrana Session](#citrana-session-citrana-sessionjs---214-lines)
    - [Edit UI](#edit-ui-citrana-edit-uijs---1020-lines)
 6. [Core Features](#core-features)
@@ -76,7 +76,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 13. [Development Commands](#development-commands)
 14. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~2757 lines)
+## CSS and Layout (styles.css - ~2960 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome; `role="dialog"` + `aria-*`), responsive breakpoints (769px desktop, 768px tablet, 600px mobile). Most tablet/mobile rules live in one `@media (max-width: 768px)` block; **post-base mobile overrides** (Help/About position, modal compact sizing) use separate `@media` blocks **after** base component selectors so cascade order is correct.
 
@@ -85,10 +85,20 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 **Presentation View:** `body.presentation-view` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, `.about-btn`, `.floating-text-edit-controls`, and `.floating-edit-ui` via CSS. Toggled from context menu or **Canvas Items** panel (`app.togglePresentationView()`); dismisses active edit sessions on enter.
 
 **Graha library layout:**
-- Header, grid, and page-dots styled in CSS (`.planet-library-header`, `.planet-grid`, `.page-dots`) — no inline styles in `index.html`
+- Header, grid, and page-dots styled in CSS (`.planet-library-header`, `.planet-grid`, `.page-dots`, `.page-dots-track`, `.page-dots-chevron`) — no inline styles in `index.html`
 - No grid scrolling (`overflow: visible`; no `max-height` on `.planet-grid`)
-- Desktop: `repeat(auto-fit, minmax(80px, 1fr))`; 80×40px `.planet-item` cells
-- Mobile (≤768px): 6×2 grid, 320px library width, compact vertical padding, 30px cells with 7px font and `word-break: break-word` for Page 5 Upagraha names
+- Desktop: `repeat(auto-fit, minmax(80px, 1fr))`; 80×40px `.planet-item` cells; page dots only (no chevrons)
+- Mobile (≤768px): 6×2 grid, 320px library width, compact vertical padding, 30px cells with 7px font and `word-break: break-word` for Page 5 Upagraha names; **swipe left/right on `.page-dots` bar only** to change pages (grey `chevrons-left` / `chevrons-right` hints at each end; dots remain tappable); keyboard **1**–**5** switches pages on all viewports
+
+**Canvas Items modal layout (`#items-modal`):**
+- `#items-modal .options-modal-content` — flex column, `overflow: hidden` (modal shell does not scroll)
+- Pinned: header, `#items-modal-description`, `#items-modal-nav` Section Anchors (`.items-section-nav-wrap`)
+- Scrollable list only: `#items-modal-body` with `--items-scrollbar-gutter` (scrollbar in outer gutter, Help-style thumb)
+- Section Anchors: `.items-section-nav-scroll-wrap` with mobile horizontal edge fades (`items-section-nav-fade-start` / `items-section-nav-fade-end`)
+- Context Menu row: `.items-row-context-menu-on` (green tint) / `.items-row-context-menu-off` (red tint)
+
+**Mobile toolbar / Edit UI scroll:**
+- `.toolbar-scroll-wrap` with `.toolbar-scroll-fade-start` / `.toolbar-scroll-fade-end` edge gradients (≤768px) alongside chevron scroll buttons
 
 **JSColorPicker theme (`--cp-*` in `:root`):** chip size, borders, swatch width, shadows — aligned to Citrana light theme. Compact toolbars hide hex input, format tabs, and dropdown caret (`.cp_input`, `.cp_formats`, `.cp_caret`).
 
@@ -96,16 +106,16 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 - Safe-area CSS vars (`--sat` … `--sal`, `--ui-inset`, `--ui-bottom-pad`, `--ui-bottom-stack`)
 - `body { position: fixed; inset: 0 }` — avoids bottom gap on iOS
 - `viewport-fit=cover`; manifest `display: standalone`
-- Mobile: Graha library bottom stack; Help bottom-left; drawing tools visible in toolbar; toolbar and Edit UI horizontal scroll with chevrons when controls overflow; **Canvas Items** button in zoom bar
+- Mobile: Graha library bottom stack; Help bottom-left; drawing tools visible in toolbar; toolbar and Edit UI horizontal scroll with chevrons and edge fades when controls overflow; **Canvas Items** button in zoom bar
 
 ## Complete Project Structure
 
 | Path | Lines | Description |
 |------|-------|-------------|
-| `index.html` | ~579 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Canvas Items modal (`#items-modal-nav` Section Anchors, `#items-modal-description`); toolbar + Edit UI scroll viewports; Help usage guide with pen select/drag/edit |
+| `index.html` | ~586 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Canvas Items modal (`#items-modal-nav` Section Anchors, pinned header/description, `#items-modal-body` scroll); toolbar + Edit UI scroll wraps; Help usage guide |
 | `robots.txt` | — | Search engine rules |
 | `sitemap.xml` | — | Sitemap |
-| `assets/css/styles.css` | ~2757 | Complete styling; primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` (`.items-section-nav-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`); `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` (toolbar + Edit UI) |
+| `assets/css/styles.css` | ~2960 | Complete styling; primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`); `.page-dots-chevron`; `#items-modal` pinned layout; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` (toolbar + Edit UI edge fades) |
 | `assets/js/citrana-annotation-fonts.js` | ~118 | Normal and hand-written annotation fonts |
 | `assets/js/citrana-app.js` | ~2189 | Main application coordinator |
 | `assets/js/citrana-arrow.js` | ~185 | Unified filled-arrow geometry |
@@ -119,9 +129,9 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 | `assets/js/citrana-drawing-tools.js` | ~3218 | Drawing tools implementation |
 | `assets/js/citrana-edit-ui.js` | ~1020 | Edit interface controls |
 | `assets/js/citrana-history.js` | ~94 | Unified undo/redo timeline |
-| `assets/js/citrana-items-menu.js` | ~756 | Canvas Items panel — chart/Bhava/Graha/Annotation actions; Section Anchors |
+| `assets/js/citrana-items-menu.js` | ~818 | Canvas Items panel — chart/Bhava/Graha/Annotation actions; Section Anchors; list-only scroll; mobile anchor fades |
 | `assets/js/citrana-laser.js` | ~248 | Ephemeral laser pointer Canvas overlay |
-| `assets/js/citrana-planet-system.js` | ~880 | Graha library and drag-drop |
+| `assets/js/citrana-planet-system.js` | ~910 | Graha library and drag-drop; dots-bar swipe; chevron hints |
 | `assets/js/citrana-rashis.js` | ~49 | Rashi names, Lucide zodiac icons, grid numbers |
 | `assets/js/citrana-selection.js` | ~98 | Selection Pill |
 | `assets/js/citrana-session.js` | ~214 | Save/open `.citrana.json` session files |
@@ -170,7 +180,7 @@ Key Responsibilities:
 Key Methods:
 - `init()`: Application initialisation; loads `this.options` from `localStorage`
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
-- `setupToolbarScroll()`: Horizontal toolbar overflow with `#toolbar-scroll-prev` / `#toolbar-scroll-next`
+- `setupToolbarScroll()`: Horizontal toolbar overflow with `#toolbar-scroll-wrap`, chevrons, and mobile edge fades (`toolbar-scroll-fade-start` / `toolbar-scroll-fade-end`)
 - `setupKeyboardShortcuts()`: Tool/action shortcuts; **I** toggles **Canvas Items** panel (open/close); **Escape** → `dismissActiveModalOnEscape()`; **Tab** → `trapModalFocus()` when a modal is open; otherwise blocked while inline Graha/text editors are focused or `isModalBlockingShortcuts()` (Help, Options, About, Welcome, Confirmation, Canvas Items, operation progress)
 - `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop `_modalFocusStack`; focus close button on open
 - `closeWelcomeModal()`: Welcome close + `localStorage.citrana_welcome_seen`
@@ -311,7 +321,7 @@ Key Methods:
 - `setNorthIndicatorsVisible(visible)` / `applyNorthIndicatorsPreference()`: Show or hide `tinyBoxGroupNorth` (bhava numbers in black corner boxes) per `app.options`
 - `zoomToFit()`: Fit chart to viewport using **local bounds** (desktop `extraTopMargin=-50`)
 
-### Graha System (citrana-planet-system.js - ~880 lines)
+### Graha System (citrana-planet-system.js - ~910 lines)
 Manages the floating Graha library and drag-and-drop functionality with paging system.
 
 Key Responsibilities:
@@ -326,8 +336,8 @@ Key Responsibilities:
 Key Features:
 - Floating, draggable Graha library with paging
 - 60 Grahas across five pages (12 per page)
-- Desktop navigation with clickable page dots
-- Mobile swipe navigation (left/right)
+- Desktop navigation with clickable page dots; keyboard **1**–**5** on all viewports
+- Mobile paging: swipe left/right on **`.page-dots` bar only** (not the Graha grid or header — avoids accidental panel moves or Graha drags); decorative grey chevron hints (`.page-dots-chevron`, `chevrons-left` / `chevrons-right`); dots remain tappable
 - Drag preview with visual feedback
 - Touch and mouse support
 - Drop zone validation
@@ -407,8 +417,8 @@ Graha Library - Page 5 (Upagrahas & Outer Grahas):
 Key Methods:
 - `init()`: Initialise Graha library
 - `createPlanetLibrary()`: Build UI elements with paging
-- `createPageDots()`: Create desktop navigation dots
-- `setupSwipeEvents()`: Configure mobile swipe navigation
+- `createPageDots()`: Create page dots in `.page-dots-track` with mobile chevron hints
+- `setupSwipeEvents()`: Horizontal swipe listeners on `.page-dots` only (`pageDotsEl`)
 - `goToPage()`: Navigate between pages
 - `setupDragAndDrop()`: Configure drag functionality
 - `handleDragStart/Move/End()`: Drag interaction handling
@@ -598,14 +608,15 @@ Key Methods:
 - `getContextMenuItemsTitle()` / `getContextMenuItemsMeta()` / `getContextMenuToggleActionLabel()` — Canvas Items panel **Context Menu** row copy
 - `openPlanetEditor()`, `removePlanetFromHouse()`, `clearHousePlanets()`, `getActiveChartTemplate()`, `findPlanetTextNode()`
 
-### Citrana Items Menu (citrana-items-menu.js - ~756 lines)
+### Citrana Items Menu (citrana-items-menu.js - ~818 lines)
 Floating **Canvas Items** panel for chart, Bhava, Graha, and annotation actions — primary workflow on touch; also available on desktop.
 
 Key Responsibilities:
 - Opens from `#items-menu-btn` in the zoom bar or keyboard **I** (`title="Canvas Items (I)"`)
-- **`#items-modal-nav`**: Section Anchors — jump to Canvas, Chart, Bhavas, Grahas, Annotations, Lagna, Actions; swipe/scroll horizontally when pills overflow; active anchor via `IntersectionObserver`
+- **Pinned chrome:** title, `#items-modal-description`, and `#items-modal-nav` Section Anchors stay fixed; only `#items-modal-body` scrolls (`scrollContainer` / `IntersectionObserver` root)
+- **`#items-modal-nav`**: Section Anchors — jump to Canvas, Chart, Bhavas, Grahas, Annotations, Lagna, Actions; horizontal swipe/scroll on pills when they overflow (mobile edge fades via `setupSectionNavScrollFades()`); active anchor via `IntersectionObserver`
 - Sections use `id="items-section-{id}"`; `renderSectionNav()`, `scrollToSection()`, `handleNavClick()`
-- **Canvas**: **Clear Selection** (`app.clearCanvasSelection()`), **Context Menu** toggle (On/Off meta; `square-menu` / `power` / `power-off` icons; `.items-row-context-menu-on` / `.items-row-context-menu-off`)
+- **Canvas**: **Clear Selection** (`app.clearCanvasSelection()`), **Context Menu** toggle (On/Off meta; green `.items-row-context-menu-on` / red `.items-row-context-menu-off` row tint; `square-menu` / `power` / `power-off` icons)
 - Selected rows use `.items-row-selected`; `refreshSelectionHighlight()` syncs with `app.getCanvasSelection()`
 - South Indian Bhava rows show fixed Rashi names with Lucide zodiac icons (`CitranaRashis.iconHtml`)
 - Reuses `citrana-context-menu.js` `handleAction()` for chart/Bhava/Graha actions where possible
@@ -613,7 +624,7 @@ Key Responsibilities:
 - **Presentation View** and chart management actions mirror context menu icons
 
 Key Methods:
-- `init()`, `open()`, `close()`, `render()`, `renderSectionNav()`, `scrollToSection()`, `setupSectionNavObserver()`, `handleNavClick()`, `handleBodyClick()`, `refreshSelectionHighlight()`
+- `init()`, `open()`, `close()`, `render()`, `renderSectionNav()`, `scrollToSection()`, `setupSectionNavObserver()`, `setupSectionNavScrollFades()`, `handleNavClick()`, `handleBodyClick()`, `refreshSelectionHighlight()`
 - `isRowSelected()`, `renderUtilitySection()`, `getBhavaRowLabel()`
 - `getDrawingShapes()`, `getAnnotationDisplayName()`, `getAnnotationIcon()`
 
@@ -635,7 +646,7 @@ Wired from `app.saveSession()` / `app.openSessionFromFile()` / `app.applyImporte
 Provides context-sensitive editing controls for drawing elements.
 
 Key Responsibilities:
-- Creates floating edit interface with mobile chevron scroll (`setupEditUIScroll`, reuses `.toolbar-scroll-*` pattern at ≤768px)
+- Creates floating edit interface with mobile chevron scroll (`setupEditUIScroll`, reuses `.toolbar-scroll-wrap` + edge fade classes at ≤768px)
 - Provides tool-specific controls
 - Manages shape property editing
 - Handles colour and stroke customisation
@@ -710,7 +721,7 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 
 ### Graha Management
 - 60 Major Grahas: 12 traditional Grahas on Page 1, 12 Jaimini Karakas on Page 2, 12 Tamil Grahas on Page 3, 12 Hindi Grahas on Page 4, and 12 Upagrahas and outer Grahas on Page 5
-- Paging System: Five-page navigation with desktop dots and mobile swipe
+- Paging System: Five-page navigation — desktop dots and keyboard **1**–**5**; mobile swipe on dots bar with chevron hints
 - Library Labels: Graha library cells show `fullName` (e.g. Page 5 Upagrahas); chart placement still uses text abbreviations
 - Library Layout: No grid scrolling — desktop auto-fit columns (80×40px cells); mobile 6×2 grid with 30px cells and word-wrap for long names
 - Text-based Display: Uses abbreviations on the chart instead of symbols for better compatibility
@@ -763,12 +774,12 @@ Technical Implementation:
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
 - Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha (Select/Hand when enabled; off by default on touch-primary devices; suppressed while drawing or when disabled via Canvas Items); chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
-- **Canvas Items**: `#items-menu-btn` or **I** — chart/Bhava/Graha/Annotation actions; Section Anchors; **Clear Selection** and **Context Menu** (On/Off); row highlight syncs with canvas selection; desktop and touch workflow
+- **Canvas Items**: `#items-menu-btn` or **I** — chart/Bhava/Graha/Annotation actions; pinned Section Anchors; **Clear Selection** and **Context Menu** (On/Off with green/red row tint); row highlight syncs with canvas selection; desktop and touch workflow
 - **Selection Pill**: dashed outline behind selected Graha labels and Text/Heading/Pen Stroke Annotations; Bhava highlight in light grey
-- **Edit UI mobile scroll**: chevron buttons scroll style controls when they overflow on narrow screens
+- **Edit UI mobile scroll**: chevron buttons and edge fades scroll style controls when they overflow on narrow screens
 - Status Updates: Real-time feedback and notifications
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
-- Help Modal: Shortcuts and usage guide (Laser Pointer, Canvas Items with Section Anchors, **I** shortcut, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
+- Help Modal: Shortcuts and usage guide (Laser Pointer, Canvas Items with pinned Section Anchors and Context Menu visual state, Graha Library dots-bar swipe and **1**–**5** page keys, **I** shortcut, Presentation View, undo exclusions); `#help-modal-description` / `.help-modal-description` intro spacing
 - About Modal: Information about Citrana with creator details and links; mobile compact layout without scroll
 - Welcome Modal: First-time user experience; `closeWelcomeModal()` marks seen in `localStorage`; mobile compact layout without scroll
 - Options Modal: Chart indicator toggles and **Save Chart Only** export; shared modal width with Help (`width: min(600px, 90vw)`)
