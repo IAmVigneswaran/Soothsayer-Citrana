@@ -349,7 +349,6 @@ class PlanetSystem {
         this.swipeStartX = 0;
         this.swipeStartY = 0;
         this.isSwiping = false;
-        this.isPageSwiping = false;
         this.draggedPlanet = null;
     }
 
@@ -579,14 +578,18 @@ class PlanetSystem {
 
     // Mobile touch handlers
     handleTouchStart(e, planetAbbr) {
+        e.preventDefault();
         e.stopPropagation();
 
         this.draggedPlanet = planetAbbr;
         this.touchStartX = e.touches[0].clientX;
         this.touchStartY = e.touches[0].clientY;
         this.isDragging = false;
-        this.isPageSwiping = false;
 
+        // Create visual drag preview immediately for Safari
+        this.createDragPreview(planetAbbr, e.touches[0].clientX, e.touches[0].clientY);
+
+        // Add touch move listener to document for better Safari support
         document.addEventListener('touchmove', this.boundTouchMove = (e) => this.handleTouchMove(e, planetAbbr), {
             passive: false
         });
@@ -598,78 +601,46 @@ class PlanetSystem {
     }
 
     handleTouchMove(e, planetAbbr) {
-        if (!this.draggedPlanet && !this.isPageSwiping) {
-            return;
-        }
+        e.preventDefault();
+        e.stopPropagation();
 
-        if (this.draggedPlanet && this.draggedPlanet !== planetAbbr && !this.isPageSwiping) {
-            return;
-        }
+        if (!this.draggedPlanet || this.draggedPlanet !== planetAbbr) return;
 
         const touch = e.touches[0];
-        const deltaX = touch.clientX - this.touchStartX;
-        const deltaY = touch.clientY - this.touchStartY;
-        const absX = Math.abs(deltaX);
-        const absY = Math.abs(deltaY);
+        const deltaX = Math.abs(touch.clientX - this.touchStartX);
+        const deltaY = Math.abs(touch.clientY - this.touchStartY);
 
-        if (!this.isDragging && !this.isPageSwiping && this.draggedPlanet === planetAbbr) {
-            if (absX < 8 && absY < 8) {
-                return;
-            }
-
-            // Horizontal swipe on the grid changes pages; otherwise treat as Graha drag.
-            if (absX > absY && absX >= 24) {
-                this.isPageSwiping = true;
-                this.draggedPlanet = null;
-                this.removeDragPreview();
-                e.preventDefault();
-                return;
-            }
-
-            if (absX > 5 || absY > 5) {
-                this.isDragging = true;
-                if (!this.dragPreview) {
-                    this.createDragPreview(planetAbbr, touch.clientX, touch.clientY);
-                }
-            }
+        // Start dragging after a small movement threshold
+        if (!this.isDragging && (deltaX > 5 || deltaY > 5)) {
+            this.isDragging = true;
+            citranaDebug('Started mobile drag');
         }
 
-        if (this.isPageSwiping) {
-            e.preventDefault();
-            return;
-        }
-
-        if (this.isDragging && this.dragPreview) {
-            e.preventDefault();
+        if (this.dragPreview) {
+            // Update drag preview position
             this.dragPreview.style.left = (touch.clientX - 25) + 'px';
             this.dragPreview.style.top = (touch.clientY - 25) + 'px';
         }
     }
 
     handleTouchEnd(e, planetAbbr) {
-        if (this.isPageSwiping) {
-            e.preventDefault();
-            const deltaX = e.changedTouches[0].clientX - this.touchStartX;
-            const threshold = 50;
+        e.preventDefault();
+        e.stopPropagation();
 
-            if (Math.abs(deltaX) > threshold) {
-                if (deltaX > 0 && this.currentPage > 1) {
-                    this.goToPage(this.currentPage - 1);
-                } else if (deltaX < 0 && this.currentPage < this.totalPages) {
-                    this.goToPage(this.currentPage + 1);
-                }
-            }
-        } else if (this.isDragging && this.draggedPlanet === planetAbbr) {
-            e.preventDefault();
+        if (!this.draggedPlanet || this.draggedPlanet !== planetAbbr) return;
+
+        if (this.isDragging) {
+            // Handle drop
             const touch = e.changedTouches[0];
             this.handleMobileDrop(touch.clientX, touch.clientY);
         }
 
+        // Clean up
         this.draggedPlanet = null;
         this.isDragging = false;
-        this.isPageSwiping = false;
         this.removeDragPreview();
 
+        // Remove document event listeners
         if (this.boundTouchMove) {
             document.removeEventListener('touchmove', this.boundTouchMove);
             this.boundTouchMove = null;
@@ -840,22 +811,15 @@ class PlanetSystem {
 
     setupSwipeEvents() {
         const library = document.getElementById('graha-library');
-        const grid = document.getElementById('planet-library');
         if (!library) return;
 
         // Remove existing swipe listeners
         library.removeEventListener('touchstart', this.handleSwipeStart);
         library.removeEventListener('touchmove', this.handleSwipeMove);
         library.removeEventListener('touchend', this.handleSwipeEnd);
-        grid?.removeEventListener('touchstart', this.handleSwipeStart);
-        grid?.removeEventListener('touchmove', this.handleSwipeMove);
-        grid?.removeEventListener('touchend', this.handleSwipeEnd);
 
+        // Add new swipe listeners
         this.handleSwipeStart = (e) => {
-            if (e.target.closest('.planet-item')) {
-                return;
-            }
-
             this.swipeStartX = e.touches[0].clientX;
             this.swipeStartY = e.touches[0].clientY;
             this.isSwiping = false;
@@ -867,27 +831,25 @@ class PlanetSystem {
             const deltaX = e.touches[0].clientX - this.swipeStartX;
             const deltaY = e.touches[0].clientY - this.swipeStartY;
 
-            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 24) {
+            // Check if it's a horizontal swipe
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
                 this.isSwiping = true;
-                e.preventDefault();
+                e.preventDefault(); // Prevent default scroll
             }
         };
 
         this.handleSwipeEnd = (e) => {
-            if (!this.isSwiping || !this.swipeStartX) {
-                this.swipeStartX = 0;
-                this.swipeStartY = 0;
-                this.isSwiping = false;
-                return;
-            }
+            if (!this.isSwiping || !this.swipeStartX) return;
 
             const deltaX = e.changedTouches[0].clientX - this.swipeStartX;
-            const threshold = 50;
+            const threshold = 100; // Minimum swipe distance
 
             if (Math.abs(deltaX) > threshold) {
                 if (deltaX > 0 && this.currentPage > 1) {
+                    // Swipe right - go to previous page
                     this.goToPage(this.currentPage - 1);
                 } else if (deltaX < 0 && this.currentPage < this.totalPages) {
+                    // Swipe left - go to next page
                     this.goToPage(this.currentPage + 1);
                 }
             }
@@ -897,17 +859,14 @@ class PlanetSystem {
             this.isSwiping = false;
         };
 
-        const swipeTargets = grid ? [library, grid] : [library];
-        swipeTargets.forEach((target) => {
-            target.addEventListener('touchstart', this.handleSwipeStart, {
-                passive: true
-            });
-            target.addEventListener('touchmove', this.handleSwipeMove, {
-                passive: false
-            });
-            target.addEventListener('touchend', this.handleSwipeEnd, {
-                passive: true
-            });
+        library.addEventListener('touchstart', this.handleSwipeStart, {
+            passive: false
+        });
+        library.addEventListener('touchmove', this.handleSwipeMove, {
+            passive: false
+        });
+        library.addEventListener('touchend', this.handleSwipeEnd, {
+            passive: false
         });
     }
 
