@@ -420,6 +420,41 @@ class PlanetSystem {
             : 'Enable Graha Library';
     }
 
+    getGrahaLibraryResetItemsTitle() {
+        return 'Reset Graha Library Position';
+    }
+
+    getGrahaLibraryResetItemsMeta() {
+        return 'Default Layout';
+    }
+
+    getGrahaLibraryResetActionLabel() {
+        return 'Reset Graha Library Position';
+    }
+
+    resetGrahaLibraryPosition() {
+        if (!this.grahaLibrary) return;
+
+        if (this.isDraggingLibrary) {
+            this.isDraggingLibrary = false;
+            this.setGrahaLibraryDragging(false);
+            document.body.style.cursor = '';
+        }
+
+        ['left', 'top', 'right', 'bottom', 'transform', 'transition', 'height', 'minHeight', 'maxHeight']
+            .forEach((prop) => this.grahaLibrary.style.removeProperty(prop));
+
+        this.grahaLibrary.querySelectorAll('.planet-item').forEach((item) => {
+            item.style.removeProperty('transition');
+        });
+
+        const planetGrid = this.grahaLibrary.querySelector('.planet-grid');
+        if (planetGrid) {
+            planetGrid.style.removeProperty('maxHeight');
+            planetGrid.style.removeProperty('overflow');
+        }
+    }
+
     // --- Graha Library Floating UI ---
     setupLibraryEventListeners() {
         // Drag functionality for floating library
@@ -434,6 +469,11 @@ class PlanetSystem {
         header.addEventListener('touchstart', (e) => this.handleLibraryTouchStart(e));
         document.addEventListener('touchmove', (e) => this.handleLibraryTouchMove(e));
         document.addEventListener('touchend', () => this.handleLibraryTouchEnd());
+    }
+
+    setGrahaLibraryDragging(isDragging) {
+        if (!this.grahaLibrary) return;
+        this.grahaLibrary.classList.toggle('graha-library-dragging', isDragging);
     }
 
     handleLibraryTouchStart(e) {
@@ -471,9 +511,7 @@ class PlanetSystem {
             planetGrid.style.overflow = 'hidden';
         }
 
-        // Add subtle visual feedback for mobile dragging (no size change)
-        this.grahaLibrary.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
-        this.grahaLibrary.style.zIndex = '1001';
+        this.setGrahaLibraryDragging(true);
     }
 
     handleLibraryTouchMove(e) {
@@ -515,9 +553,7 @@ class PlanetSystem {
                 planetGrid.style.overflow = 'hidden';
             }
 
-            // Remove visual feedback
-            this.grahaLibrary.style.boxShadow = '';
-            this.grahaLibrary.style.zIndex = '';
+            this.setGrahaLibraryDragging(false);
 
             // Don't restore transform - keep the library where user dragged it
         }
@@ -530,6 +566,7 @@ class PlanetSystem {
         this.initialX = rect.left;
         this.initialY = rect.top;
         this.grahaLibrary.style.transition = 'none';
+        this.setGrahaLibraryDragging(true);
         document.body.style.cursor = 'grabbing';
     }
     handleLibraryDragMove(e) {
@@ -550,6 +587,7 @@ class PlanetSystem {
         if (this.isDraggingLibrary) {
             this.isDraggingLibrary = false;
             this.grahaLibrary.style.transition = '';
+            this.setGrahaLibraryDragging(false);
             document.body.style.cursor = '';
         }
     }

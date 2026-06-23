@@ -453,6 +453,16 @@ class CitranaItemsMenu {
                 this.actionButton('toggle-graha-library', grahaLibraryActionLabel, grahaLibraryActionIcon),
                 'orbit',
                 { extraClass: grahaLibraryRowClass }
+            ),
+            this.renderRow(
+                planetSystem?.getGrahaLibraryResetItemsTitle?.() || 'Reset Graha Library Position',
+                planetSystem?.getGrahaLibraryResetItemsMeta?.() || 'Default Layout',
+                this.actionButton(
+                    'reset-graha-library-position',
+                    planetSystem?.getGrahaLibraryResetActionLabel?.() || 'Reset Graha Library Position',
+                    'move'
+                ),
+                'move'
             )
         ].join('');
 
@@ -683,6 +693,11 @@ class CitranaItemsMenu {
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }
+                break;
+
+            case 'reset-graha-library-position':
+                this.getPlanetSystem()?.resetGrahaLibraryPosition();
+                this.close();
                 break;
 
             case 'select-bhava':

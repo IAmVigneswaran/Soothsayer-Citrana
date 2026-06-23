@@ -49,7 +49,7 @@ Citrana 2.0 is a major update focused on chart workflow, Annotations, sessions, 
 
 - **Canvas Items** (**I**) — one panel for chart actions, Bhavas, Grahas, Annotations, and canvas controls on desktop and touch
   - **Section Anchors** jump between sections while the header stays fixed
-  - Under the **Canvas** section: **Clear Selection**, **Context Menu** on/off, and **Graha Library** on/off (green/red row tint)
+  - Under the **Canvas** section: **Clear Selection**, **Context Menu** on/off, **Graha Library** on/off (green/red row tint), and **Reset Graha Library Position** (default layout)
   - Text and Heading rows offer separate **Edit text** and **Style** actions
 - **Presentation View** — hide toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart
 - **Graha Library visibility** — show or hide the library under Canvas Items (separate from Presentation View)

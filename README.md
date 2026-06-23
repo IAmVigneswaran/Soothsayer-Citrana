@@ -154,7 +154,7 @@ Option preferences are saved in this browser, included in **Save Session**, and 
 
 Drag Grahas from the floating library onto chart Bhavas. The same Graha can be placed more than once. Five pages cover traditional Grahas, Jaimini Karakas, Tamil, Hindi, and Upagrahas with outer Grahas. Switch pages with the dots at the bottom, keys **1**–**5**, or on mobile by swiping the **dots bar** (grey chevrons hint that you can swipe; the dots remain tappable). Swiping the Graha grid or header still drags Grahas or moves the library panel.
 
-Under **Canvas Items**, in the **Canvas** section, you can show or hide the library (saved in this browser; separate from Presentation View).
+Under **Canvas Items**, in the **Canvas** section, you can show or hide the library (saved in this browser; separate from Presentation View) or **Reset Graha Library Position** to return the panel to its default place.
 
 ### Grahas on the Chart
 
@@ -181,7 +181,7 @@ Under **Canvas Items**, the **Annotations** section lists every arrow, line, pen
 Open **Canvas Items** from the layers icon in the zoom bar or press **I**. One panel lists chart actions, Bhavas, Grahas, Annotations, and canvas controls.
 
 - **Section Anchors** — jump between sections; the title, description, and anchors stay fixed while the list scrolls
-- **Canvas** — **Clear Selection**; **Context Menu** on/off (off by default on touch devices; green or red row tint); **Graha Library** on/off
+- **Canvas** — **Clear Selection**; **Context Menu** on/off (off by default on touch devices; green or red row tint); **Graha Library** on/off; **Reset Graha Library Position**
 - **Chart** — create a chart, set Lagna, Presentation View, reset actions, and clear the canvas
 - **Bhavas** — select a Bhava, set Lagna or First Bhava, or clear Grahas in that Bhava; South Indian rows show each cell's fixed Rashi name with its zodiac symbol
 - **Grahas** — select, edit, or delete placed Grahas
