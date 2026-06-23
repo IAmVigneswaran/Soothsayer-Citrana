@@ -2187,14 +2187,18 @@ class CitranaApp {
 
             welcomeLoadingFill.style.width = progress + '%';
 
-            if (progress < 30) {
-                welcomeLoadingText.textContent = 'Loading Citrana...';
-            } else if (progress < 60) {
-                welcomeLoadingText.textContent = 'Initialising components...';
-            } else if (progress < 90) {
-                welcomeLoadingText.textContent = 'Setting up chart templates...';
-            } else {
+            if (progress >= 100) {
                 welcomeLoadingText.textContent = 'Ready!';
+            } else if (progress < 20) {
+                welcomeLoadingText.textContent = 'Loading Citrana...';
+            } else if (progress < 40) {
+                welcomeLoadingText.textContent = 'Initialising Components...';
+            } else if (progress < 60) {
+                welcomeLoadingText.textContent = 'Preparing Chart Templates...';
+            } else if (progress < 80) {
+                welcomeLoadingText.textContent = 'Setting Up Graha Library...';
+            } else {
+                welcomeLoadingText.textContent = 'Almost Ready...';
             }
 
             if (progress >= 100) {
