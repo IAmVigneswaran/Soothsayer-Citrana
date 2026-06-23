@@ -23,7 +23,7 @@ class CitranaItemsMenu {
         this.modal = document.getElementById('items-modal');
         this.bodyEl = document.getElementById('items-modal-body');
         this.navEl = document.getElementById('items-modal-nav');
-        this.scrollContainer = this.modal?.querySelector('.options-modal-content') || null;
+        this.scrollContainer = this.bodyEl;
         this.openBtn = document.getElementById('items-menu-btn');
 
         if (!this.modal || !this.bodyEl || !this.openBtn) {

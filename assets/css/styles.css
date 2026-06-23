@@ -1664,6 +1664,36 @@ body.presentation-view .about-btn {
   flex-direction: column;
 }
 
+/* Canvas Items: pin header, description, and Section Anchors; scroll the list only */
+#items-modal .options-modal-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#items-modal .options-modal-header,
+#items-modal .help-modal-description,
+#items-modal .items-section-nav-wrap {
+  flex-shrink: 0;
+}
+
+#items-modal .items-section-nav-wrap {
+  position: static;
+  top: auto;
+  z-index: 1;
+}
+
+#items-modal .items-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#items-modal .items-section {
+  scroll-margin-top: 8px;
+}
+
 .items-section-nav-wrap {
   position: sticky;
   top: 0;
@@ -1688,6 +1718,8 @@ body.presentation-view .about-btn {
   position: relative;
   display: flex;
   align-items: center;
+  padding-block: 2px;
+  box-sizing: border-box;
 }
 
 .items-section-nav {
@@ -1698,7 +1730,6 @@ body.presentation-view .about-btn {
   width: 100%;
   padding: 0;
   overflow-x: auto;
-  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -1718,7 +1749,7 @@ body.presentation-view .about-btn {
   color: #000000;
   font-size: 12px;
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.2;
   padding: 6px 12px;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
