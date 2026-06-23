@@ -1694,10 +1694,18 @@ body.presentation-view .about-btn {
   flex-shrink: 0;
 }
 
+#items-modal .help-modal-description {
+  margin-bottom: 10px;
+}
+
 #items-modal .items-section-nav-wrap {
   position: static;
   top: auto;
   z-index: 1;
+  padding: 2px 0 8px;
+  margin-bottom: 6px;
+  border-bottom: none;
+  box-shadow: 0 1px 0 #e5e7eb;
 }
 
 #items-modal .items-modal-body {
@@ -1726,9 +1734,10 @@ body.presentation-view .about-btn {
   display: flex;
   align-items: center;
   background: #ffffff;
-  padding: 12px 0 14px;
+  padding: 4px 0 10px;
   margin-bottom: 8px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: none;
+  box-shadow: 0 1px 0 #e5e7eb;
   box-sizing: border-box;
 }
 
@@ -1743,7 +1752,7 @@ body.presentation-view .about-btn {
   position: relative;
   display: flex;
   align-items: center;
-  padding-block: 3px;
+  padding-block: 2px 4px;
   box-sizing: border-box;
 }
 
@@ -1775,8 +1784,8 @@ body.presentation-view .about-btn {
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
-  min-height: 28px;
-  padding: 5px 12px 6px;
+  min-height: 30px;
+  padding: 6px 12px;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
@@ -1791,11 +1800,6 @@ body.presentation-view .about-btn {
 }
 
 @media (max-width: 768px) {
-  .items-section-nav-scroll-wrap {
-    overflow-x: clip;
-    overflow-y: visible;
-  }
-
   .items-section-nav-scroll-wrap::before,
   .items-section-nav-scroll-wrap::after {
     content: '';
