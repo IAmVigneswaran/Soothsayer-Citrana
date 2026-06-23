@@ -734,11 +734,48 @@ body.presentation-view .about-btn {
   .toolbar-scroll-viewport {
     flex: 1 1 0;
     min-width: 0;
+    position: relative;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     scroll-behavior: smooth;
+  }
+
+  .toolbar-scroll-viewport::before,
+  .toolbar-scroll-viewport::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .toolbar-scroll-viewport::before {
+    left: 0;
+    background: linear-gradient(to right, var(--toolbar-scroll-fade, #ffffff) 0%, rgba(255, 255, 255, 0) 100%);
+  }
+
+  .toolbar-scroll-viewport::after {
+    right: 0;
+    background: linear-gradient(to left, var(--toolbar-scroll-fade, #ffffff) 0%, rgba(255, 255, 255, 0) 100%);
+  }
+
+  .toolbar-scroll-viewport.toolbar-scroll-fade-start::before {
+    opacity: 1;
+  }
+
+  .toolbar-scroll-viewport.toolbar-scroll-fade-end::after {
+    opacity: 1;
+  }
+
+  .floating-top-toolbar,
+  .floating-edit-ui {
+    --toolbar-scroll-fade: #ffffff;
   }
 
   .toolbar-scroll-viewport::-webkit-scrollbar {

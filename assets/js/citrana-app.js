@@ -520,6 +520,7 @@ class CitranaApp {
                 prev.hidden = true;
                 next.hidden = true;
                 viewport.scrollLeft = 0;
+                viewport.classList.remove('toolbar-scroll-fade-start', 'toolbar-scroll-fade-end');
                 return;
             }
 
@@ -530,6 +531,8 @@ class CitranaApp {
             next.hidden = !hasOverflow;
             prev.disabled = viewport.scrollLeft <= 1;
             next.disabled = viewport.scrollLeft >= maxScroll - 1;
+            viewport.classList.toggle('toolbar-scroll-fade-start', hasOverflow && viewport.scrollLeft > 1);
+            viewport.classList.toggle('toolbar-scroll-fade-end', hasOverflow && viewport.scrollLeft < maxScroll - 1);
         };
 
         this.updateToolbarScrollButtons = updateToolbarScrollButtons;
