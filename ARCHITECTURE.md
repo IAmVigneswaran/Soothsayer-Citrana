@@ -2,6 +2,23 @@
 
 This document describes how Citrana is structured at a system level: runtime composition, module boundaries, data flows, and safe extension points. For feature-level documentation and usage guidance, see [AGENT.md](AGENT.md) and [README.md](README.md).
 
+## Table of Contents
+
+1. [Terminology](#terminology)
+2. [Design Principles](#design-principles)
+3. [Runtime Composition](#runtime-composition)
+4. [High-Level Component Diagram](#high-level-component-diagram)
+5. [Module Responsibilities](#module-responsibilities)
+6. [Canvas Object Naming](#canvas-object-naming)
+7. [Graha Data Model](#graha-data-model)
+8. [Key Data Flows](#key-data-flows)
+9. [Global State](#global-state)
+10. [Debug logging](#debug-logging)
+11. [UI Architecture](#ui-architecture)
+12. [Undo / redo](#undo--redo)
+13. [Extension Points](#extension-points)
+14. [Known Limitations](#known-limitations)
+15. [Related Documentation](#related-documentation)
 
 ## Terminology
 
@@ -61,6 +78,8 @@ flowchart TB
         Session["CitranaSession"]
     end
 
+    Zoom["CitranaZoom<br/>citrana-zoom.js<br/>fine / small / medium / large"]
+
     PlanetSystem["PlanetSystem<br/>Graha library"]
     Coordinator["ChartCoordinator"]
 
@@ -78,7 +97,7 @@ flowchart TB
     end
 
     ContextMenu["ContextMenu<br/>gating + Lagna menus"]
-    ItemsMenu["CitranaItemsMenu<br/>row highlight sync"]
+    ItemsMenu["CitranaItemsMenu<br/>row highlight sync<br/>Graha Library toggle"]
 
     subgraph Shared["Shared utilities"]
         Device["CitranaDevice"]
@@ -90,7 +109,11 @@ flowchart TB
 
     App --> History
     App --> Session
+    App --> Zoom
     App --> PlanetSystem
+    App --> Coordinator
+    Session --> Zoom
+    Coordinator --> Zoom
     PlanetSystem -->|"drag/drop + hit-test"| Coordinator
     Coordinator --> South
     Coordinator --> North
@@ -110,32 +133,33 @@ flowchart TB
     App -.-> Fonts
 ```
 
-`CitranaDevice` and `CitranaRashis` are used across `citrana-app.js`, chart templates, `citrana-drawing-tools.js`, `citrana-context-menu.js`, and `citrana-laser.js`. `CitranaSelection` attaches the dashed Selection Pill behind selected Grahas and text/heading/pen stroke annotations. `CitranaAnnotationFonts` is consumed by `citrana-edit-ui.js` and preloaded from `citrana-app.js` on init. `app.getCanvasSelection()` / `notifyCanvasSelectionChanged()` keep the Canvas Items panel in sync. `CitranaHistory` is wired in `app.setupComponents()` for undo/redo snapshots; `CitranaSession` captures the same serialised chart + drawing payload for `.citrana.json` export.
+`CitranaZoom` (`citrana-zoom.js`) centralises zoom step math (`computeNextScale`) for toolbar buttons, keyboard **+**/**−**, scroll wheel (`app.handleWheel()`), and `ChartCoordinator.zoomIn()` / `zoomOut()`. Step preference (`fine` | `small` | `medium` | `large`) lives in `app.options.zoomStep`, `localStorage.citrana_zoom_step`, and `.citrana.json` session `options`. `CitranaDevice` and `CitranaRashis` are used across `citrana-app.js`, chart templates, `citrana-drawing-tools.js`, `citrana-context-menu.js`, and `citrana-laser.js`. `CitranaSelection` attaches the dashed Selection Pill behind selected Grahas and text/heading/pen stroke annotations. `CitranaAnnotationFonts` is consumed by `citrana-edit-ui.js` and preloaded from `citrana-app.js` on init. `app.getCanvasSelection()` / `notifyCanvasSelectionChanged()` keep the Canvas Items panel in sync. `CitranaHistory` is wired in `app.setupComponents()` for undo/redo snapshots; `CitranaSession` captures the same serialised chart + drawing payload for `.citrana.json` export.
 
 ## Module Responsibilities
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `citrana-app.js` | ~2189 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser; **I** Canvas Items toggle; centralised **Delete**; **Escape** modal dismiss; **Tab** focus trap), zoom lock, export (full viewport or chart-only crop), shared progress modal (`showProgressModal`; `isExporting` / `isSessionBusy` guards), modals, chart display preferences, history, **Presentation View**, **Save/Open Session**, **Canvas Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `applySaveChartOnlyTransparency()` restores white background when Save Chart Only off; touch `preventDefault` gated via `drawingTools.shouldPreserveTouchDrag()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open |
+| `citrana-app.js` | ~2210 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser; **I** Canvas Items toggle; centralised **Delete**; **Escape** modal dismiss; **Tab** focus trap), zoom lock, **Zoom Step** preference (`setZoomStep()`), export (full viewport or chart-only crop), shared progress modal (`showProgressModal`; `isExporting` / `isSessionBusy` guards), modals, chart display preferences, history, **Presentation View**, **Save/Open Session**, **Canvas Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `applySaveChartOnlyTransparency()` restores white background when Save Chart Only off; touch `preventDefault` gated via `drawingTools.shouldPreserveTouchDrag()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open |
+| `citrana-zoom.js` | ~58 | Zoom step presets — `CitranaZoom.computeNextScale()`, `resolveZoomStep()`, `VALID_STEPS` (`fine` 1%, `small` ~10%, `medium` ~20%, `large` ~25%); used by app wheel zoom, coordinator zoom buttons, and session import/export |
 | `citrana-annotation-fonts.js` | ~118 | Normal vs Hand-written annotation typography — Arial / Arial Black vs Caveat / Caveat Brush; `setBold` / `setItalic` / `setMode`; `ensureLoaded()` for Google Fonts |
 | `citrana-history.js` | ~94 | Unified undo/redo timeline (`CitranaHistory`) |
-| `citrana-chart-coordinator.js` | ~334 | Unified API over South/North templates; zoom (`zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
+| `citrana-chart-coordinator.js` | ~320 | Unified API over South/North templates; zoom (`zoomIn`/`zoomOut` via `CitranaZoom`; `zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `citrana-chart-templates-south.js` | ~989 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds (compact viewport fixed **65%**); `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `CitranaRashis` / `CitranaDevice` |
 | `citrana-chart-templates-north.js` | ~1015 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds (compact viewport fixed **82%**); `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `raiseDrawingsAboveChart()` / `syncNorthChartLayerOrder()`; `CitranaRashis` / `CitranaDevice` |
 | `citrana-planet-system.js` | ~962 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, visibility toggle (`citrana_graha_library_enabled`, `#graha-library.graha-library-hidden`), dots-bar swipe paging with mobile chevron hints, keyboard **1**–**5** via `goToPage()`, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `citrana-arrow.js` | ~185 | Unified filled-arrow geometry (`Konva.Line` polygon); `arrowAnchors`; legacy `Konva.Arrow` migration |
-| `citrana-colorpicker.js` | ~383 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()`; `isPickerPopupTarget()` for touch-outside dismiss |
+| `citrana-colorpicker.js` | ~388 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()`; `isPickerPopupTarget()` for touch-outside dismiss |
 | `citrana-device.js` | ~39 | Shared `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()`, `isLaserViewport()` (all viewports), `hasFinePointer()` |
 | `citrana-rashis.js` | ~49 | Shared `RASHIS` (`icon`: Lucide `zodiac-*`), `NAMES`, `NUMBERS`, `getName()`, `getNumberForHouseIndex()`, `iconHtml()` |
-| `citrana-selection.js` | ~98 | Selection Pill — dashed transparent `Konva.Rect` (`selection-pill`) behind selected Graha labels and text/heading/pen stroke annotations; `attach()` / `sync()` / `detach()`; pen uses bounds from `getTaperedPenBoundsInLayer()`; extra padding on mobile |
+| `citrana-selection.js` | ~99 | Selection Pill — dashed transparent `Konva.Rect` (`selection-pill`) behind selected Graha labels and text/heading/pen stroke annotations; `attach()` / `sync()` / `detach()`; pen uses bounds from `getTaperedPenBoundsInLayer()`; extra padding on mobile |
 | `citrana-laser.js` | ~248 | Ephemeral laser pointer — Canvas 2D overlay above stage; independent strokes per gesture; ~3s fade; `isAvailable()` → `CitranaDevice.isLaserViewport()`; not serialised or undoable |
-| `citrana-drawing-tools.js` | ~3218 | Drawing tools, selection, control points (desktop hover/drag feedback; `raiseControlPointsAbovePickRects()`), Graha text editing, `CitranaArrow.create()`, tapered pen (`Konva.Shape` + `penTaper` attrs + `bounding-box-pen` pick rects), pen select/drag/edit (`bindPenPickRectInteraction`, `beginManualPenDrag`, `editPenAnnotation`), `CitranaLaser` delegation, multi-line `startInlineContentEdit()`, `bindRestoredDrawingInteractions()`; history `recordHistory()` calls (laser excluded); notifies `app.notifyCanvasSelectionChanged()` on select/clear; `CitranaSelection` for annotation text and pen; `CitranaDevice` for touch/mobile |
-| `citrana-edit-ui.js` | ~1020 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close); `getEditTarget()` for stable pen node; Normal / Hand-written font toggles via `CitranaAnnotationFonts`; mobile chevron scroll (`setupEditUIScroll`, `#edit-ui-scroll-*`); touch-outside dismiss excludes picker popup and `.konva-textarea` |
+| `citrana-drawing-tools.js` | ~3270 | Drawing tools, selection, control points (desktop hover/drag feedback; `raiseControlPointsAbovePickRects()`), Graha text editing, `CitranaArrow.create()`, tapered pen (`Konva.Shape` + `penTaper` attrs + `bounding-box-pen` pick rects), pen select/drag/edit (`bindPenPickRectInteraction`, `beginManualPenDrag`, `editPenAnnotation`), `CitranaLaser` delegation, multi-line `startInlineContentEdit()`, `bindRestoredDrawingInteractions()`; history `recordHistory()` calls (laser excluded); notifies `app.notifyCanvasSelectionChanged()` on select/clear; `CitranaSelection` for annotation text and pen; `CitranaDevice` for touch/mobile |
+| `citrana-edit-ui.js` | ~1030 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close); `getEditTarget()` for stable pen node; Normal / Hand-written font toggles via `CitranaAnnotationFonts`; mobile chevron scroll (`setupEditUIScroll`, `#edit-ui-scroll-*`); touch-outside dismiss excludes picker popup and `.konva-textarea` |
 | `citrana-context-menu.js` | ~742 | Right-click / long-press menus; `resolveDefaultCanvasContextMenuEnabled()` (off on touch-primary until set); `shouldBlockCanvasContextMenu()`; **Presentation View**; North **Set Lagna as …** flyout; `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()`; Items row helpers `getContextMenuItemsTitle()` / `getContextMenuItemsMeta()` |
 | `citrana-items-menu.js` | ~846 | **Canvas Items** panel (`#items-menu-btn`, shortcut **I**); pinned header/description + `#items-modal-nav` Section Anchors; scrollable `#items-modal-body` only; mobile Section Anchor edge fades; Chart/**Canvas**/Bhava/Graha/Annotation sections; **Clear Selection**, **Context Menu**, **Graha Library** (On/Off, green/red row tint); `.items-row-selected` sync; reuses `ContextMenu.handleAction()`; Text/Heading **Edit text** + **Style** |
-| `citrana-session.js` | ~214 | Save/open `.citrana.json` (`format: citrana-session`, `version: 1`); `capture()`, `validate()`, `download()`, `applyOptions()` |
+| `citrana-session.js` | ~225 | Save/open `.citrana.json` (`format: citrana-session`, `version: 1`); `capture()`, `validate()`, `download()`, `applyOptions()` (includes `zoomStep`) |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
-| `styles.css` | ~2964 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid (`.page-dots-chevron`, `#graha-library.graha-library-hidden`), JSColorPicker `--cp-*` theme, `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`, `#items-modal` pinned layout, `--items-scrollbar-gutter`), `.toolbar-scroll-*` (toolbar + Edit UI edge fades), `.help-modal-description`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
+| `styles.css` | ~3040 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid (`.page-dots-chevron`, `#graha-library.graha-library-hidden`), JSColorPicker `--cp-*` theme, `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`, `#items-modal` pinned layout, `--items-scrollbar-gutter`), `.toolbar-scroll-*` (toolbar + Edit UI edge fades), `.help-modal-description`, `.help-intro`, `.help-subsection-title`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
 
 ## Canvas Object Naming
 
@@ -271,11 +295,12 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 | Control | Path |
 |---------|------|
-| `#zoom-in` / `#zoom-out` | `app.zoomIn/Out()` → `ChartCoordinator.zoomIn/Out()` (scale 0.1–5, about stage centre); disabled when zoom locked |
+| `#zoom-in` / `#zoom-out` | `app.zoomIn/Out()` → `ChartCoordinator.zoomIn/Out()` → `CitranaZoom.computeNextScale()` (scale 0.1–5, about stage centre); disabled when zoom locked |
 | `#reset-zoom` | `app.zoomToFit()` → `ChartCoordinator.zoomToFit()` (routes by `currentChartType`) or scale reset (always available) |
 | `#zoom-lock` | `app.toggleZoomLock()` — default **locked** (`zoomLocked: true`); `lock` icon when locked, `lock-open` when unlocked |
-| Mouse wheel | `app.handleWheel()` (desktop only; scales about pointer when unlocked; no `preventDefault` when locked) |
-| Keyboard `+`/`-`/`0` | `+`/`-` zoom when unlocked; `0` reset zoom always; **Escape** closes dismissible modals; **Tab** trapped inside open modal; other shortcuts ignored when `isModalBlockingShortcuts()` or Graha/text inline editor focused |
+| Mouse wheel | `app.handleWheel()` → `CitranaZoom.computeNextScale()` (desktop only; scales about pointer when unlocked; no `preventDefault` when locked) |
+| Keyboard `+`/`-`/`0` | `+`/`-` zoom when unlocked (step from `app.options.zoomStep`); `0` reset zoom always; **Escape** closes dismissible modals; **Tab** trapped inside open modal; other shortcuts ignored when `isModalBlockingShortcuts()` or Graha/text inline editor focused |
+| **Zoom Step** (Options) | `app.setZoomStep()` → `localStorage.citrana_zoom_step` (`fine` \| `small` \| `medium` \| `large`); included in `.citrana.json` `options`; not undoable |
 | Display | `stage.on('scaleXChange scaleYChange')` → `app.updateZoomLevel()` → `#zoom-level` text |
 
 **`zoomToFit()`** in both templates converts `getClientRect()` to **local bounds** (undoes current scale/pan) before computing scale. Compact viewport (`CitranaDevice.isCompactViewport()`, `≤600px`): fixed defaults — South **65%**, North **82%**. Desktop: computed fit (`scaleFactor=0.7`; North `extraTopMargin=-50`, South `extraTopMargin=20`).
@@ -333,20 +358,21 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 **Edit sessions** (one step on commit, not per click): drawing Edit UI (`hide()`), Graha text bar (`finish(true)`), inline text/heading double-click editors.
 
-**Not tracked:** active tool, Bhava highlight, Graha library page, modal/UI state, chart indicator visibility preferences, Save Chart Only export preference, laser pointer strokes, **Presentation View**.
+**Not tracked:** active tool, Bhava highlight, Graha library page, modal/UI state, chart indicator visibility preferences, Save Chart Only export preference, **Zoom Step** preference, laser pointer strokes, **Presentation View**.
 
 **Tracked with viewport:** zoom level and pan position are preserved across undo/redo (`restoreHistoryState()` + `skipZoomToFit` on template reload).
 
 ### Chart display options
 
 1. User opens `#options-btn` (gear, toolbar export group) → `#options-modal`
-2. Toggle **Hide North Indian Chart Indicators**, **Hide South Indian Chart Indicators**, and/or **Save Chart Only**
-3. Indicator toggles → `app.setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)` → `localStorage` (`citrana_north_hide_indicators` / `citrana_south_hide_indicators`, `'1'` when hidden)
-4. Active chart template applies indicators via `applyNorthIndicatorsPreference()` or `applySouthIndicatorsPreference()`:
+2. Choose **Zoom Step** (**Fine (1%)** default, **Small (~10%)**, **Medium (~20%)**, **Large (~25%)**), and/or toggle **Hide North Indian Chart Indicators**, **Hide South Indian Chart Indicators**, and/or **Save Chart Only**
+3. **Zoom Step** → `app.setZoomStep(step)` → `localStorage.citrana_zoom_step`; applies to zoom buttons, keyboard **+**/**−**, and scroll wheel via `CitranaZoom.computeNextScale()`
+4. Indicator toggles → `app.setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)` → `localStorage` (`citrana_north_hide_indicators` / `citrana_south_hide_indicators`, `'1'` when hidden)
+5. Active chart template applies indicators via `applyNorthIndicatorsPreference()` or `applySouthIndicatorsPreference()`:
    - **North**: `tinyBoxGroupNorth.visible(!hide)`
    - **South**: lagna diagonal lines, yellow bhava boxes, black rashi boxes via `setSouthIndicatorsVisible()`
-5. **Save Chart Only** → `app.setSaveChartOnly(enabled)` → `localStorage.citrana_save_chart_only`; `applySaveChartOnlyTransparency()` forces `exportWithWhiteBg = false` and locks `#toggle-transparency-btn` when on; restores `exportWithWhiteBg = true` when off
-6. Indicator prefs reapply on chart create and Lagna changes; all option prefs survive refresh but are **not** in undo snapshots
+6. **Save Chart Only** → `app.setSaveChartOnly(enabled)` → `localStorage.citrana_save_chart_only`; `applySaveChartOnlyTransparency()` forces `exportWithWhiteBg = false` and locks `#toggle-transparency-btn` when on; restores `exportWithWhiteBg = true` when off
+7. Indicator and zoom-step prefs reapply on chart create and Lagna changes; all option prefs survive refresh and are included in `.citrana.json` but are **not** in undo snapshots
 
 ### Export
 
@@ -374,9 +400,9 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 **Save / Open Session (`.citrana.json`):**
 1. User clicks **Save Session** → `app.saveSession()` → shared progress modal (`Saving Session`) → `CitranaSession.capture(app)` → `download()` with timestamped filename
-2. Payload: `{ format: 'citrana-session', version: 1, chartData, drawingData, options }` where `options` mirrors indicator toggles and Save Chart Only preference
+2. Payload: `{ format: 'citrana-session', version: 1, chartData, drawingData, options }` where `options` mirrors indicator toggles, Save Chart Only preference, and **Zoom Step**
 3. **Open Session** → file picker → `CitranaSession.readFile()` → `validate()` → confirm if canvas has content → `app.applyImportedSession()` → progress modal (`Opening Session`) → `app.restoreSessionState()`
-4. Import applies chart + drawings + options; `history.resetToState()` seeds a fresh undo timeline
+4. Import applies chart + drawings + options; `history.resetToState()` seeds a fresh undo timeline; users can save to any cloud storage and resume on another device
 5. `isSessionBusy` and `isExporting` are mutually exclusive — concurrent save/open/export is blocked
 6. **Export PNG** remains the raster copy path; session files are the structured save path
 
@@ -392,6 +418,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | `localStorage.citrana_north_hide_indicators` | Options modal (North toggle) | `'1'` hides North bhava corner boxes; key removed when shown |
 | `localStorage.citrana_south_hide_indicators` | Options modal (South toggle) | `'1'` hides South lagna line and bhava/rashi boxes; key removed when shown |
 | `localStorage.citrana_save_chart_only` | Options modal (Save Chart Only) | `'1'` enables chart-area export (transparent, no watermark); key removed when off |
+| `localStorage.citrana_zoom_step` | Options modal (Zoom Step) | `fine` (default), `small`, `medium`, or `large`; removed when set to default `fine` |
 | `localStorage.citrana_context_menu_enabled` | Canvas Items panel (**Context Menu** row) | `'false'` disables right-click and long-press menus; touch-primary default off until user enables (desktop fine-pointer default on) |
 | `localStorage.citrana_graha_library_enabled` | Canvas Items panel (**Graha Library** row) | `'false'` hides `#graha-library` via `.graha-library-hidden`; default on; independent of Presentation View |
 | `localStorage.citrana_debug` | DevTools / manual | `'0'` silences `citranaDebug()`; default is on |
@@ -447,7 +474,7 @@ Modals: Welcome, Help, **Options**, About, **Canvas Items**, Confirmation, **Ope
 - `openModal()` / `showProgressModal()` push prior focus onto `_modalFocusStack` and focus close button (or modal root if no focusables)
 - `closeModal()` / `hideProgressModal()` pop stack and restore focus
 - Operation progress: dynamic title (`Exporting Chart`, `Saving Session`, `Opening Session`); `aria-busy="true"` while running; status text id referenced by `aria-describedby`; `completeProgressModal()` / `failProgressModal()` for success/error
-- Help intro: `#help-modal-description` with `.help-modal-description` (spacing before **Keyboard Shortcuts** section)
+- Help **Guide** (`#help-modal`): `.help-intro` workspace overview; `.help-subsection-title` sections (Charts, Options, Graha Library, Grahas on the Chart, Annotations, Canvas Items, Presentation View, Zoom and Pan, Undo and Redo, Sessions and Export, Privacy Note); portable `.citrana.json` session guidance; `#help-modal-description` with `.help-modal-description` (spacing before **Keyboard Shortcuts**)
 - **Canvas Items** intro: `#items-modal-description`; Section Anchors in `#items-modal-nav` (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`); scrollable list in `#items-modal-body` only (`--items-scrollbar-gutter`)
 - Mobile About/Welcome: compact typography, `overflow: hidden`; `@media` blocks after base modal CSS (cascade-safe)
 
@@ -526,6 +553,8 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | North chart Lagna by Rashi | `handleAction('set-lagna')` with rashi 1–12 |
 | Library drop hit-test | `findHouseAtChartPoint()` in template; coords in `ChartCoordinator` |
 | Zoom fit behaviour | `zoomToFit()` in chart template — compact viewport fixed **65%** (South) / **82%** (North); desktop computed fit |
+| Zoom step presets | `citrana-zoom.js` (`computeNextScale`, `VALID_STEPS`); `app.setZoomStep()`; `#zoom-step-*` in `index.html` Options modal; `localStorage.citrana_zoom_step`; session `options.zoomStep` in `citrana-session.js` |
+| Help Guide content | `#help-modal` in `index.html` (`.help-intro`, `.help-subsection-title` sections); styles in `styles.css`; keep aligned with README Usage Guide |
 | Theme / layout / safe areas | `assets/css/styles.css` — keep post-base mobile `@media` blocks after component base rules when overrides must win |
 | Export behaviour | `app.exportChart()` / `finalizeExportImage()`; crop bounds in `ChartCoordinator.getExportCropRect()`; `isExporting` guard; progress via `showProgressModal()` |
 | Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
