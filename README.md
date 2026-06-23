@@ -38,7 +38,7 @@ This codebase is developed using AI agents.
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
 - Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark; transparency toolbar locks on and restores a white background when turned off), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
 - Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); off by default on touch devices (enable from **Canvas Items** → **Canvas** → **Context Menu**); suppressed while drawing tools are active so strokes are not interrupted
-- Canvas Items: Layers button in the zoom bar or shortcut **I** opens chart actions, Bhavas, Grahas, and Annotations on desktop and touch devices; **Section Anchors** jump between sections (pinned below the description while the list scrolls; swipe or scroll left and right when they overflow); **Clear Selection** and **Context Menu** (On/Off with green/red row tint) in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading Annotations offer separate **Edit text** and **Style** actions
+- Canvas Items: Layers button in the zoom bar or shortcut **I** opens chart actions, Bhavas, Grahas, and Annotations on desktop and touch devices; **Section Anchors** jump between sections (pinned below the description while the list scrolls; swipe or scroll left and right when they overflow); **Clear Selection**, **Context Menu**, and **Graha Library** (On/Off with green/red row tint) in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading Annotations offer separate **Edit text** and **Style** actions
 - Keyboard Shortcuts: Tools (including **K** for Laser Pointer and **I** for Canvas Items), Graha Library pages **1**–**5**, undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; save a `.citrana.json` session file or export PNG to keep a copy
@@ -183,7 +183,7 @@ Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the
 
 #### Graha Library
 
-Five pages — traditional Grahas, Jaimini Karakas, Tamil, Hindi, and Upagrahas with outer Grahas. Switch pages with the dots at the bottom of the library, keyboard **1**–**5**, or on mobile swipe left or right on the **dots bar only** (grey chevrons at each end hint that you can swipe; the dots remain tappable). Swiping the Graha grid or header still drags Grahas or moves the library panel.
+Five pages — traditional Grahas, Jaimini Karakas, Tamil, Hindi, and Upagrahas with outer Grahas. Switch pages with the dots at the bottom of the library, keyboard **1**–**5**, or on mobile swipe left or right on the **dots bar only** (grey chevrons at each end hint that you can swipe; the dots remain tappable). Swiping the Graha grid or header still drags Grahas or moves the library panel. Hide or show the library from **Canvas Items** → **Canvas** → **Graha Library** (saved in this browser; separate from Presentation View).
 
 #### Adding Degrees
 
@@ -217,7 +217,7 @@ Use the toolbar to add arrows, lines, pen strokes, text, and headings.
 
 #### Presentation View
 
-Right-click the canvas (or a Bhava), open **Canvas Items**, or use the chart context menu and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again, reopen **Canvas Items**, or choose **Exit Presentation View** to restore the interface.
+Right-click the canvas (or a Bhava), open **Canvas Items**, or use the chart context menu and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again, reopen **Canvas Items**, or choose **Exit Presentation View** to restore the interface. To hide only the Graha Library without hiding other controls, use **Canvas Items** → **Canvas** → **Graha Library**.
 
 #### Undo and Redo
 
@@ -240,7 +240,7 @@ Open **Canvas Items** from the layers icon in the zoom bar (after the zoom lock)
 
 - Lists chart actions, all Bhavas, placed Grahas, and Annotations in one panel
 - **Section Anchors:** pill buttons below the description jump to **Canvas**, **Chart**, **Bhavas**, **Grahas**, **Annotations**, and other sections. The title, description, and Section Anchors stay fixed at the top while only the list scrolls. Swipe or scroll the Section Anchors left and right when not all pills fit on screen. The active section is highlighted
-- **Canvas:** **Clear Selection** and **Context Menu** (On/Off — saved in this browser; off by default on touch devices). The Context Menu row uses a green tint when on and a red tint when off
+- **Canvas:** **Clear Selection**, **Context Menu** (On/Off — saved in this browser; off by default on touch devices), and **Graha Library** (On/Off — saved in this browser). Both toggle rows use a green tint when on and a red tint when off. Hiding the Graha Library here is separate from Presentation View
 - Selected Bhavas, Grahas, and Annotations are highlighted in the list and stay in sync with the canvas
 - **Chart:** create a chart, set Lagna (North Indian), Presentation View, Reset Chart, Reset Annotations, and Clear Canvas
 - **Bhavas:** select a Bhava, set as Lagna or First Bhava, or clear Grahas in that Bhava; South Indian rows show each cell's fixed Rashi name with its zodiac symbol
