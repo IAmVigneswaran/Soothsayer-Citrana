@@ -462,7 +462,7 @@ class CitranaItemsMenu {
                     planetSystem?.getGrahaLibraryResetActionLabel?.() || 'Reset Graha Library Position',
                     'move'
                 ),
-                'move'
+                'orbit'
             )
         ].join('');
 
