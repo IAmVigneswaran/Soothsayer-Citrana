@@ -2148,6 +2148,24 @@ body.presentation-view .about-btn {
   margin: 0 0 12px 0;
 }
 
+.help-subsection-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin: 20px 0 8px 0;
+}
+
+.help-instructions > .help-subsection-title:first-child {
+  margin-top: 0;
+}
+
+.help-intro {
+  margin: 0 0 16px 0;
+  line-height: 1.6;
+  color: #374151;
+  font-size: 14px;
+}
+
 .help-shortcuts {
   display: grid;
   gap: 8px;
