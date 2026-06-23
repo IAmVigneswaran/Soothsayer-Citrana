@@ -117,9 +117,9 @@ flowchart TB
 | `citrana-annotation-fonts.js` | ~118 | Normal vs Hand-written annotation typography — Arial / Arial Black vs Caveat / Caveat Brush; `setBold` / `setItalic` / `setMode`; `ensureLoaded()` for Google Fonts |
 | `citrana-history.js` | ~94 | Unified undo/redo timeline (`CitranaHistory`) |
 | `citrana-chart-coordinator.js` | ~334 | Unified API over South/North templates; zoom (`zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
-| `citrana-chart-templates-south.js` | ~984 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `CitranaRashis` / `CitranaDevice` |
-| `citrana-chart-templates-north.js` | ~1011 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds; `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `raiseDrawingsAboveChart()` / `syncNorthChartLayerOrder()`; `CitranaRashis` / `CitranaDevice` |
-| `citrana-planet-system.js` | ~910 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, dots-bar swipe paging with mobile chevron hints, keyboard **1**–**5** via `goToPage()`, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
+| `citrana-chart-templates-south.js` | ~989 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds (compact viewport fixed **65%**); `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `CitranaRashis` / `CitranaDevice` |
+| `citrana-chart-templates-north.js` | ~1015 | Diamond polygon chart, rashi boxes, Lagna rashi math, indicator visibility (`tinyBoxGroupNorth`), `zoomToFit()` with local bounds (compact viewport fixed **82%**); `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `raiseDrawingsAboveChart()` / `syncNorthChartLayerOrder()`; `CitranaRashis` / `CitranaDevice` |
+| `citrana-planet-system.js` | ~962 | Graha library UI (5 pages, 60 Grahas — Page 5: Upagrahas and outer Grahas), `fullName` library labels, no-scroll grid layout, visibility toggle (`citrana_graha_library_enabled`, `#graha-library.graha-library-hidden`), dots-bar swipe paging with mobile chevron hints, keyboard **1**–**5** via `goToPage()`, drag-and-drop via coordinator hit-test, `clearSelectedBhavaDropTarget()` |
 | `citrana-arrow.js` | ~185 | Unified filled-arrow geometry (`Konva.Line` polygon); `arrowAnchors`; legacy `Konva.Arrow` migration |
 | `citrana-colorpicker.js` | ~383 | JSColorPicker v1.1.0 theme, swatches, chip toggles, alpha; `applyToKonvaArrow()` / `fromKonvaShape()`; `isPickerPopupTarget()` for touch-outside dismiss |
 | `citrana-device.js` | ~39 | Shared `isTouchDevice()`, `isMobileUA()`, `isCompactViewport()`, `isLaserViewport()` (all viewports), `hasFinePointer()` |
@@ -128,11 +128,11 @@ flowchart TB
 | `citrana-laser.js` | ~248 | Ephemeral laser pointer — Canvas 2D overlay above stage; independent strokes per gesture; ~3s fade; `isAvailable()` → `CitranaDevice.isLaserViewport()`; not serialised or undoable |
 | `citrana-drawing-tools.js` | ~3218 | Drawing tools, selection, control points (desktop hover/drag feedback; `raiseControlPointsAbovePickRects()`), Graha text editing, `CitranaArrow.create()`, tapered pen (`Konva.Shape` + `penTaper` attrs + `bounding-box-pen` pick rects), pen select/drag/edit (`bindPenPickRectInteraction`, `beginManualPenDrag`, `editPenAnnotation`), `CitranaLaser` delegation, multi-line `startInlineContentEdit()`, `bindRestoredDrawingInteractions()`; history `recordHistory()` calls (laser excluded); notifies `app.notifyCanvasSelectionChanged()` on select/clear; `CitranaSelection` for annotation text and pen; `CitranaDevice` for touch/mobile |
 | `citrana-edit-ui.js` | ~1020 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close); `getEditTarget()` for stable pen node; Normal / Hand-written font toggles via `CitranaAnnotationFonts`; mobile chevron scroll (`setupEditUIScroll`, `#edit-ui-scroll-*`); touch-outside dismiss excludes picker popup and `.konva-textarea` |
-| `citrana-context-menu.js` | ~743 | Right-click / long-press menus; `resolveDefaultCanvasContextMenuEnabled()` (off on touch-primary until set); `shouldBlockCanvasContextMenu()`; **Presentation View**; North **Set Lagna as …** flyout; `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()`; Items row helpers `getContextMenuItemsTitle()` / `getContextMenuItemsMeta()` |
-| `citrana-items-menu.js` | ~818 | **Canvas Items** panel (`#items-menu-btn`, shortcut **I**); pinned header/description + `#items-modal-nav` Section Anchors; scrollable `#items-modal-body` only; mobile Section Anchor edge fades; Chart/**Canvas**/Bhava/Graha/Annotation sections; **Clear Selection**, **Context Menu** (On/Off, green/red row tint); `.items-row-selected` sync; reuses `ContextMenu.handleAction()`; Text/Heading **Edit text** + **Style** |
+| `citrana-context-menu.js` | ~742 | Right-click / long-press menus; `resolveDefaultCanvasContextMenuEnabled()` (off on touch-primary until set); `shouldBlockCanvasContextMenu()`; **Presentation View**; North **Set Lagna as …** flyout; `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()`; Items row helpers `getContextMenuItemsTitle()` / `getContextMenuItemsMeta()` |
+| `citrana-items-menu.js` | ~846 | **Canvas Items** panel (`#items-menu-btn`, shortcut **I**); pinned header/description + `#items-modal-nav` Section Anchors; scrollable `#items-modal-body` only; mobile Section Anchor edge fades; Chart/**Canvas**/Bhava/Graha/Annotation sections; **Clear Selection**, **Context Menu**, **Graha Library** (On/Off, green/red row tint); `.items-row-selected` sync; reuses `ContextMenu.handleAction()`; Text/Heading **Edit text** + **Style** |
 | `citrana-session.js` | ~214 | Save/open `.citrana.json` (`format: citrana-session`, `version: 1`); `capture()`, `validate()`, `download()`, `applyOptions()` |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
-| `styles.css` | ~2960 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid (`.page-dots-chevron`), JSColorPicker `--cp-*` theme, `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`, `#items-modal` pinned layout, `--items-scrollbar-gutter`), `.toolbar-scroll-*` (toolbar + Edit UI edge fades), `.help-modal-description`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
+| `styles.css` | ~2964 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid (`.page-dots-chevron`, `#graha-library.graha-library-hidden`), JSColorPicker `--cp-*` theme, `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`, `#items-modal` pinned layout, `--items-scrollbar-gutter`), `.toolbar-scroll-*` (toolbar + Edit UI edge fades), `.help-modal-description`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
 
 ## Canvas Object Naming
 
@@ -241,14 +241,14 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | Bhava | Bhava hit | South: Set as Lagna; North: Set as First Bhava; Clear Bhava; **Presentation View**; … |
 | Graha | Graha hit | Edit Graha, Delete Graha |
 
-**Presentation View:** `toggle-presentation-view` → `app.togglePresentationView()` toggles `presentationView` and `body.presentation-view` (hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, drawing Edit UI). Dismisses active edit sessions on enter. Label alternates **Presentation View** / **Exit Presentation View**. Available from context menus and the **Canvas Items** panel. Not undoable.
+**Presentation View:** `toggle-presentation-view` → `app.togglePresentationView()` toggles `presentationView` and `body.presentation-view` (hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, drawing Edit UI). Dismisses active edit sessions on enter. Label alternates **Presentation View** / **Exit Presentation View**. Available from context menus and the **Canvas Items** panel. Not undoable. **Graha Library** can also be hidden independently via Canvas Items → **Graha Library** (On/Off).
 
 ### Canvas Items panel
 
 1. User opens **Canvas Items** via `#items-menu-btn` (zoom bar) or keyboard **I** → `CitranaItemsMenu.open()` → `render()` lists Chart, **Canvas**, Bhavas, Grahas, Annotations (and North **Lagna** / **Chart Actions** when applicable)
 2. **Layout:** `#items-modal .options-modal-content` is a non-scrolling flex column; title, `#items-modal-description`, and `#items-modal-nav` stay pinned; only `#items-modal-body` scrolls (Help-style gutter scrollbar via `--items-scrollbar-gutter`)
 3. **`#items-modal-nav`**: `renderSectionNav()` builds Section Anchors in `.items-section-nav-scroll-wrap` (hidden when fewer than two sections); tap anchor → `scrollToSection()`; `IntersectionObserver` (root `#items-modal-body`) updates active anchor; `setupSectionNavScrollFades()` toggles mobile horizontal edge fades
-4. **Canvas** rows: **Clear Selection** → `app.clearCanvasSelection()`; **Context Menu** → `ContextMenu.toggleCanvasContextMenu()` (persisted in `localStorage.citrana_context_menu_enabled`; default off on touch-primary; `.items-row-context-menu-on` green / `.items-row-context-menu-off` red row tint)
+4. **Canvas** rows: **Clear Selection** → `app.clearCanvasSelection()`; **Context Menu** → `ContextMenu.toggleCanvasContextMenu()` (persisted in `localStorage.citrana_context_menu_enabled`; default off on touch-primary; `.items-row-context-menu-on` green / `.items-row-context-menu-off` red row tint); **Graha Library** → `PlanetSystem.toggleGrahaLibrary()` (persisted in `localStorage.citrana_graha_library_enabled`; default on; `#graha-library.graha-library-hidden`; same On/Off row tint; `orbit` row icon)
 4. Chart rows dispatch `ContextMenu.handleAction()` (create/reset/clear, **Presentation View**, North Set Lagna, etc.)
 5. Bhava/Graha rows reuse the same action handlers as context menus; South Bhava labels show fixed Rashi names from `CitranaRashis`
 6. Selected row gets `.items-row-selected` via `isRowSelected()` / `app.getCanvasSelection()`; `refreshSelectionHighlight()` on canvas selection change
@@ -275,7 +275,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | Keyboard `+`/`-`/`0` | `+`/`-` zoom when unlocked; `0` reset zoom always; **Escape** closes dismissible modals; **Tab** trapped inside open modal; other shortcuts ignored when `isModalBlockingShortcuts()` or Graha/text inline editor focused |
 | Display | `stage.on('scaleXChange scaleYChange')` → `app.updateZoomLevel()` → `#zoom-level` text |
 
-**`zoomToFit()`** in both templates converts `getClientRect()` to **local bounds** (undoes current scale/pan) before computing fit scale. South: desktop `scaleFactor=0.7`, mobile `0.95`. North: desktop `extraTopMargin=-50`, mobile `20`.
+**`zoomToFit()`** in both templates converts `getClientRect()` to **local bounds** (undoes current scale/pan) before computing scale. Compact viewport (`CitranaDevice.isCompactViewport()`, `≤600px`): fixed defaults — South **65%**, North **82%**. Desktop: computed fit (`scaleFactor=0.7`; North `extraTopMargin=-50`, South `extraTopMargin=20`).
 
 ### Edit Graha
 
@@ -390,6 +390,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 | `localStorage.citrana_south_hide_indicators` | Options modal (South toggle) | `'1'` hides South lagna line and bhava/rashi boxes; key removed when shown |
 | `localStorage.citrana_save_chart_only` | Options modal (Save Chart Only) | `'1'` enables chart-area export (transparent, no watermark); key removed when off |
 | `localStorage.citrana_context_menu_enabled` | Canvas Items panel (**Context Menu** row) | `'false'` disables right-click and long-press menus; touch-primary default off until user enables (desktop fine-pointer default on) |
+| `localStorage.citrana_graha_library_enabled` | Canvas Items panel (**Graha Library** row) | `'false'` hides `#graha-library` via `.graha-library-hidden`; default on; independent of Presentation View |
 | `localStorage.citrana_debug` | DevTools / manual | `'0'` silences `citranaDebug()`; default is on |
 
 ## Debug logging
@@ -423,7 +424,7 @@ All interactive chrome is **fixed/absolute positioned** over a full-viewport can
 | Desktop | `repeat(auto-fit, minmax(80px, 1fr))` | 80×40px | No scroll; grows to fit 12 items per page |
 | Mobile ≤768px | 6 cols × 2 rows | 30px tall, 7px font | Compact header/grid/dots padding; `word-break: break-word` for Page 5 Upagrahas; swipe left/right on `.page-dots` bar only; grey chevron hints (`.page-dots-chevron`) |
 
-Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-grid` + `.page-dots` (`.page-dots-track` + `.page-dots-chevron` prev/next on mobile). Styles in `styles.css` only (no inline header/grid styles in `index.html`). Library cells show `planet.fullName` from `createPlanetLibrary()`. Paging: dot click, keyboard **1**–**5** (`app` → `goToPage()`), mobile swipe on `.page-dots` via `setupSwipeEvents()` on `pageDotsEl`.
+Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-grid` + `.page-dots` (`.page-dots-track` + `.page-dots-chevron` prev/next on mobile). Styles in `styles.css` only (no inline header/grid styles in `index.html`). Library cells show `planet.fullName` from `createPlanetLibrary()`. Paging: dot click, keyboard **1**–**5** (`app` → `goToPage()`), mobile swipe on `.page-dots` via `setupSwipeEvents()` on `pageDotsEl`. Visibility: `PlanetSystem.applyGrahaLibraryVisibility()` toggles `#graha-library.graha-library-hidden` (Canvas Items → **Graha Library**; separate from Presentation View).
 
 ### Floating elements
 
@@ -495,7 +496,8 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | Goal | Where to change |
 |------|-----------------|
 | Add Graha to library | `planetsPage1`–`planetsPage5` in `citrana-planet-system.js` (Page 5: Upagrahas before outer Grahas) |
-| Graha library layout | `.floating-planet-library`, `.planet-library-header`, `.planet-grid`, `.page-dots`, `.page-dots-chevron` in `styles.css`; markup in `index.html`; paging via dots, **1**–**5**, mobile dots-bar swipe |
+| Graha library layout | `.floating-planet-library`, `#graha-library.graha-library-hidden`, `.planet-library-header`, `.planet-grid`, `.page-dots`, `.page-dots-chevron` in `styles.css`; markup in `index.html`; paging via dots, **1**–**5**, mobile dots-bar swipe; visibility via Canvas Items |
+| Graha library visibility | `PlanetSystem.isGrahaLibraryEnabled()` / `toggleGrahaLibrary()` in `citrana-planet-system.js`; `toggle-graha-library` in `citrana-items-menu.js`; `localStorage.citrana_graha_library_enabled` |
 | Add drawing tool | `DrawingTools.startDrawing()` switch, toolbar in `index.html`, `app.setTool()` |
 | Laser pointer overlay | `citrana-laser.js` (`init`, fade loop, `pruneStrokes`, `isAvailable` → `CitranaDevice.isLaserViewport()`); CSS `.citrana-laser-canvas`; exclude from `recordHistory` / `serializeDrawings` |
 | Device / viewport helpers | `citrana-device.js` (`isTouchDevice`, `isMobileUA`, `isCompactViewport`, `isLaserViewport`, `hasFinePointer`) |
@@ -520,7 +522,7 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | North First Bhava → Lagna | `handleAction('set-first-house')` |
 | North chart Lagna by Rashi | `handleAction('set-lagna')` with rashi 1–12 |
 | Library drop hit-test | `findHouseAtChartPoint()` in template; coords in `ChartCoordinator` |
-| Zoom fit behaviour | `zoomToFit()` in chart template |
+| Zoom fit behaviour | `zoomToFit()` in chart template — compact viewport fixed **65%** (South) / **82%** (North); desktop computed fit |
 | Theme / layout / safe areas | `assets/css/styles.css` — keep post-base mobile `@media` blocks after component base rules when overrides must win |
 | Export behaviour | `app.exportChart()` / `finalizeExportImage()`; crop bounds in `ChartCoordinator.getExportCropRect()`; `isExporting` guard; progress via `showProgressModal()` |
 | Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
