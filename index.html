@@ -191,7 +191,7 @@
             <i data-lucide="lock"></i>
             </button>
             <span class="zoom-divider" aria-hidden="true"></span>
-            <button id="items-menu-btn" type="button" title="Items (I)" aria-label="Items">
+            <button id="items-menu-btn" type="button" title="Canvas Items (I)" aria-label="Canvas Items">
             <i data-lucide="layers"></i>
             </button>
          </div>
@@ -248,17 +248,17 @@
             </div>
          </div>
       </div>
-      <!-- Items Modal (uses Options modal styles) -->
+      <!-- Canvas Items Modal (uses Options modal styles) -->
       <div id="items-modal" class="options-modal" role="dialog" aria-modal="true" aria-labelledby="items-modal-title" aria-describedby="items-modal-description" aria-hidden="true">
          <div class="options-modal-content">
             <div class="options-modal-header">
-               <h2 id="items-modal-title" class="options-modal-title">Items</h2>
-               <button class="options-modal-close" id="items-modal-close" type="button" aria-label="Close items">
+               <h2 id="items-modal-title" class="options-modal-title">Canvas Items</h2>
+               <button class="options-modal-close" id="items-modal-close" type="button" aria-label="Close Canvas Items">
                <i data-lucide="x"></i>
                </button>
             </div>
-            <p id="items-modal-description" class="help-modal-description">All chart actions in one list: Bhavas, Grahas, annotations, and canvas options. Use the sticky chip bar to jump between sections; swipe or scroll left and right if not all chips fit on screen. Use this when right-click or long-press is awkward. Context Menu is off by default on touch devices; enable it in the Canvas section below. Also available on desktop (I).</p>
-            <nav id="items-modal-nav" class="items-section-nav-wrap" aria-label="Jump to section" hidden></nav>
+            <p id="items-modal-description" class="help-modal-description">All chart actions in one list: Bhavas, Grahas, Annotations, and canvas options. Use the <strong>Section Anchors</strong> to jump between sections; swipe or scroll left and right if not all anchors fit on screen. Context Menu is off by default on touch devices; enable it in the Canvas section below.</p>
+            <nav id="items-modal-nav" class="items-section-nav-wrap" aria-label="Section Anchors" hidden></nav>
             <div id="items-modal-body" class="items-modal-body"></div>
          </div>
       </div>
@@ -304,6 +304,10 @@
                      <span class="help-shortcut-key">H</span>
                   </div>
                   <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Graha Library</span>
+                     <span class="help-shortcut-key">1 – 5</span>
+                  </div>
+                  <div class="help-shortcut">
                      <span class="help-shortcut-desc">Zoom In</span>
                      <span class="help-shortcut-key">+</span>
                   </div>
@@ -316,7 +320,7 @@
                      <span class="help-shortcut-key">0</span>
                   </div>
                   <div class="help-shortcut">
-                     <span class="help-shortcut-desc">Open Items</span>
+                     <span class="help-shortcut-desc">Open Canvas Items</span>
                      <span class="help-shortcut-key">I</span>
                   </div>
                   <div class="help-shortcut">
@@ -345,7 +349,7 @@
                <h3 class="help-section-title">Basic Usage</h3>
                <div class="help-instructions">
                   <p><strong>Screen Size:</strong> If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.</p>
-                  <p><strong>Browser and Device Compatibility:</strong> Citrana is designed for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). For optimal performance and full feature access, use a desktop environment. On mobile and touch devices, use the <strong>Items</strong> panel for chart, Bhava, Graha, and annotation actions. Brave users must disable Brave Shields for full functionality.</p>
+                  <p><strong>Browser and Device Compatibility:</strong> Citrana is designed for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). For optimal performance and full feature access, use a desktop environment. On mobile and touch devices, use the <strong>Canvas Items</strong> panel for chart, Bhava, Graha, and Annotation actions. Brave users must disable Brave Shields for full functionality.</p>
                   <p><strong>Chart Types:</strong> Citrana supports both South Indian and North Indian chart layouts.</p>
                   <p><strong>South Indian Chart:</strong> Traditional 4x4 grid layout with centre empty.</p>
                   <ul class="help-sublist">
@@ -361,7 +365,7 @@
                   <ul class="help-sublist">
                      <li><strong>Hide North Indian Chart Indicators</strong> — hides bhava numbers (black corner boxes).</li>
                      <li><strong>Hide South Indian Chart Indicators</strong> — hides the lagna diagonal line, yellow bhava numbers, and black rashi numbers.</li>
-                     <li><strong>Save Chart Only</strong> — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark.</li>
+                     <li><strong>Save Chart Only</strong> — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and Annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark.</li>
                      <li>Preferences are saved in this browser, included when you <strong>Save Session</strong>, and are not tracked by undo/redo.</li>
                   </ul>
                   <p><strong>Adding Grahas:</strong> Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times.</p>
@@ -378,29 +382,29 @@
                   <ul class="help-sublist">
                      <li>After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool and Laser Pointer stay active for continuous drawing.</li>
                      <li>The Laser Pointer (<strong>K</strong>) draws a temporary highlight that fades away — it is not saved to the chart or included in undo/redo.</li>
-                     <li>Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or the Items panel — see below) to change colour, font size, bold, italic, alignment, and font style (<strong>Normal</strong> or <strong>Hand-written</strong>).</li>
-                     <li>With the <strong>Select</strong> tool, click or tap a pen stroke to select it, click-and-drag or touch-and-drag to move it, and double-click or double-tap to open colour and stroke controls (or use <strong>Items</strong> → <strong>Edit</strong>).</li>
+                     <li>Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or the Canvas Items panel — see below) to change colour, font size, bold, italic, alignment, and font style (<strong>Normal</strong> or <strong>Hand-written</strong>).</li>
+                     <li>With the <strong>Select</strong> tool, click or tap a pen stroke to select it, click-and-drag or touch-and-drag to move it, and double-click or double-tap to open colour and stroke controls (or use <strong>Canvas Items</strong> → <strong>Edit</strong>).</li>
                      <li>Text and headings support multiple lines: press <strong>Shift+Enter</strong> for a new line while editing; press <strong>Enter</strong> to finish.</li>
-                     <li>Select text, heading, or pen stroke annotations with the Select tool to show the dashed <strong>Selection Pill</strong>.</li>
+                     <li>Select Text, Heading, or Pen Stroke Annotations with the Select tool to show the dashed <strong>Selection Pill</strong>.</li>
                      <li>Use the Hand tool to pan around the chart.</li>
                   </ul>
-                  <p><strong>Items Panel:</strong> Click the layers icon in the zoom bar (after the zoom lock) or press <strong>I</strong> to open <strong>Items</strong>. It works on desktop and touch devices when you want one list instead of right-click or long-press menus.</p>
+                  <p><strong>Canvas Items:</strong> Click the layers icon in the zoom bar (after the zoom lock) or press <strong>I</strong> to open <strong>Canvas Items</strong>. It works on desktop and touch devices when you want one list instead of right-click or long-press menus.</p>
                   <ul class="help-sublist">
-                     <li>Lists chart actions, all Bhavas, placed Grahas, and annotations in one panel.</li>
-                     <li><strong>Sticky chip bar:</strong> pill buttons at the top jump to <strong>Canvas</strong>, <strong>Chart</strong>, <strong>Bhavas</strong>, <strong>Grahas</strong>, <strong>Annotations</strong>, and other sections without scrolling the full list. Swipe or scroll left and right along the chip bar when not all pills fit on screen. The bar stays visible while you scroll; the active section is highlighted.</li>
+                     <li>Lists chart actions, all Bhavas, placed Grahas, and Annotations in one panel.</li>
+                     <li><strong>Section Anchors:</strong> pill buttons at the top jump to <strong>Canvas</strong>, <strong>Chart</strong>, <strong>Bhavas</strong>, <strong>Grahas</strong>, <strong>Annotations</strong>, and other sections without scrolling the full list. Swipe or scroll left and right when not all Section Anchors fit on screen. They stay visible while you scroll; the active section is highlighted.</li>
                      <li><strong>Canvas:</strong> <strong>Clear Selection</strong> and <strong>Context Menu</strong> (On/Off — saved in this browser; off by default on touch devices).</li>
-                     <li>Selected Bhavas, Grahas, and annotations are highlighted in the list and stay in sync with the canvas.</li>
-                     <li><strong>Chart:</strong> create a chart, set Lagna (North Indian), Presentation View, Reset Chart, Reset Drawings, and Clear Canvas.</li>
+                     <li>Selected Bhavas, Grahas, and Annotations are highlighted in the list and stay in sync with the canvas.</li>
+                     <li><strong>Chart:</strong> create a chart, set Lagna (North Indian), Presentation View, Reset Chart, Reset Annotations, and Clear Canvas.</li>
                      <li><strong>Bhavas:</strong> select a Bhava, set as Lagna or First Bhava, or clear Grahas in that Bhava.</li>
                      <li><strong>Grahas:</strong> select, edit, or delete placed Grahas.</li>
                      <li><strong>Annotations:</strong> select, edit, or delete arrows, lines, pen strokes, text, and headings.</li>
-                     <li>For <strong>Text</strong> and <strong>Heading</strong> annotations, use <strong>Edit text</strong> to change wording (opens the keyboard on touch devices) and <strong>Style</strong> to adjust colour, font size, bold, italic, alignment, and Normal or Hand-written font.</li>
+                     <li>For <strong>Text</strong> and <strong>Heading</strong> Annotations, use <strong>Edit text</strong> to change wording (opens the keyboard on touch devices) and <strong>Style</strong> to adjust colour, font size, bold, italic, alignment, and Normal or Hand-written font.</li>
                      <li>Canvas right-click and long-press menus work in Select and Hand; they are suppressed while Arrow, Line, Pen, Text, Heading, or Laser tools are active so drawing is not interrupted.</li>
                   </ul>
-                  <p><strong>Presentation View:</strong> Right-click the canvas (or a Bhava), open <strong>Items</strong>, or use the chart context menu and choose <strong>Presentation View</strong> to hide the toolbar, zoom bar, Graha library, Help, and About for a clean chart on screen. Right-click again, reopen <strong>Items</strong>, or choose <strong>Exit Presentation View</strong> to restore the interface.</p>
+                  <p><strong>Presentation View:</strong> Right-click the canvas (or a Bhava), open <strong>Canvas Items</strong>, or use the chart context menu and choose <strong>Presentation View</strong> to hide the toolbar, zoom bar, Graha library, Help, and About for a clean chart on screen. Right-click again, reopen <strong>Canvas Items</strong>, or choose <strong>Exit Presentation View</strong> to restore the interface.</p>
                   <p><strong>Undo and Redo:</strong> Use the undo and redo buttons in the toolbar or the keyboard shortcuts above to step backward and forward through your work — up to 50 steps.</p>
                   <ul class="help-sublist">
-                     <li><strong>Tracked:</strong> chart changes (Graha placement, Lagna, reset actions), drawing edits, and Graha text edits.</li>
+                     <li><strong>Tracked:</strong> chart changes (Graha placement, Lagna, reset actions), Annotation edits, and Graha text edits.</li>
                      <li><strong>Not tracked:</strong> zoom, pan, tool selection, laser pointer strokes, and Presentation View.</li>
                   </ul>
                   <p><strong>Navigation:</strong></p>
@@ -413,9 +417,9 @@
                   <p><strong>Save and Open Session:</strong> Use <strong>Save Session</strong> and <strong>Open Session</strong> in the toolbar to download or restore a working file.</p>
                   <ul class="help-sublist">
                      <li>Session files use the <strong>.citrana.json</strong> extension only — other file types are rejected.</li>
-                     <li><strong>Included:</strong> chart layout, Grahas, annotations, and Options (indicator toggles and Save Chart Only).</li>
+                     <li><strong>Included:</strong> chart layout, Grahas, Annotations, and Options (indicator toggles and Save Chart Only).</li>
                      <li><strong>Not included:</strong> undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan.</li>
-                     <li>Opening a session replaces your current chart and annotations; Citrana asks for confirmation if you already have work on the canvas.</li>
+                     <li>Opening a session replaces your current chart and Annotations; Citrana asks for confirmation if you already have work on the canvas.</li>
                   </ul>
                   <p><strong>Export PNG:</strong> Click the save icon to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image.</p>
                   <p><strong>Export Viewpoint:</strong> Exported images will always follow and inherit the browser's current viewpoint. If you resize the browser window, the exported image will reflect the visible area accordingly. Adjust your browser window size and zoom level before exporting to achieve the desired output.</p>
@@ -425,7 +429,7 @@
                      <li>Images can be saved with transparency enabled (Toggle Transparency Button) and imported into other canvas applications such as tldraw for advanced annotation and note-taking workflows.</li>
                   </ul>
                   <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
-                  <p><strong>Note:</strong> Your chart lives in this browser tab while you work (nothing is sent to a server). Refreshing the page starts a fresh session — your chart, Grahas, and drawings are not restored automatically. Use <strong>Save Session</strong> to keep a working copy you can reopen with <strong>Open Session</strong>, or <strong>Export PNG</strong> for a shareable image.</p>
+                  <p><strong>Note:</strong> Your chart lives in this browser tab while you work (nothing is sent to a server). Refreshing the page starts a fresh session — your chart, Grahas, and Annotations are not restored automatically. Use <strong>Save Session</strong> to keep a working copy you can reopen with <strong>Open Session</strong>, or <strong>Export PNG</strong> for a shareable image.</p>
                   <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
                   <p><strong>Contact Information:</strong> Should you encounter an error or issue on this site, feel free to send a message with description and screenshot. Contact information is found in the About button (bottom right).</p>
                </div>
@@ -527,11 +531,11 @@
                         <li>For South Indian charts, right-click a Bhava and select <strong>Set as Lagna</strong>. For North Indian charts, right-click a Bhava and select <strong>Set as First Bhava</strong>, or right-click the chart and choose <strong>Set Lagna as …</strong> to pick a Lagna.</li>
                         <li>Click on your desired Bhava, drag Graha from the Graha Library to place them in the chart's Bhava.</li>
                         <li>Use the page dots in the Graha Library to access additional Grahas (Tamil, Hindi, Upagrahas, outer Grahas) and Karakas.</li>
-                        <li>Use drawing tools to add annotations and notes to your chart.</li>
+                        <li>Use drawing tools to add Annotations and notes to your chart.</li>
                         <li>Click the Save icon to export your chart as an image.</li>
                      </ol>
                      <p class="welcome-help-note">Please click on the Help button to learn more.</p>
-                     <p class="welcome-browser-note">System Requirements: Citrana is optimised for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). On mobile and touch devices, use the Items panel for chart and annotation actions.</p>
+                     <p class="welcome-browser-note">System Requirements: Citrana is optimised for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). On mobile and touch devices, use the Canvas Items panel for chart and Annotation actions.</p>
                   </div>
                   <p class="welcome-copyright">© 2026 Soothsayer. All Rights Reserved</p>
                   <div class="welcome-loading-container">

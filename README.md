@@ -28,18 +28,18 @@ This codebase is developed using AI agents.
 - Dual Chart Types: South Indian (4x4 grid) and North Indian (diamond layout) with dynamic Bhava numbering
 - Graha Library: 60 Grahas across 5 pages — traditional Grahas, Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Upagrahas with outer Grahas
 - Drag & Drop Grahas: Drop onto the Bhava under your pointer; click a Bhava first to target that Bhava on the **next** drop only (then the pointer takes over again)
-- Selection Pill: Click or tap a placed Graha, or select a text, heading, or pen stroke annotation with the Select tool; a dashed **Selection Pill** appears behind the label or stroke
+- Selection Pill: Click or tap a placed Graha, or select a Text, Heading, or Pen Stroke Annotation with the Select tool; a dashed **Selection Pill** appears behind the label or stroke
 - Undo and Redo: Up to 50 steps for chart, Graha, and drawing changes via toolbar buttons or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo (zoom and pan are not tracked)
-- Save and Open Session: Download or restore a `.citrana.json` working file (chart, Grahas, annotations, and Options) from the toolbar; only `.citrana.json` files are accepted
+- Save and Open Session: Download or restore a `.citrana.json` working file (chart, Grahas, Annotations, and Options) from the toolbar; only `.citrana.json` files are accepted
 - Comprehensive Drawing Tools: Select, arrow, line, pen, laser pointer, text, and heading tools
 - Laser Pointer: Temporary fading highlight for presentations; not saved or undoable
 - Presentation View: Right-click the canvas to hide toolbar, zoom bar, Graha library, Help, and About; choose **Exit Presentation View** to restore
 - Professional Export: High-resolution PNG exports with optional transparency
 - Zoom Lock: Zoom is locked by default to prevent accidental scroll-wheel zoom; unlock from the zoom bar when you need to zoom in or out
 - Chart Display Options: Hide North or South chart indicators, or enable **Save Chart Only** (transparent chart-area export with no watermark; transparency toolbar locks on and restores a white background when turned off), from the toolbar **Options** modal; preferences persist in this browser and are included in session files
-- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); off by default on touch devices (enable from **Items** → **Canvas** → **Context Menu**); suppressed while drawing tools are active so strokes are not interrupted
-- Items Panel: Layers button in the zoom bar or shortcut **I** opens chart actions, Bhavas, Grahas, and annotations on desktop and touch devices; **sticky chip bar** jumps between sections (swipe or scroll left and right when pills overflow); **Clear Selection** and **Context Menu** (On/Off) in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading annotations offer separate **Edit text** and **Style** actions
-- Keyboard Shortcuts: Tools (including **K** for Laser Pointer and **I** for Items), undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
+- Context Menus: Right-click and long-press for chart, Bhava, and Graha actions (**Set as Lagna**, **Clear Bhava**, **Edit Graha**, **Delete Graha**, **Presentation View**, and more); off by default on touch devices (enable from **Canvas Items** → **Canvas** → **Context Menu**); suppressed while drawing tools are active so strokes are not interrupted
+- Canvas Items: Layers button in the zoom bar or shortcut **I** opens chart actions, Bhavas, Grahas, and Annotations on desktop and touch devices; **Section Anchors** jump between sections (swipe or scroll left and right when they overflow); **Clear Selection** and **Context Menu** (On/Off) in the **Canvas** section; selected rows stay in sync with the canvas; Text and Heading Annotations offer separate **Edit text** and **Style** actions
+- Keyboard Shortcuts: Tools (including **K** for Laser Pointer and **I** for Canvas Items), Graha Library pages **1**–**5**, undo/redo, zoom (when unlocked), **Delete** (selected Graha first, then selected drawing with Select tool), and help — press `?` or `/` in the app for the full list
 - Multi-language Support: Grahas available in English, Tamil, and Hindi
 - Privacy focused: Chart data is not uploaded to our servers; save a `.citrana.json` session file or export PNG to keep a copy
 
@@ -68,7 +68,7 @@ This codebase is developed using AI agents.
     - [Presentation View](#presentation-view)
     - [Undo and Redo](#undo-and-redo)
     - [Navigation](#navigation)
-  - [Items Panel](#items-panel)
+  - [Canvas Items](#canvas-items)
   - [Export, Session, and Limitations](#export-session-and-limitations)
     - [Save and Open Session](#save-and-open-session)
     - [Export PNG](#export-png)
@@ -128,7 +128,7 @@ Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's inte
 
 ### Browser and Device Compatibility
 
-Citrana is designed for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). For optimal performance and full feature access, use a desktop environment. On mobile and touch devices, the **Items** panel (layers icon or **I**) is the primary way to run chart, Bhava, Graha, and annotation actions. Note: Brave users must disable Brave Shields for full functionality.
+Citrana is designed for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). For optimal performance and full feature access, use a desktop environment. On mobile and touch devices, the **Canvas Items** panel (layers icon or **I**) is the primary way to run chart, Bhava, Graha, and Annotation actions. Note: Brave users must disable Brave Shields for full functionality.
 
 Screen Size: If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.
 
@@ -168,7 +168,7 @@ Click the gear icon in the toolbar (after Save) to open **Options**.
 
 - **Hide North Indian Chart Indicators** — hides bhava numbers (black corner boxes)
 - **Hide South Indian Chart Indicators** — hides the lagna diagonal line, yellow bhava numbers, and black rashi numbers
-- **Save Chart Only** — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark (transparency toolbar turns on automatically; turning **Save Chart Only** off restores a white background export)
+- **Save Chart Only** — exports only the chart area when you click Save. Citrana fits the chart and ignores your current zoom and pan. Grahas and Annotations on the chart are included; anything outside the chart boundary is left out. The export uses a transparent background and omits the watermark (transparency toolbar turns on automatically; turning **Save Chart Only** off restores a white background export)
 - Preferences are saved in this browser, included when you **Save Session**, and are not tracked by undo/redo
 
 ### Working with Grahas
@@ -209,15 +209,15 @@ Use the toolbar to add arrows, lines, pen strokes, text, and headings.
 
 - After you create an arrow, line, text box, or heading, the Select tool activates automatically so you can adjust it; the Pen tool and Laser Pointer stay active for continuous drawing
 - The Laser Pointer (**K**) draws a temporary highlight that fades away — it is not saved to the chart or included in undo/redo
-- Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or the **Items** panel — see below) to change colour, font size, bold, italic, alignment, and font style (**Normal** or **Hand-written**)
-- With the **Select** tool, click or tap a pen stroke to select it, click-and-drag or touch-and-drag to move it, and double-click or double-tap to open colour and stroke controls (or use **Items** → **Edit**)
+- Double-click text and heading elements to edit their wording on desktop. Use the floating Edit UI (single-click a heading, or the **Canvas Items** panel — see below) to change colour, font size, bold, italic, alignment, and font style (**Normal** or **Hand-written**)
+- With the **Select** tool, click or tap a pen stroke to select it, click-and-drag or touch-and-drag to move it, and double-click or double-tap to open colour and stroke controls (or use **Canvas Items** → **Edit**)
 - Text and headings support multiple lines: press **Shift+Enter** for a new line while editing; press **Enter** to finish
-- Select text, heading, or pen stroke annotations with the Select tool to show the dashed **Selection Pill**
+- Select Text, Heading, or Pen Stroke Annotations with the Select tool to show the dashed **Selection Pill**
 - Use the Hand tool to pan around the chart
 
 #### Presentation View
 
-Right-click the canvas (or a Bhava), open **Items**, or use the chart context menu and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again, reopen **Items**, or choose **Exit Presentation View** to restore the interface.
+Right-click the canvas (or a Bhava), open **Canvas Items**, or use the chart context menu and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Right-click again, reopen **Canvas Items**, or choose **Exit Presentation View** to restore the interface.
 
 #### Undo and Redo
 
@@ -234,19 +234,19 @@ Use the undo/redo buttons in the toolbar or **Ctrl+Z** / **Cmd+Z** undo and **Ct
 - On narrow screens, use the chevrons at the edges of the top toolbar and Edit UI to scroll through controls
 - Press `?` or `/` in the app for the full keyboard shortcut list
 
-### Items Panel
+### Canvas Items
 
-Open **Items** from the layers icon in the zoom bar (after the zoom lock) or press **I**. It works on desktop and touch devices when you want one list instead of right-click or long-press menus.
+Open **Canvas Items** from the layers icon in the zoom bar (after the zoom lock) or press **I**. It works on desktop and touch devices when you want one list instead of right-click or long-press menus.
 
-- Lists chart actions, all Bhavas, placed Grahas, and annotations in one panel
-- **Sticky chip bar:** pill buttons at the top jump to **Canvas**, **Chart**, **Bhavas**, **Grahas**, **Annotations**, and other sections without scrolling the full list. Swipe or scroll left and right along the chip bar when not all pills fit on screen. The bar stays visible while you scroll; the active section is highlighted
+- Lists chart actions, all Bhavas, placed Grahas, and Annotations in one panel
+- **Section Anchors:** pill buttons at the top jump to **Canvas**, **Chart**, **Bhavas**, **Grahas**, **Annotations**, and other sections without scrolling the full list. Swipe or scroll left and right when not all Section Anchors fit on screen. They stay visible while you scroll; the active section is highlighted
 - **Canvas:** **Clear Selection** and **Context Menu** (On/Off — saved in this browser; off by default on touch devices)
-- Selected Bhavas, Grahas, and annotations are highlighted in the list and stay in sync with the canvas
-- **Chart:** create a chart, set Lagna (North Indian), Presentation View, Reset Chart, Reset Drawings, and Clear Canvas
+- Selected Bhavas, Grahas, and Annotations are highlighted in the list and stay in sync with the canvas
+- **Chart:** create a chart, set Lagna (North Indian), Presentation View, Reset Chart, Reset Annotations, and Clear Canvas
 - **Bhavas:** select a Bhava, set as Lagna or First Bhava, or clear Grahas in that Bhava; South Indian rows show each cell's fixed Rashi name with its zodiac symbol
 - **Grahas:** select, edit, or delete placed Grahas
 - **Annotations:** select, edit, or delete arrows, lines, pen strokes, text, and headings
-- For **Text** and **Heading** annotations, use **Edit text** to change wording (opens the keyboard on touch devices) and **Style** to adjust colour, font size, bold, italic, alignment, and Normal or Hand-written font
+- For **Text** and **Heading** Annotations, use **Edit text** to change wording (opens the keyboard on touch devices) and **Style** to adjust colour, font size, bold, italic, alignment, and Normal or Hand-written font
 - Canvas right-click and long-press menus work in Select and Hand when enabled; they are suppressed while Arrow, Line, Pen, Text, Heading, or Laser tools are active so drawing is not interrupted
 
 ### Export, Session, and Limitations
@@ -256,9 +256,9 @@ Open **Items** from the layers icon in the zoom bar (after the zoom lock) or pre
 Use **Save Session** and **Open Session** in the toolbar to download or restore a `.citrana.json` working file.
 
 - Session files use the `.citrana.json` extension only — other file types are rejected
-- **Included:** chart layout, Grahas, annotations, and Options (indicator toggles and Save Chart Only)
+- **Included:** chart layout, Grahas, Annotations, and Options (indicator toggles and Save Chart Only)
 - **Not included:** undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan
-- Opening a session replaces your current chart and annotations; Citrana asks for confirmation if you already have work on the canvas
+- Opening a session replaces your current chart and Annotations; Citrana asks for confirmation if you already have work on the canvas
 
 #### Export PNG
 

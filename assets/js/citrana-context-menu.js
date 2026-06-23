@@ -211,14 +211,14 @@ class ContextMenu {
     getContextMenuItemsMeta() {
         const enabled = this.isCanvasContextMenuEnabled();
         const useClick = typeof CitranaDevice !== 'undefined' && CitranaDevice.hasFinePointer();
-        const verb = useClick ? 'click' : 'tap';
-        return enabled ? `On · ${verb} to disable` : `Off · ${verb} to enable`;
+        const verb = useClick ? 'Click' : 'Tap';
+        return enabled ? `On · ${verb} to Disable` : `Off · ${verb} to Enable`;
     }
 
     getContextMenuToggleActionLabel() {
         return this.isCanvasContextMenuEnabled()
-            ? 'Disable context menu'
-            : 'Enable context menu';
+            ? 'Disable Context Menu'
+            : 'Enable Context Menu';
     }
 
     getShapeAtClientPoint(clientX, clientY) {
@@ -393,12 +393,12 @@ class ContextMenu {
             <div class="context-menu-separator"></div>
             `;
         }
-        // Add 'Reset Chart', 'Reset Drawings', and 'Clear Canvas' (renamed from 'Clear Chart')
+        // Add 'Reset Chart', 'Reset Annotations', and 'Clear Canvas' (renamed from 'Clear Chart')
         menuHtml += `
             ${this.getPresentationViewMenuHtml()}
             <div class="context-menu-separator"></div>
             <div class="context-menu-item" data-action="reset-chart"><i data-lucide="trash-2"></i> Reset Chart</div>
-            <div class="context-menu-item" data-action="reset-drawings"><i data-lucide="trash-2"></i> Reset Drawings</div>
+            <div class="context-menu-item" data-action="reset-drawings"><i data-lucide="trash-2"></i> Reset Annotations</div>
             <div class="context-menu-item last-item" data-action="clear-chart"><i data-lucide="trash-2"></i> Clear Canvas</div>
         `;
         this.menu.innerHTML = menuHtml;
@@ -657,14 +657,14 @@ class ContextMenu {
                 break;
             case 'reset-chart':
                 window.app.showConfirmationDialog(
-                    'This will reset the current chart by removing all Grahas and drawing elements (arrows, lines, pen strokes, text, and headings), but will preserve the chart structure and layout. The chart type (South Indian or North Indian) will remain the same. This action cannot be undone.',
+                    'This will reset the current chart by removing all Grahas and Annotations (arrows, lines, pen strokes, text, and headings), but will preserve the chart structure and layout. The chart type (South Indian or North Indian) will remain the same. This action cannot be undone.',
                     () => window.app.resetChart()
                 );
                 break;
 
             case 'reset-drawings':
                 window.app.showConfirmationDialog(
-                    'This will remove all drawing elements (arrows, lines, pen strokes, text annotations, and headings) from the chart. The chart structure and all placed Grahas will remain unchanged. This action cannot be undone.',
+                    'This will remove all Annotations (arrows, lines, pen strokes, text, and headings) from the chart. The chart structure and all placed Grahas will remain unchanged. This action cannot be undone.',
                     () => window.app.resetDrawings()
                 );
                 break;

@@ -204,7 +204,7 @@ class CitranaApp {
     }
 
     /**
-     * Current canvas selection for Items panel row highlight.
+     * Current canvas selection for Canvas Items panel row highlight.
      * @returns {{ type: 'graha'|'bhava'|'annotation', houseNumber?: number, planetId?: string, shapeIndex?: number }|null}
      */
     getCanvasSelection() {
@@ -1221,6 +1221,11 @@ class CitranaApp {
             } else if (e.key === 'h' || e.key === 'H') {
                 e.preventDefault();
                 this.setTool('hand');
+            } else if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key >= '1' && e.key <= '5') {
+                const page = parseInt(e.key, 10);
+                if (this.planetSystem?.goToPage(page)) {
+                    e.preventDefault();
+                }
             }
 
             // Action shortcuts
@@ -1898,7 +1903,7 @@ class CitranaApp {
         // Hide edit UI if it's showing
         this.drawingTools.editUI?.hide();
 
-        this.recordHistory('Reset drawings');
+        this.recordHistory('Reset annotations');
         this.layer.batchDraw();
         citranaDebug('Drawings reset: all drawing elements cleared while keeping chart structure and Grahas');
     }
@@ -2016,7 +2021,7 @@ class CitranaApp {
 
         requestAnimationFrame(() => {
             try {
-                this.updateProgressModal(40, 'Serialising chart and annotations...');
+                this.updateProgressModal(40, 'Serialising chart and Annotations...');
                 const session = CitranaSession.capture(this);
                 this.updateProgressModal(75, 'Preparing download...');
                 CitranaSession.download(session);
@@ -2044,7 +2049,7 @@ class CitranaApp {
 
                 if (this.hasSessionContent()) {
                     this.showConfirmationDialog(
-                        'Opening a session will replace your current chart and annotations. Do you want to continue?',
+                        'Opening a session will replace your current chart and Annotations. Do you want to continue?',
                         apply
                     );
                 } else {

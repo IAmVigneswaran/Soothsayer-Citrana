@@ -2,7 +2,7 @@
  * citrana-items-menu.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana
  * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
- * Items panel — chart, Bhava, Graha, and annotation actions (desktop and mobile)
+ * Canvas Items panel — chart, Bhava, Graha, and annotation actions (desktop and mobile)
  */
 class CitranaItemsMenu {
     constructor() {
@@ -293,7 +293,7 @@ class CitranaItemsMenu {
         const chartActions = [
             this.renderRow(this.getPresentationLabel(), '', this.actionButton('toggle-presentation-view', this.getPresentationLabel(), 'presentation'), 'presentation'),
             this.renderRow('Reset Chart', '', this.actionButton('reset-chart', 'Reset Chart', 'trash-2'), 'trash-2'),
-            this.renderRow('Reset Drawings', '', this.actionButton('reset-drawings', 'Reset Drawings', 'trash-2'), 'trash-2'),
+            this.renderRow('Reset Annotations', '', this.actionButton('reset-drawings', 'Reset Annotations', 'trash-2'), 'trash-2'),
             this.renderRow('Clear Canvas', '', this.actionButton('clear-chart', 'Clear Canvas', 'trash-2'), 'trash-2')
         ].join('');
 
@@ -360,7 +360,7 @@ class CitranaItemsMenu {
         const rows = [
             this.renderRow(
                 'Clear Selection',
-                'Grahas, Bhavas, annotations',
+                'Grahas, Bhavas, Annotations',
                 this.actionButton('clear-selection', 'Clear Selection', 'mouse-pointer-2'),
                 'mouse-pointer-2'
             ),
@@ -489,7 +489,7 @@ class CitranaItemsMenu {
         this._shapes = this.getDrawingShapes();
 
         if (this._shapes.length === 0) {
-            return this.renderSection('Annotations', '<p class="items-empty">No annotations yet.</p>', 'annotations');
+            return this.renderSection('Annotations', '<p class="items-empty">No Annotations yet.</p>', 'annotations');
         }
 
         const rows = this._shapes.map((shape, index) => {

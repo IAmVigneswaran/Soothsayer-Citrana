@@ -800,7 +800,8 @@ class PlanetSystem {
         for (let i = 1; i <= this.totalPages; i++) {
             const dot = document.createElement('div');
             dot.className = `page-dot ${i === this.currentPage ? 'active' : ''}`;
-
+            dot.title = `Graha Library Page ${i} (${i})`;
+            dot.setAttribute('aria-label', `Graha Library Page ${i}`);
             dot.addEventListener('click', () => this.goToPage(i));
             dotsContainer.appendChild(dot);
         }
@@ -871,11 +872,12 @@ class PlanetSystem {
 
     goToPage(pageNumber) {
         if (pageNumber < 1 || pageNumber > this.totalPages || pageNumber === this.currentPage) {
-            return;
+            return false;
         }
 
         this.currentPage = pageNumber;
         this.createPlanetLibrary();
         citranaDebug(`Switched to page ${pageNumber}`);
+        return true;
     }
 }

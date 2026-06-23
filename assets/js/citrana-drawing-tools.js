@@ -1410,7 +1410,7 @@ class DrawingTools {
     }
 
     /**
-     * Open pen style controls — same path as Items menu → Edit.
+     * Open pen style controls — same path as Canvas Items → Edit.
      * @param {Konva.Node} shape
      * @param {Konva.KonvaEventObject} [e]
      */
