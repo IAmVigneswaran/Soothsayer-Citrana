@@ -58,6 +58,10 @@ class EditUI {
         prev.hidden = true;
         prev.innerHTML = '<i data-lucide="square-chevron-left"></i>';
 
+        const wrap = document.createElement('div');
+        wrap.id = 'edit-ui-scroll-wrap';
+        wrap.className = 'toolbar-scroll-wrap';
+
         const viewport = document.createElement('div');
         viewport.id = 'edit-ui-scroll-viewport';
         viewport.className = 'toolbar-scroll-viewport';
@@ -66,6 +70,7 @@ class EditUI {
         contentArea.id = 'edit-ui-content';
         contentArea.className = 'edit-ui-content toolbar-scroll-track';
 
+        wrap.appendChild(viewport);
         viewport.appendChild(contentArea);
 
         const next = document.createElement('button');
@@ -77,7 +82,7 @@ class EditUI {
         next.innerHTML = '<i data-lucide="square-chevron-right"></i>';
 
         editUIContainer.appendChild(prev);
-        editUIContainer.appendChild(viewport);
+        editUIContainer.appendChild(wrap);
         editUIContainer.appendChild(next);
 
         document.body.appendChild(editUIContainer);
@@ -94,9 +99,10 @@ class EditUI {
      */
     setupEditUIScroll() {
         const viewport = document.getElementById('edit-ui-scroll-viewport');
+        const wrap = document.getElementById('edit-ui-scroll-wrap');
         const prev = document.getElementById('edit-ui-scroll-prev');
         const next = document.getElementById('edit-ui-scroll-next');
-        if (!viewport || !prev || !next) {
+        if (!viewport || !wrap || !prev || !next) {
             return;
         }
 
@@ -108,7 +114,7 @@ class EditUI {
                 prev.hidden = true;
                 next.hidden = true;
                 viewport.scrollLeft = 0;
-                viewport.classList.remove('toolbar-scroll-fade-start', 'toolbar-scroll-fade-end');
+                wrap.classList.remove('toolbar-scroll-fade-start', 'toolbar-scroll-fade-end');
                 return;
             }
 
@@ -119,8 +125,8 @@ class EditUI {
             next.hidden = !hasOverflow;
             prev.disabled = viewport.scrollLeft <= 1;
             next.disabled = viewport.scrollLeft >= maxScroll - 1;
-            viewport.classList.toggle('toolbar-scroll-fade-start', hasOverflow && viewport.scrollLeft > 1);
-            viewport.classList.toggle('toolbar-scroll-fade-end', hasOverflow && viewport.scrollLeft < maxScroll - 1);
+            wrap.classList.toggle('toolbar-scroll-fade-start', hasOverflow && viewport.scrollLeft > 1);
+            wrap.classList.toggle('toolbar-scroll-fade-end', hasOverflow && viewport.scrollLeft < maxScroll - 1);
         };
 
         this.updateEditUIScrollButtons = updateEditUIScrollButtons;

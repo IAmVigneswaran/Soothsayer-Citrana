@@ -121,6 +121,12 @@ body.presentation-view .about-btn {
   border-radius: 8px;
 }
 
+.toolbar-scroll-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+}
+
 .toolbar-scroll-viewport {
   display: flex;
   min-width: 0;
@@ -731,10 +737,18 @@ body.presentation-view .about-btn {
     height: 18px;
   }
 
-  .toolbar-scroll-viewport {
+  .toolbar-scroll-wrap {
     flex: 1 1 0;
     min-width: 0;
     position: relative;
+    overflow: hidden;
+  }
+
+  .toolbar-scroll-viewport {
+    width: 100%;
+    flex: none;
+    position: static;
+    display: flex;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
@@ -742,34 +756,34 @@ body.presentation-view .about-btn {
     scroll-behavior: smooth;
   }
 
-  .toolbar-scroll-viewport::before,
-  .toolbar-scroll-viewport::after {
+  .toolbar-scroll-wrap::before,
+  .toolbar-scroll-wrap::after {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 20px;
-    z-index: 2;
+    width: 24px;
+    z-index: 3;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.2s ease;
   }
 
-  .toolbar-scroll-viewport::before {
+  .toolbar-scroll-wrap::before {
     left: 0;
-    background: linear-gradient(to right, var(--toolbar-scroll-fade, #ffffff) 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to right, var(--toolbar-scroll-fade, #ffffff) 15%, rgba(255, 255, 255, 0) 100%);
   }
 
-  .toolbar-scroll-viewport::after {
+  .toolbar-scroll-wrap::after {
     right: 0;
-    background: linear-gradient(to left, var(--toolbar-scroll-fade, #ffffff) 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to left, var(--toolbar-scroll-fade, #ffffff) 15%, rgba(255, 255, 255, 0) 100%);
   }
 
-  .toolbar-scroll-viewport.toolbar-scroll-fade-start::before {
+  .toolbar-scroll-wrap.toolbar-scroll-fade-start::before {
     opacity: 1;
   }
 
-  .toolbar-scroll-viewport.toolbar-scroll-fade-end::after {
+  .toolbar-scroll-wrap.toolbar-scroll-fade-end::after {
     opacity: 1;
   }
 
@@ -891,16 +905,6 @@ body.presentation-view .about-btn {
   .floating-edit-ui .toolbar-scroll-btn i {
     width: 18px;
     height: 18px;
-  }
-
-  .floating-edit-ui .toolbar-scroll-viewport {
-    flex: 1 1 0;
-    min-width: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    scroll-behavior: smooth;
   }
 
   .floating-edit-ui .toolbar-scroll-viewport::-webkit-scrollbar {

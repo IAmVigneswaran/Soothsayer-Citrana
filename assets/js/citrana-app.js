@@ -508,9 +508,10 @@ class CitranaApp {
      */
     setupToolbarScroll() {
         const viewport = document.getElementById('toolbar-scroll-viewport');
+        const wrap = document.getElementById('toolbar-scroll-wrap');
         const prev = document.getElementById('toolbar-scroll-prev');
         const next = document.getElementById('toolbar-scroll-next');
-        if (!viewport || !prev || !next) return;
+        if (!viewport || !wrap || !prev || !next) return;
 
         this._toolbarScrollMQ = window.matchMedia('(max-width: 768px)');
         const scrollStep = 140;
@@ -520,7 +521,7 @@ class CitranaApp {
                 prev.hidden = true;
                 next.hidden = true;
                 viewport.scrollLeft = 0;
-                viewport.classList.remove('toolbar-scroll-fade-start', 'toolbar-scroll-fade-end');
+                wrap.classList.remove('toolbar-scroll-fade-start', 'toolbar-scroll-fade-end');
                 return;
             }
 
@@ -531,8 +532,8 @@ class CitranaApp {
             next.hidden = !hasOverflow;
             prev.disabled = viewport.scrollLeft <= 1;
             next.disabled = viewport.scrollLeft >= maxScroll - 1;
-            viewport.classList.toggle('toolbar-scroll-fade-start', hasOverflow && viewport.scrollLeft > 1);
-            viewport.classList.toggle('toolbar-scroll-fade-end', hasOverflow && viewport.scrollLeft < maxScroll - 1);
+            wrap.classList.toggle('toolbar-scroll-fade-start', hasOverflow && viewport.scrollLeft > 1);
+            wrap.classList.toggle('toolbar-scroll-fade-end', hasOverflow && viewport.scrollLeft < maxScroll - 1);
         };
 
         this.updateToolbarScrollButtons = updateToolbarScrollButtons;
@@ -548,6 +549,7 @@ class CitranaApp {
         viewport.addEventListener('scroll', updateToolbarScrollButtons, { passive: true });
         this._toolbarScrollMQ.addEventListener('change', updateToolbarScrollButtons);
         window.addEventListener('load', updateToolbarScrollButtons);
+        window.addEventListener('resize', updateToolbarScrollButtons);
         requestAnimationFrame(updateToolbarScrollButtons);
     }
 
