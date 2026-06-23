@@ -40,7 +40,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 4. [Complete Project Structure](#complete-project-structure)
 5. [Script load order](#script-load-order-indexhtml)
 6. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2210-lines)
+   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2214-lines)
    - [History Engine (citrana-history.js)](#history-engine-citrana-historyjs---94-lines)
    - [Chart Coordinator](#chart-coordinator-citrana-chart-coordinatorjs---320-lines)
    - [Citrana Zoom](#citrana-zoom-citrana-zoomjs---58-lines)
@@ -104,6 +104,8 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 **Help modal (`#help-modal`):** `.help-intro` workspace overview; `.help-subsection-title` sections aligned with README Usage Guide (Charts, Options, Graha Library, Grahas on the Chart, Annotations, Canvas Items, Presentation View, Zoom and Pan, Undo and Redo, Sessions and Export, Privacy Note); portable `.citrana.json` session guidance
 
+**Welcome modal (`#welcome-modal`):** `.welcome-steps` six-point quick start; `.welcome-loading-bar` / `.welcome-loading-fill` / `.welcome-loading-text`; compact mobile layout (`overflow: hidden`); styles in `styles.css` (`.welcome-modal-*`)
+
 **JSColorPicker theme (`--cp-*` in `:root`):** chip size, borders, swatch width, shadows — aligned to Citrana light theme. Compact toolbars hide hex input, format tabs, and dropdown caret (`.cp_input`, `.cp_formats`, `.cp_caret`).
 
 **iOS standalone PWA (2.0):**
@@ -116,12 +118,12 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 | Path | Lines | Description |
 |------|-------|-------------|
-| `index.html` | ~601 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Help **Guide** (`.help-intro`, `.help-subsection-title`); Canvas Items modal; Options modal (Zoom Step); script tags at bottom in **dependency order** (see below) |
+| `index.html` | ~601 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Welcome modal (6-step quick start, simulated loading bar); Help **Guide** (`.help-intro`, `.help-subsection-title`); Canvas Items modal; Options modal (Zoom Step); script tags at bottom in **dependency order** (see below) |
 | `robots.txt` | — | Search engine rules |
 | `sitemap.xml` | — | Sitemap |
 | `assets/css/styles.css` | ~3040 | Complete styling; primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.page-dots-chevron`; `#items-modal` pinned layout; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` |
 | `assets/js/citrana-annotation-fonts.js` | ~118 | Normal and hand-written annotation fonts |
-| `assets/js/citrana-app.js` | ~2210 | Main application coordinator |
+| `assets/js/citrana-app.js` | ~2214 | Main application coordinator |
 | `assets/js/citrana-arrow.js` | ~185 | Unified filled-arrow geometry |
 | `assets/js/citrana-chart-coordinator.js` | ~320 | Chart type management |
 | `assets/js/citrana-chart-templates-north.js` | ~1015 | North Indian chart logic |
@@ -198,7 +200,7 @@ See also [ARCHITECTURE.md](ARCHITECTURE.md) — Runtime Composition table.
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (citrana-app.js - ~2210 lines)
+### Main Application (citrana-app.js - ~2214 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -240,7 +242,7 @@ Key Methods:
 - `undo()` / `redo()` / `updateHistoryButtons()`: Delegate to `this.history`; sync `#undo-btn` / `#redo-btn` disabled state
 - `clearChart()` / `resetChart()` / `resetDrawings()`
 - `isPresentationView()` / `togglePresentationView()`: Toggle `presentationView` and `body.presentation-view`; hides toolbar, zoom bar, Graha library, Help, About, Graha bar, and drawing Edit UI; dismisses open edit sessions on enter; Safari visibility fix skips when active; not undoable
-- `clearWelcomeLoadingInterval()` / `showWelcomeModal()`: Welcome progress timer cleared on close or at 100%
+- `clearWelcomeLoadingInterval()` / `showWelcomeModal()`: First-visit welcome (`citrana_welcome_seen`); simulated `.welcome-loading-fill` progress (100ms interval); status text at &lt;20% / &lt;40% / &lt;60% / &lt;80% / &lt;100% (**Ready!** only at 100%); timer cleared on close or completion; user dismisses manually
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`; `handleTouchStart/Move` call `drawingTools.shouldPreserveTouchDrag()` before `preventDefault`; empty-canvas `mousedown`/`tap` → `clearCanvasSelection()`; `_selectPointerDownOnDrawing` prevents stage `tap` from clearing selection when pointer down was on a drawing but release was elsewhere
 - `isAnnotationTarget()`: Pen tool — blocks starting a stroke only on existing annotations, not on chart Bhavas
 - `clearCanvasSelection()` / `getCanvasSelection()` / `notifyCanvasSelectionChanged()`: Unified selection state for Canvas Items panel row highlight
@@ -836,7 +838,7 @@ Technical Implementation:
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
 - Help Modal (**Guide**): Desktop-first workspace intro (`.help-intro`); sections match README Usage Guide; keyboard shortcuts; portable `.citrana.json` session guidance; `#help-modal-description` / `.help-modal-description` spacing before shortcuts list
 - About Modal: Information about Citrana with creator details and links; mobile compact layout without scroll
-- Welcome Modal: First-time user experience; `closeWelcomeModal()` marks seen in `localStorage`; mobile compact layout without scroll
+- Welcome Modal: First visit only; compact **Creating Your First Chart** (6 steps aligned with README — chart type, Lagna, Grahas, library pages, Annotations, Save Session / PNG); mobile note points to **Canvas Items** via layers icon in zoom bar (no keyboard shortcut); simulated loading bar with five title-case stages plus **Ready!** at 100%; `closeWelcomeModal()` marks seen in `localStorage`; timer cleared if dismissed early; mobile compact layout without scroll
 - Options Modal: **Zoom Step**, chart indicator toggles, and **Save Chart Only** export; shared modal width with Help (`width: min(600px, 90vw)`)
 - Confirmation Modal: Destructive-action confirm; dynamic message + warning in `aria-describedby`
 - Export Progress Modal: Shared `#export-progress-modal` for export PNG, save session, and open session; non-dismissible; dynamic title; live status in `aria-describedby`; `aria-busy` while operation runs

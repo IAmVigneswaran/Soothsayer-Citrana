@@ -26,7 +26,7 @@ Classic tree view for Cursor rules context (see [AGENT.md](AGENT.md) for a markd
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~601 lines); viewport-fit=cover; PWA meta; Google Fonts Caveat; JSColorPicker CSS; modal a11y (role, aria-*); Help Guide (.help-intro, .help-subsection-title); Canvas Items modal; Options modal (Zoom Step); toolbar + Edit UI scroll wraps
+├── index.html                    # Main entry (~601 lines); viewport-fit=cover; PWA meta; Welcome modal (6-step quick start, loading bar); Help Guide (.help-intro, .help-subsection-title); Canvas Items modal; Options modal (Zoom Step); toolbar + Edit UI scroll wraps
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
@@ -34,7 +34,7 @@ Soothsayer-Citrana/
 │   │   └── styles.css            # Complete styling system (~3040 lines); primary @media (max-width: 768px) block + post-base mobile overrides; JSColorPicker --cp-* theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.page-dots-chevron`; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*`
 │   ├── js/                       # 20 modules — all citrana-* prefixed
 │   │   ├── citrana-annotation-fonts.js # Normal and hand-written annotation fonts (~118 lines)
-│   │   ├── citrana-app.js                # Main application coordinator (~2210 lines)
+│   │   ├── citrana-app.js                # Main application coordinator (~2214 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
 │   │   ├── citrana-chart-coordinator.js  # Chart type management (~320 lines)
 │   │   ├── citrana-chart-templates-north.js  # North Indian chart logic (~1015 lines)
@@ -255,7 +255,7 @@ The application uses a mobile-first approach with three main breakpoints:
 
 For system design, module boundaries, data flows, and extension points, see ARCHITECTURE.md.
 
-### Main Application (assets/js/citrana-app.js - ~2210 lines)
+### Main Application (assets/js/citrana-app.js - ~2214 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -297,7 +297,7 @@ Key Methods:
 - `undo()` / `redo()` / `updateHistoryButtons()`: Delegate to `this.history`; sync `#undo-btn` / `#redo-btn` disabled state
 - `clearChart()` / `resetChart()` / `resetDrawings()`
 - `isPresentationView()` / `togglePresentationView()`: Toggle `presentationView` flag and `body.presentation-view` class; hides toolbar, zoom bar, Graha library, Help, About, Graha bar, and drawing Edit UI; dismisses open edit sessions on enter; not undoable
-- `clearWelcomeLoadingInterval()` / `showWelcomeModal()`: Welcome progress timer cleared on close or at 100%
+- `clearWelcomeLoadingInterval()` / `showWelcomeModal()`: First-visit welcome (`citrana_welcome_seen`); simulated `.welcome-loading-fill` progress; status at &lt;20% / &lt;40% / &lt;60% / &lt;80% / &lt;100% (**Ready!** at 100% only); timer cleared on close or completion; manual dismiss
 - Mouse/touch handlers: `handleMouseDown/Move/Up`, `handleTouchStart/Move/End`; `handleTouchStart/Move` call `drawingTools.shouldPreserveTouchDrag()` before `preventDefault` (Grahas, drawings, pen pick rects, control points, active pen drag); empty-canvas `mousedown`/`tap` → `clearCanvasSelection()`; `_selectPointerDownOnDrawing` prevents stage `tap` from clearing selection when pointer down was on a drawing but release was elsewhere
 - `isAnnotationTarget()`: Pen tool — blocks starting a stroke only on existing annotations, not on chart Bhavas
 - `clearCanvasSelection()` / `getCanvasSelection()` / `notifyCanvasSelectionChanged()`: Unified selection for Canvas Items panel row highlight
@@ -841,7 +841,7 @@ Technical Implementation:
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
 - Help Modal (**Guide**): `.help-intro` workspace overview; sections aligned with README (Charts → Privacy Note); portable `.citrana.json` session guidance; keyboard shortcuts
 - About Modal: Information about Citrana with creator details and links
-- Welcome Modal: First-time user experience with getting started guide; `closeWelcomeModal()` marks seen in `localStorage`; mobile compact layout without scroll
+- Welcome Modal: First visit only; **Creating Your First Chart** (6 steps — chart type, Lagna, Grahas, library pages **1**–**5**, Annotations, Save Session / PNG); mobile **Canvas Items** via layers icon (not **I**); loading bar stages in title case ending with **Ready!** at 100%; `closeWelcomeModal()` + `localStorage`; early close stops timer; mobile compact, no scroll
 - Options Modal: **Zoom Step**, chart indicator toggles, and **Save Chart Only** export; shared modal width with Help
 - Confirmation Modal: Destructive-action confirm; dynamic message + warning in `aria-describedby`
 - Export Progress Modal: Shared `#export-progress-modal` for export PNG, save session, and open session; non-dismissible; dynamic title; live status in `aria-describedby`; `aria-busy` while operation runs

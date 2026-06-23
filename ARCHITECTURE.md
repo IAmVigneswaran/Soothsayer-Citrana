@@ -139,7 +139,7 @@ flowchart TB
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `citrana-app.js` | ~2210 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser; **I** Canvas Items toggle; centralised **Delete**; **Escape** modal dismiss; **Tab** focus trap), zoom lock, **Zoom Step** preference (`setZoomStep()`), export (full viewport or chart-only crop), shared progress modal (`showProgressModal`; `isExporting` / `isSessionBusy` guards), modals, chart display preferences, history, **Presentation View**, **Save/Open Session**, **Canvas Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `applySaveChartOnlyTransparency()` restores white background when Save Chart Only off; touch `preventDefault` gated via `drawingTools.shouldPreserveTouchDrag()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open |
+| `citrana-app.js` | ~2214 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser; **I** Canvas Items toggle; centralised **Delete**; **Escape** modal dismiss; **Tab** focus trap), zoom lock, **Zoom Step** preference (`setZoomStep()`), export (full viewport or chart-only crop), shared progress modal (`showProgressModal`; `isExporting` / `isSessionBusy` guards), modals, chart display preferences, history, **Presentation View**, **Save/Open Session**, **Welcome modal** (`showWelcomeModal`, `clearWelcomeLoadingInterval`), **Canvas Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `applySaveChartOnlyTransparency()` restores white background when Save Chart Only off; touch `preventDefault` gated via `drawingTools.shouldPreserveTouchDrag()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open |
 | `citrana-zoom.js` | ~58 | Zoom step presets — `CitranaZoom.computeNextScale()`, `resolveZoomStep()`, `VALID_STEPS` (`fine` 1%, `small` ~10%, `medium` ~20%, `large` ~25%); used by app wheel zoom, coordinator zoom buttons, and session import/export |
 | `citrana-annotation-fonts.js` | ~118 | Normal vs Hand-written annotation typography — Arial / Arial Black vs Caveat / Caveat Brush; `setBold` / `setItalic` / `setMode`; `ensureLoaded()` for Google Fonts |
 | `citrana-history.js` | ~94 | Unified undo/redo timeline (`CitranaHistory`) |
@@ -475,12 +475,13 @@ Modals: Welcome, Help, **Options**, About, **Canvas Items**, Confirmation, **Ope
 - `closeModal()` / `hideProgressModal()` pop stack and restore focus
 - Operation progress: dynamic title (`Exporting Chart`, `Saving Session`, `Opening Session`); `aria-busy="true"` while running; status text id referenced by `aria-describedby`; `completeProgressModal()` / `failProgressModal()` for success/error
 - Help **Guide** (`#help-modal`): `.help-intro` workspace overview; `.help-subsection-title` sections (Charts, Options, Graha Library, Grahas on the Chart, Annotations, Canvas Items, Presentation View, Zoom and Pan, Undo and Redo, Sessions and Export, Privacy Note); portable `.citrana.json` session guidance; `#help-modal-description` with `.help-modal-description` (spacing before **Keyboard Shortcuts**)
+- **Welcome** (`#welcome-modal`): first visit when `citrana_welcome_seen` unset; `.welcome-steps` six-point **Creating Your First Chart** (aligned with README); mobile system note uses **Canvas Items** layers icon (not **I**); `.welcome-loading-bar` / `.welcome-loading-fill` / `.welcome-loading-text` — simulated progress in `showWelcomeModal()` with title-case messages at &lt;20% / &lt;40% / &lt;60% / &lt;80% / &lt;100% and **Ready!** only at 100%; `clearWelcomeLoadingInterval()` on early close; manual dismiss → `closeWelcomeModal()` sets `citrana_welcome_seen`
 - **Canvas Items** intro: `#items-modal-description`; Section Anchors in `#items-modal-nav` (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`); scrollable list in `#items-modal-body` only (`--items-scrollbar-gutter`)
 - Mobile About/Welcome: compact typography, `overflow: hidden`; `@media` blocks after base modal CSS (cascade-safe)
 
 **CSS responsive cascade:** Additional `@media (max-width: 768px)` blocks after base `.help-btn`, `.about-btn`, and modal selectors override desktop rules that appear later in the file.
 
-Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit factor. Desktop is the primary supported experience; mobile/touch layouts are tuned with the **Canvas Items** panel (`#items-menu-btn` or **I**) as the recommended action surface.
+Breakpoints: **769px+** desktop, **768px** tablet, **600px** mobile chart fit factor. Desktop is the primary supported experience; mobile/touch layouts are tuned with the **Canvas Items** panel (`#items-menu-btn` layers icon; desktop shortcut **I**) as the recommended action surface.
 
 ### PWA
 
@@ -555,6 +556,7 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | Zoom fit behaviour | `zoomToFit()` in chart template — compact viewport fixed **65%** (South) / **82%** (North); desktop computed fit |
 | Zoom step presets | `citrana-zoom.js` (`computeNextScale`, `VALID_STEPS`); `app.setZoomStep()`; `#zoom-step-*` in `index.html` Options modal; `localStorage.citrana_zoom_step`; session `options.zoomStep` in `citrana-session.js` |
 | Help Guide content | `#help-modal` in `index.html` (`.help-intro`, `.help-subsection-title` sections); styles in `styles.css`; keep aligned with README Usage Guide |
+| Welcome modal content | `#welcome-modal` in `index.html` (`.welcome-steps`, `.welcome-loading-*`); `showWelcomeModal()` / `clearWelcomeLoadingInterval()` in `citrana-app.js`; keep six-step quick start aligned with README; mobile Canvas Items via layers icon only |
 | Theme / layout / safe areas | `assets/css/styles.css` — keep post-base mobile `@media` blocks after component base rules when overrides must win |
 | Export behaviour | `app.exportChart()` / `finalizeExportImage()`; crop bounds in `ChartCoordinator.getExportCropRect()`; `isExporting` guard; progress via `showProgressModal()` |
 | Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
