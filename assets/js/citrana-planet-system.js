@@ -799,6 +799,19 @@ class PlanetSystem {
         dotsContainer.setAttribute('role', 'tablist');
         dotsContainer.setAttribute('aria-label', 'Graha Library pages — swipe left or right to change page');
 
+        const prevChevron = document.createElement('span');
+        prevChevron.className = `page-dots-chevron page-dots-chevron-prev${this.currentPage <= 1 ? ' is-disabled' : ''}`;
+        prevChevron.setAttribute('aria-hidden', 'true');
+        prevChevron.innerHTML = '<i data-lucide="chevrons-left"></i>';
+
+        const dotsTrack = document.createElement('div');
+        dotsTrack.className = 'page-dots-track';
+
+        const nextChevron = document.createElement('span');
+        nextChevron.className = `page-dots-chevron page-dots-chevron-next${this.currentPage >= this.totalPages ? ' is-disabled' : ''}`;
+        nextChevron.setAttribute('aria-hidden', 'true');
+        nextChevron.innerHTML = '<i data-lucide="chevrons-right"></i>';
+
         // Create dots for each page
         for (let i = 1; i <= this.totalPages; i++) {
             const dot = document.createElement('div');
@@ -806,10 +819,15 @@ class PlanetSystem {
             dot.title = `Graha Library Page ${i} (${i})`;
             dot.setAttribute('aria-label', `Graha Library Page ${i}`);
             dot.addEventListener('click', () => this.goToPage(i));
-            dotsContainer.appendChild(dot);
+            dotsTrack.appendChild(dot);
         }
 
+        dotsContainer.append(prevChevron, dotsTrack, nextChevron);
         library.appendChild(dotsContainer);
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     setupSwipeEvents() {

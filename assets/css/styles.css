@@ -304,11 +304,23 @@ body.presentation-view .about-btn {
 .page-dots {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 8px;
   padding: 8px;
   background: rgba(255, 255, 255, 0.95);
   border-top: 1px solid #000000;
   border-radius: 0 0 0.75rem 0.75rem;
+}
+
+.page-dots-track {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-dots-chevron {
+  display: none;
 }
 
 .page-dot {
@@ -844,11 +856,39 @@ body.presentation-view .about-btn {
 
   /* Mobile page dots adjustments */
   .page-dots {
+    justify-content: space-between;
     padding: 8px 6px;
-    gap: 6px;
+    gap: 4px;
     min-height: 28px;
     touch-action: pan-x;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .page-dots-track {
+    flex: 1;
+    gap: 6px;
+  }
+
+  .page-dots-chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    color: #9ca3af;
+    opacity: 0.85;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .page-dots-chevron.is-disabled {
+    opacity: 0.3;
+  }
+
+  .page-dots-chevron i,
+  .page-dots-chevron svg {
+    width: 16px;
+    height: 16px;
   }
 
   .page-dot {

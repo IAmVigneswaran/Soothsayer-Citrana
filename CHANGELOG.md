@@ -9,7 +9,7 @@
 - **Richer colour controls** — when editing a Graha or a drawing, pick from a **16-colour** rainbow palette, adjust **transparency**, or use the eyedropper. The same swatches appear in the Graha bar and the drawing Edit UI; the toolbar shows a compact colour chip instead of a hex code.
 - **Improved arrows** — arrow shaft and head render as one shape, with a straight (non-tapering) body and a clearer triangular head. Transparency applies evenly across the whole arrow.
 - **Fresh start on refresh** — reloading the page always begins with a blank canvas unless you **Open Session**.
-- **Save and Open Session** — toolbar **Save Session** and **Open Session** download or restore a **`.citrana.json`** working file (chart, Grahas, Annotations, and Options). Undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan are not included. Only `.citrana.json` files are accepted.
+- **Save and Open Session** — toolbar **Save Session** and **Open Session** download or restore a **`.citrana.json`** working file (chart, Grahas, Annotations, and Options). A progress dialog appears while the file is prepared or loaded. Undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan are not included. Only `.citrana.json` files are accepted.
 - **Undo and redo** — step backward and forward through chart, Graha, and Annotation changes (up to 50 steps). Use the toolbar buttons or **Ctrl+Z** / **Cmd+Z** undo and **Ctrl+Y** / **Cmd+Shift+Z** redo. Covers Graha placement and edits, Lagna, chart resets, Annotations, and Edit UI sessions. Your zoom and pan stay where you left them while content is restored. Tool selection, laser pointer strokes, and Presentation View are not tracked.
 - **Edit or delete Grahas from the menu** — right-click any Graha for **Edit Graha** or **Delete Graha** (same editor as double-click).
 - **Clearer Lagna setup** by chart type:
@@ -21,14 +21,14 @@
 - **Upagrahas in Graha Library** — Page 5 adds nine Upagrahas (Dhuma, Vyatipata, Parivesha, Indra Chapa, Upaketu, Kala, Mrityu, Ardha Prahara, Yama Ghantaka) before Uranus, Neptune, and Pluto — **60 Grahas** in total across five pages (12 per page).
 - **Laser Pointer** — draw a temporary red highlight over the chart for presentations (toolbar after Pen, shortcut **K**). The trail fades away over a few seconds; it is not saved, exported, or included in undo/redo.
 - **Presentation View** — right-click the canvas or a Bhava and choose **Presentation View** to hide the toolbar, zoom bar, Graha library, Help, About, and any open edit bars for a clean on-screen chart. Choose **Exit Presentation View** from the same menu to restore the interface. Not tracked by undo/redo.
-- **Canvas Items panel** — layers button in the zoom bar (shortcut **I**) opens **Canvas Items** on desktop and touch devices. Lists chart actions, all Bhavas, placed Grahas, and Annotations in one panel — select, edit, delete, set Lagna, Presentation View, reset, and clear. **Section Anchors** jump to Canvas, Chart, Bhavas, Grahas, Annotations, and other sections without scrolling the full list. **Canvas** section offers **Clear Selection** and **Context Menu** (On/Off with visual state; off by default on touch devices, saved in this browser). Selected rows stay in sync with the canvas. Text and Heading Annotations offer separate **Edit text** (inline wording and keyboard) and **Style** (colour, font, alignment) actions.
+- **Canvas Items panel** — layers button in the zoom bar (shortcut **I**) opens **Canvas Items** on desktop and touch devices. Lists chart actions, all Bhavas, placed Grahas, and Annotations in one panel — select, edit, delete, set Lagna, Presentation View, reset, and clear. **Section Anchors** jump to Canvas, Chart, Bhavas, Grahas, Annotations, and other sections; the title, description, and Section Anchors stay fixed while only the list scrolls. **Canvas** section offers **Clear Selection** and **Context Menu** (On/Off with green/red row tint; off by default on touch devices, saved in this browser). Selected rows stay in sync with the canvas. Text and Heading Annotations offer separate **Edit text** (inline wording and keyboard) and **Style** (colour, font, alignment) actions.
 - **Graha Selection Pill** — click or tap a placed Graha or a Text/Heading Annotation to select it; a dashed **Selection Pill** appears behind the label so coloured Grahas (e.g. Ju) and Annotations stay readable.
 - **Hand-written Annotations** — optional **Caveat** script style for text and headings, with **Normal** and **Hand-written** toggles in the Edit UI.
 
 **🔧 Improvements:**
 - Retrograde Grahas use **underlined text** instead of a small ᵣ character, so your 8-character Graha labels are not shortened.
 - South Indian Bhava menus show **Bhava** numbers based on where Lagna is set.
-- Help, Welcome, and README updated for Lagna setup, session files (`.citrana.json`), zoom lock, undo/redo, chart display options, Upagrahas, Laser Pointer, Presentation View, Canvas Items panel (shortcut **I**, Section Anchors, Context Menu touch defaults), Selection Pill, multi-line text/heading editing, hand-written fonts, drawing defaults, and mobile/touch guidance.
+- Help, Welcome, and README updated for Lagna setup, session files (`.citrana.json`), zoom lock, undo/redo, chart display options, Upagrahas, Laser Pointer, Presentation View, Canvas Items panel (shortcut **I**, pinned Section Anchors, Context Menu touch defaults and visual state), Graha Library mobile dots-bar swipe, Selection Pill, multi-line text/heading editing, hand-written fonts, drawing defaults, and mobile/touch guidance.
 - Drawing and icon libraries now ship with the app for faster, more reliable loading.
 - Tidied older code paths that are no longer used, including automatic chart restore on refresh.
 - README aligned with in-app Help for **Delete** key routing (Graha first, then drawing), auto-switch to Select after arrow/line/text/heading, and one-shot bhava drop targeting.
@@ -45,7 +45,12 @@
 - **Arrow and line control points** — endpoint handles give hover and drag feedback on desktop (black/white invert on hover, **grab** / **grabbing** cursor, wider hit targets).
 - **Context Menu defaults on touch** — right-click and long-press menus are off by default on touch-primary devices; enable them from **Canvas Items** → **Canvas** → **Context Menu**.
 - **Help shortcuts** — **I** added for Open Canvas Items.
-- **Graha Library page shortcuts** — press **1**–**5** to switch between the five Graha Library pages without using the page dots or swipe.
+- **Graha Library page shortcuts** — press **1**–**5** to switch between the five Graha Library pages without using the page dots.
+- **Graha Library mobile paging** — swipe left or right on the **page dots bar only** to change pages without moving the library panel or starting a Graha drag; grey chevron hints at each end on mobile (dots remain tappable).
+- **Canvas Items layout polish** — title, description, and **Section Anchors** stay pinned at the top while only the list scrolls; list scrollbar matches Help modal styling and sits in the outer gutter.
+- **Section Anchors polish** — improved vertical alignment, mobile horizontal scroll edge fades, and chip clipping fixes.
+- **Context Menu visual state** — **Canvas Items** **Context Menu** row uses a green tint when on and a red tint when off.
+- **Mobile toolbar and Edit UI scroll fades** — subtle edge fades alongside chevron scroll when tools overflow on narrow screens.
 - **Rashi zodiac icons** — Lucide zodiac icons replace Unicode symbols in **Set Lagna as …** menus and South Indian Bhava rows in the **Canvas Items** panel for consistent rendering across browsers.
 - **Help and About sizing** — corner buttons match the zoom bar at 48px; icons scaled for visual balance.
 - **More room on mobile** — extra space between the Graha library and the zoom bar so bottom controls are easier to use.
