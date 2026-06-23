@@ -998,6 +998,10 @@ body.presentation-view .about-btn {
     padding-right: 30px;
     margin-right: 6px;
   }
+
+  #items-modal .options-modal-content {
+    --items-scrollbar-gutter: 10px;
+  }
   .options-toggle-row {
     align-items: center;
     padding: 14px 0;
@@ -1540,25 +1544,37 @@ body.presentation-view .about-btn {
 
 /* Custom scrollbar styling for help/options modal */
 .help-modal-content::-webkit-scrollbar,
-.options-modal-content::-webkit-scrollbar {
+.options-modal-content::-webkit-scrollbar,
+#items-modal .items-modal-body::-webkit-scrollbar {
   width: 8px;
 }
 
+.help-modal-content::-webkit-scrollbar-button,
+.options-modal-content::-webkit-scrollbar-button,
+#items-modal .items-modal-body::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
 .help-modal-content::-webkit-scrollbar-track,
-.options-modal-content::-webkit-scrollbar-track {
+.options-modal-content::-webkit-scrollbar-track,
+#items-modal .items-modal-body::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 4px;
 }
 
 .help-modal-content::-webkit-scrollbar-thumb,
-.options-modal-content::-webkit-scrollbar-thumb {
+.options-modal-content::-webkit-scrollbar-thumb,
+#items-modal .items-modal-body::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 4px;
   border: 1px solid #a8a8a8;
 }
 
 .help-modal-content::-webkit-scrollbar-thumb:hover,
-.options-modal-content::-webkit-scrollbar-thumb:hover {
+.options-modal-content::-webkit-scrollbar-thumb:hover,
+#items-modal .items-modal-body::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
 
@@ -1669,6 +1685,7 @@ body.presentation-view .about-btn {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  --items-scrollbar-gutter: 8px;
 }
 
 #items-modal .options-modal-header,
@@ -1686,8 +1703,16 @@ body.presentation-view .about-btn {
 #items-modal .items-modal-body {
   flex: 1 1 auto;
   min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 transparent;
+  box-sizing: border-box;
+  width: calc(100% + var(--items-scrollbar-gutter));
+  max-width: calc(100% + var(--items-scrollbar-gutter));
+  margin-right: calc(-1 * var(--items-scrollbar-gutter));
+  padding-right: var(--items-scrollbar-gutter);
 }
 
 #items-modal .items-section {
@@ -1701,7 +1726,7 @@ body.presentation-view .about-btn {
   display: flex;
   align-items: center;
   background: #ffffff;
-  padding: 12px 0;
+  padding: 12px 0 14px;
   margin-bottom: 8px;
   border-bottom: 1px solid #e5e7eb;
   box-sizing: border-box;
@@ -1718,7 +1743,7 @@ body.presentation-view .about-btn {
   position: relative;
   display: flex;
   align-items: center;
-  padding-block: 2px;
+  padding-block: 3px;
   box-sizing: border-box;
 }
 
@@ -1750,7 +1775,8 @@ body.presentation-view .about-btn {
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
-  padding: 6px 12px;
+  min-height: 28px;
+  padding: 5px 12px 6px;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
@@ -1766,7 +1792,8 @@ body.presentation-view .about-btn {
 
 @media (max-width: 768px) {
   .items-section-nav-scroll-wrap {
-    overflow: hidden;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   .items-section-nav-scroll-wrap::before,
