@@ -38,7 +38,7 @@ const CitranaCanvasHints = {
             id: 'start',
             src: 'assets/images/hint-start-message.png',
             desktopOnly: false,
-            centered: true,
+            centeredStack: true,
             offsetX: 0,
             offsetY: 0,
             isVisible() {
@@ -140,11 +140,30 @@ const CitranaCanvasHints = {
                 el.classList.add('citrana-canvas-hint--desktop');
             }
 
+            if (cfg.centeredStack) {
+                const brand = document.createElement('div');
+                brand.className = 'citrana-canvas-hint-start-brand';
+
+                const logo = document.createElement('img');
+                logo.className = 'citrana-canvas-hint-start-logo';
+                logo.src = 'assets/images/Soothsayer-Citrana-Full-Logo-Black.png';
+                logo.alt = '';
+                logo.draggable = false;
+                logo.decoding = 'async';
+                logo.addEventListener('load', () => this.scheduleUpdate());
+
+                brand.appendChild(logo);
+                el.appendChild(brand);
+            }
+
             const img = document.createElement('img');
             img.src = cfg.src;
             img.alt = '';
             img.draggable = false;
             img.decoding = 'async';
+            if (cfg.centeredStack) {
+                img.className = 'citrana-canvas-hint-start-message';
+            }
             img.addEventListener('load', () => {
                 cfg.artboardW = img.naturalWidth || this.ARTBOARD_W;
                 cfg.artboardH = img.naturalHeight || this.ARTBOARD_H;
@@ -343,6 +362,20 @@ const CitranaCanvasHints = {
 
             if (!visible) {
                 el.hidden = true;
+                return;
+            }
+
+            if (cfg.centeredStack) {
+                const width = this.getDisplayWidth();
+                const offsetX = cfg.offsetX ?? 0;
+                const offsetY = cfg.offsetY ?? 0;
+                const margin = 8;
+                el.hidden = false;
+                el.style.width = `${width}px`;
+                el.style.height = 'auto';
+                el.style.left = `${Math.max(margin, (window.innerWidth - width) / 2 + offsetX)}px`;
+                const height = el.offsetHeight;
+                el.style.top = `${Math.max(margin, (window.innerHeight - height) / 2 + offsetY)}px`;
                 return;
             }
 
