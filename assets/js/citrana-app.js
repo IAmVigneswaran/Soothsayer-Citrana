@@ -291,7 +291,7 @@ class CitranaApp {
 
         if (openSessionBtn && openSessionInput) {
             openSessionBtn.addEventListener('click', () => {
-                openSessionInput.click();
+                this.showOpenSessionDialog();
             });
 
             openSessionInput.addEventListener('change', (e) => {
@@ -742,47 +742,291 @@ class CitranaApp {
         const confirmationNo = document.getElementById('confirmation-no');
 
         if (confirmationModal && confirmationClose && confirmationYes && confirmationNo) {
-            // Close button
-            confirmationClose.addEventListener('click', () => {
+            const dismissConfirmation = () => {
+                this.pendingConfirmationCallback = null;
+                this._clearSaveAsFilenameError();
                 this.closeModal(confirmationModal);
-            });
+            };
+
+            const confirmationFilenameInput = document.getElementById('confirmation-filename-input');
+            if (confirmationFilenameInput) {
+                confirmationFilenameInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && confirmationModal.classList.contains('confirmation-modal--save-as')) {
+                        e.preventDefault();
+                        confirmationYes.click();
+                    }
+                });
+            }
+
+            // Close button
+            confirmationClose.addEventListener('click', dismissConfirmation);
 
             // No button - close modal
-            confirmationNo.addEventListener('click', () => {
-                this.closeModal(confirmationModal);
-            });
+            confirmationNo.addEventListener('click', dismissConfirmation);
 
-            // Yes button - execute the callback
+            // Yes / OK / Choose file / Save - execute the callback when set
             confirmationYes.addEventListener('click', () => {
                 if (this.pendingConfirmationCallback) {
-                    this.pendingConfirmationCallback();
+                    const keepOpen = this.pendingConfirmationCallback() === false;
+                    if (keepOpen) {
+                        return;
+                    }
                     this.pendingConfirmationCallback = null;
                 }
+                this._clearSaveAsFilenameError();
                 this.closeModal(confirmationModal);
             });
 
             // Close when clicking outside
             confirmationModal.addEventListener('click', (e) => {
                 if (e.target === confirmationModal) {
-                    this.closeModal(confirmationModal);
+                    dismissConfirmation();
                 }
             });
         }
     }
 
+    /**
+     * @param {'confirm'|'alert'|'open'|'save-as'} mode
+     * @param {{ title: string, message: string, showWarning?: boolean, yesLabel?: string, noLabel?: string, showNo?: boolean, showFilename?: boolean, defaultFileName?: string }} options
+     */
+    _setConfirmationModalLayout(mode, options) {
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const confirmationTitle = document.getElementById('confirmation-modal-title');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const confirmationWarning = document.getElementById('confirmation-warning');
+        const confirmationFilenameWrap = document.getElementById('confirmation-filename-wrap');
+        const confirmationFilenameInput = document.getElementById('confirmation-filename-input');
+        const confirmationYes = document.getElementById('confirmation-yes');
+        const confirmationNo = document.getElementById('confirmation-no');
+
+        if (!confirmationModal || !confirmationTitle || !confirmationMessage
+            || !confirmationWarning || !confirmationYes || !confirmationNo
+            || !confirmationFilenameWrap || !confirmationFilenameInput) {
+            return false;
+        }
+
+        confirmationModal.classList.remove(
+            'confirmation-modal--confirm',
+            'confirmation-modal--alert',
+            'confirmation-modal--open',
+            'confirmation-modal--save-as'
+        );
+        confirmationModal.classList.add(`confirmation-modal--${mode}`);
+
+        confirmationTitle.textContent = options.title;
+        confirmationMessage.textContent = options.message;
+        confirmationWarning.hidden = options.showWarning !== true;
+        confirmationYes.textContent = options.yesLabel || 'Yes';
+        confirmationNo.textContent = options.noLabel || 'No';
+        confirmationNo.hidden = options.showNo === false;
+        confirmationNo.style.display = options.showNo === false ? 'none' : '';
+
+        const showFilename = options.showFilename === true;
+        confirmationFilenameWrap.hidden = !showFilename;
+        if (showFilename) {
+            confirmationFilenameInput.value = options.defaultFileName || '';
+            this._clearSaveAsFilenameError();
+        }
+
+        return true;
+    }
+
+    _clearSaveAsFilenameError() {
+        const errorEl = document.getElementById('confirmation-filename-error');
+        if (!errorEl) {
+            return;
+        }
+        errorEl.textContent = '';
+        errorEl.hidden = true;
+    }
+
+    _setSaveAsFilenameError(message) {
+        const errorEl = document.getElementById('confirmation-filename-error');
+        const inputEl = document.getElementById('confirmation-filename-input');
+        if (!errorEl) {
+            return;
+        }
+        errorEl.textContent = message;
+        errorEl.hidden = !message;
+        inputEl?.focus();
+        inputEl?.select();
+    }
+
+    _readSaveAsFileName(requiredExtension) {
+        const inputEl = document.getElementById('confirmation-filename-input');
+        const rawName = inputEl?.value ?? '';
+
+        if (typeof CitranaSession !== 'undefined' && typeof CitranaSession.normalizeDownloadFileName === 'function') {
+            return CitranaSession.normalizeDownloadFileName(rawName, requiredExtension);
+        }
+
+        const extension = requiredExtension || '';
+        const trimmed = String(rawName).trim();
+        if (!trimmed) {
+            return { ok: false, error: 'Enter a file name.' };
+        }
+
+        const fileName = trimmed.toLowerCase().endsWith(extension.toLowerCase())
+            ? trimmed
+            : `${trimmed.replace(/\.[^./\\]+$/i, '')}${extension}`;
+        return { ok: true, fileName };
+    }
+
+    /**
+     * @param {{ title: string, message: string, defaultFileName: string, requiredExtension: string, onSave: (fileName: string) => void }} options
+     */
+    showSaveAsDialog(options) {
+        const confirmationModal = document.getElementById('confirmation-modal');
+
+        if (!confirmationModal || typeof options.onSave !== 'function') {
+            return;
+        }
+
+        if (!this._setConfirmationModalLayout('save-as', {
+            title: options.title,
+            message: options.message,
+            showWarning: false,
+            yesLabel: 'Save',
+            noLabel: 'Cancel',
+            showNo: true,
+            showFilename: true,
+            defaultFileName: options.defaultFileName
+        })) {
+            return;
+        }
+
+        this.pendingConfirmationCallback = () => {
+            const result = this._readSaveAsFileName(options.requiredExtension);
+            if (!result.ok) {
+                this._setSaveAsFilenameError(result.error || 'Enter a valid file name.');
+                return false;
+            }
+
+            options.onSave(result.fileName);
+            return true;
+        };
+
+        this.openModal(confirmationModal);
+
+        requestAnimationFrame(() => {
+            const inputEl = document.getElementById('confirmation-filename-input');
+            if (!inputEl) {
+                return;
+            }
+            inputEl.focus();
+            const value = inputEl.value;
+            const extension = options.requiredExtension || '';
+            if (extension && value.toLowerCase().endsWith(extension.toLowerCase())) {
+                inputEl.setSelectionRange(0, value.length - extension.length);
+            } else {
+                const dotIndex = value.lastIndexOf('.');
+                if (dotIndex > 0) {
+                    inputEl.setSelectionRange(0, dotIndex);
+                } else {
+                    inputEl.select();
+                }
+            }
+        });
+    }
+
+    buildChartExportFileName(date = new Date()) {
+        const timestamp = typeof CitranaSession?.formatTimestamp === 'function'
+            ? CitranaSession.formatTimestamp(date)
+            : date.toISOString().replace(/[:.]/g, '-');
+        return `citrana-chart-${timestamp}.png`;
+    }
+
     showConfirmationDialog(message, callback) {
         const confirmationModal = document.getElementById('confirmation-modal');
-        const confirmationMessage = document.getElementById('confirmation-message');
 
-        if (confirmationModal && confirmationMessage) {
-            confirmationMessage.textContent = message;
-            this.pendingConfirmationCallback = callback;
-            this.openModal(confirmationModal);
+        if (!confirmationModal) {
+            return;
         }
+
+        if (!this._setConfirmationModalLayout('confirm', {
+            title: 'Confirm Action',
+            message,
+            showWarning: true,
+            yesLabel: 'Yes',
+            noLabel: 'No',
+            showNo: true
+        })) {
+            return;
+        }
+
+        this.pendingConfirmationCallback = callback;
+        this.openModal(confirmationModal);
+    }
+
+    /**
+     * Single-action notice dialog (reuses confirmation modal chrome).
+     * @param {string} message
+     * @param {{ title?: string }} [options]
+     */
+    showAlertDialog(message, options = {}) {
+        const confirmationModal = document.getElementById('confirmation-modal');
+
+        if (!confirmationModal) {
+            return;
+        }
+
+        if (!this._setConfirmationModalLayout('alert', {
+            title: options.title || 'Notice',
+            message,
+            showWarning: false,
+            yesLabel: 'OK',
+            noLabel: 'No',
+            showNo: false
+        })) {
+            return;
+        }
+
+        this.pendingConfirmationCallback = null;
+        this.openModal(confirmationModal);
+    }
+
+    showOpenSessionDialog() {
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const openSessionInput = document.getElementById('open-session-input');
+
+        if (!confirmationModal || !openSessionInput) {
+            return;
+        }
+
+        if (!this._setConfirmationModalLayout('open', {
+            title: 'Open Session',
+            message: 'Choose a .citrana.json file saved from Citrana. Other file types cannot be opened.',
+            showWarning: false,
+            yesLabel: 'Choose file',
+            noLabel: 'Cancel',
+            showNo: true
+        })) {
+            return;
+        }
+
+        this.pendingConfirmationCallback = () => {
+            openSessionInput.click();
+        };
+        this.openModal(confirmationModal);
     }
 
     exportChart() {
-        // Prevent multiple concurrent exports
+        if (this.isExporting || this.isSessionBusy) {
+            citranaDebug('Export already in progress, ignoring duplicate request');
+            return;
+        }
+
+        this.showSaveAsDialog({
+            title: 'Export PNG',
+            message: 'Choose a file name for your chart image.',
+            defaultFileName: this.buildChartExportFileName(),
+            requiredExtension: '.png',
+            onSave: (fileName) => this.runExportChart(fileName)
+        });
+    }
+
+    runExportChart(fileName) {
         if (this.isExporting || this.isSessionBusy) {
             citranaDebug('Export already in progress, ignoring duplicate request');
             return;
@@ -872,7 +1116,7 @@ class CitranaApp {
                     ? 'Preparing download...'
                     : 'Adding padding and watermark...');
 
-                this.finalizeExportImage(dataURL, { chartOnly });
+                this.finalizeExportImage(dataURL, { chartOnly, fileName });
             } catch (error) {
                 console.error('Error exporting chart:', error);
                 if (savedView) {
@@ -896,7 +1140,7 @@ class CitranaApp {
         requestAnimationFrame(performExport);
     }
 
-    finalizeExportImage(dataURL, { chartOnly = false } = {}) {
+    finalizeExportImage(dataURL, { chartOnly = false, fileName } = {}) {
         const img = new window.Image();
         img.onload = () => {
             try {
@@ -933,24 +1177,19 @@ class CitranaApp {
                 this.updateExportProgress(95, 'Preparing download...');
 
                 const finalDataURL = offscreen.toDataURL('image/png');
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                const seconds = String(now.getSeconds()).padStart(2, '0');
-                const timestamp = `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
-                const filename = `citrana-chart-${timestamp}.png`;
+                const normalized = CitranaSession?.normalizeDownloadFileName?.(fileName, '.png');
+                const resolvedFileName = normalized?.ok
+                    ? normalized.fileName
+                    : this.buildChartExportFileName();
 
-                this.downloadFile(finalDataURL, filename);
+                this.downloadFile(finalDataURL, resolvedFileName);
                 this.updateExportProgress(100, 'Export completed successfully!');
 
                 setTimeout(() => {
                     this.hideExportProgress();
                     this.isExporting = false;
                     this._lastDownloadedFile = null;
-                    citranaDebug(`Chart exported successfully as: ${filename}`);
+                    citranaDebug(`Chart exported successfully as: ${resolvedFileName}`);
                 }, 300);
             } catch (error) {
                 console.error('Error processing export:', error);
@@ -1530,6 +1769,13 @@ class CitranaApp {
     }
 
     getModalInitialFocusElement(modal) {
+        if (modal?.id === 'confirmation-modal' && modal.classList.contains('confirmation-modal--save-as')) {
+            const filenameInput = document.getElementById('confirmation-filename-input');
+            if (filenameInput) {
+                return filenameInput;
+            }
+        }
+
         const closeButton = modal.querySelector('button[class*="modal-close"]');
         if (closeButton) {
             return closeButton;
@@ -2056,7 +2302,26 @@ class CitranaApp {
         }
 
         if (typeof CitranaSession === 'undefined') {
-            window.alert('Session save is unavailable.');
+            this.showAlertDialog('Session save is unavailable.', { title: 'Save Session' });
+            return;
+        }
+
+        this.showSaveAsDialog({
+            title: 'Save Session',
+            message: 'Choose a file name for your session.',
+            defaultFileName: CitranaSession.buildExportFileName(),
+            requiredExtension: CitranaSession.FILE_EXTENSION,
+            onSave: (fileName) => this.runSaveSession(fileName)
+        });
+    }
+
+    runSaveSession(fileName) {
+        if (this.isExporting || this.isSessionBusy) {
+            return;
+        }
+
+        if (typeof CitranaSession === 'undefined') {
+            this.showAlertDialog('Session save is unavailable.', { title: 'Save Session' });
             return;
         }
 
@@ -2068,7 +2333,7 @@ class CitranaApp {
                 this.updateProgressModal(40, 'Serialising chart and Annotations...');
                 const session = CitranaSession.capture(this);
                 this.updateProgressModal(75, 'Preparing download...');
-                CitranaSession.download(session);
+                CitranaSession.download(session, fileName);
                 this.completeProgressModal('Session saved successfully!', () => {
                     this.isSessionBusy = false;
                 });
@@ -2083,7 +2348,7 @@ class CitranaApp {
 
     openSessionFromFile(file) {
         if (typeof CitranaSession === 'undefined') {
-            window.alert('Session open is unavailable.');
+            this.showAlertDialog('Session open is unavailable.', { title: 'Open Session' });
             return;
         }
 
@@ -2102,7 +2367,9 @@ class CitranaApp {
             })
             .catch((error) => {
                 console.error('Error reading session:', error);
-                window.alert(error.message || 'Could not open session.');
+                this.showAlertDialog(error.message || 'Could not open session.', {
+                    title: 'Could not open session'
+                });
             });
     }
 

@@ -148,23 +148,66 @@ const CitranaSession = (() => {
         }
     }
 
-    function buildExportFileName(date = new Date()) {
+    function formatTimestamp(date = new Date()) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
-        return `citrana-session-${year}-${month}-${day}-${hours}${minutes}${seconds}${FILE_EXTENSION}`;
+        return `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
     }
 
-    function download(session) {
+    function buildExportFileName(date = new Date()) {
+        return `citrana-session-${formatTimestamp(date)}${FILE_EXTENSION}`;
+    }
+
+    /**
+     * @param {string} fileName
+     * @param {string} requiredExtension e.g. ".png" or ".citrana.json"
+     */
+    function normalizeDownloadFileName(fileName, requiredExtension) {
+        const extension = typeof requiredExtension === 'string' ? requiredExtension : FILE_EXTENSION;
+        let name = String(fileName ?? '').trim();
+
+        if (!name) {
+            return { ok: false, error: 'Enter a file name.' };
+        }
+
+        name = name.replace(/^.*[\\/]/, '');
+        name = name.replace(/[<>:"|?*\x00-\x1f]/g, '').trim();
+
+        if (!name) {
+            return { ok: false, error: 'Enter a valid file name.' };
+        }
+
+        const lowerExtension = extension.toLowerCase();
+        if (!name.toLowerCase().endsWith(lowerExtension)) {
+            name = name.replace(/\.[^./\\]+$/i, '');
+            name += extension;
+        }
+
+        if (name.length > 200) {
+            name = name.slice(0, 200);
+            if (!name.toLowerCase().endsWith(lowerExtension)) {
+                name = name.replace(/\.[^./\\]+$/i, '');
+                name += extension;
+            }
+        }
+
+        return { ok: true, fileName: name };
+    }
+
+    function download(session, fileName) {
+        const resolvedName = typeof fileName === 'string' && fileName.trim()
+            ? normalizeDownloadFileName(fileName, FILE_EXTENSION).fileName || buildExportFileName()
+            : buildExportFileName();
         const json = JSON.stringify(session, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = buildExportFileName();
+        link.download = resolvedName;
         link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
@@ -218,6 +261,8 @@ const CitranaSession = (() => {
         capture,
         applyOptions,
         buildExportFileName,
+        formatTimestamp,
+        normalizeDownloadFileName,
         download,
         readFile
     };

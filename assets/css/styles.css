@@ -2937,6 +2937,53 @@ body.presentation-view .about-btn {
   color: white;
 }
 
+.confirmation-modal--alert .confirmation-btn-no {
+  display: none;
+}
+
+.confirmation-modal--alert .confirmation-warning,
+.confirmation-modal--open .confirmation-warning,
+.confirmation-modal--save-as .confirmation-warning {
+  display: none;
+}
+
+.confirmation-filename-field {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.confirmation-filename-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+  margin-bottom: 6px;
+}
+
+.confirmation-filename-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #000000;
+  background: #ffffff;
+}
+
+.confirmation-filename-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+.confirmation-filename-error {
+  font-size: 13px;
+  color: #da3b26;
+  margin: 8px 0 0 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
 /* Mobile styles for confirmation dialog */
 @media (max-width: 768px) {
   .confirmation-modal-content {

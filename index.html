@@ -450,7 +450,7 @@
          </div>
       </div>
       <!-- Confirmation Dialog Modal -->
-      <div id="confirmation-modal" class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-describedby="confirmation-message confirmation-warning" aria-hidden="true">
+      <div id="confirmation-modal" class="confirmation-modal confirmation-modal--confirm" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-describedby="confirmation-message confirmation-warning" aria-hidden="true">
          <div class="confirmation-modal-content">
             <div class="confirmation-modal-header">
                <h2 id="confirmation-modal-title" class="confirmation-modal-title">Confirm Action</h2>
@@ -460,6 +460,11 @@
             </div>
             <div class="confirmation-modal-body">
                <p id="confirmation-message">Are you sure you want to proceed? This action cannot be undone.</p>
+               <div class="confirmation-filename-field" id="confirmation-filename-wrap" hidden>
+                  <label for="confirmation-filename-input" class="confirmation-filename-label">File name</label>
+                  <input type="text" id="confirmation-filename-input" class="confirmation-filename-input" autocomplete="off" spellcheck="false">
+                  <p class="confirmation-filename-error" id="confirmation-filename-error" hidden></p>
+               </div>
                <p class="confirmation-warning" id="confirmation-warning"><strong>Warning:</strong> Be sure to save your image before proceeding.</p>
             </div>
             <div class="confirmation-modal-actions">
