@@ -1,7 +1,7 @@
 /**
- * chart-templates-south.js
+ * citrana-chart-templates-south.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
- * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
+ * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
  * Handles South Indian chart layout and functionality
  */
 class SouthIndianChartTemplate {
@@ -11,12 +11,11 @@ class SouthIndianChartTemplate {
         this.chartGroupSouth = null;
         this.houseDataSouth = {};
         this.lagnaHouseSouth = 1;
-        this.firstHouseSouth = 1;
-        this.selectedHouse = null; // Track selected house for highlight
-        this.southIndianHouseOrder = null;
+        this._southIndicatorsVisible = true;
+        this.selectedHouse = null; // Track selected Bhava for highlight
 
         if (stage && layer) {
-            console.log('South Indian Chart Template initialized with stage and layer');
+            citranaDebug('South Indian Chart Template initialized with stage and layer');
         }
     }
 
@@ -36,11 +35,35 @@ class SouthIndianChartTemplate {
         return this.houseDataSouth;
     }
 
-    getDropZones() {
-        return Object.keys(this.houseDataSouth);
+    findHouseAtChartPoint(px, py) {
+        for (const hNum in this.houseDataSouth) {
+            const h = this.houseDataSouth[hNum];
+            if (!h || h.width == null) continue;
+            if (px >= h.x && px <= h.x + h.width && py >= h.y && py <= h.y + h.height) {
+                return parseInt(hNum, 10);
+            }
+        }
+
+        let closest = null;
+        let closestDist = Infinity;
+        for (const hNum in this.houseDataSouth) {
+            const h = this.houseDataSouth[hNum];
+            if (!h || h.width == null) continue;
+            const centerX = h.x + h.width / 2;
+            const centerY = h.y + h.height / 2;
+            const distance = Math.hypot(px - centerX, py - centerY);
+            const threshold = Math.max(h.width, h.height) / 2;
+            if (distance < threshold && distance < closestDist) {
+                closestDist = distance;
+                closest = parseInt(hNum, 10);
+            }
+        }
+        return closest;
     }
 
-    createSouthIndianChart() {
+    createSouthIndianChart(options = {}) {
+        const { initialLagna = 1, skipZoomToFit = false } = options;
+
         if (!this.stage || !this.layer) {
             console.error('Stage or layer not initialized');
             return;
@@ -48,8 +71,7 @@ class SouthIndianChartTemplate {
 
         this.clearChart();
 
-        // Set Aries (house 1) as default Lagna
-        this.lagnaHouseSouth = 1;
+        this.lagnaHouseSouth = initialLagna;
 
         // Create chart group
         this.chartGroupSouth = new Konva.Group({
@@ -64,7 +86,7 @@ class SouthIndianChartTemplate {
 
         // Create 4x4 grid with center empty (South Indian layout)
         const positions = [
-            // Top row (houses 12, 1, 2, 3)
+            // Top row (Bhavas 12, 1, 2, 3)
             {
                 x: startX,
                 y: startY,
@@ -85,7 +107,7 @@ class SouthIndianChartTemplate {
                 y: startY,
                 house: 3
             },
-            // Second row (houses 11, empty, empty, 4)
+            // Second row (Bhavas 11, empty, empty, 4)
             {
                 x: startX,
                 y: startY + houseSize,
@@ -96,7 +118,7 @@ class SouthIndianChartTemplate {
                 y: startY + houseSize,
                 house: 4
             },
-            // Third row (houses 10, empty, empty, 5)
+            // Third row (Bhavas 10, empty, empty, 5)
             {
                 x: startX,
                 y: startY + houseSize * 2,
@@ -107,7 +129,7 @@ class SouthIndianChartTemplate {
                 y: startY + houseSize * 2,
                 house: 5
             },
-            // Bottom row (houses 9, 8, 7, 6)
+            // Bottom row (Bhavas 9, 8, 7, 6)
             {
                 x: startX,
                 y: startY + houseSize * 3,
@@ -129,9 +151,6 @@ class SouthIndianChartTemplate {
                 house: 6
             }
         ];
-
-        // Store the visual order for renumbering
-        this.southIndianHouseOrder = positions.map(pos => pos.house);
 
         positions.forEach(pos => {
             this.createHouse(pos.x, pos.y, houseSize, houseSize, pos.house);
@@ -184,6 +203,7 @@ class SouthIndianChartTemplate {
             textarea.className = 'konva-textarea';
             document.body.appendChild(textarea);
             textarea.value = centerText.text();
+            const initialCenterText = centerText.text();
             // Style textarea to match the text bounding box
             textarea.style.position = 'absolute';
             textarea.style.top = areaPosition.y + 'px';
@@ -218,9 +238,13 @@ class SouthIndianChartTemplate {
             });
             // Save on blur or Enter
             const finishEditing = () => {
-                centerText.text(textarea.value);
+                const newText = textarea.value;
+                centerText.text(newText);
                 textarea.remove();
                 this.layer.batchDraw();
+                if (newText !== initialCenterText && window.app?.recordHistory) {
+                    window.app.recordHistory('Edit centre label');
+                }
             };
             textarea.addEventListener('blur', finishEditing);
             textarea.addEventListener('keydown', (e) => {
@@ -248,14 +272,18 @@ class SouthIndianChartTemplate {
         this.layer.add(this.chartGroupSouth);
         this.layer.batchDraw();
 
-        // Zoom to fit
-        this.zoomToFit();
+        this.renumberHouses();
+        this.applySouthIndicatorsPreference();
 
-        console.log('South Indian chart created');
+        if (!skipZoomToFit) {
+            this.zoomToFit();
+        }
+
+        citranaDebug('South Indian chart created');
     }
 
     createHouse(x, y, width, height, houseNumber) {
-        // Create house rectangle
+        // Create Bhava rectangle
         const house = new Konva.Rect({
             x: x,
             y: y,
@@ -267,24 +295,7 @@ class SouthIndianChartTemplate {
             name: `house-${houseNumber}`
         });
 
-        // Rashi (Zodiac signs) mapping
-        const rashis = [
-            '1', // Aries
-            '2', // Taurus
-            '3', // Gemini
-            '4', // Cancer
-            '5', // Leo
-            '6', // Virgo
-            '7', // Libra
-            '8', // Scorpio
-            '9', // Sagittarius
-            '10', // Capricorn
-            '11', // Aquarius
-            '12' // Pisces
-        ];
-
-        const rashiIndex = (houseNumber - 1) % 12;
-        const rashiName = rashis[rashiIndex];
+        const rashiName = CitranaRashis.getNumberForHouseIndex(houseNumber - 1);
 
         // Create small rounded black box for Rashi
         const rashiNumberBoxSizeSouth = 20;
@@ -314,7 +325,7 @@ class SouthIndianChartTemplate {
             name: `rashiNumberSouthText-${houseNumber}`
         });
 
-        // Store house data
+        // Store Bhava data
         this.houseDataSouth[houseNumber] = {
             x: x,
             y: y,
@@ -322,6 +333,8 @@ class SouthIndianChartTemplate {
             height: height,
             planets: [],
             houseRectSouth: house,
+            rashiNumberSouthBox: rashiNumberSouthBox,
+            rashiNumberSouthText: rashiNumberSouthText,
             bhavaNumberSouthBox: null, // Initialize bhavaNumberSouthBox to null
             bhavaNumberSouthText: null, // Initialize bhavaNumberSouthText to null
             lagnaLinesSouth: null // Store Lagna indicator lines
@@ -362,7 +375,7 @@ class SouthIndianChartTemplate {
         this.houseDataSouth[houseNumber].bhavaNumberSouthBox = bhavaNumberSouthBox;
         this.houseDataSouth[houseNumber].bhavaNumberSouthText = bhavaNumberSouthText;
 
-        // Draw Lagna indicator lines if this is the Lagna house
+        // Draw Lagna indicator lines if this is the Lagna Bhava
         if (houseNumber === this.lagnaHouseSouth) {
             // Single diagonal line from top-left to a point near top and left sides
             const line = new Konva.Line({
@@ -377,64 +390,27 @@ class SouthIndianChartTemplate {
 
         // Add right-click event for context menu
         house.on('contextmenu', (e) => {
-            console.log('[DEBUG] South Indian Chart House right-clicked:', houseNumber);
+            citranaDebug('South Indian Chart Bhava right-clicked:', houseNumber);
             e.evt.preventDefault();
+            e.evt.stopPropagation();
             this.highlightHouse(houseNumber);
             window.app.contextMenu.showHouseMenu(e.evt.clientX, e.evt.clientY, houseNumber);
         });
 
-        // Add touch support for mobile context menu
-        let longPressTimer = null;
-        let longPressTriggered = false;
-        house.on('touchstart', (e) => {
-            if (e.evt.touches.length === 1) {
-                longPressTriggered = false;
-                longPressTimer = setTimeout(() => {
-                    const touch = e.evt.touches[0];
-                    e.evt.preventDefault();
-                    longPressTriggered = true;
-                    this.highlightHouse(houseNumber);
-                    window.app.contextMenu.showHouseMenu(touch.clientX, touch.clientY, houseNumber);
-                }, 500);
-            }
-        });
-
-        house.on('touchmove', (e) => {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        });
-
-        house.on('touchend', (e) => {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-
-            // If long press was triggered, prevent the menu from being hidden
-            if (longPressTriggered) {
-                e.evt.preventDefault();
-                e.evt.stopPropagation();
-                // Reset the flag after a short delay
-                setTimeout(() => {
-                    longPressTriggered = false;
-                }, 100);
-            }
-        });
-
         // Add click event for selection
         house.on('click', (e) => {
+            this.clearSelectedPlanet();
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
-            console.log('[SELECT] South Indian Chart House selected:', houseNumber);
+            citranaDebug('[SELECT] South Indian Chart Bhava selected:', houseNumber);
         });
 
         // Add touch event for mobile selection
         house.on('tap', (e) => {
+            this.clearSelectedPlanet();
             this.highlightHouse(houseNumber);
             window.selectedBhavaSouth = houseNumber;
-            console.log('[SELECT] South Indian Chart House selected via touch:', houseNumber);
+            citranaDebug('[SELECT] South Indian Chart Bhava selected via touch:', houseNumber);
         });
     }
 
@@ -449,6 +425,7 @@ class SouthIndianChartTemplate {
             this.selectedHouse = houseNumber;
             this.layer.batchDraw();
         }
+        window.app?.notifyCanvasSelectionChanged?.();
     }
 
     clearHighlight() {
@@ -457,66 +434,65 @@ class SouthIndianChartTemplate {
             this.selectedHouse = null;
             this.layer.batchDraw();
         }
+        window.app?.notifyCanvasSelectionChanged?.();
     }
 
-    // --- Robust Planet Management ---
-    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null) {
+    // --- Robust Graha Management ---
+    addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null, retrograde = false, skipSnapshot = false) {
         const house = this.houseDataSouth[houseNumber];
         if (!house) return;
         if (!house.planets) house.planets = [];
-        // Use unique ID for each planet instance
+        // Use unique ID for each Graha instance
         const planetId = id || (Date.now().toString(36) + Math.random().toString(36).substr(2, 5));
         const planet = window.app.planetSystem.getPlanetInfo(planetAbbr);
         const planetColor = planet ? planet.color : '#000000';
+        let resolvedLabel = label || planetAbbr;
+        let resolvedRetrograde = retrograde;
+        if (resolvedLabel.includes('ᵣ')) {
+            resolvedRetrograde = true;
+            resolvedLabel = resolvedLabel.replace(/ᵣ/g, '');
+        }
         house.planets.push({
             abbr: planetAbbr,
-            label: label || planetAbbr,
+            label: resolvedLabel,
             id: planetId,
-            color: planetColor
+            color: planetColor,
+            retrograde: resolvedRetrograde
         });
         this.updatePlanetsInHouse(houseNumber);
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
-        console.log(`[ADD] Planet ${planetAbbr} (id=${planetId}) added to house ${houseNumber}`);
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Add Graha');
+        citranaDebug(`[ADD] Graha ${planetAbbr} (id=${planetId}) added to Bhava ${houseNumber}`);
     }
 
-    removePlanetFromHouseById(houseNumber, planetId) {
+    removePlanetFromHouseById(houseNumber, planetId, skipSnapshot = false) {
         const house = this.houseDataSouth[houseNumber];
         if (!house || !house.planets) return;
         house.planets = house.planets.filter((planet) => planet.id !== planetId);
         this.updatePlanetsInHouse(houseNumber);
         this.layer.batchDraw();
         this.clearSelectedPlanet();
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
-    }
-
-    renamePlanetInHouseById(houseNumber, planetId, newLabel) {
-        const house = this.houseDataSouth[houseNumber];
-        if (!house || !house.planets) return;
-        const planet = house.planets.find((p) => p.id === planetId);
-        if (planet) planet.label = newLabel;
-        this.updatePlanetsInHouse(houseNumber);
-        this.layer.batchDraw();
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Remove Graha');
     }
 
     updatePlanetsInHouse(houseNumber) {
         const house = this.houseDataSouth[houseNumber];
         if (!house) return;
-        // Remove all existing planet texts for this house
+        // Remove all existing Graha texts for this Bhava
         this.chartGroupSouth.getChildren(node => node.name() && node.name().startsWith(`planet-`) && node.name().includes(`-${houseNumber}-`)).forEach(node => node.destroy());
-        // Calculate font size based on number of planets
+        // Calculate font size based on number of Grahas
         const n = house.planets.length;
         const BASE_FONT = 24;
         const MIN_FONT = 14;
         const STEP = 4;
         const fontSize = Math.max(MIN_FONT, BASE_FONT - (n - 1) * STEP);
-        // Perfectly center all planet texts both horizontally and vertically in the house
+        // Perfectly center all Graha texts both horizontally and vertically in the Bhava
         const totalHeight = n * fontSize + (n - 1) * 4;
         const startY = house.y + house.height / 2 - totalHeight / 2;
         house.planets.forEach((planetObj, i) => {
             const planet = window.app.planetSystem.getPlanetInfo(planetObj.abbr);
             const planetY = startY + i * (fontSize + 4);
 
-            // Add a transparent rectangle for easier hit area
+            // Transparent hit area for easier click/right-click (not draggable)
             const hitRect = new Konva.Rect({
                 x: house.x + house.width / 2 - fontSize,
                 y: planetY - fontSize / 2,
@@ -525,25 +501,16 @@ class SouthIndianChartTemplate {
                 fill: 'rgba(0,0,0,0)',
                 name: `planet-hit-${planetObj.id}`,
                 listening: true,
-                draggable: true // Make hit rect draggable too for Safari
+                draggable: false
             });
 
             // Safari-specific: Add touch event handling to hit rect
-            hitRect.on('touchstart', (e) => {
-                e.evt.preventDefault();
-                console.log(`[DEBUG] Touch start for hit rect of planet ${planetObj.abbr} from house ${houseNumber}`);
+            hitRect.on('touchstart', () => {
+                citranaDebug(`Touch start for hit rect of Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
             });
 
-            hitRect.on('touchmove', (e) => {
-                e.evt.preventDefault();
-            });
-
-            hitRect.on('touchend', (e) => {
-                e.evt.preventDefault();
-            });
-
-            // The planet text - perfectly centered
-            const isMobile = /Mobile|Android|iP(ad|hone|od)/.test(navigator.userAgent);
+            // The Graha text - perfectly centered
+            const isMobile = CitranaDevice.isMobileUA();
             const planetText = new Konva.Text({
                 x: house.x + house.width / 2,
                 y: planetY,
@@ -552,6 +519,7 @@ class SouthIndianChartTemplate {
                 fontFamily: 'Arial Black, Arial, sans-serif',
                 fontWeight: isMobile ? 700 : 'bold',
                 fill: planetObj.color || (planet ? planet.color : '#000'),
+                textDecoration: planetObj.retrograde ? 'underline' : '',
                 name: `planet-${planetObj.abbr}-${houseNumber}-${planetObj.id}`,
                 draggable: true,
                 align: 'left',
@@ -578,30 +546,23 @@ class SouthIndianChartTemplate {
             }, 10);
 
             // Safari-specific: Add touch event handling
-            planetText.on('touchstart', (e) => {
-                e.evt.preventDefault();
-                console.log(`[DEBUG] Touch start for planet ${planetObj.abbr} from house ${houseNumber}`);
+            planetText.on('touchstart', () => {
+                citranaDebug(`Touch start for Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
             });
 
-            planetText.on('touchmove', (e) => {
-                e.evt.preventDefault();
-            });
-
-            planetText.on('touchend', (e) => {
-                e.evt.preventDefault();
-            });
-
-            // Make planet text editable with live preview
+            // Make Graha text editable with live preview
             if (window.app && window.app.drawingTools) {
-                window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel, newColor) => {
-                    // Update the planet label in the house data
+                window.app.drawingTools.makePlanetTextEditable(planetText, (newLabel, newColor, newRetrograde) => {
+                    // Update the Graha label in the Bhava data
                     const planetIndex = house.planets.findIndex(p => p.id === planetObj.id);
                     if (planetIndex !== -1) {
                         house.planets[planetIndex].label = newLabel;
                         house.planets[planetIndex].color = newColor;
-                        // Update the planet text and color
+                        house.planets[planetIndex].retrograde = !!newRetrograde;
+                        // Update the Graha text and color
                         planetText.text(newLabel);
                         planetText.fill(newColor);
+                        planetText.textDecoration(newRetrograde ? 'underline' : '');
 
                         // Re-center the text after editing
                         setTimeout(() => {
@@ -613,11 +574,7 @@ class SouthIndianChartTemplate {
                         }, 10);
 
                         this.layer.batchDraw();
-                        console.log(`[DEBUG] Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
-                        // Trigger snapshot for undo/redo
-                        if (window.app && window.app.pushSnapshot) {
-                            window.app.pushSnapshot();
-                        }
+                        citranaDebug(`Planet ${planetObj.abbr} updated - Label: ${newLabel}, Color: ${newColor}`);
                     }
                 });
             }
@@ -627,173 +584,57 @@ class SouthIndianChartTemplate {
                 this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
             };
             hitRect.on('click', selectHandler);
+            hitRect.on('tap', selectHandler);
             planetText.on('click', selectHandler);
+            planetText.on('tap', selectHandler);
             // Right-click context menu
             const contextHandler = (e) => {
                 e.evt.preventDefault();
+                e.evt.stopPropagation();
                 this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
                 window.app.contextMenu.showPlanetMenu(e.evt.clientX, e.evt.clientY, houseNumber, planetObj.abbr, planetObj.id);
             };
             hitRect.on('contextmenu', contextHandler);
             planetText.on('contextmenu', contextHandler);
 
-            // Touch support for mobile context menu
-            let planetLongPressTimer = null;
-            let planetLongPressTriggered = false;
-            const touchContextHandler = (e) => {
-                if (e.evt.touches.length === 1) {
-                    planetLongPressTriggered = false;
-                    planetLongPressTimer = setTimeout(() => {
-                        const touch = e.evt.touches[0];
-                        e.evt.preventDefault();
-                        planetLongPressTriggered = true;
-                        this.selectPlanet(planetText, houseNumber, planetObj.abbr, planetObj.id);
-                        window.app.contextMenu.showPlanetMenu(touch.clientX, touch.clientY, houseNumber, planetObj.abbr, planetObj.id);
-                    }, 500);
-                }
-            };
-
-            const touchMoveHandler = (e) => {
-                if (planetLongPressTimer) {
-                    clearTimeout(planetLongPressTimer);
-                    planetLongPressTimer = null;
-                }
-            };
-
-            const touchEndHandler = (e) => {
-                if (planetLongPressTimer) {
-                    clearTimeout(planetLongPressTimer);
-                    planetLongPressTimer = null;
-                }
-
-                // If long press was triggered, prevent the menu from being hidden
-                if (planetLongPressTriggered) {
-                    e.evt.preventDefault();
-                    e.evt.stopPropagation();
-                    // Reset the flag after a short delay
-                    setTimeout(() => {
-                        planetLongPressTriggered = false;
-                    }, 100);
-                }
-            };
-
-            hitRect.on('touchstart', touchContextHandler);
-            planetText.on('touchstart', touchContextHandler);
-            hitRect.on('touchmove', touchMoveHandler);
-            planetText.on('touchmove', touchMoveHandler);
-            hitRect.on('touchend', touchEndHandler);
-            planetText.on('touchend', touchEndHandler);
-
-            // Safari-compatible drag handlers for both hit rect and planet text
+            // Drag-and-drop between bhavas (label only; hit rect is for selection)
             const dragStartHandler = (e) => {
-                console.log(`[DEBUG] Drag start for planet ${planetObj.abbr} from house ${houseNumber}`);
+                citranaDebug(`Drag start for Graha ${planetObj.abbr} from Bhava ${houseNumber}`);
 
-                this._dragSource = {
-                    houseNumber,
-                    abbr: planetObj.abbr,
-                    id: planetObj.id,
-                    label: planetObj.label,
-                    color: planetObj.color
-                };
                 planetText.opacity(0.5);
-                hitRect.opacity(0.5);
+                if (this.selectedPlanet?.planetText === planetText) {
+                    CitranaSelection?.sync?.(planetText);
+                }
                 planetText.moveToTop();
                 hitRect.moveToTop();
                 this.layer.batchDraw();
-                console.log(`[DRAGSTART] Planet ${planetObj.abbr} (id=${planetObj.id}) from house ${houseNumber}`);
+                citranaDebug(`[DRAGSTART] Graha ${planetObj.abbr} (id=${planetObj.id}) from Bhava ${houseNumber}`);
+            };
+
+            const dragMoveHandler = () => {
+                if (this.selectedPlanet?.planetText === planetText) {
+                    CitranaSelection?.sync?.(planetText);
+                    hitRect.moveToTop();
+                    planetText.moveToTop();
+                    this.layer.batchDraw();
+                }
             };
 
             const dragEndHandler = (e) => {
                 planetText.opacity(1);
-                hitRect.opacity(1);
 
-                // Safari-compatible drop detection
-                let targetHouse = null;
-                let pointer = null;
-
-                // Try multiple methods to get pointer position for Safari compatibility
-                try {
-                    // Method 1: Use stage pointer position
-                    pointer = this.stage.getPointerPosition();
-
-                    // Method 2: If stage pointer fails, try event position
-                    if (!pointer && e.evt) {
-                        const stageBox = this.stage.container().getBoundingClientRect();
-                        const scale = this.stage.scaleX();
-                        const stagePos = this.stage.position();
-
-                        pointer = {
-                            x: (e.evt.clientX - stageBox.left - stagePos.x) / scale,
-                            y: (e.evt.clientY - stageBox.top - stagePos.y) / scale
-                        };
-                    }
-
-                    // Method 3: If still no pointer, use the planet's current position
-                    if (!pointer) {
-                        pointer = {
-                            x: planetText.x(),
-                            y: planetText.y()
-                        };
-                    }
-
-                    // Method 4: Safari fallback - use the planet's final position after drag
-                    if (!pointer) {
-                        const planetPos = planetText.position();
-                        pointer = {
-                            x: planetPos.x,
-                            y: planetPos.y
-                        };
-                    }
-
-                    // --- NEW: Always transform pointer to stage coordinates ---
-                    const scale = this.stage.scaleX();
-                    const stagePos = this.stage.position();
-                    const px = (pointer.x - stagePos.x) / scale;
-                    const py = (pointer.y - stagePos.y) / scale;
-
-                    // Find which bhava the drop is over
-                    for (const hNum in this.houseDataSouth) {
-                        const h = this.houseDataSouth[hNum];
-                        if (
-                            px >= h.x && px <= h.x + h.width &&
-                            py >= h.y && py <= h.y + h.height
-                        ) {
-                            targetHouse = parseInt(hNum);
-                            console.log(`[DEBUG] Drop detected over house ${targetHouse}`);
-                            break;
-                        }
-                    }
-
-                    // Method 5: If still no target house found, try a broader search
-                    if (!targetHouse) {
-                        console.log('[DEBUG] No target house found, trying broader search...');
-                        for (const hNum in this.houseDataSouth) {
-                            const h = this.houseDataSouth[hNum];
-                            const centerX = h.x + h.width / 2;
-                            const centerY = h.y + h.height / 2;
-                            const distance = Math.sqrt(
-                                Math.pow(px - centerX, 2) +
-                                Math.pow(py - centerY, 2)
-                            );
-
-                            // If planet is within reasonable distance of house center
-                            if (distance < Math.max(h.width, h.height) / 2) {
-                                targetHouse = parseInt(hNum);
-                                console.log(`[DEBUG] Drop detected over house ${targetHouse} using distance method`);
-                                break;
-                            }
-                        }
-                    }
-
-                } catch (error) {
-                    console.error('[DEBUG] Error in drop detection:', error);
-                }
+                const coordinator = window.app?.chartTemplates;
+                const targetHouse = coordinator?.resolveDropHouse({
+                    event: e,
+                    chartLocalX: planetText.x(),
+                    chartLocalY: planetText.y()
+                }) ?? null;
 
                 if (targetHouse && targetHouse !== houseNumber) {
-                    // Move planet to new bhava by ID
-                    this.removePlanetFromHouseById(houseNumber, planetObj.id);
-                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id);
-                    // Update the color of the moved planet
+                    // Move Graha to new Bhava by ID
+                    this.removePlanetFromHouseById(houseNumber, planetObj.id, true);
+                    this.addPlanetToHouse(planetObj.abbr, targetHouse, planetObj.label, planetObj.id, planetObj.retrograde, true);
+                    // Update the color of the moved Graha
                     const targetHouseData = this.houseDataSouth[targetHouse];
                     if (targetHouseData && targetHouseData.planets) {
                         const movedPlanet = targetHouseData.planets.find(p => p.id === planetObj.id);
@@ -802,61 +643,87 @@ class SouthIndianChartTemplate {
                         }
                     }
                     this.updatePlanetsInHouse(targetHouse);
-                    console.log(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to house ${targetHouse}`);
+                    if (window.app?.recordHistory) window.app.recordHistory('Move Graha');
+                    citranaDebug(`[DROP] Planet ${planetObj.abbr} (id=${planetObj.id}) moved to Bhava ${targetHouse}`);
                 } else {
                     // Snap back to original position
                     this.updatePlanetsInHouse(houseNumber);
-                    console.log(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id}) - Target house: ${targetHouse}, Original house: ${houseNumber}`);
+                    citranaDebug(`[SNAPBACK] Planet ${planetObj.abbr} (id=${planetObj.id}) - Target Bhava: ${targetHouse}, Original Bhava: ${houseNumber}`);
                 }
-                this._dragSource = null;
                 this.layer.batchDraw();
             };
 
-            // Add drag handlers to both hit rect and planet text
-            hitRect.on('dragstart', dragStartHandler);
             planetText.on('dragstart', dragStartHandler);
-            hitRect.on('dragend', dragEndHandler);
+            planetText.on('dragmove', dragMoveHandler);
             planetText.on('dragend', dragEndHandler);
             this.chartGroupSouth.add(hitRect);
             this.chartGroupSouth.add(planetText);
             hitRect.moveToTop();
             planetText.moveToTop();
         });
+
+        this.restorePlanetSelectionInHouse(houseNumber);
+        window.app?.drawingTools?.raiseDrawingsAboveChart?.();
         this.layer.batchDraw();
+    }
+
+    restorePlanetSelectionInHouse(houseNumber) {
+        const selectedId = this.selectedPlanet?.id;
+        const selectedHouse = this.selectedPlanet?.houseNumber;
+        if (!selectedId || selectedHouse !== houseNumber) {
+            return;
+        }
+
+        const house = this.houseDataSouth[houseNumber];
+        const planet = house?.planets?.find((p) => p.id === selectedId);
+        const planetText = this.chartGroupSouth.findOne((node) => node.getAttr?.('_planetId') === selectedId);
+        if (!planet || !planetText) {
+            this.clearSelectedPlanet();
+            return;
+        }
+
+        this.selectedPlanet = null;
+        this.selectPlanet(planetText, houseNumber, planet.abbr, selectedId);
     }
 
     // --- Selection and Keyboard Delete ---
     selectPlanet(planetText, houseNumber, abbr, id) {
-        this.clearSelectedPlanet();
+        window.app?.chartTemplates?.northIndianTemplate?.clearSelectedPlanet?.();
+        window.app?.drawingTools?.clearSelection?.();
+        window.app?.drawingTools?.editUI?.hide?.();
+        this.clearSelectedPlanet({ notify: false });
+
+        const parent = planetText.getParent();
+        if (typeof CitranaSelection !== 'undefined' && parent) {
+            CitranaSelection.attach(planetText, parent);
+            const hitRect = parent.findOne((node) => node.name() === `planet-hit-${id}`);
+            hitRect?.moveToTop();
+            planetText.moveToTop();
+        }
+
         this.selectedPlanet = {
             planetText,
             houseNumber,
             abbr,
             id
         };
-        planetText.stroke('#f59e42');
-        planetText.strokeWidth(2);
         this.layer.batchDraw();
-        if (!this._deleteKeyListener) {
-            this._deleteKeyListener = (e) => {
-                if (e.key === 'Delete' && this.selectedPlanet) {
-                    this.removePlanetFromHouseById(this.selectedPlanet.houseNumber, this.selectedPlanet.id);
-                }
-            };
-            window.addEventListener('keydown', this._deleteKeyListener);
-        }
+        window.app?.notifyCanvasSelectionChanged?.();
     }
-    clearSelectedPlanet() {
-        if (this.selectedPlanet && this.selectedPlanet.planetText) {
-            this.selectedPlanet.planetText.strokeEnabled(false);
-            this.selectedPlanet.planetText.strokeWidth(0);
+    clearSelectedPlanet({ notify = true } = {}) {
+        if (this.selectedPlanet?.planetText) {
+            CitranaSelection?.detach?.(this.selectedPlanet.planetText);
         }
         this.selectedPlanet = null;
         this.layer.batchDraw();
+        if (notify) {
+            window.app?.notifyCanvasSelectionChanged?.();
+        }
     }
 
-    setLagnaHouse(houseNumber) {
-        console.log('[DEBUG] setLagnaHouse called with house number:', houseNumber);
+    setLagnaHouse(houseNumber, options = {}) {
+        const { skipSnapshot = false } = options;
+        citranaDebug('setLagnaHouse called with Bhava number:', houseNumber);
         // Remove old Lagna indicator lines if present
         if (this.houseDataSouth[this.lagnaHouseSouth] && this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth) {
             this.houseDataSouth[this.lagnaHouseSouth].lagnaLinesSouth.forEach(line => line.destroy());
@@ -881,21 +748,27 @@ class SouthIndianChartTemplate {
             this.houseDataSouth[houseNumber].lagnaLinesSouth = [line];
             this.layer.batchDraw();
         }
-        if (window.app && window.app.pushSnapshot) window.app.pushSnapshot();
-        console.log(`Lagna set to house ${houseNumber}`);
+        this.applySouthIndicatorsPreference();
+        if (!skipSnapshot && window.app?.recordHistory) window.app.recordHistory('Set Lagna');
+        citranaDebug(`Lagna set to Bhava ${houseNumber}`);
     }
 
-    setFirstHouse(houseNumber) {
-        this.firstHouseSouth = houseNumber;
-        this.renumberHouses();
-        console.log(`First house set to house ${houseNumber}`);
+    /**
+     * Get the bhava number (1–12 from Lagna) for a fixed grid Bhava position.
+     * Rashis are fixed per cell in the South Indian layout; bhava counting rotates with Lagna.
+     * @param {number} houseNumber - Fixed grid Bhava number (1–12)
+     * @returns {number} Bhava number relative to current Lagna
+     */
+    getBhavaNumberForHouse(houseNumber) {
+        const visualOrder = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        const lagnaIdx = visualOrder.indexOf(this.lagnaHouseSouth);
+        const houseOrder = visualOrder.slice(lagnaIdx).concat(visualOrder.slice(0, lagnaIdx));
+        const bhavaIdx = houseOrder.indexOf(houseNumber);
+        return bhavaIdx >= 0 ? bhavaIdx + 1 : houseNumber;
     }
 
     renumberHouses() {
-        // Initialize debug array at the beginning
-        const debugBhavas = [];
-
-        // Visual order for South Indian chart (house numbers)
+        // Visual order for South Indian chart (Bhava numbers)
         const visualOrder = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
         let houseOrder;
 
@@ -903,23 +776,9 @@ class SouthIndianChartTemplate {
         const lagnaIdx = visualOrder.indexOf(this.lagnaHouseSouth);
         houseOrder = visualOrder.slice(lagnaIdx).concat(visualOrder.slice(0, lagnaIdx));
 
-        const rashis = [
-            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
-        ];
-
         for (let i = 0; i < houseOrder.length; i++) {
             const houseNum = houseOrder[i];
             const bhavaNum = i + 1;
-
-            // For South Indian chart, use the original logic
-            const rashiIndex = (houseNum - 1) % 12;
-            const rashiName = rashis[rashiIndex];
-
-            debugBhavas.push({
-                bhavaNum,
-                houseNum,
-                rashiName
-            });
 
             // Update South Indian chart bhava numbers
             if (this.houseDataSouth[houseNum] && this.houseDataSouth[houseNum].bhavaNumberSouthText) {
@@ -928,8 +787,33 @@ class SouthIndianChartTemplate {
         }
 
         this.layer.batchDraw();
-        console.log('Bhava mapping:', debugBhavas);
-        console.log('Houses renumbered');
+        citranaDebug('South Indian Bhavas renumbered');
+    }
+
+    /**
+     * Show or hide Lagna line, bhava number boxes, and rashi number boxes on all Bhavas.
+     * @param {boolean} visible
+     */
+    setSouthIndicatorsVisible(visible) {
+        this._southIndicatorsVisible = visible;
+        for (let houseNum = 1; houseNum <= 12; houseNum++) {
+            const data = this.houseDataSouth[houseNum];
+            if (!data) continue;
+            if (data.rashiNumberSouthBox) data.rashiNumberSouthBox.visible(visible);
+            if (data.rashiNumberSouthText) data.rashiNumberSouthText.visible(visible);
+            if (data.bhavaNumberSouthBox) data.bhavaNumberSouthBox.visible(visible);
+            if (data.bhavaNumberSouthText) data.bhavaNumberSouthText.visible(visible);
+            if (data.lagnaLinesSouth) {
+                data.lagnaLinesSouth.forEach((line) => line.visible(visible));
+            }
+        }
+        this.layer?.batchDraw();
+    }
+
+    /** Apply user preference from app.options (default: indicators visible). */
+    applySouthIndicatorsPreference() {
+        const hide = window.app?.options?.southHideIndicators === true;
+        this.setSouthIndicatorsVisible(!hide);
     }
 
     clearChart() {
@@ -953,7 +837,7 @@ class SouthIndianChartTemplate {
             this.stage.batchDraw();
         }
 
-        console.log('South Indian chart cleared');
+        citranaDebug('South Indian chart cleared');
     }
 
     zoomToFit() {
@@ -961,45 +845,112 @@ class SouthIndianChartTemplate {
 
         const stageWidth = this.stage.width();
         const stageHeight = this.stage.height();
+
+        // Convert screen bounds to local bounds (unaffected by current zoom/pan)
         const chartBounds = this.chartGroupSouth.getClientRect();
+        const scale = this.stage.scaleX();
+        const stagePos = this.stage.position();
+        const localBounds = {
+            x: (chartBounds.x - stagePos.x) / scale,
+            y: (chartBounds.y - stagePos.y) / scale,
+            width: chartBounds.width / scale,
+            height: chartBounds.height / scale
+        };
 
         // Detect mobile vs desktop (Zoom to fit)
-        const isMobile = window.innerWidth <= 600;
-        const scaleFactor = isMobile ? 0.95 : 0.7;
+        const isMobile = CitranaDevice.isCompactViewport();
         const extraTopMargin = isMobile ? 20 : 20;
-
-        const scaleX = (stageWidth * scaleFactor) / chartBounds.width;
-        const scaleY = (stageHeight * scaleFactor) / chartBounds.height;
-        const scale = Math.min(scaleX, scaleY, 2); // Max scale of 2
+        let newScale;
+        if (isMobile) {
+            newScale = 0.65;
+        } else {
+            const scaleFactor = 0.7;
+            const scaleX = (stageWidth * scaleFactor) / localBounds.width;
+            const scaleY = (stageHeight * scaleFactor) / localBounds.height;
+            newScale = Math.min(scaleX, scaleY, 2);
+        }
 
         this.stage.scale({
-            x: scale,
-            y: scale
+            x: newScale,
+            y: newScale
         });
 
         // Center the chart, but add extra top margin for the label
         const chartCenter = {
-            x: chartBounds.x + chartBounds.width / 2,
-            y: chartBounds.y + chartBounds.height / 2
+            x: localBounds.x + localBounds.width / 2,
+            y: localBounds.y + localBounds.height / 2
         };
         const stageCenter = {
             x: stageWidth / 2,
             y: (stageHeight / 2) + (extraTopMargin / 2)
         };
         const newPos = {
-            x: stageCenter.x - chartCenter.x * scale,
-            y: stageCenter.y - chartCenter.y * scale - extraTopMargin
+            x: stageCenter.x - chartCenter.x * newScale,
+            y: stageCenter.y - chartCenter.y * newScale - extraTopMargin
         };
         this.stage.position(newPos);
         this.stage.batchDraw();
     }
 
+    extractSerializablePlanets(houseData = this.houseDataSouth) {
+        const planetsByHouse = {};
+        for (const houseNum in houseData) {
+            const planets = houseData[houseNum]?.planets;
+            if (!Array.isArray(planets) || planets.length === 0) continue;
+            const serialized = planets
+                .filter((planet) => planet && typeof planet.abbr === 'string')
+                .map((planet) => ({
+                    abbr: planet.abbr,
+                    label: planet.label || planet.abbr,
+                    id: planet.id,
+                    color: planet.color,
+                    retrograde: !!planet.retrograde
+                }));
+            if (serialized.length > 0) {
+                planetsByHouse[houseNum] = serialized;
+            }
+        }
+        return planetsByHouse;
+    }
+
+    parseSavedPlanets(data) {
+        if (data.planetsByHouse) {
+            return data.planetsByHouse;
+        }
+        return this.extractSerializablePlanets(data.houseData || {});
+    }
+
+    restoreSavedPlanets(planetsByHouse, skipSnapshot = true) {
+        for (const houseNum in planetsByHouse) {
+            const houseNumber = parseInt(houseNum, 10);
+            if (!houseNumber) continue;
+            for (const planet of planetsByHouse[houseNum]) {
+                this.addPlanetToHouse(
+                    planet.abbr,
+                    houseNumber,
+                    planet.label,
+                    planet.id,
+                    !!planet.retrograde,
+                    skipSnapshot
+                );
+            }
+        }
+    }
+
     getChartData() {
+        let centerLabel = null;
+        if (this.chartGroupSouth) {
+            const centerText = this.chartGroupSouth.findOne((node) => node.name() === 'center-label-text');
+            if (centerText) {
+                centerLabel = centerText.text();
+            }
+        }
+
         return {
             chartType: 'south-indian',
             lagnaHouse: this.lagnaHouseSouth,
-            firstHouse: this.firstHouseSouth,
-            houseData: this.houseDataSouth
+            planetsByHouse: this.extractSerializablePlanets(),
+            centerLabel
         };
     }
 
@@ -1007,14 +958,22 @@ class SouthIndianChartTemplate {
         if (!data || data.chartType !== 'south-indian') return;
 
         try {
-            this.lagnaHouseSouth = data.lagnaHouse || 1;
-            this.firstHouseSouth = data.firstHouse || 1;
-            this.houseDataSouth = data.houseData || {};
+            const lagnaHouse = data.lagnaHouse || 1;
+            const planetsByHouse = this.parseSavedPlanets(data);
 
-            // Recreate the chart
-            this.createSouthIndianChart();
+            this.createSouthIndianChart({ initialLagna: lagnaHouse, skipZoomToFit: true });
+            this.restoreSavedPlanets(planetsByHouse, true);
+            this.setLagnaHouse(lagnaHouse, { skipSnapshot: true });
 
-            console.log('South Indian chart data loaded successfully');
+            if (data.centerLabel && this.chartGroupSouth) {
+                const centerText = this.chartGroupSouth.findOne((node) => node.name() === 'center-label-text');
+                if (centerText) {
+                    centerText.text(data.centerLabel);
+                    this.layer.batchDraw();
+                }
+            }
+
+            citranaDebug('South Indian chart data loaded successfully');
         } catch (error) {
             console.error('Error loading South Indian chart data:', error);
         }
@@ -1026,6 +985,6 @@ class SouthIndianChartTemplate {
             this.updatePlanetsInHouse(houseNum);
         }
         this.layer.batchDraw();
-        console.log('All planets cleared from South Indian chart');
+        citranaDebug('All Grahas cleared from South Indian chart');
     }
 }

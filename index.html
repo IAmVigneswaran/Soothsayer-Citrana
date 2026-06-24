@@ -2,7 +2,7 @@
 <!--
    sarvataḥ pāṇi-pādaṁ tat sarvato ’kṣhi-śhiro-mukham sarvataḥ śhrutimal loke sarvam āvṛitya tiṣhṭhati
    -->
-<html lang="en">
+<html lang="en" data-cp-theme="light">
    <head>
       <!-- Primary Meta Tags -->
       <meta charset="UTF-8">
@@ -36,6 +36,7 @@
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
       <!-- stylesheets -->
       <link rel="stylesheet" href="assets/css/styles.css">
+      <link rel="stylesheet" href="assets/vendor/colorpicker.min.css">
       <!-- favicon -->
       <link rel="apple-touch-icon" sizes="57x57" href="/assets/favicon/apple-icon-57x57.png">
       <link rel="apple-touch-icon" sizes="60x60" href="/assets/favicon/apple-icon-60x60.png">
@@ -51,14 +52,13 @@
       <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
       <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon/favicon-48x48.png">
       <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon/favicon-96x96.png">
-      <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
       <link rel="icon" type="image/x-icon" href="/assets/favicon/favicon.ico">
       <link rel="manifest" href="/assets/favicon/manifest.json">
-      <meta name="msapplication-TileColor" content="#000000">
+      <meta name="msapplication-TileColor" content="#ffffff">
       <meta name="msapplication-TileImage" content="/assets/favicon/ms-icon-144x144.png">
-      <meta name="theme-color" content="#000000">
       <!-- Scripts -->
-      <script src="https://unpkg.com/konva@9/konva.min.js"></script>
+      <!-- Vendor scripts (pinned; self-hosted — Konva 9.3.20, Lucide 0.576.0) -->
+      <script src="assets/vendor/konva.min.js"></script>
       <!-- Google tag (gtag.js) -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-HSXDGXST4D"></script>
       <script>
@@ -84,16 +84,31 @@
       <!-- End Google Tag Manager (noscript) -->
       <div class="app-container">
          <!-- Help Button (Desktop Only) -->
-         <button id="help-btn" class="help-btn" title="Help">
+         <button id="help-btn" class="help-btn" type="button" title="Help" aria-label="Help">
          <i data-lucide="help-circle"></i>
          </button>
          <!-- About Button -->
-         <button id="about-btn" class="about-btn" title="About Citrana">
+         <button id="about-btn" class="about-btn" type="button" title="About Citrana" aria-label="About Citrana">
          <img src="assets/images/Soothsayer-Logo-Black.png" alt="About" class="about-btn-icon about-btn-icon-black" fetchpriority="high">
          <img src="assets/images/Soothsayer-Logo-White.png" alt="About" class="about-btn-icon about-btn-icon-white" fetchpriority="high">
          </button>
          <!-- Floating Top Toolbar -->
          <div class="floating-top-toolbar">
+            <button type="button" id="toolbar-scroll-prev" class="toolbar-scroll-btn" aria-label="Scroll toolbar left" hidden>
+               <i data-lucide="square-chevron-left"></i>
+            </button>
+            <div class="toolbar-scroll-wrap" id="toolbar-scroll-wrap">
+            <div class="toolbar-scroll-viewport" id="toolbar-scroll-viewport">
+               <div class="toolbar-scroll-track" id="toolbar-scroll-track">
+            <!-- History -->
+            <div class="toolbar-group">
+               <button id="undo-btn" class="toolbar-btn" title="Undo (Ctrl+Z)" disabled>
+               <i data-lucide="undo-2"></i>
+               </button>
+               <button id="redo-btn" class="toolbar-btn" title="Redo (Ctrl+Y)" disabled>
+               <i data-lucide="redo-2"></i>
+               </button>
+            </div>
             <!-- Selection Tools -->
             <div class="toolbar-group">
                <button id="select-tool" class="toolbar-btn active" title="Select (V)">
@@ -114,6 +129,9 @@
                <button id="pen-tool" class="toolbar-btn" title="Pen">
                <i data-lucide="pen-tool"></i>
                </button>
+               <button id="laser-tool" class="toolbar-btn" title="Laser Pointer (K)">
+               <i data-lucide="sun"></i>
+               </button>
                <button id="text-tool" class="toolbar-btn" title="Text">
                <i data-lucide="type"></i>
                </button>
@@ -126,22 +144,36 @@
                <button id="toggle-transparency-btn" class="toolbar-btn" title="Toggle Transparency">
                <i data-lucide="image-off"></i>
                </button>
-               <button id="export-btn" class="toolbar-btn" title="Export">
+               <button id="export-btn" class="toolbar-btn" title="Export PNG">
                <i data-lucide="save"></i>
                </button>
+               <button id="save-session-btn" class="toolbar-btn" title="Save Session">
+               <i data-lucide="save-all"></i>
+               </button>
+               <button id="open-session-btn" class="toolbar-btn" title="Open Session">
+               <i data-lucide="folder-open"></i>
+               </button>
+               <input type="file" id="open-session-input" accept=".citrana.json,application/json" hidden>
+               <button id="options-btn" class="toolbar-btn" title="Options">
+               <i data-lucide="settings"></i>
+               </button>
             </div>
+               </div>
+            </div>
+            </div>
+            <button type="button" id="toolbar-scroll-next" class="toolbar-scroll-btn" aria-label="Scroll toolbar right" hidden>
+               <i data-lucide="square-chevron-right"></i>
+            </button>
          </div>
          <!-- Floating Graha Library -->
-         <div class="floating-planet-library" id="graha-library" style="border-radius: 0.75rem; overflow: visible;">
-            <div class="planet-library-header" style="background: #fff; color: #000; padding: 0.5rem 1rem; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 2.5rem; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem;">Graha Library</div>
-            <div class="planet-grid" id="planet-library" style="overflow: visible;">
+         <div class="floating-planet-library" id="graha-library">
+            <div class="planet-library-header">Graha Library</div>
+            <div class="planet-grid" id="planet-library">
                <!-- Grahas will be populated by JavaScript -->
             </div>
          </div>
          <!-- Canvas Container -->
-         <div class="canvas-container" id="canvas-container">
-            <canvas id="canvas"></canvas>
-         </div>
+         <div class="canvas-container" id="canvas-container" role="application" aria-label="Vedic astrology chart canvas. Use the toolbar and Graha library to build your chart."></div>
          <!-- Floating Zoom Controls -->
          <div class="floating-zoom-controls">
             <button id="zoom-out" title="Zoom Out (-)">
@@ -154,18 +186,18 @@
             <button id="reset-zoom" title="Reset Zoom">
             <i data-lucide="maximize-2"></i>
             </button>
-            <span class="zoom-divider" style="width:1px;height:24px;background:#000;opacity:0.15;margin:0 8px;display:inline-block;"></span>
-            <button id="zoom-select-tool" title="Select Tool (V)">
-            <i data-lucide="mouse-pointer"></i>
+            <button id="zoom-lock" type="button" title="Unlock zoom" aria-pressed="true" aria-label="Unlock zoom">
+            <i data-lucide="lock"></i>
             </button>
-            <button id="zoom-hand-tool" title="Hand Tool (H)">
-            <i data-lucide="hand"></i>
+            <span class="zoom-divider" aria-hidden="true"></span>
+            <button id="items-menu-btn" type="button" title="Canvas Items (I)" aria-label="Canvas Items">
+            <i data-lucide="layers"></i>
             </button>
          </div>
          <!-- Floating Text Edit Controls -->
          <div class="floating-text-edit-controls" id="text-edit-controls" style="display: none;">
             <input type="text" id="text-edit-input" placeholder="Enter text (max 8 chars)" maxlength="8" class="text-edit-input">
-            <input type="color" id="text-edit-color" class="text-edit-color-input" title="Text color">
+            <button type="button" id="text-edit-color" class="text-edit-color-input" title="Graha colour" aria-label="Graha colour"></button>
             <button id="text-edit-retrograde" title="Toggle Retrograde">
             <i data-lucide="rotate-ccw"></i>
             </button>
@@ -175,20 +207,82 @@
             <button id="text-edit-cancel" title="Cancel">
             <i data-lucide="x"></i>
             </button>
-            <button id="text-edit-delete" title="Delete" class="text-edit-delete danger" style="display: none;">
+            <button id="text-edit-delete" title="Delete" class="text-edit-delete">
             <i data-lucide="trash-2"></i>
             </button>
          </div>
       </div>
-      <!-- Help Modal -->
-      <div id="help-modal" class="help-modal">
-         <div class="help-modal-content">
-            <div class="help-modal-header">
-               <h2 class="help-modal-title">Help</h2>
-               <button class="help-modal-close" id="help-modal-close">
+      <!-- Options Modal -->
+      <div id="options-modal" class="options-modal" role="dialog" aria-modal="true" aria-labelledby="options-modal-title" aria-describedby="options-modal-description" aria-hidden="true">
+         <div class="options-modal-content">
+            <div class="options-modal-header">
+               <h2 id="options-modal-title" class="options-modal-title">Options</h2>
+               <button class="options-modal-close" id="options-modal-close" type="button" aria-label="Close options">
                <i data-lucide="x"></i>
                </button>
             </div>
+            <p id="options-modal-description" class="help-modal-description">Chart display, zoom, and export preferences saved in this browser.</p>
+            <div class="options-list">
+               <div class="options-select-row">
+                  <label class="options-select-text" for="zoom-step-select">
+                     <span class="options-toggle-label">Zoom Step</span>
+                     <span class="options-toggle-hint">Fine: 1%, Small: ~10%, Medium: ~20%, Large: ~25%</span>
+                  </label>
+                  <select id="zoom-step-select" class="options-select-input" aria-label="Zoom step">
+                     <option value="fine" selected>Fine (1%)</option>
+                     <option value="small">Small (~10%)</option>
+                     <option value="medium">Medium (~20%)</option>
+                     <option value="large">Large (~25%)</option>
+                  </select>
+               </div>
+               <label class="options-toggle-row" for="north-hide-indicators-toggle">
+                  <span class="options-toggle-text">
+                     <span class="options-toggle-label">Hide North Indian Chart Indicators</span>
+                     <span class="options-toggle-hint">Bhava No. (Black)</span>
+                  </span>
+                  <input type="checkbox" id="north-hide-indicators-toggle" class="options-toggle-input">
+               </label>
+               <label class="options-toggle-row" for="south-hide-indicators-toggle">
+                  <span class="options-toggle-text">
+                     <span class="options-toggle-label">Hide South Indian Chart Indicators</span>
+                     <span class="options-toggle-hint">Lagna Line, Bhava No. (Yellow), Rashi No. (Black)</span>
+                  </span>
+                  <input type="checkbox" id="south-hide-indicators-toggle" class="options-toggle-input">
+               </label>
+               <label class="options-toggle-row" for="save-chart-only-toggle">
+                  <span class="options-toggle-text">
+                     <span class="options-toggle-label">Save Chart Only</span>
+                     <span class="options-toggle-hint">Fit Chart, Transparent, No Watermark</span>
+                  </span>
+                  <input type="checkbox" id="save-chart-only-toggle" class="options-toggle-input">
+               </label>
+            </div>
+         </div>
+      </div>
+      <!-- Canvas Items Modal (uses Options modal styles) -->
+      <div id="items-modal" class="options-modal" role="dialog" aria-modal="true" aria-labelledby="items-modal-title" aria-describedby="items-modal-description" aria-hidden="true">
+         <div class="options-modal-content">
+            <div class="options-modal-header">
+               <h2 id="items-modal-title" class="options-modal-title">Canvas Items</h2>
+               <button class="options-modal-close" id="items-modal-close" type="button" aria-label="Close Canvas Items">
+               <i data-lucide="x"></i>
+               </button>
+            </div>
+            <p id="items-modal-description" class="help-modal-description">All chart actions in one list: Bhavas, Grahas, Annotations, and canvas options. Use the <strong>Section Anchors</strong> to jump between sections; swipe or scroll left and right if not all anchors fit on screen. Context Menu is off by default on touch devices; enable it in the Canvas section below.</p>
+            <nav id="items-modal-nav" class="items-section-nav-wrap" aria-label="Section Anchors" hidden></nav>
+            <div id="items-modal-body" class="items-modal-body"></div>
+         </div>
+      </div>
+      <!-- Help Modal -->
+      <div id="help-modal" class="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" aria-describedby="help-modal-description" aria-hidden="true">
+         <div class="help-modal-content">
+            <div class="help-modal-header">
+               <h2 id="help-modal-title" class="help-modal-title">Help</h2>
+               <button class="help-modal-close" id="help-modal-close" type="button" aria-label="Close help">
+               <i data-lucide="x"></i>
+               </button>
+            </div>
+            <p id="help-modal-description" class="help-modal-description">Keyboard shortcuts and guidance for building Vedic astrology charts in Citrana.</p>
             <div class="help-section">
                <h3 class="help-section-title">Keyboard Shortcuts</h3>
                <div class="help-shortcuts">
@@ -208,6 +302,10 @@
                      <span class="help-shortcut-desc">Pen Tool</span>
                      <span class="help-shortcut-key">P</span>
                   </div>
+                  <div class="help-shortcut" id="laser-help-shortcut">
+                     <span class="help-shortcut-desc">Laser Pointer</span>
+                     <span class="help-shortcut-key">K</span>
+                  </div>
                   <div class="help-shortcut">
                      <span class="help-shortcut-desc">Text Tool</span>
                      <span class="help-shortcut-key">T</span>
@@ -215,6 +313,10 @@
                   <div class="help-shortcut">
                      <span class="help-shortcut-desc">Hand Tool</span>
                      <span class="help-shortcut-key">H</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Graha Library</span>
+                     <span class="help-shortcut-key">1 – 5</span>
                   </div>
                   <div class="help-shortcut">
                      <span class="help-shortcut-desc">Zoom In</span>
@@ -229,53 +331,136 @@
                      <span class="help-shortcut-key">0</span>
                   </div>
                   <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Open Canvas Items</span>
+                     <span class="help-shortcut-key">I</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Open Help</span>
+                     <span class="help-shortcut-key">? or /</span>
+                  </div>
+                  <div class="help-shortcut">
                      <span class="help-shortcut-desc">Delete Selected</span>
                      <span class="help-shortcut-key">Delete / Fn+Delete</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Undo</span>
+                     <span class="help-shortcut-key">Ctrl+Z / Cmd+Z</span>
+                  </div>
+                  <div class="help-shortcut">
+                     <span class="help-shortcut-desc">Redo</span>
+                     <span class="help-shortcut-key">Ctrl+Y / Cmd+Shift+Z</span>
                   </div>
                </div>
             </div>
             <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
             <div class="help-section">
                <div class="about-links" style="margin-bottom: 18px;">
-                  <a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana?tab=readme-ov-file#tutorials" target="_blank" class="about-link" style="text-align: center; display: block;">View Citrana Tutorials</a>
+                  <a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana?tab=readme-ov-file#tutorials" target="_blank" rel="noopener noreferrer" class="about-link" style="text-align: center; display: block;">View Citrana Tutorials</a>
                </div>
-               <h3 class="help-section-title">Basic Usage</h3>
+               <h3 class="help-section-title">Guide</h3>
                <div class="help-instructions">
-                  <p><strong>Screen Size:</strong> If you have a small screen size or if this site appears too large, please utilise your browser's zoom control under the browser's View menu to adjust the browser viewpoint for optimal viewing.</p>
-                  <p><strong>Browser and Device Compatibility:</strong> Citrana is designed exclusively for desktop browsers only (Brave, Chrome, Firefox, Safari, Edge) and is not supported on mobile or touch devices. For optimal performance and full feature access, use a desktop environment. Note: Brave users must disable Brave Shields for full functionality.</p>
-                  <p><strong>Chart Types:</strong> Citrana supports both South Indian and North Indian chart layouts.</p>
-                  <p><strong>South Indian Chart:</strong> Traditional 4x4 grid layout with centre empty. Right-click any Bhava to set it as Lagna. A diagonal line indicator will appear at the top-left corner of the Lagna Bhava.</p>
-                  <p><strong>North Indian Chart:</strong> Diamond layout with dynamic positioning. Right-click any Bhava to set it as Lagna. All Grahas placed in the Bhavas will automatically rotate and renumbered based on the new Lagna position.</p>
-                  <p><strong>Adding Grahas:</strong> Drag Grahas from the Graha Library (top-left) to chart Bhavas. You can place the same Graha multiple times. Double-click any Graha to open a floating editing panel where you can modify text or set it as retrograde (a small "r" subscript will appear).</p>
-                  <p><strong>Graha Library:</strong> Use the page dots in the Graha Library to access Jaimini Karakas, Grahas in Tamil, Grahas in Hindi, and Outer Grahas.</p>
-                  <p><strong>Adding Degrees:</strong> To include degree positions for Grahas, double-click any placed Graha to access the editing panel. Enter the degree value in the text field using the format "Graha-Degree" (e.g., "Su-20" for Sun at 20 degrees).</p>
-                  <p><strong>Custom Graha:</strong> There is also a "Custom" Graha available in the library. Drag and drop it into any Bhava, then double-click to edit the name. There is a maximum character limit of 8 characters for all Graha names.</p>
-                  <p><strong>Editing Panel:</strong> When modifying Graha text or colours, ensure to press the save button (✓) in the editing panel to confirm your changes. Failure to save will result in the modifications reverting to default values when the Graha is moved between Bhavas.</p>
-                  <p><strong>Drawing Tools:</strong> Use the toolbar to add arrows, lines, text, and heading. For all drawing tools, the Select Tool will automatically be activated after an element is created, except for the Pen tool which remains active for continuous drawing. Double-click text elements to edit them. Use the Hand tool to pan around the chart.</p>
-                  <p><strong>Navigation:</strong> Use zoom controls or mouse wheel to zoom in/out. The Hand tool allows you to pan around the canvas.</p>
-                  <p><strong>Export Options:</strong> Click the save button to export your chart as a PNG file with timestamp. Use the transparency toggle button (before save) to choose between solid white background or transparent background for your exported image.</p>
-                  <p><strong>Export Viewpoint:</strong> Exported images will always follow and inherit the browser's current viewpoint. If you resize the browser window, the exported image will reflect the visible area accordingly. Adjust your browser window size and zoom level before exporting to achieve the desired output.</p>
-                  <p><strong>Single Chart Limitation:</strong> Citrana does not and will not support multiple charts in a single canvas. To create another chart, open a new browser window or tab. This ensures optimal performance and prevents conflicts between different chart configurations. Additionally, images can be saved with transparency enabled (Toggle Transparency Button) and imported into other canvas applications such as tldraw for advanced annotation and note-taking workflows.</p>
+                  <p class="help-intro">Citrana is a <strong>desktop-first</strong> Janma Kundali (Vedic charts) workspace: create South Indian or North Indian layouts, place Grahas, add Annotations, and export or save your work — all in the browser, with no account required. For the best experience, use a current desktop browser (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, or Edge 138+). On mobile and touch devices, use <strong>Canvas Items</strong> (<strong>I</strong>) for chart, Bhava, Graha, and Annotation actions. Brave users should disable Brave Shields for full functionality. If the interface looks too large on a small display, adjust your browser zoom under the View menu.</p>
+
+                  <h4 class="help-subsection-title">Charts</h4>
+                  <p>Citrana supports <strong>South Indian</strong> (traditional 4×4 grid with an empty centre) and <strong>North Indian</strong> (diamond layout with dynamic Rashi numbering). Grahas reposition automatically when Lagna changes on North Indian charts.</p>
+                  <ul class="help-sublist">
+                     <li><strong>South Indian:</strong> right-click a Bhava and choose <strong>Set as Lagna</strong>. A diagonal line marks the Lagna Bhava.</li>
+                     <li><strong>North Indian:</strong> right-click a Bhava and choose <strong>Set as First Bhava</strong>, or right-click the chart and use <strong>Set Lagna as …</strong> to pick the Lagna Rashi.</li>
+                  </ul>
+                  <p>Only one chart per canvas. To start another chart, open a new browser tab or window.</p>
+
+                  <h4 class="help-subsection-title">Options</h4>
+                  <p>Open <strong>Options</strong> from the gear icon in the toolbar (after Save).</p>
+                  <ul class="help-sublist">
+                     <li><strong>Zoom Step</strong> — <strong>Fine (1%)</strong> is the default; <strong>Small (~10%)</strong>, <strong>Medium (~20%)</strong>, and <strong>Large (~25%)</strong> are also available. Applies to zoom buttons, keyboard <strong>+</strong>/<strong>−</strong>, and the scroll wheel when zoom is unlocked.</li>
+                     <li><strong>Hide North Indian Chart Indicators</strong> — hides bhava numbers in the black corner boxes.</li>
+                     <li><strong>Hide South Indian Chart Indicators</strong> — hides the Lagna line, yellow bhava numbers, and black rashi numbers.</li>
+                     <li><strong>Save Chart Only</strong> — the Save button exports only the chart area (fitted, transparent, no watermark). Turning this off restores a white-background full-canvas export.</li>
+                  </ul>
+                  <p>Option preferences are saved in this browser, included in <strong>Save Session</strong>, and are not tracked by undo/redo.</p>
+
+                  <h4 class="help-subsection-title">Graha Library</h4>
+                  <p>Drag Grahas from the floating library onto chart Bhavas. The same Graha can be placed more than once. Five pages cover traditional Grahas, Jaimini Karakas, Tamil, Hindi, and Upagrahas with outer Grahas. Switch pages with the dots at the bottom, keys <strong>1</strong>–<strong>5</strong>, or on mobile by swiping the <strong>dots bar</strong> (grey chevrons hint that you can swipe; the dots remain tappable). Swiping the Graha grid or header still drags Grahas or moves the library panel.</p>
+                  <p>Under <strong>Canvas Items</strong>, in the <strong>Canvas</strong> section, you can show or hide the library (saved in this browser; separate from Presentation View) or <strong>Reset Graha Library Position</strong> to return the panel to its default place.</p>
+
+                  <h4 class="help-subsection-title">Grahas on the Chart</h4>
+                  <ul class="help-sublist">
+                     <li>Click or tap a placed Graha to select it; a dashed <strong>Selection Pill</strong> appears behind the label.</li>
+                     <li>Double-click a Graha, or right-click and choose <strong>Edit Graha</strong>, to change text, colour, or retrograde (retrograde Grahas are underlined).</li>
+                     <li>Add degrees in the editor using the format <strong>Graha-Degree</strong> (e.g. <strong>Su-20</strong>).</li>
+                     <li>Use <strong>Custom</strong> from the library for a user-defined label (up to 8 characters).</li>
+                     <li>Press the save button (✓) in the Graha editor before moving a Graha, or your edits may be lost.</li>
+                     <li>Right-click and choose <strong>Delete Graha</strong>, or press <strong>Delete</strong> when a Graha is selected.</li>
+                  </ul>
+
+                  <h4 class="help-subsection-title">Annotations</h4>
+                  <p>Use the toolbar to add arrows, lines, pen strokes, text, and headings on the canvas. After you create an arrow, line, text box, or heading, the Select tool activates automatically; the Pen tool and Laser Pointer stay active for continuous use.</p>
+                  <ul class="help-sublist">
+                     <li><strong>Select</strong> — click or tap an Annotation to select it (Selection Pill). Drag to move pen strokes. Double-click text or headings to edit wording; use the Edit UI for colour, stroke, font size, bold, italic, alignment, and <strong>Normal</strong> or <strong>Hand-written</strong> style. Text and headings support multiple lines (<strong>Shift+Enter</strong> for a new line, <strong>Enter</strong> to finish).</li>
+                     <li><strong>Hand</strong> — pan around the chart.</li>
+                     <li><strong>Laser Pointer</strong> (<strong>K</strong>) — temporary highlight that fades away; not saved, exported, or undoable.</li>
+                  </ul>
+                  <p>Under <strong>Canvas Items</strong>, the <strong>Annotations</strong> section lists every arrow, line, pen stroke, text, and heading. Text and Heading rows offer <strong>Edit text</strong> and <strong>Style</strong> separately.</p>
+
+                  <h4 class="help-subsection-title">Canvas Items</h4>
+                  <p>Open <strong>Canvas Items</strong> from the layers icon in the zoom bar or press <strong>I</strong>. One panel lists chart actions, Bhavas, Grahas, Annotations, and canvas controls.</p>
+                  <ul class="help-sublist">
+                     <li><strong>Section Anchors</strong> — jump between sections; the title, description, and anchors stay fixed while the list scrolls.</li>
+                     <li><strong>Canvas</strong> — <strong>Clear Selection</strong>; <strong>Context Menu</strong> on/off (off by default on touch devices; green or red row tint); <strong>Graha Library</strong> on/off; <strong>Reset Graha Library Position</strong>.</li>
+                     <li><strong>Chart</strong> — create a chart, set Lagna, Presentation View, reset actions, and clear the canvas.</li>
+                     <li><strong>Bhavas</strong> — select a Bhava, set Lagna or First Bhava, or clear Grahas in that Bhava.</li>
+                     <li><strong>Grahas</strong> — select, edit, or delete placed Grahas.</li>
+                  </ul>
+                  <p>Right-click and long-press menus work in Select and Hand when the Context Menu is enabled. They are suppressed while annotation tools are active so drawing is not interrupted.</p>
+
+                  <h4 class="help-subsection-title">Presentation View</h4>
+                  <p>Hide the toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart. Turn it on from the chart context menu or under <strong>Canvas Items</strong> in the <strong>Chart</strong> section. Choose <strong>Exit Presentation View</strong> to restore the interface. To hide only the Graha Library, use the <strong>Graha Library</strong> toggle under <strong>Canvas Items</strong> in the <strong>Canvas</strong> section instead.</p>
+
+                  <h4 class="help-subsection-title">Zoom and Pan</h4>
+                  <ul class="help-sublist">
+                     <li>Zoom is <strong>locked by default</strong>. Click the lock icon in the zoom bar to unlock, then use the zoom buttons, mouse wheel, or <strong>+</strong>/<strong>−</strong>.</li>
+                     <li><strong>Reset Zoom</strong> refits the chart (always available).</li>
+                     <li>Step size is set under <strong>Options</strong> (<strong>Zoom Step</strong>).</li>
+                     <li>On narrow screens, chevrons at the edges of the top toolbar and Edit UI scroll overflow controls; edge fades indicate more tools off-screen.</li>
+                  </ul>
+
+                  <h4 class="help-subsection-title">Undo and Redo</h4>
+                  <p>Use the toolbar buttons or <strong>Ctrl+Z</strong> / <strong>Cmd+Z</strong> (undo) and <strong>Ctrl+Y</strong> / <strong>Cmd+Shift+Z</strong> (redo) — up to 50 steps.</p>
+                  <ul class="help-sublist">
+                     <li><strong>Tracked:</strong> chart changes, Graha placement and edits, Lagna, reset actions, and Annotation edits.</li>
+                     <li><strong>Not tracked:</strong> zoom, pan, tool selection, laser pointer strokes, and Presentation View.</li>
+                  </ul>
+
+                  <h4 class="help-subsection-title">Sessions and Export</h4>
+                  <p><strong>Save Session</strong> and <strong>Open Session</strong> in the toolbar work with <code>.citrana.json</code> files only. A progress dialog appears while the file is prepared or loaded. Opening a session replaces your current work; Citrana asks for confirmation if the canvas is not empty.</p>
+                  <p>Take your work with you: build a chart on mobile, save the file, and store it in any cloud service you already use — iCloud Drive, Google Drive, Dropbox, and so on. When you <strong>Open Session</strong> on another device or browser, your chart, Grahas, Annotations, and Options are restored.</p>
+                  <ul class="help-sublist">
+                     <li><strong>Included:</strong> chart layout, Grahas, Annotations, and Options.</li>
+                     <li><strong>Not included:</strong> undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan.</li>
+                  </ul>
+                  <p><strong>Export PNG</strong> — click the save icon for a timestamped image. Use the transparency toggle before export for a white or transparent background. By default, export follows the current viewport; with <strong>Save Chart Only</strong> enabled in Options, Save exports only the chart area.</p>
+
                   <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
-                  <p><strong>Note:</strong> All sessions are ephemeral. The moment the browser refreshes, all data and progress will be reset and cleared. Citrana is privacy-focused and nothing is stored on the server.</p>
+                  <h4 class="help-subsection-title">Privacy Note</h4>
+                  <p>Your chart lives in this browser tab while you work — nothing is sent to a server. Refreshing the page starts a fresh session. Use <strong>Save Session</strong> to keep a working copy, or <strong>Export PNG</strong> for a shareable image.</p>
                   <hr style="margin: 18px 0; border: none; border-top: 1px solid #e9ecef;">
-                  <p><strong>Contact Information:</strong> Should you encounter an error or issue on this site, feel free to send a message with description and screenshot. Contact information is found in the About button (bottom right).</p>
+                  <p><strong>Contact:</strong> If you encounter an error, send a description and screenshot using the details in the About button (bottom right).</p>
                </div>
             </div>
          </div>
       </div>
       <!-- Confirmation Dialog Modal -->
-      <div id="confirmation-modal" class="confirmation-modal">
+      <div id="confirmation-modal" class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-describedby="confirmation-message confirmation-warning" aria-hidden="true">
          <div class="confirmation-modal-content">
             <div class="confirmation-modal-header">
-               <h2 class="confirmation-modal-title">Confirm Action</h2>
-               <button class="confirmation-modal-close" id="confirmation-modal-close">
+               <h2 id="confirmation-modal-title" class="confirmation-modal-title">Confirm Action</h2>
+               <button class="confirmation-modal-close" id="confirmation-modal-close" type="button" aria-label="Close confirmation">
                <i data-lucide="x"></i>
                </button>
             </div>
             <div class="confirmation-modal-body">
                <p id="confirmation-message">Are you sure you want to proceed? This action cannot be undone.</p>
-               <p class="confirmation-warning"><strong>Warning:</strong> Be sure to save your image before proceeding.</p>
+               <p class="confirmation-warning" id="confirmation-warning"><strong>Warning:</strong> Be sure to save your image before proceeding.</p>
             </div>
             <div class="confirmation-modal-actions">
                <button class="confirmation-btn confirmation-btn-yes" id="confirmation-yes">Yes</button>
@@ -284,10 +469,10 @@
          </div>
       </div>
       <!-- Export Progress Modal -->
-      <div id="export-progress-modal" class="export-progress-modal">
+      <div id="export-progress-modal" class="export-progress-modal" role="dialog" aria-modal="true" aria-labelledby="export-progress-modal-title" aria-describedby="export-progress-text" aria-hidden="true" aria-busy="false">
          <div class="export-progress-modal-content">
             <div class="export-progress-modal-header">
-               <h2 class="export-progress-modal-title">Exporting Chart</h2>
+               <h2 id="export-progress-modal-title" class="export-progress-modal-title">Exporting Chart</h2>
             </div>
             <div class="export-progress-modal-body">
                <div class="export-progress-container">
@@ -300,11 +485,11 @@
          </div>
       </div>
       <!-- About Modal -->
-      <div id="about-modal" class="about-modal">
+      <div id="about-modal" class="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-modal-title" aria-describedby="about-modal-description" aria-hidden="true">
          <div class="about-modal-content">
             <div class="about-modal-header">
-               <h2 class="about-modal-title">About</h2>
-               <button class="about-modal-close" id="about-modal-close">
+               <h2 id="about-modal-title" class="about-modal-title">About</h2>
+               <button class="about-modal-close" id="about-modal-close" type="button" aria-label="Close about">
                <i data-lucide="x"></i>
                </button>
             </div>
@@ -315,7 +500,7 @@
                <div class="about-divider"></div>
                <div class="about-content">
                   <h3 class="about-app-name">Citrana</h3>
-                  <p class="about-description">Citrana is a Planetary Chart Builder for Vedanga Jyotisha Practitioners.</p>
+                  <p id="about-modal-description" class="about-description">Citrana is a Planetary Chart Builder for Vedanga Jyotisha Practitioners.</p>
                   <blockquote class="about-definition">
                      <strong>Sanskrit (संस्कृतम्):</strong> <strong>Citraṇā</strong> (चित्रणा): The act of painting, drawing, illustration, or portrayal. Derived from the Sanskrit root <em>citrayati</em> with the suffix <em>-anā</em>.<br><br>
                      <strong>Tamil (தமிழ்):</strong> <strong>சித்திரம்</strong> (Cittiram): Artistic representation, drawing, illustration, or systematic arrangement.<br><br>
@@ -324,22 +509,23 @@
                   <p class="about-creator">Created by Vigneswaran Rajkumar</p>
                   <p class="about-email">seek@soothsayer.life</p>
                   <div class="about-links">
-                     <a href="https://soothsayer.life" target="_blank" class="about-link">Soothsayer.life</a>
-                     <a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana" target="_blank" class="about-link">GitHub</a>
-                     <a href="https://bsky.app/profile/soothsayer.life" target="_blank" class="about-link">Bluesky</a>
+                     <a href="https://soothsayer.life" target="_blank" rel="noopener noreferrer" class="about-link">Soothsayer.life</a>
+                     <a href="https://github.com/IAmVigneswaran/Soothsayer-Citrana" target="_blank" rel="noopener noreferrer" class="about-link">GitHub</a>
+                     <a href="https://bsky.app/profile/soothsayer.life" target="_blank" rel="noopener noreferrer" class="about-link">Bluesky</a>
                   </div>
-                  <p class="about-version">Version 1.0.0</p>
-                  <p class="about-copyright">© 2025 Soothsayer. All Rights Reserved</p>
+                  <p class="about-version">Version 2.0.0</p>
+                  <p class="about-copyright">© 2026 Soothsayer. All Rights Reserved</p>
                </div>
             </div>
          </div>
       </div>
       <!-- Welcome Modal -->
-      <div id="welcome-modal" class="welcome-modal">
+      <div id="welcome-modal-backdrop" class="welcome-modal-backdrop" aria-hidden="true"></div>
+      <div id="welcome-modal" class="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-modal-title" aria-describedby="welcome-modal-description" aria-hidden="true">
          <div class="welcome-modal-content">
             <div class="welcome-modal-header">
-               <h2 class="welcome-modal-title">Welcome</h2>
-               <button class="welcome-modal-close" id="welcome-modal-close">
+               <h2 id="welcome-modal-title" class="welcome-modal-title">Welcome</h2>
+               <button class="welcome-modal-close" id="welcome-modal-close" type="button" aria-label="Close welcome">
                <i data-lucide="x"></i>
                </button>
             </div>
@@ -351,20 +537,21 @@
                <div class="welcome-content">
                   <h3 class="welcome-app-name">Citrana</h3>
                   <div class="welcome-instructions">
+                     <p id="welcome-modal-description" class="welcome-browser-note">Quick steps to create your first South or North Indian chart.</p>
                      <h5 class="welcome-instructions-title">Creating Your First Chart</h5>
                      <p class="welcome-browser-note">Screen Size: If the site appears too large, utilise your browser's zoom control to adjust the viewpoint.</p>
                      <ol class="welcome-steps">
-                        <li>Right-click on the canvas to select between South Indian or North Indian chart layout</li>
-                        <li>For North Indian charts, click anywhere on the chart to "Set as Lagna"; for South Indian charts, right-click any house and select "Set as Lagna"</li>
-                        <li>Click on your desired Bhava, drag Graha from the Graha Library to place them in chart's Bhava</li>
-                        <li>Use the page dots in the Graha Library to access additional planets (Tamil, Hindi or Outer Grahas) and Karakas</li>
-                        <li>Use drawing tools to add annotations and notes to your chart</li>
-                        <li>Click the Save icon to export your chart as a image</li>
+                        <li>Right-click the canvas and choose South Indian or North Indian layout.</li>
+                        <li>Set Lagna — South Indian: <strong>Set as Lagna</strong> on a Bhava. North Indian: <strong>Set as First Bhava</strong> or <strong>Set Lagna as …</strong> on the chart.</li>
+                        <li>Drag Grahas from the library onto the Bhava under your pointer (click a Bhava first to target the <strong>next</strong> drop only).</li>
+                        <li>Use page dots or keys <strong>1</strong>–<strong>5</strong> in the Graha Library for Tamil, Hindi, Karakas, and Upagrahas.</li>
+                        <li>Use the toolbar to add Annotations — arrows, lines, pen strokes, text, and headings.</li>
+                        <li><strong>Save Session</strong> for a <code>.citrana.json</code> file, or the save icon for a PNG export.</li>
                      </ol>
                      <p class="welcome-help-note">Please click on the Help button to learn more.</p>
-                     <p class="welcome-browser-note">System Requirements: Citrana is optimised for desktop browsers and is not supported on mobile or touch devices.</p>
+                     <p class="welcome-browser-note">System Requirements: Citrana is optimised for desktop browsers (Brave 1.80+, Chrome 138+, Firefox 128+, Safari 18+, Edge 138+). On mobile and touch devices, use <strong>Canvas Items</strong> (layers icon in the zoom bar) for chart, Bhava, Graha, and Annotation actions.</p>
                   </div>
-                  <p class="welcome-copyright">© 2025 Soothsayer. All Rights Reserved</p>
+                  <p class="welcome-copyright">© 2026 Soothsayer. All Rights Reserved</p>
                   <div class="welcome-loading-container">
                      <div class="welcome-loading-bar">
                         <div class="welcome-loading-fill"></div>
@@ -376,22 +563,36 @@
          </div>
       </div>
       <!-- Scripts -->
-      <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-      <script src="assets/js/chart-templates-south.js"></script>
-      <script src="assets/js/chart-templates-north.js"></script>
-      <script src="assets/js/chart-coordinator.js"></script>
-      <script src="assets/js/planet-system.js"></script>
-      <script src="assets/js/drawing-tools.js"></script>
-      <script src="assets/js/edit-ui.js"></script>
-      <script src="assets/js/context-menu.js"></script>
-      <script src="assets/js/app.js"></script>
+      <script src="assets/vendor/lucide.min.js"></script>
+      <script src="assets/vendor/colorpicker.iife.min.js"></script>
+      <script src="assets/js/citrana-debug.js"></script>
+      <script src="assets/js/citrana-device.js"></script>
+      <script src="assets/js/citrana-canvas-hints.js"></script>
+      <script src="assets/js/citrana-rashis.js"></script>
+      <script src="assets/js/citrana-selection.js"></script>
+      <script src="assets/js/citrana-annotation-fonts.js"></script>
+      <script src="assets/js/citrana-chart-templates-south.js"></script>
+      <script src="assets/js/citrana-chart-templates-north.js"></script>
+      <script src="assets/js/citrana-zoom.js"></script>
+      <script src="assets/js/citrana-chart-coordinator.js"></script>
+      <script src="assets/js/citrana-planet-system.js"></script>
+      <script src="assets/js/citrana-arrow.js"></script>
+      <script src="assets/js/citrana-colorpicker.js"></script>
+      <script src="assets/js/citrana-laser.js"></script>
+      <script src="assets/js/citrana-drawing-tools.js"></script>
+      <script src="assets/js/citrana-edit-ui.js"></script>
+      <script src="assets/js/citrana-context-menu.js"></script>
+      <script src="assets/js/citrana-items-menu.js"></script>
+      <script src="assets/js/citrana-history.js"></script>
+      <script src="assets/js/citrana-session.js"></script>
+      <script src="assets/js/citrana-app.js"></script>
       <script>
          // Initialize Lucide icons
          lucide.createIcons();
          
          // Initialize the app
          document.addEventListener('DOMContentLoaded', function() {
-             console.log('DOM loaded, initializing Citrana...');
+             citranaDebug('DOM loaded, initializing Citrana...');
              window.app = new CitranaApp();
          });
       </script>

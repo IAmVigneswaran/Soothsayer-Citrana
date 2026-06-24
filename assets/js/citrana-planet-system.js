@@ -1,8 +1,8 @@
 /**
- * planet-system.js
+ * citrana-planet-system.js
  * Citrana • https://github.com/IAmVigneswaran/Soothsayer-Citrana 
- * © 2025 Vigneswaran Rajkumar • Licensed under MIT License
- * Manages planet library, floating Graha Library UI, and drag-and-drop functionality
+ * © 2026 Vigneswaran Rajkumar • Licensed under MIT License
+ * Manages Graha library, floating Graha Library UI, and drag-and-drop functionality
  */
 class PlanetSystem {
     constructor(stage, layer, chartTemplates) {
@@ -14,15 +14,24 @@ class PlanetSystem {
         // Graha Library UI state
         this.grahaLibrary = null;
         this.planetGrid = null;
+        this._grahaLibraryEnabled = true;
+        try {
+            const stored = localStorage.getItem('citrana_graha_library_enabled');
+            if (stored !== null) {
+                this._grahaLibraryEnabled = stored === 'true';
+            }
+        } catch (_) {
+            // localStorage unavailable
+        }
         this.isDraggingLibrary = false;
         this.dragStartX = 0;
         this.dragStartY = 0;
         this.initialX = 0;
         this.initialY = 0;
 
-        // Planet data - Page 1 (Grahas)
+        // Graha data - Page 1 (Traditional Grahas)
         // Contains the 12 traditional grahas used in Vedic astrology
-        // To add more planets to this page, simply add new entries to this object
+        // To add more Grahas to this page, simply add new entries to this object
         // Structure: { abbreviation: { name, fullName, color } }
         this.planetsPage1 = {
             'Lg': {
@@ -87,7 +96,7 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 2 (Jaimini Karakas)
+        // Graha data - Page 2 (Jaimini Karakas)
         this.planetsPage2 = {
             'AK': {
                 name: 'AK',
@@ -151,7 +160,7 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 3 (In Tamil)
+        // Graha data - Page 3 (In Tamil)
         this.planetsPage3 = {
             'ல': {
                 name: 'லக்கினம்',
@@ -215,7 +224,7 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 4 (In Hindi)
+        // Graha data - Page 4 (In Hindi)
         this.planetsPage4 = {
             'लग्न': {
                 name: 'लग्न',
@@ -279,8 +288,53 @@ class PlanetSystem {
             }
         };
 
-        // Planet data - Page 5 (Outer Planets)
+        // Graha data - Page 5 (Upagrahas & Outer Grahas)
         this.planetsPage5 = {
+            'Dh': {
+                name: 'Dhuma',
+                fullName: 'Dhuma',
+                color: '#000000'
+            },
+            'Vy': {
+                name: 'Vyatipata',
+                fullName: 'Vyatipata',
+                color: '#000000'
+            },
+            'Pv': {
+                name: 'Parivesha',
+                fullName: 'Parivesha',
+                color: '#000000'
+            },
+            'Ic': {
+                name: 'Indra Chapa',
+                fullName: 'Indra Chapa',
+                color: '#000000'
+            },
+            'Uk': {
+                name: 'Upaketu',
+                fullName: 'Upaketu',
+                color: '#000000'
+            },
+            'Kl': {
+                name: 'Kala',
+                fullName: 'Kala',
+                color: '#000000'
+            },
+            'Mr': {
+                name: 'Mrityu',
+                fullName: 'Mrityu',
+                color: '#000000'
+            },
+            'Ap': {
+                name: 'Ardha Prahara',
+                fullName: 'Ardha Prahara',
+                color: '#000000'
+            },
+            'Yg': {
+                name: 'Yama Ghantaka',
+                fullName: 'Yama Ghantaka',
+                color: '#000000'
+            },
             'Ur': {
                 name: 'Uranus',
                 fullName: 'Uranus',
@@ -304,8 +358,8 @@ class PlanetSystem {
         this.swipeStartX = 0;
         this.swipeStartY = 0;
         this.isSwiping = false;
+        this.pageDotsEl = null;
         this.draggedPlanet = null;
-        this.dropZones = [];
     }
 
     init() {
@@ -319,7 +373,89 @@ class PlanetSystem {
         this.setupLibraryEventListeners();
         this.createPlanetLibrary();
         this.setupDragAndDrop();
-        console.log('Planet system initialized');
+        this.applyGrahaLibraryVisibility();
+        citranaDebug('Graha system initialized');
+    }
+
+    isGrahaLibraryEnabled() {
+        return this._grahaLibraryEnabled !== false;
+    }
+
+    setGrahaLibraryEnabled(enabled) {
+        this._grahaLibraryEnabled = !!enabled;
+
+        try {
+            localStorage.setItem('citrana_graha_library_enabled', String(this._grahaLibraryEnabled));
+        } catch (_) {
+            // localStorage unavailable
+        }
+
+        this.applyGrahaLibraryVisibility();
+    }
+
+    toggleGrahaLibrary() {
+        this.setGrahaLibraryEnabled(!this.isGrahaLibraryEnabled());
+        return this.isGrahaLibraryEnabled();
+    }
+
+    applyGrahaLibraryVisibility() {
+        if (!this.grahaLibrary) return;
+        this.grahaLibrary.classList.toggle('graha-library-hidden', !this.isGrahaLibraryEnabled());
+        window.app?.refreshCanvasHints?.();
+    }
+
+    getGrahaLibraryItemsTitle() {
+        return 'Graha Library';
+    }
+
+    getGrahaLibraryItemsMeta() {
+        const enabled = this.isGrahaLibraryEnabled();
+        const useClick = typeof CitranaDevice !== 'undefined' && CitranaDevice.hasFinePointer();
+        const verb = useClick ? 'Click' : 'Tap';
+        return enabled ? `On · ${verb} to Disable` : `Off · ${verb} to Enable`;
+    }
+
+    getGrahaLibraryToggleActionLabel() {
+        return this.isGrahaLibraryEnabled()
+            ? 'Disable Graha Library'
+            : 'Enable Graha Library';
+    }
+
+    getGrahaLibraryResetItemsTitle() {
+        return 'Reset Graha Library Position';
+    }
+
+    getGrahaLibraryResetItemsMeta() {
+        return 'Default Layout';
+    }
+
+    getGrahaLibraryResetActionLabel() {
+        return 'Reset Graha Library Position';
+    }
+
+    resetGrahaLibraryPosition() {
+        if (!this.grahaLibrary) return;
+
+        if (this.isDraggingLibrary) {
+            this.isDraggingLibrary = false;
+            this.setGrahaLibraryDragging(false);
+            document.body.style.cursor = '';
+        }
+
+        ['left', 'top', 'right', 'bottom', 'transform', 'transition', 'height', 'minHeight', 'maxHeight']
+            .forEach((prop) => this.grahaLibrary.style.removeProperty(prop));
+
+        this.grahaLibrary.querySelectorAll('.planet-item').forEach((item) => {
+            item.style.removeProperty('transition');
+        });
+
+        const planetGrid = this.grahaLibrary.querySelector('.planet-grid');
+        if (planetGrid) {
+            planetGrid.style.removeProperty('maxHeight');
+            planetGrid.style.removeProperty('overflow');
+        }
+
+        window.app?.refreshCanvasHints?.();
     }
 
     // --- Graha Library Floating UI ---
@@ -336,6 +472,11 @@ class PlanetSystem {
         header.addEventListener('touchstart', (e) => this.handleLibraryTouchStart(e));
         document.addEventListener('touchmove', (e) => this.handleLibraryTouchMove(e));
         document.addEventListener('touchend', () => this.handleLibraryTouchEnd());
+    }
+
+    setGrahaLibraryDragging(isDragging) {
+        if (!this.grahaLibrary) return;
+        this.grahaLibrary.classList.toggle('graha-library-dragging', isDragging);
     }
 
     handleLibraryTouchStart(e) {
@@ -360,7 +501,7 @@ class PlanetSystem {
         this.grahaLibrary.style.minHeight = this.initialHeight + 'px';
         this.grahaLibrary.style.maxHeight = this.initialHeight + 'px';
 
-        // Disable transitions on all planet items to prevent height changes
+        // Disable transitions on all Graha items to prevent height changes
         const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
         planetItems.forEach(item => {
             item.style.transition = 'none';
@@ -373,9 +514,7 @@ class PlanetSystem {
             planetGrid.style.overflow = 'hidden';
         }
 
-        // Add subtle visual feedback for mobile dragging (no size change)
-        this.grahaLibrary.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
-        this.grahaLibrary.style.zIndex = '1001';
+        this.setGrahaLibraryDragging(true);
     }
 
     handleLibraryTouchMove(e) {
@@ -404,7 +543,7 @@ class PlanetSystem {
             this.grahaLibrary.style.minHeight = this.initialHeight + 'px';
             this.grahaLibrary.style.maxHeight = this.initialHeight + 'px';
 
-            // Re-enable transitions on planet items
+            // Re-enable transitions on Graha items
             const planetItems = this.grahaLibrary.querySelectorAll('.planet-item');
             planetItems.forEach(item => {
                 item.style.transition = '';
@@ -417,9 +556,7 @@ class PlanetSystem {
                 planetGrid.style.overflow = 'hidden';
             }
 
-            // Remove visual feedback
-            this.grahaLibrary.style.boxShadow = '';
-            this.grahaLibrary.style.zIndex = '';
+            this.setGrahaLibraryDragging(false);
 
             // Don't restore transform - keep the library where user dragged it
         }
@@ -432,6 +569,7 @@ class PlanetSystem {
         this.initialX = rect.left;
         this.initialY = rect.top;
         this.grahaLibrary.style.transition = 'none';
+        this.setGrahaLibraryDragging(true);
         document.body.style.cursor = 'grabbing';
     }
     handleLibraryDragMove(e) {
@@ -452,37 +590,23 @@ class PlanetSystem {
         if (this.isDraggingLibrary) {
             this.isDraggingLibrary = false;
             this.grahaLibrary.style.transition = '';
+            this.setGrahaLibraryDragging(false);
             document.body.style.cursor = '';
         }
     }
-    getLibraryPosition() {
-        const rect = this.grahaLibrary.getBoundingClientRect();
-        return {
-            x: rect.left,
-            y: rect.top
-        };
-    }
-    setLibraryPosition(x, y) {
-        const maxX = window.innerWidth - this.grahaLibrary.offsetWidth;
-        const maxY = window.innerHeight - this.grahaLibrary.offsetHeight;
-        const clampedX = Math.max(0, Math.min(x, maxX));
-        const clampedY = Math.max(0, Math.min(y, maxY));
-        this.grahaLibrary.style.left = clampedX + 'px';
-        this.grahaLibrary.style.top = clampedY + 'px';
-    }
 
-    // --- Planet Library and Drag-and-Drop ---
+    // --- Graha Library and Drag-and-Drop ---
     createPlanetLibrary() {
         const library = document.getElementById('planet-library');
         if (!library) {
-            console.error('Planet library container not found');
+            console.error('Graha library container not found');
             return;
         }
 
         // Clear existing content
         library.innerHTML = '';
 
-        // Get current page planets
+        // Get current page Grahas
         let currentPlanets;
         if (this.currentPage === 1) {
             currentPlanets = this.planetsPage1;
@@ -496,7 +620,7 @@ class PlanetSystem {
             currentPlanets = this.planetsPage5;
         }
 
-        // Create planet items for current page
+        // Create Graha items for current page
         Object.entries(currentPlanets).forEach(([abbr, planet]) => {
             const planetItem = document.createElement('div');
             planetItem.className = 'planet-item';
@@ -530,12 +654,6 @@ class PlanetSystem {
             canvas.addEventListener('drop', (e) => this.handleDrop(e));
         }
     }
-    setupDropZones() {
-        if (this.chartTemplates) {
-            this.dropZones = this.chartTemplates.getDropZones();
-            console.log('Drop zones setup complete');
-        }
-    }
     handleDragStart(e, planetAbbr) {
         this.draggedPlanet = planetAbbr;
         e.dataTransfer.setData('text/plain', planetAbbr);
@@ -543,14 +661,14 @@ class PlanetSystem {
         // Add visual feedback
         e.target.style.opacity = '0.5';
         e.target.style.transform = 'scale(0.9)';
-        console.log(`Started dragging planet: ${planetAbbr}`);
+        citranaDebug(`Started dragging Graha: ${planetAbbr}`);
     }
     handleDragEnd(e) {
         this.draggedPlanet = null;
         // Remove visual feedback
         e.target.style.opacity = '1';
         e.target.style.transform = 'scale(1)';
-        console.log('Drag ended');
+        citranaDebug('Drag ended');
     }
 
     // Mobile touch handlers
@@ -574,7 +692,7 @@ class PlanetSystem {
             passive: false
         });
 
-        console.log(`Touch started for planet: ${planetAbbr}`);
+        citranaDebug(`Touch started for Graha: ${planetAbbr}`);
     }
 
     handleTouchMove(e, planetAbbr) {
@@ -590,7 +708,7 @@ class PlanetSystem {
         // Start dragging after a small movement threshold
         if (!this.isDragging && (deltaX > 5 || deltaY > 5)) {
             this.isDragging = true;
-            console.log('Started mobile drag');
+            citranaDebug('Started mobile drag');
         }
 
         if (this.dragPreview) {
@@ -627,17 +745,17 @@ class PlanetSystem {
             this.boundTouchEnd = null;
         }
 
-        console.log('Touch ended');
+        citranaDebug('Touch ended');
     }
 
     createDragPreview(planetAbbr, x, y) {
         // Remove existing preview
         this.removeDragPreview();
 
-        // Get planet info from current page or both pages
+        // Get Graha info from current page or both pages
         const planetInfo = this.getPlanetInfo(planetAbbr);
         if (!planetInfo) {
-            console.error(`Planet info not found for: ${planetAbbr}`);
+            console.error(`Graha info not found for: ${planetAbbr}`);
             return;
         }
 
@@ -676,6 +794,15 @@ class PlanetSystem {
         }
     }
 
+    clearSelectedBhavaDropTarget() {
+        const chartType = this.chartTemplates?.currentChartType;
+        if (chartType === 'south-indian') {
+            window.selectedBhavaSouth = null;
+        } else if (chartType === 'north-indian') {
+            window.selectedBhavaNorth = null;
+        }
+    }
+
     handleMobileDrop(x, y) {
         // Check for selected bhava first
         let targetHouse = null;
@@ -687,33 +814,20 @@ class PlanetSystem {
         }
 
         if (!targetHouse) {
-            // Find house based on touch position
+            // Find Bhava based on touch position
             targetHouse = this.findHouseAtPosition(x, y);
         }
 
         if (targetHouse && this.draggedPlanet) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
-            console.log(`Mobile drop: Planet ${this.draggedPlanet} placed in house ${targetHouse}`);
+            this.clearSelectedBhavaDropTarget();
+            citranaDebug(`Mobile drop: Graha ${this.draggedPlanet} placed in Bhava ${targetHouse}`);
         }
     }
 
-    findHouseAtPosition(x, y) {
-        // This is a simplified implementation
-        // In a real implementation, you'd need to convert screen coordinates to chart coordinates
-        // and check which house polygon contains the point
-
-        const chartType = this.chartTemplates?.currentChartType;
-        if (chartType === 'south-indian') {
-            // For South Indian chart, you'd check the 3x4 grid
-            // This is a placeholder - you'd need to implement proper coordinate conversion
-            return 1; // Default to house 1
-        } else if (chartType === 'north-indian') {
-            // For North Indian chart, you'd check the polygon shapes
-            // This is a placeholder - you'd need to implement proper coordinate conversion
-            return 1; // Default to house 1
-        }
-
-        return null;
+    findHouseAtPosition(clientX, clientY) {
+        if (!this.chartTemplates) return null;
+        return this.chartTemplates.findHouseAtClientPoint(clientX, clientY);
     }
     handleDrop(e) {
         e.preventDefault();
@@ -732,50 +846,35 @@ class PlanetSystem {
                 console.error('Stage not available for drop');
                 return;
             }
-            // Get drop position relative to stage
             const pointer = stage.getPointerPosition();
-            if (!pointer) {
-                console.error('Could not get pointer position');
-                return;
+            if (pointer) {
+                targetHouse = this.chartTemplates.findHouseAtPointer(pointer);
             }
-            // Fallback: Find the closest house to drop position
-            targetHouse = this.findClosestHouse(pointer);
+            if (!targetHouse) {
+                targetHouse = this.findHouseAtPosition(e.clientX, e.clientY);
+            }
         }
         if (targetHouse) {
             this.placePlanetInHouse(this.draggedPlanet, targetHouse);
-            console.log(`Planet ${this.draggedPlanet} placed in house ${targetHouse}`);
+            this.clearSelectedBhavaDropTarget();
+            citranaDebug(`Graha ${this.draggedPlanet} placed in Bhava ${targetHouse}`);
         } else {
-            console.log('No suitable house found for planet placement');
+            citranaDebug('No suitable Bhava found for Graha placement');
         }
         this.draggedPlanet = null;
-    }
-    findClosestHouse(pointer) {
-        // This would need to be implemented based on the chart templates
-        // For now, return a default house index
-        return 1; // Place in first house by default
     }
     placePlanetInHouse(planetAbbr, houseIndex, label = null, id = null) {
         if (!this.chartTemplates) {
             console.error('Chart templates not available');
             return;
         }
-        // Add planet to the specified house
+        // Add Graha to the specified Bhava
         this.chartTemplates.addPlanetToHouse(planetAbbr, houseIndex, label, id);
+        window.app?.notifyCanvasContentCreated?.();
     }
     getPlanetInfo(abbr) {
-        // Check all five pages for planet info
+        // Check all five pages for Graha info
         return this.planetsPage1[abbr] || this.planetsPage2[abbr] || this.planetsPage3[abbr] || this.planetsPage4[abbr] || this.planetsPage5[abbr] || null;
-    }
-
-    getAllPlanets() {
-        // Return all planets from all five pages
-        return {
-            ...this.planetsPage1,
-            ...this.planetsPage2,
-            ...this.planetsPage3,
-            ...this.planetsPage4,
-            ...this.planetsPage5
-        };
     }
 
     // Paging methods
@@ -792,29 +891,52 @@ class PlanetSystem {
         // Create page dots container
         const dotsContainer = document.createElement('div');
         dotsContainer.className = 'page-dots';
+        dotsContainer.setAttribute('role', 'tablist');
+        dotsContainer.setAttribute('aria-label', 'Graha Library pages — swipe left or right to change page');
+
+        const prevChevron = document.createElement('span');
+        prevChevron.className = `page-dots-chevron page-dots-chevron-prev${this.currentPage <= 1 ? ' is-disabled' : ''}`;
+        prevChevron.setAttribute('aria-hidden', 'true');
+        prevChevron.innerHTML = '<i data-lucide="chevrons-left"></i>';
+
+        const dotsTrack = document.createElement('div');
+        dotsTrack.className = 'page-dots-track';
+
+        const nextChevron = document.createElement('span');
+        nextChevron.className = `page-dots-chevron page-dots-chevron-next${this.currentPage >= this.totalPages ? ' is-disabled' : ''}`;
+        nextChevron.setAttribute('aria-hidden', 'true');
+        nextChevron.innerHTML = '<i data-lucide="chevrons-right"></i>';
 
         // Create dots for each page
         for (let i = 1; i <= this.totalPages; i++) {
             const dot = document.createElement('div');
             dot.className = `page-dot ${i === this.currentPage ? 'active' : ''}`;
-
+            dot.title = `Graha Library Page ${i} (${i})`;
+            dot.setAttribute('aria-label', `Graha Library Page ${i}`);
             dot.addEventListener('click', () => this.goToPage(i));
-            dotsContainer.appendChild(dot);
+            dotsTrack.appendChild(dot);
         }
 
+        dotsContainer.append(prevChevron, dotsTrack, nextChevron);
         library.appendChild(dotsContainer);
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     setupSwipeEvents() {
-        const library = document.getElementById('graha-library');
-        if (!library) return;
+        if (this.pageDotsEl) {
+            this.pageDotsEl.removeEventListener('touchstart', this.handleSwipeStart);
+            this.pageDotsEl.removeEventListener('touchmove', this.handleSwipeMove);
+            this.pageDotsEl.removeEventListener('touchend', this.handleSwipeEnd);
+        }
 
-        // Remove existing swipe listeners
-        library.removeEventListener('touchstart', this.handleSwipeStart);
-        library.removeEventListener('touchmove', this.handleSwipeMove);
-        library.removeEventListener('touchend', this.handleSwipeEnd);
+        this.pageDotsEl = document.querySelector('#graha-library .page-dots');
+        if (!this.pageDotsEl) {
+            return;
+        }
 
-        // Add new swipe listeners
         this.handleSwipeStart = (e) => {
             this.swipeStartX = e.touches[0].clientX;
             this.swipeStartY = e.touches[0].clientY;
@@ -822,30 +944,34 @@ class PlanetSystem {
         };
 
         this.handleSwipeMove = (e) => {
-            if (!this.swipeStartX) return;
+            if (!this.swipeStartX) {
+                return;
+            }
 
             const deltaX = e.touches[0].clientX - this.swipeStartX;
             const deltaY = e.touches[0].clientY - this.swipeStartY;
 
-            // Check if it's a horizontal swipe
-            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
                 this.isSwiping = true;
-                e.preventDefault(); // Prevent default scroll
+                e.preventDefault();
             }
         };
 
         this.handleSwipeEnd = (e) => {
-            if (!this.isSwiping || !this.swipeStartX) return;
+            if (!this.isSwiping || !this.swipeStartX) {
+                this.swipeStartX = 0;
+                this.swipeStartY = 0;
+                this.isSwiping = false;
+                return;
+            }
 
             const deltaX = e.changedTouches[0].clientX - this.swipeStartX;
-            const threshold = 100; // Minimum swipe distance
+            const threshold = 40;
 
             if (Math.abs(deltaX) > threshold) {
                 if (deltaX > 0 && this.currentPage > 1) {
-                    // Swipe right - go to previous page
                     this.goToPage(this.currentPage - 1);
                 } else if (deltaX < 0 && this.currentPage < this.totalPages) {
-                    // Swipe left - go to next page
                     this.goToPage(this.currentPage + 1);
                 }
             }
@@ -855,24 +981,25 @@ class PlanetSystem {
             this.isSwiping = false;
         };
 
-        library.addEventListener('touchstart', this.handleSwipeStart, {
+        this.pageDotsEl.addEventListener('touchstart', this.handleSwipeStart, {
+            passive: true
+        });
+        this.pageDotsEl.addEventListener('touchmove', this.handleSwipeMove, {
             passive: false
         });
-        library.addEventListener('touchmove', this.handleSwipeMove, {
-            passive: false
-        });
-        library.addEventListener('touchend', this.handleSwipeEnd, {
-            passive: false
+        this.pageDotsEl.addEventListener('touchend', this.handleSwipeEnd, {
+            passive: true
         });
     }
 
     goToPage(pageNumber) {
         if (pageNumber < 1 || pageNumber > this.totalPages || pageNumber === this.currentPage) {
-            return;
+            return false;
         }
 
         this.currentPage = pageNumber;
         this.createPlanetLibrary();
-        console.log(`Switched to page ${pageNumber}`);
+        citranaDebug(`Switched to page ${pageNumber}`);
+        return true;
     }
 }
