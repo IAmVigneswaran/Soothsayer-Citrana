@@ -1856,6 +1856,7 @@ class CitranaApp {
             const backdrop = document.getElementById('welcome-modal-backdrop');
             backdrop?.classList.add('active');
             backdrop?.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('welcome-modal-open');
             CitranaCanvasHints?.scheduleUpdate?.();
         }
         if (!wasActive) {
@@ -1873,6 +1874,7 @@ class CitranaApp {
             const backdrop = document.getElementById('welcome-modal-backdrop');
             backdrop?.classList.remove('active');
             backdrop?.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('welcome-modal-open');
             CitranaCanvasHints?.scheduleUpdate?.();
         }
         if (wasActive) {

@@ -2534,6 +2534,17 @@ body.presentation-view .about-btn {
   pointer-events: auto;
 }
 
+/* Keep app chrome behind the welcome grey-out (Safari mobile toolbar/zoom use z-index 9999–10000) */
+body.welcome-modal-open .floating-top-toolbar,
+body.welcome-modal-open .floating-zoom-controls,
+body.welcome-modal-open .help-btn,
+body.welcome-modal-open .about-btn,
+body.welcome-modal-open .floating-planet-library,
+body.welcome-modal-open .floating-text-edit-controls,
+body.welcome-modal-open .floating-edit-ui {
+  z-index: 800 !important;
+}
+
 .welcome-modal {
   position: fixed;
   top: 0;
