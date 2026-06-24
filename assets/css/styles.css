@@ -3121,6 +3121,43 @@ body.presentation-view .citrana-canvas-hints {
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
+  opacity: 0;
+}
+
+.citrana-canvas-hint:not([hidden]) {
+  animation: citrana-hint-fade-in 0.55s ease-out both;
+}
+
+.citrana-canvas-hint--start:not([hidden]) {
+  animation-delay: 0s;
+}
+
+.citrana-canvas-hint--graha-library:not([hidden]) {
+  animation-delay: 0.06s;
+}
+
+.citrana-canvas-hint--main-toolbar:not([hidden]) {
+  animation-delay: 0.1s;
+}
+
+.citrana-canvas-hint--zoom-bar:not([hidden]) {
+  animation-delay: 0.14s;
+}
+
+.citrana-canvas-hint--help:not([hidden]) {
+  animation-delay: 0.18s;
+}
+
+@keyframes citrana-hint-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .citrana-canvas-hint[hidden] {
@@ -3171,6 +3208,14 @@ body.presentation-view .citrana-canvas-hints {
 @media (max-width: 768px) {
   .citrana-canvas-hint--desktop {
     display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .citrana-canvas-hint:not([hidden]) {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
