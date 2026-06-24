@@ -35,8 +35,8 @@ This codebase is developed using AI agents.
 - **Presentation View:** Hide toolbar, zoom bar, Graha library, Help, and About for a clean on-screen chart; separate from the Graha Library visibility toggle
 - **Zoom and Pan:** Zoom is **locked by default**; unlock from the zoom bar for scroll-wheel zoom; **Reset Zoom** always refits the chart
 - **Undo and Redo:** Up to 50 steps via toolbar buttons or **Ctrl+Z** / **Cmd+Z** and **Ctrl+Y** / **Cmd+Shift+Z**; tracks chart, Graha, and Annotation changes (not zoom, pan, laser strokes, or Presentation View)
-- **Save and Open Session:** Download or restore `.citrana.json` files — chart, Grahas, Annotations, and Options; save to any cloud storage and **Open Session** on another device to resume where you left off
-- **Export PNG:** High-resolution images with optional transparency
+- **Save and Open Session:** Download or restore `.citrana.json` files — chart, Grahas, Annotations, and Options; Save As dialog before download; **Open Session** dialog before the file picker; save to any cloud storage and **Open Session** on another device to resume where you left off
+- **Export PNG:** High-resolution images with optional transparency; Save As dialog before download
 - **Privacy:** Chart data stays in your browser — nothing is uploaded to our servers; refreshing starts a fresh session unless you save or export
 - **Keyboard shortcuts:** Tools (**K** laser, **I** Canvas Items), Graha Library pages **1**–**5**, undo/redo, zoom when unlocked, and **Delete** (selected Graha first, then selected Annotation) — press `?` or `/` in the app for the full list
 
@@ -129,7 +129,7 @@ Citrana is a **desktop-first** Janma Kundali (Vedic charts) workspace: create So
 2. **Set Lagna** — South Indian: right-click a Bhava and choose **Set as Lagna**. North Indian: right-click a Bhava and choose **Set as First Bhava**, or right-click the chart and use **Set Lagna as …**
 3. **Add Grahas** — drag from the Graha Library onto the Bhava under your pointer. Click a Bhava first to target that Bhava on the **next** drop only (then the pointer takes over again)
 4. **Add Annotations** — use the toolbar to add arrows, lines, pen strokes, text, and headings
-5. **Save your work** — **Save Session** for a `.citrana.json` file, or the save icon for a PNG export
+5. **Save your work** — **Save Session** for a `.citrana.json` file (edit the name in the Save As dialog), or the save icon for a PNG export (Save As dialog)
 
 ### Charts
 
@@ -210,14 +210,18 @@ Use the toolbar buttons or **Ctrl+Z** / **Cmd+Z** (undo) and **Ctrl+Y** / **Cmd+
 
 ### Sessions and Export
 
-**Save Session** and **Open Session** in the toolbar work with `.citrana.json` files only. A progress dialog appears while the file is prepared or loaded. Opening a session replaces your current work; Citrana asks for confirmation if the canvas is not empty.
+**Save Session** and **Open Session** in the toolbar work with `.citrana.json` files only. Plain `.json` or other extensions cannot be opened.
+
+**Save Session** opens a Save As dialog where you can edit the file name (a timestamped default is offered; the `.citrana.json` extension is kept). A progress dialog then appears while the file is prepared.
+
+**Open Session** opens a dialog first — click **Choose file**, then pick a session file from your device. A progress dialog appears while it loads. Opening a session replaces your current work; Citrana asks for confirmation if the canvas is not empty. If the file is invalid, an in-app notice explains the problem.
 
 Take your work with you: build a chart on mobile, save the file, and store it in any cloud service you already use — iCloud Drive, Google Drive, Dropbox, and so on. When you **Open Session** on another device or browser, your chart, Grahas, Annotations, and Options are restored.
 
 - **Included:** chart layout, Grahas, Annotations, and Options
 - **Not included:** undo/redo history, active tool, laser pointer strokes, Presentation View, and zoom/pan
 
-**Export PNG** — click the save icon for a timestamped image. Use the transparency toggle before export for a white or transparent background. By default, export follows the current viewport; with **Save Chart Only** enabled in Options, Save exports only the chart area.
+**Export PNG** — a Save As dialog lets you edit the file name before export (default `citrana-chart-….png`). A progress dialog then prepares the image. Use the transparency toggle before export for a white or transparent background. By default, export follows the current viewport; with **Save Chart Only** enabled in Options, Save exports only the chart area.
 
 ### Important Notes
 

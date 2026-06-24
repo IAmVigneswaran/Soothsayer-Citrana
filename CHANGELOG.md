@@ -38,6 +38,8 @@ Citrana 2.0 is a major update focused on chart workflow, Annotations, sessions, 
 ### Sessions, export, and options
 
 - **Save and Open Session** — download or restore a `.citrana.json` working file (chart, Grahas, Annotations, and Options); save to any cloud storage and open on another device to resume where you left off
+- **Save As dialogs** — choose or edit the file name before **Save Session** or **Export PNG**; timestamped defaults; `.citrana.json` and `.png` extensions enforced
+- **Session open and errors in-app** — **Open Session** shows a dialog before the file picker; only `.citrana.json` files are accepted; invalid files show the same modal style
 - **Fresh start on refresh** — each visit begins with a blank canvas unless you open a session
 - **Options** (gear icon in the toolbar):
   - **Zoom Step** — **Fine (1%)** default, plus Small, Medium, and Large steps for zoom buttons, keyboard **+**/**−**, and scroll wheel
