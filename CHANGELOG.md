@@ -29,7 +29,7 @@ Citrana 2.0 is a major update focused on chart workflow, Annotations, sessions, 
 - **Natural pen strokes** — velocity-based taper for a more handwritten feel (saved in session files)
 - **Select and move pen strokes** — use the Select tool to reposition pen Annotations
 - **Multi-line text and headings** — **Shift+Enter** for a new line, **Enter** to finish
-- **Hand-written style** — optional **Caveat** script for text and headings, with **Normal** and **Hand-written** toggles; bold uses **Caveat Brush** for natural weight
+- **Hand-written style** — optional self-hosted **Shantell Sans** for text and headings, with **Normal** and **Hand-written** toggles; bold and italic use font weight and style
 - **Text and heading styles** — bold, italic, alignment, and font mode stay in sync with the canvas
 - **Arrow and line control points** — draggable endpoints on desktop with clear hover feedback
 - **Laser Pointer** (**K**) — temporary highlight for presentations; not saved or undoable

@@ -767,10 +767,18 @@ class EditUI {
             const nextItalic = !this.isAnnotationItalic(this.currentElement);
             citranaDebug('[EDIT UI] Italic button clicked - nextItalic:', nextItalic);
 
-            this.setAnnotationItalic(this.currentElement, nextItalic);
-            this.currentElement.getLayer().batchDraw();
-            italicBtn.classList.toggle('active', nextItalic);
-            this.markEditDirty();
+            const applyItalic = () => {
+                this.setAnnotationItalic(this.currentElement, nextItalic);
+                this.currentElement.getLayer().batchDraw();
+                italicBtn.classList.toggle('active', nextItalic);
+                this.markEditDirty();
+            };
+
+            if (nextItalic && CitranaAnnotationFonts?.isHandwritten?.(this.currentElement)) {
+                CitranaAnnotationFonts.ensureLoaded().then(applyItalic);
+            } else {
+                applyItalic();
+            }
         });
 
         const normalFontBtn = document.createElement('button');

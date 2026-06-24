@@ -78,7 +78,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 14. [Development Commands](#development-commands)
 15. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~3046 lines)
+## CSS and Layout (styles.css - ~3080 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome; `role="dialog"` + `aria-*`), responsive breakpoints (769px desktop, 768px tablet, 600px mobile). Most tablet/mobile rules live in one `@media (max-width: 768px)` block; **post-base mobile overrides** (Help/About position, modal compact sizing) use separate `@media` blocks **after** base component selectors so cascade order is correct.
 
@@ -118,11 +118,12 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 | Path | Lines | Description |
 |------|-------|-------------|
-| `index.html` | ~601 | Main entry; viewport-fit=cover; PWA meta; Google Fonts Caveat; modal a11y; Welcome modal (6-step quick start, simulated loading bar); Help **Guide** (`.help-intro`, `.help-subsection-title`); Canvas Items modal; Options modal (Zoom Step); script tags at bottom in **dependency order** (see below) |
+| `index.html` | ~597 | Main entry; viewport-fit=cover; PWA meta; self-hosted Shantell Sans via `styles.css`; modal a11y; Welcome modal (6-step quick start, simulated loading bar); Help **Guide** (`.help-intro`, `.help-subsection-title`); Canvas Items modal; Options modal (Zoom Step); script tags at bottom in **dependency order** (see below) |
 | `robots.txt` | — | Search engine rules |
 | `sitemap.xml` | — | Sitemap |
-| `assets/css/styles.css` | ~3046 | Complete styling; primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `#items-modal` pinned layout; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` |
-| `assets/js/citrana-annotation-fonts.js` | ~118 | Normal and hand-written annotation fonts |
+| `assets/css/styles.css` | ~3080 | Complete styling; `@font-face` Shantell Sans (`assets/fonts/`); primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `#items-modal` pinned layout; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` |
+| `assets/fonts/` | 5 files | Self-hosted Shantell Sans (Regular, Bold, Italic, BoldItalic) + `OFL.txt` |
+| `assets/js/citrana-annotation-fonts.js` | ~125 | Normal and hand-written annotation fonts (Shantell Sans) |
 | `assets/js/citrana-app.js` | ~2214 | Main application coordinator |
 | `assets/js/citrana-arrow.js` | ~185 | Unified filled-arrow geometry |
 | `assets/js/citrana-chart-coordinator.js` | ~320 | Chart type management |
@@ -578,14 +579,14 @@ Key Methods:
 
 Wired from South/North `selectPlanet()` / `clearSelectedPlanet()`, annotation `selectShape()` (text/heading/pen), and on Graha `dragmove`.
 
-### Citrana Annotation Fonts (citrana-annotation-fonts.js - ~118 lines)
+### Citrana Annotation Fonts (citrana-annotation-fonts.js - ~125 lines)
 Normal vs Hand-written typography for Text and Heading Annotations.
 
 Key Responsibilities:
 - **Normal mode:** Arial / Arial Black + `fontWeight` for bold
-- **Hand-written mode:** Caveat / **Caveat Brush** (bold uses separate family — Konva has no real `fontWeight` slot for canvas fonts)
-- Italic via `fontStyle: 'italic'` in both modes
-- `ensureLoaded()` preloads Google Fonts (called from app init and Edit UI before hand-written bold)
+- **Hand-written mode:** self-hosted **Shantell Sans** (`assets/fonts/`; `@font-face` in `styles.css`); bold and italic via `fontWeight` / `fontStyle`
+- Legacy **Caveat** / **Caveat Brush** in saved sessions still recognised for hand-written/bold state; new annotations use Shantell Sans only
+- `ensureLoaded()` preloads Regular, Bold, Italic, and Bold Italic via `document.fonts.load()` (app init and Edit UI before hand-written bold)
 
 Key Methods:
 - `isHandwritten()`, `isBold()`, `isItalic()`, `setBold()`, `setItalic()`, `setMode()`, `ensureLoaded()`
@@ -807,7 +808,7 @@ See [ARCHITECTURE.md — Undo / redo](ARCHITECTURE.md#undo--redo) for data flow 
 - Presentation View: Context menu or **Canvas Items** panel toggle hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, and drawing Edit UI; dismisses active edit sessions on enter. Graha Library can also be hidden independently via Canvas Items → **Graha Library** (On/Off)
 - Text Tool: Add editable multi-line text boxes anywhere on canvas (**Shift+Enter** new line)
 - Heading Tool: Create multi-line chart headings and titles
-- **Hand-written Annotations:** optional Caveat script; bold uses Caveat Brush via Edit UI **Normal** / **Hand-written** toggles
+- **Hand-written Annotations:** optional Shantell Sans (self-hosted); bold and italic via Edit UI toggles and weight/style
 - Undo/Redo: Unified timeline via `app.recordHistory()` — see [Undo / Redo](#undo--redo)
 - Auto-Switch Behaviour: Arrow, Line, Text, and Heading automatically switch to Select Tool after creation; Pen and Laser remain active
 - Control Points: Draggable handles for arrow/line endpoints; desktop hover feedback (colour invert, grab cursor); `raiseControlPointsAbovePickRects()` keeps handles above invisible pick rects

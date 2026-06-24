@@ -26,14 +26,15 @@ Classic tree view for Cursor rules context (see [AGENT.md](AGENT.md) for a markd
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~601 lines); viewport-fit=cover; PWA meta; Welcome modal (6-step quick start, loading bar); Help Guide (.help-intro, .help-subsection-title); Canvas Items modal; Options modal (Zoom Step); toolbar + Edit UI scroll wraps
+├── index.html                    # Main entry (~597 lines); viewport-fit=cover; PWA meta; Welcome modal (6-step quick start, loading bar); Help Guide (.help-intro, .help-subsection-title); Canvas Items modal; Options modal (Zoom Step); toolbar + Edit UI scroll wraps
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~3046 lines); primary @media (max-width: 768px) block + post-base mobile overrides; JSColorPicker --cp-* theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*`
+│   │   └── styles.css            # Complete styling system (~3080 lines); `@font-face` Shantell Sans; primary @media (max-width: 768px) block + post-base mobile overrides; JSColorPicker --cp-* theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*`
+│   ├── fonts/                    # Self-hosted Shantell Sans (Regular, Bold, Italic, BoldItalic) + OFL.txt
 │   ├── js/                       # 20 modules — all citrana-* prefixed
-│   │   ├── citrana-annotation-fonts.js # Normal and hand-written annotation fonts (~118 lines)
+│   │   ├── citrana-annotation-fonts.js # Normal and hand-written annotation fonts (~125 lines)
 │   │   ├── citrana-app.js                # Main application coordinator (~2214 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
 │   │   ├── citrana-chart-coordinator.js  # Chart type management (~320 lines)
@@ -611,14 +612,14 @@ Key Methods:
 
 Wired from South/North `selectPlanet()` / `clearSelectedPlanet()`, annotation `selectShape()` (text/heading/pen), and on Graha `dragmove`.
 
-### Citrana Annotation Fonts (assets/js/citrana-annotation-fonts.js - ~118 lines)
+### Citrana Annotation Fonts (assets/js/citrana-annotation-fonts.js - ~125 lines)
 Normal vs Hand-written typography for Text and Heading Annotations.
 
 Key Responsibilities:
 - **Normal:** Arial / Arial Black + `fontWeight` for bold
-- **Hand-written:** Caveat / **Caveat Brush** for bold (Konva canvas fonts have no real weight slot)
-- Italic via `fontStyle: 'italic'` in both modes
-- `ensureLoaded()` preloads Google Fonts from `index.html`
+- **Hand-written:** self-hosted **Shantell Sans** (`assets/fonts/`; `@font-face` in `styles.css`) with `fontWeight` / `fontStyle` for bold and italic
+- Legacy session support: `isHandwritten()` still recognises saved **Caveat** / **Caveat Brush** families; new annotations use Shantell Sans only
+- `ensureLoaded()` preloads all four Shantell Sans faces via `document.fonts.load()`
 
 Key Methods:
 - `isHandwritten()`, `isBold()`, `isItalic()`, `setBold()`, `setItalic()`, `setMode()`, `ensureLoaded()`
@@ -813,7 +814,7 @@ Call `window.app.recordHistory('Label')` after undoable mutations. See [ARCHITEC
 - Presentation View: Context menu or **Canvas Items** panel toggle hides toolbar, zoom bar, Graha library, Help, About, Graha edit bar, and drawing Edit UI; dismisses active edit sessions on enter. Graha Library can also be hidden independently via Canvas Items → **Graha Library** (On/Off)
 - Text Tool: Multi-line editable text boxes (**Shift+Enter** new line)
 - Heading Tool: Multi-line chart headings and titles
-- **Hand-written Annotations:** Caveat / Caveat Brush via Edit UI **Normal** / **Hand-written** toggles
+- **Hand-written Annotations:** Shantell Sans (self-hosted) via Edit UI **Normal** / **Hand-written** toggles; bold and italic via weight and style
 - Undo/Redo: Unified timeline via `app.recordHistory()` — laser strokes excluded; see Undo / Redo above
 - Auto-Switch Behaviour: Arrow, Line, Text, and Heading automatically switch to Select Tool after creation; Pen and Laser remain active
 - Control Points: Draggable arrow/line handles with desktop hover feedback (colour invert, grab cursor)

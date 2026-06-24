@@ -34,7 +34,7 @@ User-facing copy and docs use **Bhava**, **Graha**, and **Rashi** (with correct 
 
 ## Runtime Composition
 
-`index.html` sets `viewport-fit=cover`, loads Konva and colorpicker CSS in `<head>`, Google Fonts (Caveat / Caveat Brush), then scripts at the bottom in this order:
+`index.html` sets `viewport-fit=cover`, loads Konva and colorpicker CSS in `<head>` (Shantell Sans via `@font-face` in `styles.css`), then scripts at the bottom in this order:
 
 | Order | Path | Export / role |
 |-------|------|---------------|
@@ -105,7 +105,7 @@ flowchart TB
         Debug["citranaDebug"]
     end
 
-    Fonts["Google Fonts<br/>Caveat + Caveat Brush"]
+    Fonts["Self-hosted Shantell Sans<br/>assets/fonts/"]
 
     App --> History
     App --> Session
@@ -141,7 +141,7 @@ flowchart TB
 |--------|-------|----------------|
 | `citrana-app.js` | ~2214 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser; **I** Canvas Items toggle; centralised **Delete**; **Escape** modal dismiss; **Tab** focus trap), zoom lock, **Zoom Step** preference (`setZoomStep()`), export (full viewport or chart-only crop), shared progress modal (`showProgressModal`; `isExporting` / `isSessionBusy` guards), modals, chart display preferences, history, **Presentation View**, **Save/Open Session**, **Welcome modal** (`showWelcomeModal`, `clearWelcomeLoadingInterval`), **Canvas Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `applySaveChartOnlyTransparency()` restores white background when Save Chart Only off; touch `preventDefault` gated via `drawingTools.shouldPreserveTouchDrag()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open |
 | `citrana-zoom.js` | ~58 | Zoom step presets — `CitranaZoom.computeNextScale()`, `resolveZoomStep()`, `VALID_STEPS` (`fine` 1%, `small` ~10%, `medium` ~20%, `large` ~25%); used by app wheel zoom, coordinator zoom buttons, and session import/export |
-| `citrana-annotation-fonts.js` | ~118 | Normal vs Hand-written annotation typography — Arial / Arial Black vs Caveat / Caveat Brush; `setBold` / `setItalic` / `setMode`; `ensureLoaded()` for Google Fonts |
+| `citrana-annotation-fonts.js` | ~125 | Normal vs Hand-written annotation typography — Arial / Arial Black vs self-hosted Shantell Sans; `setBold` / `setItalic` / `setMode`; legacy Caveat detection; `ensureLoaded()` |
 | `citrana-history.js` | ~94 | Unified undo/redo timeline (`CitranaHistory`) |
 | `citrana-chart-coordinator.js` | ~320 | Unified API over South/North templates; zoom (`zoomIn`/`zoomOut` via `CitranaZoom`; `zoomToFit` routes by `currentChartType`); chart serialisation; pointer-to-bhava hit-test; chart-only export crop bounds |
 | `citrana-chart-templates-south.js` | ~989 | 4×4 grid chart, bhava numbering, Lagna indicator, centre label, indicator visibility, `zoomToFit()` with local bounds (compact viewport fixed **65%**); `skipZoomToFit` on undo restore; `selectPlanet()` / `clearSelectedPlanet()` via `CitranaSelection`; `CitranaRashis` / `CitranaDevice` |
@@ -159,7 +159,7 @@ flowchart TB
 | `citrana-items-menu.js` | ~861 | **Canvas Items** panel (`#items-menu-btn`, shortcut **I**); pinned header/description + `#items-modal-nav` Section Anchors; scrollable `#items-modal-body` only; mobile Section Anchor edge fades; Chart/**Canvas**/Bhava/Graha/Annotation sections; **Clear Selection**, **Context Menu**, **Graha Library** (On/Off, green/red row tint), **Reset Graha Library Position**; `.items-row-selected` sync; reuses `ContextMenu.handleAction()`; Text/Heading **Edit text** + **Style** |
 | `citrana-session.js` | ~225 | Save/open `.citrana.json` (`format: citrana-session`, `version: 1`); `capture()`, `validate()`, `download()`, `applyOptions()` (includes `zoomStep`) |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
-| `styles.css` | ~3046 | Light theme, floating UI, safe areas, iOS PWA layout, primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid (`.page-dots-chevron`, `#graha-library.graha-library-hidden`, `.graha-library-dragging`), JSColorPicker `--cp-*` theme, `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`, `#items-modal` pinned layout, `--items-scrollbar-gutter`), `.toolbar-scroll-*` (toolbar + Edit UI edge fades), `.help-modal-description`, `.help-intro`, `.help-subsection-title`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
+| `styles.css` | ~3080 | Light theme, floating UI, safe areas, iOS PWA layout, `@font-face` Shantell Sans (`assets/fonts/`), primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid (`.page-dots-chevron`, `#graha-library.graha-library-hidden`, `.graha-library-dragging`), JSColorPicker `--cp-*` theme, `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`, `#items-modal` pinned layout, `--items-scrollbar-gutter`), `.toolbar-scroll-*` (toolbar + Edit UI edge fades), `.help-modal-description`, `.help-intro`, `.help-subsection-title`, `.citrana-laser-canvas`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
 
 ## Canvas Object Naming
 
@@ -318,7 +318,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 4. **Pen:** live preview as uniform `Konva.Line` while drawing; on release, points are smoothed (moving average + Chaikin) and converted to a custom `Konva.Shape` with velocity-based width and end taper (`penTaper` attrs, default **4px** base width, full opacity); invisible `bounding-box-pen` pick rect created for Select-tool hit-testing; `isAnnotationTarget()` allows drawing on chart Bhavas
 5. Arrow, line, text, and heading auto-switch to Select after creation; Pen and Laser stay active. `makeShapeSelectable()` runs once in `stopDrawing()` (not per mousemove). Control points appear when arrow/line is selected; `raiseControlPointsAbovePickRects()` keeps handles above pick rects
 6. **Laser:** `CitranaLaser.startStroke()` / `extendStroke()` on a DOM `<canvas>` overlay (not Konva); each gesture is a separate stroke in `strokes[]`; `stopDrawing()` skips `recordHistory()`; `clearLaser()` on `clearAll()`
-7. **Text/heading style:** Edit UI exposes size, bold, italic, alignment, colour, **Normal** / **Hand-written** (`CitranaAnnotationFonts`); hand-written bold uses **Caveat Brush** family (not `fontWeight`)
+7. **Text/heading style:** Edit UI exposes size, bold, italic, alignment, colour, **Normal** / **Hand-written** (`CitranaAnnotationFonts`); hand-written uses **Shantell Sans** with `fontWeight` / `fontStyle`
 8. Mobile: drawing tools visible in toolbar; toolbar and Edit UI horizontal scroll with chevrons and edge fades when controls overflow; **Canvas Items** button in zoom bar for touch-friendly actions; pen drag uses `beginManualPenDrag()` after move threshold; `shouldPreserveTouchDrag()` gates touch `preventDefault`
 
 ### Select / move / edit pen stroke
@@ -350,7 +350,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 1. User action calls `window.app.recordHistory(label)` (or `CitranaHistory.record` via `app.history`)
 2. `captureHistoryState()` snapshots `{ chartData, drawingData }`:
    - `chartData` ← `ChartCoordinator.getChartData()` (Grahas, Lagna, centre label)
-   - `drawingData` ← `serializeDrawings()` (Konva `drawing-*` nodes; explicit `points`/`x`/`y` for lines; `arrowAnchors` + head metrics for unified arrows; `penTaper*` attrs for tapered pen shapes; text/heading `fontFamily` / `fontStyle` including Caveat Brush)
+   - `drawingData` ← `serializeDrawings()` (Konva `drawing-*` nodes; explicit `points`/`x`/`y` for lines; `arrowAnchors` + head metrics for unified arrows; `penTaper*` attrs for tapered pen shapes; text/heading `fontFamily` / `fontStyle` / `fontWeight` including Shantell Sans; legacy Caveat Brush still deserialises)
 3. State is deep-cloned into the timeline (`maxSteps: 50`, seeded with `Start` on init)
 4. **Toolbar** `#undo-btn` / `#redo-btn` or **Ctrl+Z** / **Ctrl+Y** (or **Cmd** on macOS) → `app.undo()` / `app.redo()` → `history.undo()` / `history.redo()` → `restoreHistoryState()`; saves/restores stage scale and position around chart reload; templates recreate with `skipZoomToFit: true`; `updateHistoryButtons()` syncs disabled state
 5. Restore reloads chart via `loadChartData()`, redraws via `restorePersistedDrawings()`, clears selection and Edit UI
@@ -537,7 +537,7 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | Presentation View | `app.togglePresentationView()`; `body.presentation-view` in `styles.css` (includes edit bars); `getPresentationViewMenuHtml()` in `citrana-context-menu.js`; Canvas Items panel chart actions |
 | Canvas Items panel action | `citrana-items-menu.js` (`render`, `renderSectionNav`, `scrollToSection`, `handleNavClick`, `handleBodyClick`); reuse `ContextMenu.handleAction()` where possible |
 | Graha / annotation Selection Pill | `citrana-selection.js` (`attach`, `sync`, `detach`); wired from template `selectPlanet()` / `clearSelectedPlanet()` and annotation `selectShape()`; pen uses `syncPenSelectionPill()` in `citrana-drawing-tools.js` |
-| Annotation fonts (Normal / Hand-written) | `citrana-annotation-fonts.js` (`setMode`, `setBold`, `setItalic`, `ensureLoaded`); Google Fonts in `index.html`; consumed by `citrana-edit-ui.js` |
+| Annotation fonts (Normal / Hand-written) | `citrana-annotation-fonts.js` (`setMode`, `setBold`, `setItalic`, `ensureLoaded`); `@font-face` Shantell Sans in `styles.css` (`assets/fonts/`); consumed by `citrana-edit-ui.js` |
 | Tapered pen strokes | `citrana-drawing-tools.js` (`finalizePenStroke`, `penTaper` attrs, `bounding-box-pen`, `bindPenPickRectInteraction`, `beginManualPenDrag`, `editPenAnnotation`); serialised in `app.serializeDrawings()`; width/colour in Edit UI via `syncPenTaperWidth` and `getEditTarget()` |
 | Arrow/line control point z-order | `raiseControlPointsAbovePickRects()` at end of `syncBoundingBoxListening()` and `raiseDrawingsAboveChart()` |
 | Touch drag gating | `DrawingTools.shouldPreserveTouchDrag()`; `isPenDragActive`; called from `app.handleTouchStart/Move` |

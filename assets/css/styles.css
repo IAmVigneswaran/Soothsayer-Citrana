@@ -5,6 +5,39 @@
  * Complete styling system for the Citrana application
  */
 
+/* Self-hosted hand-written annotation font (SIL OFL — assets/fonts/OFL.txt) */
+@font-face {
+  font-family: 'Shantell Sans';
+  src: url('../fonts/ShantellSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Shantell Sans';
+  src: url('../fonts/ShantellSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Shantell Sans';
+  src: url('../fonts/ShantellSans-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Shantell Sans';
+  src: url('../fonts/ShantellSans-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 /* Base Styles */
 * {
   margin: 0;
