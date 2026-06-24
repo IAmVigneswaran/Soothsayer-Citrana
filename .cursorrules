@@ -26,16 +26,16 @@ Classic tree view for Cursor rules context (see [AGENT.md](AGENT.md) for a markd
 
 ```
 Soothsayer-Citrana/
-├── index.html                    # Main entry (~599 lines); viewport-fit=cover; PWA meta; #welcome-modal-backdrop + Welcome modal (6-step quick start, loading bar); Help Guide (.help-intro, .help-subsection-title); Canvas Items modal; Options modal (Zoom Step); toolbar + Edit UI scroll wraps
+├── index.html                    # Main entry (~607 lines); viewport-fit=cover; PWA meta; #welcome-modal-backdrop + Welcome modal (6-step quick start, loading bar); Help Guide (`.help-intro`, `.help-subsection-title`); `#confirmation-modal` (confirm / alert / open / save-as modes; `#confirmation-filename-input`); Canvas Items modal; Options modal (Zoom Step); toolbar + Edit UI scroll wraps
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~3220 lines); `@font-face` Shantell Sans; primary @media (max-width: 768px) block + post-base mobile overrides; JSColorPicker --cp-* theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `.citrana-canvas-hints`; `.welcome-modal-backdrop`; `body.presentation-view`; `.toolbar-scroll-*`
+│   │   └── styles.css            # Complete styling system (~3270 lines); `@font-face` Shantell Sans; primary @media (max-width: 768px) block + post-base mobile overrides; JSColorPicker --cp-* theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `.confirmation-modal--*` / `.confirmation-filename-*`; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `.citrana-canvas-hints`; `.welcome-modal-backdrop`; `body.presentation-view`; `.toolbar-scroll-*`
 │   ├── fonts/                    # Self-hosted Shantell Sans (Regular, Bold, Italic, BoldItalic) + OFL.txt
 │   ├── js/                       # 21 modules — all citrana-* prefixed
 │   │   ├── citrana-annotation-fonts.js # Normal and hand-written annotation fonts (~159 lines)
-│   │   ├── citrana-app.js                # Main application coordinator (~2248 lines)
+│   │   ├── citrana-app.js                # Main application coordinator (~2515 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
 │   │   ├── citrana-canvas-hints.js # Blank-canvas onboarding hint overlay (~397 lines)
 │   │   ├── citrana-chart-coordinator.js  # Chart type management (~322 lines)
@@ -53,7 +53,7 @@ Soothsayer-Citrana/
 │   │   ├── citrana-planet-system.js # Graha library and drag-drop (~1000 lines)
 │   │   ├── citrana-rashis.js     # Shared Rashi names, Lucide zodiac icons, grid numbers (~49 lines)
 │   │   ├── citrana-selection.js # Selection Pill (~99 lines)
-│   │   ├── citrana-session.js    # Save/open .citrana.json session files (~225 lines)
+│   │   ├── citrana-session.js    # Save/open .citrana.json session files (~270 lines)
 │   │   └── citrana-zoom.js       # Zoom step presets (~58 lines)
 │   ├── vendor/
 │   │   ├── konva.min.js          # Konva 9.3.20 (self-hosted; loaded in <head>)
@@ -82,11 +82,11 @@ Soothsayer-Citrana/
 │   └── workflows/
 │       ├── static.yml            # GitHub Pages deploy with minification (push to main)
 │       └── codeql.yml            # CodeQL security analysis
-├── AGENT.md                      # Comprehensive documentation (~1330 lines)
-├── ARCHITECTURE.md               # System architecture and data flows (~585 lines)
-├── .cursorrules                  # This Cursor IDE configuration (~1320 lines)
-├── CHANGELOG.md                  # Version history (~107 lines)
-├── README.md                     # Project readme (~245 lines)
+├── AGENT.md                      # Comprehensive documentation (~1355 lines)
+├── ARCHITECTURE.md               # System architecture and data flows (~600 lines)
+├── .cursorrules                  # This Cursor IDE configuration (~1340 lines)
+├── CHANGELOG.md                  # Version history (~109 lines)
+├── README.md                     # Project readme (~249 lines)
 ├── LICENSE                       # MIT License
 ├── SECURITY.md                   # Security policy
 └── .gitignore                    # Git ignore rules
@@ -195,6 +195,7 @@ The application uses a floating UI system with absolute positioning for all inte
 - Responsive sizing for different screen sizes
 - Smooth animations for show/hide states
 - `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`; `aria-hidden` toggled by `openModal()` / `closeModal()`
+- **Confirmation** (`#confirmation-modal`): confirm, alert, open, and save-as modes; `#confirmation-filename-input` for Save As
 - Help intro: `#help-modal-description` uses `.help-modal-description` (margin before first section; not `.help-instructions` wrapper)
 - Mobile About/Welcome: compact typography; `overflow: hidden` (no scroll); mobile `@media` blocks **after** base modal CSS
 - **Escape** dismisses open modals via `dismissActiveModalOnEscape()` (operation progress excepted)
@@ -260,7 +261,7 @@ The application uses a mobile-first approach with three main breakpoints:
 
 For system design, module boundaries, data flows, and extension points, see ARCHITECTURE.md.
 
-### Main Application (assets/js/citrana-app.js - ~2248 lines)
+### Main Application (assets/js/citrana-app.js - ~2515 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -271,7 +272,7 @@ Key Responsibilities:
 - Manages unified undo/redo via `CitranaHistory` (`citrana-history.js`)
 - Handles chart export (full viewport or chart-only crop via Options)
 - Manages chart display options modal and `localStorage` preferences (indicators, Save Chart Only, **Zoom Step**)
-- **Save/Open Session** via `CitranaSession` (`.citrana.json` files); shared progress dialog for save and open
+- **Save/Open Session** via `CitranaSession` (`.citrana.json` files only); **Save As** dialog before save; **Open Session** intro dialog before file picker; shared progress dialog; in-app alerts for session errors
 - Initialises **Canvas Items** panel (`CitranaItemsMenu`) and toolbar horizontal scroll
 - Initialises **Canvas onboarding hints** (`CitranaCanvasHints`); `notifyCanvasContentCreated()`, `refreshCanvasHints()`
 - Provides mobile touch support and Safari compatibility
@@ -297,7 +298,7 @@ Key Methods:
 - `updateZoomLevel()`: Updates `#zoom-level` from `stage.scaleX()`
 - `handleResize()`: Stage size from `visualViewport` or container; `CitranaLaser.resize()` syncs laser overlay
 - `handleWheel()`: Desktop wheel zoom about pointer when unlocked; early return when locked (no `preventDefault`)
-- `exportChart()` / `finalizeExportImage()`: PNG export (`pixelRatio: 2`); full stage or chart-only crop when `options.saveChartOnly`; `isExporting` guard; shared `#export-progress-modal`
+- `exportChart()` / `runExportChart(fileName)` / `finalizeExportImage()`: **Save As** dialog first, then PNG export (`pixelRatio: 2`); full stage or chart-only crop when `options.saveChartOnly`; `isExporting` guard; shared `#export-progress-modal`
 - `setNorthHideIndicators(hide)` / `setSouthHideIndicators(hide)`: Persist indicator toggles; apply to active chart template
 - `setSaveChartOnly(enabled)` / `applySaveChartOnlyTransparency()` / `updateTransparencyToggleUI()`: Chart-only export; when enabled forces transparent export and locks `#toggle-transparency-btn`; when disabled restores `exportWithWhiteBg = true` and re-enables the toggle
 - `recordHistory()` / `captureHistoryState()` / `restoreHistoryState()`: Undo timeline integration; `restoreHistoryState()` saves/restores stage scale and position (chart reload via `loadChartData()` calls `clearChart()`, which resets the viewport — restored after reload); templates use `skipZoomToFit: true` on history restore
@@ -309,10 +310,11 @@ Key Methods:
 - `isAnnotationTarget()`: Pen tool — blocks starting a stroke only on existing annotations, not on chart Bhavas
 - `clearCanvasSelection()` / `getCanvasSelection()` / `notifyCanvasSelectionChanged()`: Unified selection for Canvas Items panel row highlight
 - `setupSafariToolbarFix()`: Touch Safari UI visibility restore on focus/viewport events (`visualViewport` resize/scroll)
-- `showConfirmationDialog()`
+- `showConfirmationDialog()` / `showAlertDialog()` / `showOpenSessionDialog()` / `showSaveAsDialog()` / `_setConfirmationModalLayout()`: Reuse `#confirmation-modal` for confirm, alert, open, and save-as modes (`confirmation-modal--confirm|alert|open|save-as`); `#confirmation-filename-input` for Save As; `getModalInitialFocusElement()` focuses filename field in save-as mode
+- `buildChartExportFileName()`: Default `citrana-chart-{timestamp}.png` for export Save As
 - `showProgressModal()` / `updateProgressModal()` / `hideProgressModal()` / `completeProgressModal()` / `failProgressModal()`: Shared operation progress dialog (`#export-progress-modal`); dynamic title; focus trap and `aria-busy`; not dismissible via Escape
 - `showExportProgress()` / `updateExportProgress()` / `hideExportProgress()`: Export wrappers for the shared progress dialog
-- `saveSession()` / `openSessionFromFile()` / `applyImportedSession()` / `restoreSessionState()`: `.citrana.json` via `CitranaSession`; save/open use progress modal; confirm before replace; `isSessionBusy` blocks concurrent save/open/export; `history.resetToState()` on import
+- `saveSession()` / `runSaveSession(fileName)` / `openSessionFromFile()` / `applyImportedSession()` / `restoreSessionState()`: `.citrana.json` via `CitranaSession`; Save As before save; open intro before file picker; progress modal during capture/restore; confirm before replace; `isSessionBusy` blocks concurrent save/open/export; `history.resetToState()` on import
 - `hasSessionContent()`: Whether chart or drawings exist before session replace prompt
 
 Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `K` Laser Pointer (when available), `T` Text, `H` Hand, `1`–`5` Graha Library pages, `I` Canvas Items (toggle open/close), `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` remove selected Graha or delete selected drawing (Select tool), `?`/`/` Help, **Escape** close modal. No Heading shortcut. Ignored when a modal is open (except **Escape**/**Tab** for modal UX, and **I** to close Canvas Items when it is open) or Graha/text inline editor is focused.
@@ -712,19 +714,20 @@ Key Methods:
 - `isRowSelected()`, `renderUtilitySection()`, `getBhavaRowLabel()`
 - `getDrawingShapes()`, `getAnnotationDisplayName()`, `getAnnotationIcon()`
 
-### Citrana Session (assets/js/citrana-session.js - ~214 lines)
+### Citrana Session (assets/js/citrana-session.js - ~270 lines)
 Save and open `.citrana.json` session files.
 
 Key Responsibilities:
 - `capture(app)` — chart data, drawings, and Options preferences (`format: citrana-session`, `version: 1`)
-- `validate()` / `readFile()` — parse and validate imported JSON
-- `download()` — timestamped filename `citrana-session-YYYY-MM-DD-HHMMSS.citrana.json`
+- `validate()` / `readFile()` — parse and validate imported JSON; `isValidFileName()` requires `.citrana.json` extension
+- `normalizeDownloadFileName()` — sanitise Save As names and enforce extension
+- `download(session, fileName?)` — optional user-chosen name; default `buildExportFileName()` (`citrana-session-YYYY-MM-DD-HHMMSS.citrana.json`)
 - `applyOptions()` — restore indicator and Save Chart Only preferences on import
 
 Key Methods:
-- `capture()`, `validate()`, `readFile()`, `download()`, `applyOptions()`, `buildExportFileName()`
+- `capture()`, `validate()`, `readFile()`, `download()`, `applyOptions()`, `buildExportFileName()`, `formatTimestamp()`, `normalizeDownloadFileName()`, `isValidFileName()`
 
-Wired from `app.saveSession()` / `app.openSessionFromFile()` / `app.applyImportedSession()` / `app.restoreSessionState()`; save/open show shared progress modal; import resets undo timeline via `history.resetToState()`.
+Wired from `app.saveSession()` → `showSaveAsDialog()` → `runSaveSession(fileName)` and `app.openSessionFromFile()` (after `showOpenSessionDialog()` + file picker); save/open show shared progress modal; import resets undo timeline via `history.resetToState()`.
 
 ### Citrana Arrow (assets/js/citrana-arrow.js - ~185 lines)
 Unified filled-arrow geometry for correct semi-transparent rendering.
@@ -870,7 +873,7 @@ Technical Implementation:
 - About Modal: Information about Citrana with creator details and links
 - Welcome Modal: First visit only; `#welcome-modal-backdrop` + dialog; peripheral canvas hints visible behind dialog; **Creating Your First Chart** (6 steps — chart type, Lagna, Grahas, library pages **1**–**5**, Annotations, Save Session / PNG); mobile **Canvas Items** via layers icon (not **I**); loading bar stages in title case ending with **Ready!** at 100%; `closeWelcomeModal()` + `localStorage`; backdrop click or close button; early close stops timer; mobile compact, no scroll
 - Options Modal: **Zoom Step**, chart indicator toggles, and **Save Chart Only** export; shared modal width with Help
-- Confirmation Modal: Destructive-action confirm; dynamic message + warning in `aria-describedby`
+- Confirmation Modal (`#confirmation-modal`): Reused for destructive confirm (`confirmation-modal--confirm`), single-action notices (`--alert`), **Open Session** intro (`--open`), and **Save As** (`--save-as` with `#confirmation-filename-input`); dynamic message + optional warning in `aria-describedby`
 - Export Progress Modal: Shared `#export-progress-modal` for export PNG, save session, and open session; non-dismissible; dynamic title; live status in `aria-describedby`; `aria-busy` while operation runs
 - Modal accessibility: Escape dismiss, Tab focus trap, focus restore on close (see Main Application)
 - Zoom Controls: `#zoom-in`, `#zoom-out`, `#reset-zoom`, `#zoom-lock` (default locked), `#zoom-level`, **`#items-menu-btn`**
@@ -878,10 +881,10 @@ Technical Implementation:
 - Toolbar scroll: `#toolbar-scroll-viewport` with chevrons when tools overflow on narrow screens
 
 ### Export & Sharing
-- **Full viewport export** (default): entire stage capture; 100px padding and watermark; respects zoom/pan and transparency toggle; progress dialog **Exporting Chart**
+- **Full viewport export** (default): entire stage capture; 100px padding and watermark; respects zoom/pan and transparency toggle; **Save As** dialog then progress dialog **Exporting Chart**
 - **Save Chart Only**: chart-area crop via `getExportCropRect()` after temporary `zoomToFit()`; transparent, no padding or watermark; restores zoom/pan after capture
-- **Save Session**: `.citrana.json` file with chart, Grahas, Annotations, and Options (including Zoom Step); progress dialog during save; save to cloud storage to resume on another device
-- **Open Session**: Restore from `.citrana.json`; confirmation when replacing existing work; progress dialog during import
+- **Save Session**: **Save As** dialog (default `citrana-session-{timestamp}.citrana.json`), then `.citrana.json` download with chart, Grahas, Annotations, and Options (including Zoom Step); progress dialog during save; save to cloud storage to resume on another device
+- **Open Session**: **Open Session** intro dialog → file picker (`.citrana.json` only) → confirmation when replacing existing work → progress dialog during import; invalid files show in-app notice
 - High-Resolution PNG: `pixelRatio: 2` for both export modes
 - Cross-Platform: Works on all modern browsers
 - GitHub Pages Compatible: No build process required

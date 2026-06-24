@@ -143,7 +143,7 @@ flowchart TB
 
 | Module | Lines | Primary role |
 |--------|-------|----------------|
-| `citrana-app.js` | ~2248 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser; **I** Canvas Items toggle; centralised **Delete**; **Escape** modal dismiss; **Tab** focus trap), zoom lock, **Zoom Step** preference (`setZoomStep()`), export (full viewport or chart-only crop), shared progress modal (`showProgressModal`; `isExporting` / `isSessionBusy` guards), modals, chart display preferences, history, **Presentation View**, **Save/Open Session**, **Welcome modal** (`showWelcomeModal`, `clearWelcomeLoadingInterval`, `#welcome-modal-backdrop` z-index split), **Canvas onboarding hints** (`CitranaCanvasHints.init`, `notifyCanvasContentCreated`, `refreshCanvasHints`), **Canvas Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `applySaveChartOnlyTransparency()` restores white background when Save Chart Only off; touch `preventDefault` gated via `drawingTools.shouldPreserveTouchDrag()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open |
+| `citrana-app.js` | ~2515 | Application lifecycle, Konva stage, tool routing, keyboard shortcuts (**K** laser; **I** Canvas Items toggle; centralised **Delete**; **Escape** modal dismiss; **Tab** focus trap), zoom lock, **Zoom Step** preference (`setZoomStep()`), export (full viewport or chart-only crop) via `exportChart()` → `showSaveAsDialog()` → `runExportChart(fileName)`, shared progress modal (`showProgressModal`; `isExporting` / `isSessionBusy` guards), modals (`showConfirmationDialog`, `showAlertDialog`, `showOpenSessionDialog`, `showSaveAsDialog`, `_setConfirmationModalLayout`), chart display preferences, history, **Presentation View**, **Save/Open Session** (`saveSession()` → `runSaveSession(fileName)`), **Welcome modal** (`showWelcomeModal`, `clearWelcomeLoadingInterval`, `#welcome-modal-backdrop` z-index split), **Canvas onboarding hints** (`CitranaCanvasHints.init`, `notifyCanvasContentCreated`, `refreshCanvasHints`), **Canvas Items** panel init, toolbar scroll; `clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()`; `applySaveChartOnlyTransparency()` restores white background when Save Chart Only off; touch `preventDefault` gated via `drawingTools.shouldPreserveTouchDrag()`; `isModalBlockingShortcuts()` blocks shortcuts when modals open |
 | `citrana-canvas-hints.js` | ~397 | Blank-canvas onboarding overlay (`CitranaCanvasHints`) — PNG hints (2084×501 artboard) with `arrowTip` anchor to live UI rects; centred start stack (logo + message); UI hints (library, toolbar, zoom, help) at 50% opacity with staggered fade-in; dismiss on first chart/Graha/annotation (not laser); session-only until reload; hidden in Presentation View; welcome layering via `#welcome-modal-backdrop` (8999) / hints (9000) / `#welcome-modal` (9100) |
 | `citrana-zoom.js` | ~58 | Zoom step presets — `CitranaZoom.computeNextScale()`, `resolveZoomStep()`, `VALID_STEPS` (`fine` 1%, `small` ~10%, `medium` ~20%, `large` ~25%); used by app wheel zoom, coordinator zoom buttons, and session import/export |
 | `citrana-annotation-fonts.js` | ~159 | Normal vs Hand-written annotation typography — Arial / Arial Black vs self-hosted Shantell Sans; `setBold` / `setItalic` / `setMode`; legacy Caveat detection; `ensureLoaded()` |
@@ -162,9 +162,9 @@ flowchart TB
 | `citrana-edit-ui.js` | ~1030 | Floating property editor; colour chips via `CitranaColorPicker.createInput()` (session-based undo on close); `getEditTarget()` for stable pen node; Normal / Hand-written font toggles via `CitranaAnnotationFonts`; mobile chevron scroll (`setupEditUIScroll`, `#edit-ui-scroll-*`); touch-outside dismiss excludes picker popup and `.konva-textarea` |
 | `citrana-context-menu.js` | ~742 | Right-click / long-press menus; `resolveDefaultCanvasContextMenuEnabled()` (off on touch-primary until set); `shouldBlockCanvasContextMenu()`; **Presentation View**; North **Set Lagna as …** flyout; `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()`; Items row helpers `getContextMenuItemsTitle()` / `getContextMenuItemsMeta()` |
 | `citrana-items-menu.js` | ~861 | **Canvas Items** panel (`#items-menu-btn`, shortcut **I**); pinned header/description + `#items-modal-nav` Section Anchors; scrollable `#items-modal-body` only; mobile Section Anchor edge fades; Chart/**Canvas**/Bhava/Graha/Annotation sections; **Clear Selection**, **Context Menu**, **Graha Library** (On/Off, green/red row tint), **Reset Graha Library Position**; `.items-row-selected` sync; reuses `ContextMenu.handleAction()`; Text/Heading **Edit text** + **Style** |
-| `citrana-session.js` | ~225 | Save/open `.citrana.json` (`format: citrana-session`, `version: 1`); `capture()`, `validate()`, `download()`, `applyOptions()` (includes `zoomStep`) |
+| `citrana-session.js` | ~270 | Save/open `.citrana.json` (`format: citrana-session`, `version: 1`); `capture()`, `validate()`, `readFile()` (`.citrana.json` extension only), `normalizeDownloadFileName()`, `download(session, fileName?)`, `applyOptions()` (includes `zoomStep`) |
 | `citrana-debug.js` | ~13 | Opt-out contributor trace logging (`citranaDebug()` used across app, templates, coordinator, menus, drawing tools, Graha system) |
-| `styles.css` | ~3220 | Light theme, floating UI, safe areas, iOS PWA layout, `@font-face` Shantell Sans (`assets/fonts/`), primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid (`.page-dots-chevron`, `#graha-library.graha-library-hidden`, `.graha-library-dragging`), JSColorPicker `--cp-*` theme, `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`, `#items-modal` pinned layout, `--items-scrollbar-gutter`), `.toolbar-scroll-*` (toolbar + Edit UI edge fades), `.help-modal-description`, `.help-intro`, `.help-subsection-title`, `.citrana-laser-canvas`, `.citrana-canvas-hints` / `.citrana-canvas-hint--*` (onboarding overlay, fade-in keyframes), `.welcome-modal-backdrop`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`, `.citrana-canvas-hints`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
+| `styles.css` | ~3270 | Light theme, floating UI, safe areas, iOS PWA layout, `@font-face` Shantell Sans (`assets/fonts/`), primary `@media (max-width: 768px)` block plus post-base mobile overrides (Help/About, modals), Graha library grid (`.page-dots-chevron`, `#graha-library.graha-library-hidden`, `.graha-library-dragging`), JSColorPicker `--cp-*` theme, `.confirmation-modal--*` / `.confirmation-filename-*`, `.items-*` panel (`.items-section-nav-wrap`, `.items-section-nav-scroll-wrap`, `.items-section-chip`, `.items-row-context-menu-on/off`, `#items-modal` pinned layout, `--items-scrollbar-gutter`), `.toolbar-scroll-*` (toolbar + Edit UI edge fades), `.help-modal-description`, `.help-intro`, `.help-subsection-title`, `.citrana-laser-canvas`, `.citrana-canvas-hints` / `.citrana-canvas-hint--*` (onboarding overlay, fade-in keyframes), `.welcome-modal-backdrop`, `body.presentation-view` (includes `.floating-text-edit-controls`, `.floating-edit-ui`, `.citrana-canvas-hints`), Help/About `--corner-btn-size` (48px desktop; 50px mobile) |
 
 ## Canvas Object Naming
 
@@ -392,8 +392,8 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 
 **Full viewport** (default, or Save Chart Only with no chart loaded):
 
-1. `app.exportChart()` → `isExporting` guard → shared progress modal (`Exporting Chart`) → optional full-stage white background rect → `stage.toDataURL({ pixelRatio: 2 })`
-2. `finalizeExportImage()` adds 100px padding + watermark → download as `citrana-chart-{timestamp}.png`
+1. `app.exportChart()` → `showSaveAsDialog()` (default `citrana-chart-{timestamp}.png`) → `runExportChart(fileName)` → `isExporting` guard → shared progress modal (`Exporting Chart`) → optional full-stage white background rect → `stage.toDataURL({ pixelRatio: 2 })`
+2. `finalizeExportImage({ fileName })` adds 100px padding + watermark → download with chosen name
 3. Follows current zoom/pan and `#toggle-transparency-btn`; `completeProgressModal()` / `failProgressModal()` on success/error
 
 **Save Chart Only** (`options.saveChartOnly` and `hasActiveChart()`):
@@ -402,7 +402,7 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 2. `chartTemplates.zoomToFit()` then `getExportCropRect()` (chart group bounds; North unions visible `tinyBoxGroupNorth`)
 3. `stage.toDataURL({ x, y, width, height, pixelRatio: 2 })` — Grahas and layer annotations inside the crop are included; anything outside is clipped
 4. Restore zoom/pan and control points
-5. `finalizeExportImage({ chartOnly: true })` — transparent background, no padding, no watermark
+5. `finalizeExportImage({ chartOnly: true, fileName })` — transparent background, no padding, no watermark
 
 ### Session model
 
@@ -413,9 +413,9 @@ Rendering uses `label` and `color` for `Konva.Text`, and `retrograde` drives `te
 4. `getChartData()` / `loadChartData()` support undo snapshots within the same visit
 
 **Save / Open Session (`.citrana.json`):**
-1. User clicks **Save Session** → `app.saveSession()` → shared progress modal (`Saving Session`) → `CitranaSession.capture(app)` → `download()` with timestamped filename
+1. User clicks **Save Session** → `app.saveSession()` → `showSaveAsDialog()` (default `citrana-session-{timestamp}.citrana.json`) → `runSaveSession(fileName)` → shared progress modal (`Saving Session`) → `CitranaSession.capture(app)` → `download(session, fileName)`
 2. Payload: `{ format: 'citrana-session', version: 1, chartData, drawingData, options }` where `options` mirrors indicator toggles, Save Chart Only preference, and **Zoom Step**
-3. **Open Session** → file picker → `CitranaSession.readFile()` → `validate()` → confirm if canvas has content → `app.applyImportedSession()` → progress modal (`Opening Session`) → `app.restoreSessionState()`
+3. **Open Session** → `showOpenSessionDialog()` → hidden file input → `CitranaSession.readFile()` (rejects non-`.citrana.json` names) → `validate()` → confirm if canvas has content → `app.applyImportedSession()` → progress modal (`Opening Session`) → `app.restoreSessionState()`; read errors → `showAlertDialog()`
 4. Import applies chart + drawings + options; `history.resetToState()` seeds a fresh undo timeline; users can save to any cloud storage and resume on another device
 5. `isSessionBusy` and `isExporting` are mutually exclusive — concurrent save/open/export is blocked
 6. **Export PNG** remains the raster copy path; session files are the structured save path
@@ -479,14 +479,14 @@ Markup: `#graha-library` > `.planet-library-header` + `#planet-library.planet-gr
 - Bottom centre: Graha text edit bar, drawing Edit UI (dynamic; `#edit-ui-scroll-prev` / `#edit-ui-scroll-viewport` / `#edit-ui-scroll-next` on mobile ≤768px)
 - Full viewport: **Canvas onboarding hints** (`.citrana-canvas-hints`) — fixed DOM overlay, `pointer-events: none`; PNG callouts anchored to Graha library, toolbar, zoom bar, and Help; centred start message with logo; hidden after first chart/Graha/annotation or in Presentation View; see `citrana-canvas-hints.js`
 
-Modals: Welcome, Help, **Options**, About, **Canvas Items**, Confirmation, **Operation Progress** (`#export-progress-modal` — export PNG, save session, open session).
+Modals: Welcome, Help, **Options**, About, **Canvas Items**, **Confirmation** (`#confirmation-modal` — confirm / alert / open / save-as modes; `#confirmation-filename-input` for Save As), **Operation Progress** (`#export-progress-modal` — export PNG, save session, open session).
 
 **Modal accessibility (`index.html` + `citrana-app.js`):**
 - Overlays: `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`; `aria-hidden` toggled on open/close
 - Canvas: `#canvas-container` has `role="application"` and descriptive `aria-label`
 - **Escape** → `dismissActiveModalOnEscape()` (operation progress not dismissible)
 - **Tab** → `trapModalFocus()` cycles focus within the active modal
-- `openModal()` / `showProgressModal()` push prior focus onto `_modalFocusStack` and focus close button (or modal root if no focusables)
+- `openModal()` / `showProgressModal()` push prior focus onto `_modalFocusStack`; `getModalInitialFocusElement()` focuses `#confirmation-filename-input` in save-as mode, else close button (or modal root if no focusables)
 - `closeModal()` / `hideProgressModal()` pop stack and restore focus
 - Operation progress: dynamic title (`Exporting Chart`, `Saving Session`, `Opening Session`); `aria-busy="true"` while running; status text id referenced by `aria-describedby`; `completeProgressModal()` / `failProgressModal()` for success/error
 - Help **Guide** (`#help-modal`): `.help-intro` workspace overview; `.help-subsection-title` sections (Charts, Options, Graha Library, Grahas on the Chart, Annotations, Canvas Items, Presentation View, Zoom and Pan, Undo and Redo, Sessions and Export, Privacy Note); portable `.citrana.json` session guidance; `#help-modal-description` with `.help-modal-description` (spacing before **Keyboard Shortcuts**)
@@ -559,7 +559,7 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | Edit UI mobile scroll | `citrana-edit-ui.js` `setupEditUIScroll()`; `.floating-edit-ui .toolbar-scroll-*` in `styles.css` |
 | Canvas selection API | `app.clearCanvasSelection()`, `getCanvasSelection()`, `notifyCanvasSelectionChanged()` |
 | Context menu enable/disable | `citrana-context-menu.js` `resolveDefaultCanvasContextMenuEnabled()`, `isCanvasContextMenuEnabled()` / `toggleCanvasContextMenu()`; `localStorage.citrana_context_menu_enabled` |
-| Save/open session | `citrana-session.js` (`capture`, `validate`, `download`); `app.saveSession()` / `openSessionFromFile()` / `applyImportedSession()` / `restoreSessionState()`; shared progress modal; `isSessionBusy` blocks concurrent operations |
+| Save/open session | `citrana-session.js` (`capture`, `validate`, `normalizeDownloadFileName`, `download(session, fileName?)`); `app.showSaveAsDialog()` / `runSaveSession()` / `showOpenSessionDialog()` / `openSessionFromFile()` / `applyImportedSession()` / `restoreSessionState()`; `showAlertDialog()` for read errors; shared progress modal; `isSessionBusy` blocks concurrent operations |
 | Context menu gating | `citrana-context-menu.js` `shouldBlockCanvasContextMenu()` — Select/Hand only, not while `app.isDrawing` |
 | Arrow geometry / transparency | `citrana-arrow.js` (`buildOutlinePoints`, `create`); colour via `CitranaColorPicker.applyToKonvaArrow()` |
 | Colour picker theme / swatches | `citrana-colorpicker.js` (`SWATCHES`, `BASE_OPTIONS`); `--cp-*` in `styles.css` |
@@ -575,7 +575,8 @@ Active tool, bhava selection highlight, Graha library page, modal/UI state, char
 | Canvas onboarding hints | `citrana-canvas-hints.js` (`HINTS` array, `arrowTip` / `attachEdge` tuning); PNG assets in `assets/images/hint-*.png`; styles `.citrana-canvas-hints` in `styles.css`; dismiss via `app.notifyCanvasContentCreated()` from chart create, Graha drop, and drawing tools |
 | Welcome modal content | `#welcome-modal` + `#welcome-modal-backdrop` in `index.html` (`.welcome-steps`, `.welcome-loading-*`); `showWelcomeModal()` / `clearWelcomeLoadingInterval()` / `openModal()` backdrop toggle in `citrana-app.js`; keep six-step quick start aligned with README; mobile Canvas Items via layers icon only |
 | Theme / layout / safe areas | `assets/css/styles.css` — keep post-base mobile `@media` blocks after component base rules when overrides must win |
-| Export behaviour | `app.exportChart()` / `finalizeExportImage()`; crop bounds in `ChartCoordinator.getExportCropRect()`; `isExporting` guard; progress via `showProgressModal()` |
+| Export behaviour | `app.exportChart()` → `showSaveAsDialog()` → `runExportChart(fileName)` / `finalizeExportImage({ fileName })`; crop bounds in `ChartCoordinator.getExportCropRect()`; `isExporting` guard; progress via `showProgressModal()` |
+| Confirmation / Save As modals | `#confirmation-modal` modes in `citrana-app.js` (`showConfirmationDialog`, `showAlertDialog`, `showOpenSessionDialog`, `showSaveAsDialog`); styles `.confirmation-modal--*` / `.confirmation-filename-*` in `styles.css` |
 | Chart indicator toggles | `app.setNorthHideIndicators()` / `setSouthHideIndicators()`, template `apply*IndicatorsPreference()`, Options UI in `index.html` |
 | Save Chart Only export | `app.setSaveChartOnly()`, `applySaveChartOnlyTransparency()`, `#save-chart-only-toggle` in `index.html` |
 | Modal accessibility | `index.html` dialog `aria-*`; `app.openModal()` / `closeModal()`, `trapModalFocus()`, `dismissActiveModalOnEscape()`, shared progress focus in `showProgressModal()` / `hideProgressModal()` |
