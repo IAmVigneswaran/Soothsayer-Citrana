@@ -87,6 +87,8 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 **Presentation View:** `body.presentation-view` hides `.floating-top-toolbar`, `.floating-zoom-controls`, `.floating-planet-library`, `.help-btn`, `.about-btn`, `.floating-text-edit-controls`, and `.floating-edit-ui` via CSS. Toggled from context menu or **Canvas Items** panel (`app.togglePresentationView()`); dismisses active edit sessions on enter.
 
+**Welcome modal chrome:** `body.welcome-modal-open` (toggled in `openModal()` / `closeModal()` for welcome) lowers toolbar, zoom bar, Help, About, Graha library, and edit bars to `z-index: 800` so they sit behind `#welcome-modal-backdrop` (8999). Needed because Safari `@supports (-webkit-touch-callout: none)` forces toolbar/zoom to 9999–10000 `!important` on mobile.
+
 **Graha library layout:**
 - Header, grid, and page-dots styled in CSS (`.planet-library-header`, `.planet-grid`, `.page-dots`, `.page-dots-track`, `.page-dots-chevron`) — no inline styles in `index.html`
 - No grid scrolling (`overflow: visible`; no `max-height` on `.planet-grid`)
@@ -107,7 +109,7 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 **Help modal (`#help-modal`):** `.help-intro` workspace overview; `.help-subsection-title` sections aligned with README Usage Guide (Charts, Options, Graha Library, Grahas on the Chart, Annotations, Canvas Items, Presentation View, Zoom and Pan, Undo and Redo, Sessions and Export, Privacy Note); portable `.citrana.json` session guidance
 
-**Welcome modal (`#welcome-modal` + `#welcome-modal-backdrop`):** `.welcome-steps` six-point quick start; `.welcome-loading-bar` / `.welcome-loading-fill` / `.welcome-loading-text`; split backdrop/dialog z-index so canvas hints show alongside welcome on first visit; compact mobile layout (`overflow: hidden`); styles in `styles.css` (`.welcome-modal-*`, `.welcome-modal-backdrop`)
+**Welcome modal (`#welcome-modal` + `#welcome-modal-backdrop`):** `.welcome-steps` six-point quick start; `.welcome-loading-bar` / `.welcome-loading-fill` / `.welcome-loading-text`; split backdrop (8999) / hints (9000) / dialog (9100) z-index; `body.welcome-modal-open` keeps app chrome behind grey backdrop on mobile Safari; compact mobile layout (`overflow: hidden`); styles in `styles.css` (`.welcome-modal-*`, `.welcome-modal-backdrop`, `body.welcome-modal-open`)
 
 **Canvas onboarding hints (`.citrana-canvas-hints`):** fixed full-viewport DOM overlay (`pointer-events: none`); PNG hints at 50% opacity with staggered fade-in; centred start stack (full-opacity logo + message); hidden in Presentation View and after first chart/Graha/annotation; `prefers-reduced-motion` skips animation
 
@@ -126,10 +128,10 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 | `index.html` | ~607 | Main entry; viewport-fit=cover; PWA meta; self-hosted Shantell Sans via `styles.css`; modal a11y; `#welcome-modal-backdrop` + Welcome modal (6-step quick start, simulated loading bar); Help **Guide** (`.help-intro`, `.help-subsection-title`); `#confirmation-modal` (confirm / alert / open / save-as; `#confirmation-filename-input`); Canvas Items modal; Options modal (Zoom Step); script tags at bottom in **dependency order** (see below) |
 | `robots.txt` | — | Search engine rules |
 | `sitemap.xml` | — | Sitemap |
-| `assets/css/styles.css` | ~3270 | Complete styling; `@font-face` Shantell Sans (`assets/fonts/`); primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `.confirmation-modal--*` / `.confirmation-filename-*`; `#items-modal` pinned layout; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `.citrana-canvas-hints` / `.citrana-canvas-hint--*`; `.welcome-modal-backdrop`; `body.presentation-view`; `.toolbar-scroll-*` |
+| `assets/css/styles.css` | ~3280 | Complete styling; `@font-face` Shantell Sans (`assets/fonts/`); primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `.confirmation-modal--*` / `.confirmation-filename-*`; `#items-modal` pinned layout; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `.citrana-canvas-hints` / `.citrana-canvas-hint--*`; `.welcome-modal-backdrop`; `body.welcome-modal-open`; `body.presentation-view`; `.toolbar-scroll-*` |
 | `assets/fonts/` | 5 files | Self-hosted Shantell Sans (Regular, Bold, Italic, BoldItalic) + `OFL.txt` |
 | `assets/js/citrana-annotation-fonts.js` | ~159 | Normal and hand-written annotation fonts (Shantell Sans) |
-| `assets/js/citrana-app.js` | ~2515 | Main application coordinator |
+| `assets/js/citrana-app.js` | ~2517 | Main application coordinator |
 | `assets/js/citrana-arrow.js` | ~185 | Unified filled-arrow geometry |
 | `assets/js/citrana-canvas-hints.js` | ~397 | Blank-canvas onboarding hint overlay |
 | `assets/js/citrana-chart-coordinator.js` | ~322 | Chart type management |
@@ -208,7 +210,7 @@ See also [ARCHITECTURE.md](ARCHITECTURE.md) — Runtime Composition table.
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (citrana-app.js - ~2515 lines)
+### Main Application (citrana-app.js - ~2517 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -231,7 +233,7 @@ Key Methods:
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
 - `setupToolbarScroll()`: Horizontal toolbar overflow with `#toolbar-scroll-wrap`, chevrons, and mobile edge fades (`toolbar-scroll-fade-start` / `toolbar-scroll-fade-end`)
 - `setupKeyboardShortcuts()`: Tool/action shortcuts; **I** toggles **Canvas Items** panel (open/close); **Escape** → `dismissActiveModalOnEscape()`; **Tab** → `trapModalFocus()` when a modal is open; otherwise blocked while inline Graha/text editors are focused or `isModalBlockingShortcuts()` (Help, Options, About, Welcome, Confirmation, Canvas Items, operation progress)
-- `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop `_modalFocusStack`; focus close button on open; toggles `#welcome-modal-backdrop` when welcome opens/closes
+- `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop `_modalFocusStack`; focus close button on open; toggles `#welcome-modal-backdrop` and `body.welcome-modal-open` when welcome opens/closes
 - `closeWelcomeModal()`: Welcome close + `localStorage.citrana_welcome_seen`; refreshes canvas hints
 - `notifyCanvasContentCreated()` / `refreshCanvasHints()`: Dismiss or reposition onboarding hints
 - `getActiveModal()` / `dismissActiveModalOnEscape()`: Topmost modal; Escape dismiss (operation progress not dismissible)
@@ -274,7 +276,7 @@ Key Responsibilities:
 - Anchors UI hints to live elements via `arrowTip`, `attachEdge`, `attachX`/`attachY`, and `getTargetRect()`
 - Centred **start** stack: full-opacity Soothsayer Citrana logo + semi-transparent start message PNG
 - Hides anchored UI hints on narrow desktop viewports (`showUiHints()`); start hint remains
-- Layers with welcome modal: `#welcome-modal-backdrop` (8999) → hints (9000) → `#welcome-modal` dialog (9100)
+- Layers with welcome modal: `#welcome-modal-backdrop` (8999) → hints (9000) → `#welcome-modal` dialog (9100); `body.welcome-modal-open` lowers app chrome below backdrop (Safari mobile toolbar/zoom z-index fix)
 - Dismisses for the session when chart is created, a Graha is placed, or an Annotation is added (laser excluded)
 
 Key Methods:
@@ -875,7 +877,7 @@ Technical Implementation:
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
 - Help Modal (**Guide**): Desktop-first workspace intro (`.help-intro`); sections match README Usage Guide; keyboard shortcuts; portable `.citrana.json` session guidance; `#help-modal-description` / `.help-modal-description` spacing before shortcuts list
 - About Modal: Information about Citrana with creator details and links; mobile compact layout without scroll
-- Welcome Modal: First visit only; `#welcome-modal-backdrop` + dialog; peripheral canvas hints visible behind dialog; compact **Creating Your First Chart** (6 steps aligned with README — chart type, Lagna, Grahas, library pages, Annotations, Save Session / PNG); mobile note points to **Canvas Items** via layers icon in zoom bar (no keyboard shortcut); simulated loading bar with five title-case stages plus **Ready!** at 100%; `closeWelcomeModal()` marks seen in `localStorage`; backdrop click or close button dismisses; timer cleared if dismissed early; mobile compact layout without scroll
+- Welcome Modal: First visit only; `#welcome-modal-backdrop` + dialog; `body.welcome-modal-open` dims toolbar/zoom/Help/About/library behind grey backdrop (mobile Safari stacking); peripheral canvas hints visible between backdrop and dialog; compact **Creating Your First Chart** (6 steps aligned with README — chart type, Lagna, Grahas, library pages, Annotations, Save Session / PNG); mobile note points to **Canvas Items** via layers icon in zoom bar (no keyboard shortcut); simulated loading bar with five title-case stages plus **Ready!** at 100%; `closeWelcomeModal()` marks seen in `localStorage`; backdrop click or close button dismisses; timer cleared if dismissed early; mobile compact layout without scroll
 - Options Modal: **Zoom Step**, chart indicator toggles, and **Save Chart Only** export; shared modal width with Help (`width: min(600px, 90vw)`)
 - Confirmation Modal (`#confirmation-modal`): Reused for destructive confirm, single-action notices, **Open Session** intro, and **Save As** (`#confirmation-filename-input`); modes `confirmation-modal--confirm|alert|open|save-as`; dynamic message + optional warning in `aria-describedby`
 - Export Progress Modal: Shared `#export-progress-modal` for export PNG, save session, and open session; non-dismissible; dynamic title; live status in `aria-describedby`; `aria-busy` while operation runs

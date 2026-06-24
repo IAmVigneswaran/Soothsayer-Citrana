@@ -31,11 +31,11 @@ Soothsayer-Citrana/
 ├── sitemap.xml
 ├── assets/
 │   ├── css/
-│   │   └── styles.css            # Complete styling system (~3270 lines); `@font-face` Shantell Sans; primary @media (max-width: 768px) block + post-base mobile overrides; JSColorPicker --cp-* theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `.confirmation-modal--*` / `.confirmation-filename-*`; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `.citrana-canvas-hints`; `.welcome-modal-backdrop`; `body.presentation-view`; `.toolbar-scroll-*`
+│   │   └── styles.css            # Complete styling system (~3280 lines); `@font-face` Shantell Sans; primary @media (max-width: 768px) block + post-base mobile overrides; JSColorPicker --cp-* theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `.confirmation-modal--*` / `.confirmation-filename-*`; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `.citrana-canvas-hints`; `.welcome-modal-backdrop`; `body.welcome-modal-open`; `body.presentation-view`; `.toolbar-scroll-*`
 │   ├── fonts/                    # Self-hosted Shantell Sans (Regular, Bold, Italic, BoldItalic) + OFL.txt
 │   ├── js/                       # 21 modules — all citrana-* prefixed
 │   │   ├── citrana-annotation-fonts.js # Normal and hand-written annotation fonts (~159 lines)
-│   │   ├── citrana-app.js                # Main application coordinator (~2515 lines)
+│   │   ├── citrana-app.js                # Main application coordinator (~2517 lines)
 │   │   ├── citrana-arrow.js      # Unified filled-arrow geometry (~185 lines)
 │   │   ├── citrana-canvas-hints.js # Blank-canvas onboarding hint overlay (~397 lines)
 │   │   ├── citrana-chart-coordinator.js  # Chart type management (~322 lines)
@@ -198,6 +198,7 @@ The application uses a floating UI system with absolute positioning for all inte
 - **Confirmation** (`#confirmation-modal`): confirm, alert, open, and save-as modes; `#confirmation-filename-input` for Save As
 - Help intro: `#help-modal-description` uses `.help-modal-description` (margin before first section; not `.help-instructions` wrapper)
 - Mobile About/Welcome: compact typography; `overflow: hidden` (no scroll); mobile `@media` blocks **after** base modal CSS
+- Welcome: split z-index backdrop (8999) / hints (9000) / dialog (9100); `body.welcome-modal-open` keeps chrome behind grey backdrop on mobile Safari
 - **Escape** dismisses open modals via `dismissActiveModalOnEscape()` (operation progress excepted)
 - **Tab focus trap** via `trapModalFocus()`; focus moves to close button on open and restores on close (`_modalFocusStack`)
 
@@ -261,7 +262,7 @@ The application uses a mobile-first approach with three main breakpoints:
 
 For system design, module boundaries, data flows, and extension points, see ARCHITECTURE.md.
 
-### Main Application (assets/js/citrana-app.js - ~2515 lines)
+### Main Application (assets/js/citrana-app.js - ~2517 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -284,7 +285,7 @@ Key Methods:
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
 - `setupToolbarScroll()`: Horizontal toolbar overflow with `#toolbar-scroll-wrap`, chevrons, and mobile edge fades (`toolbar-scroll-fade-start` / `toolbar-scroll-fade-end`)
 - `setupKeyboardShortcuts()`: Tool/action shortcuts; **I** toggles **Canvas Items** panel (open/close; **I** again closes when Canvas Items is open); **Escape** → `dismissActiveModalOnEscape()`; **Tab** → `trapModalFocus()` when a modal is open; otherwise blocked while inline Graha/text editors are focused or `isModalBlockingShortcuts()` (Help, Options, About, Welcome, Confirmation, Canvas Items, operation progress)
-- `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop focus stack; focus close button on open; toggles `#welcome-modal-backdrop` for welcome
+- `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop focus stack; focus close button on open; toggles `#welcome-modal-backdrop` and `body.welcome-modal-open` for welcome
 - `closeWelcomeModal()`: Welcome close + `localStorage.citrana_welcome_seen`; refreshes canvas hints
 - `notifyCanvasContentCreated()` / `refreshCanvasHints()`: Dismiss or reposition onboarding hints
 - `getActiveModal()` / `dismissActiveModalOnEscape()`: Topmost modal; Escape dismiss (operation progress not dismissible)
@@ -326,7 +327,7 @@ Key Responsibilities:
 - PNG hints (2084×501 artboard) anchored to Graha library, toolbar, zoom bar, and Help via `arrowTip` / `attachEdge`
 - Centred start stack: full-opacity logo + semi-transparent start message
 - Staggered fade-in; hidden after chart/Graha/annotation or in Presentation View
-- Welcome layering: `#welcome-modal-backdrop` → hints → `#welcome-modal` dialog
+- Welcome layering: `#welcome-modal-backdrop` (8999) → hints (9000) → `#welcome-modal` dialog (9100); `body.welcome-modal-open` lowers toolbar/zoom/Help/About/library/edit bars to z-index 800 so Safari mobile `!important` chrome (9999–10000) stays behind the grey backdrop
 
 Key Methods:
 - `init(app)`, `update()`, `scheduleUpdate()`, `dismiss()`, `shouldShow()`
@@ -871,7 +872,7 @@ Technical Implementation:
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
 - Help Modal (**Guide**): `.help-intro` workspace overview; sections aligned with README (Charts → Privacy Note); portable `.citrana.json` session guidance; keyboard shortcuts
 - About Modal: Information about Citrana with creator details and links
-- Welcome Modal: First visit only; `#welcome-modal-backdrop` + dialog; peripheral canvas hints visible behind dialog; **Creating Your First Chart** (6 steps — chart type, Lagna, Grahas, library pages **1**–**5**, Annotations, Save Session / PNG); mobile **Canvas Items** via layers icon (not **I**); loading bar stages in title case ending with **Ready!** at 100%; `closeWelcomeModal()` + `localStorage`; backdrop click or close button; early close stops timer; mobile compact, no scroll
+- Welcome Modal: First visit only; `#welcome-modal-backdrop` + dialog; `body.welcome-modal-open` dims app chrome behind grey backdrop (beats Safari mobile toolbar/zoom z-index overrides); peripheral canvas hints visible between backdrop and dialog; **Creating Your First Chart** (6 steps — chart type, Lagna, Grahas, library pages **1**–**5**, Annotations, Save Session / PNG); mobile **Canvas Items** via layers icon (not **I**); loading bar stages in title case ending with **Ready!** at 100%; `closeWelcomeModal()` + `localStorage`; backdrop click or close button; early close stops timer; mobile compact, no scroll
 - Options Modal: **Zoom Step**, chart indicator toggles, and **Save Chart Only** export; shared modal width with Help
 - Confirmation Modal (`#confirmation-modal`): Reused for destructive confirm (`confirmation-modal--confirm`), single-action notices (`--alert`), **Open Session** intro (`--open`), and **Save As** (`--save-as` with `#confirmation-filename-input`); dynamic message + optional warning in `aria-describedby`
 - Export Progress Modal: Shared `#export-progress-modal` for export PNG, save session, and open session; non-dismissible; dynamic title; live status in `aria-describedby`; `aria-busy` while operation runs
