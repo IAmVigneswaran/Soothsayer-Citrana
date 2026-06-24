@@ -36,13 +36,14 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 
 1. [Project Overview](#project-overview)
 2. [Technology Stack](#technology-stack)
-3. [CSS and Layout](#css-and-layout-stylescss---3040-lines)
+3. [CSS and Layout](#css-and-layout-stylescss---3220-lines)
 4. [Complete Project Structure](#complete-project-structure)
 5. [Script load order](#script-load-order-indexhtml)
 6. [Core Components Architecture](#core-components-architecture)
-   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2214-lines)
+   - [Main Application (citrana-app.js)](#main-application-citrana-appjs---2248-lines)
+   - [Canvas Hints (citrana-canvas-hints.js)](#canvas-hints-citrana-canvas-hintsjs---397-lines)
    - [History Engine (citrana-history.js)](#history-engine-citrana-historyjs---94-lines)
-   - [Chart Coordinator](#chart-coordinator-citrana-chart-coordinatorjs---320-lines)
+   - [Chart Coordinator](#chart-coordinator-citrana-chart-coordinatorjs---322-lines)
    - [Citrana Zoom](#citrana-zoom-citrana-zoomjs---58-lines)
    - [South Indian Chart Template](#south-indian-chart-template-citrana-chart-templates-southjs---989-lines)
    - [North Indian Chart Template](#north-indian-chart-template-citrana-chart-templates-northjs---1015-lines)
@@ -78,7 +79,7 @@ For system architecture, data flows, and extension points, see [ARCHITECTURE.md]
 14. [Development Commands](#development-commands)
 15. [GitHub Actions Workflow](#github-actions-workflow)
 
-## CSS and Layout (styles.css - ~3080 lines)
+## CSS and Layout (styles.css - ~3220 lines)
 
 Light theme, floating UI, modals (Help and Options share modal chrome; `role="dialog"` + `aria-*`), responsive breakpoints (769px desktop, 768px tablet, 600px mobile). Most tablet/mobile rules live in one `@media (max-width: 768px)` block; **post-base mobile overrides** (Help/About position, modal compact sizing) use separate `@media` blocks **after** base component selectors so cascade order is correct.
 
@@ -104,7 +105,9 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 **Help modal (`#help-modal`):** `.help-intro` workspace overview; `.help-subsection-title` sections aligned with README Usage Guide (Charts, Options, Graha Library, Grahas on the Chart, Annotations, Canvas Items, Presentation View, Zoom and Pan, Undo and Redo, Sessions and Export, Privacy Note); portable `.citrana.json` session guidance
 
-**Welcome modal (`#welcome-modal`):** `.welcome-steps` six-point quick start; `.welcome-loading-bar` / `.welcome-loading-fill` / `.welcome-loading-text`; compact mobile layout (`overflow: hidden`); styles in `styles.css` (`.welcome-modal-*`)
+**Welcome modal (`#welcome-modal` + `#welcome-modal-backdrop`):** `.welcome-steps` six-point quick start; `.welcome-loading-bar` / `.welcome-loading-fill` / `.welcome-loading-text`; split backdrop/dialog z-index so canvas hints show alongside welcome on first visit; compact mobile layout (`overflow: hidden`); styles in `styles.css` (`.welcome-modal-*`, `.welcome-modal-backdrop`)
+
+**Canvas onboarding hints (`.citrana-canvas-hints`):** fixed full-viewport DOM overlay (`pointer-events: none`); PNG hints at 50% opacity with staggered fade-in; centred start stack (full-opacity logo + message); hidden in Presentation View and after first chart/Graha/annotation; `prefers-reduced-motion` skips animation
 
 **JSColorPicker theme (`--cp-*` in `:root`):** chip size, borders, swatch width, shadows — aligned to Citrana light theme. Compact toolbars hide hex input, format tabs, and dropdown caret (`.cp_input`, `.cp_formats`, `.cp_caret`).
 
@@ -118,15 +121,16 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 
 | Path | Lines | Description |
 |------|-------|-------------|
-| `index.html` | ~597 | Main entry; viewport-fit=cover; PWA meta; self-hosted Shantell Sans via `styles.css`; modal a11y; Welcome modal (6-step quick start, simulated loading bar); Help **Guide** (`.help-intro`, `.help-subsection-title`); Canvas Items modal; Options modal (Zoom Step); script tags at bottom in **dependency order** (see below) |
+| `index.html` | ~599 | Main entry; viewport-fit=cover; PWA meta; self-hosted Shantell Sans via `styles.css`; modal a11y; `#welcome-modal-backdrop` + Welcome modal (6-step quick start, simulated loading bar); Help **Guide** (`.help-intro`, `.help-subsection-title`); Canvas Items modal; Options modal (Zoom Step); script tags at bottom in **dependency order** (see below) |
 | `robots.txt` | — | Search engine rules |
 | `sitemap.xml` | — | Sitemap |
-| `assets/css/styles.css` | ~3080 | Complete styling; `@font-face` Shantell Sans (`assets/fonts/`); primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `#items-modal` pinned layout; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `body.presentation-view`; `.toolbar-scroll-*` |
+| `assets/css/styles.css` | ~3220 | Complete styling; `@font-face` Shantell Sans (`assets/fonts/`); primary mobile block + post-base overrides; JSColorPicker `--cp-*` theme; `.items-*` panel; `#graha-library.graha-library-hidden`; `.graha-library-dragging`; `.page-dots-chevron`; `#items-modal` pinned layout; `.help-intro` / `.help-subsection-title`; `.citrana-laser-canvas`; `.citrana-canvas-hints` / `.citrana-canvas-hint--*`; `.welcome-modal-backdrop`; `body.presentation-view`; `.toolbar-scroll-*` |
 | `assets/fonts/` | 5 files | Self-hosted Shantell Sans (Regular, Bold, Italic, BoldItalic) + `OFL.txt` |
-| `assets/js/citrana-annotation-fonts.js` | ~125 | Normal and hand-written annotation fonts (Shantell Sans) |
-| `assets/js/citrana-app.js` | ~2214 | Main application coordinator |
+| `assets/js/citrana-annotation-fonts.js` | ~159 | Normal and hand-written annotation fonts (Shantell Sans) |
+| `assets/js/citrana-app.js` | ~2248 | Main application coordinator |
 | `assets/js/citrana-arrow.js` | ~185 | Unified filled-arrow geometry |
-| `assets/js/citrana-chart-coordinator.js` | ~320 | Chart type management |
+| `assets/js/citrana-canvas-hints.js` | ~397 | Blank-canvas onboarding hint overlay |
+| `assets/js/citrana-chart-coordinator.js` | ~322 | Chart type management |
 | `assets/js/citrana-chart-templates-north.js` | ~1015 | North Indian chart logic |
 | `assets/js/citrana-chart-templates-south.js` | ~989 | South Indian chart logic |
 | `assets/js/citrana-colorpicker.js` | ~388 | JSColorPicker theme and helpers |
@@ -147,17 +151,17 @@ Light theme, floating UI, modals (Help and Options share modal chrome; `role="di
 | `assets/vendor/lucide.min.js` | — | Lucide 0.576.0 (self-hosted) |
 | `assets/vendor/colorpicker.iife.min.js` | — | JSColorPicker 1.1.0 (self-hosted) |
 | `assets/vendor/colorpicker.min.css` | — | JSColorPicker 1.1.0 stylesheet |
-| `assets/images/` | 14 files | Logos, demo GIFs, browser screenshot |
+| `assets/images/` | 19 files | Logos, demo GIFs, browser screenshot, canvas hint PNGs (`hint-*.png`) |
 | `assets/svgs/north-indian.svg` | — | North Indian chart template |
 | `assets/svgs/south-indian.svg` | — | South Indian chart template |
 | `assets/favicon/` | 29 files | Favicon set, `manifest.json` (PWA standalone), `browserconfig.xml` |
 | `.github/workflows/static.yml` | — | GitHub Pages deploy with minification (push to `main`) |
 | `.github/workflows/codeql.yml` | — | CodeQL security analysis |
-| `AGENT.md` | ~1300 | Comprehensive documentation |
-| `ARCHITECTURE.md` | ~575 | System architecture and data flows |
-| `.cursorrules` | ~1300 | Cursor IDE configuration |
-| `CHANGELOG.md` | ~106 | Version history |
-| `README.md` | ~244 | Project readme |
+| `AGENT.md` | ~1330 | Comprehensive documentation |
+| `ARCHITECTURE.md` | ~585 | System architecture and data flows |
+| `.cursorrules` | ~1320 | Cursor IDE configuration |
+| `CHANGELOG.md` | ~107 | Version history |
+| `README.md` | ~245 | Project readme |
 | `LICENSE` | — | MIT License |
 | `SECURITY.md` | — | Security policy |
 | `.gitignore` | — | Git ignore rules |
@@ -174,24 +178,25 @@ Citrana uses classic `<script>` tags (no bundler). Each file expects globals fro
 
 1. `citrana-debug.js` — logging helper
 2. `citrana-device.js` — `CitranaDevice`
-3. `citrana-rashis.js` — `CitranaRashis`
-4. `citrana-selection.js` — `CitranaSelection` (uses `CitranaDevice`)
-5. `citrana-annotation-fonts.js`
-6. `citrana-chart-templates-south.js` — uses `CitranaRashis`, `CitranaDevice`
-7. `citrana-chart-templates-north.js` — same
-8. `citrana-zoom.js` — `CitranaZoom` (before coordinator and session)
-9. `citrana-chart-coordinator.js` — templates + `CitranaZoom`
-10. `citrana-planet-system.js` — coordinator
-11. `citrana-arrow.js` — before color picker
-12. `citrana-colorpicker.js`
-13. `citrana-laser.js` — before drawing tools
-14. `citrana-drawing-tools.js`
-15. `citrana-edit-ui.js`
-16. `citrana-context-menu.js` — before Canvas Items menu
-17. `citrana-items-menu.js`
-18. `citrana-history.js`
-19. `citrana-session.js` — uses `CitranaZoom`
-20. `citrana-app.js` — **always last**; creates `window.app`
+3. `citrana-canvas-hints.js` — `CitranaCanvasHints` (before app init; uses `app` reference after `init()`)
+4. `citrana-rashis.js` — `CitranaRashis`
+5. `citrana-selection.js` — `CitranaSelection` (uses `CitranaDevice`)
+6. `citrana-annotation-fonts.js`
+7. `citrana-chart-templates-south.js` — uses `CitranaRashis`, `CitranaDevice`
+8. `citrana-chart-templates-north.js` — same
+9. `citrana-zoom.js` — `CitranaZoom` (before coordinator and session)
+10. `citrana-chart-coordinator.js` — templates + `CitranaZoom`
+11. `citrana-planet-system.js` — coordinator
+12. `citrana-arrow.js` — before color picker
+13. `citrana-colorpicker.js`
+14. `citrana-laser.js` — before drawing tools
+15. `citrana-drawing-tools.js`
+16. `citrana-edit-ui.js`
+17. `citrana-context-menu.js` — before Canvas Items menu
+18. `citrana-items-menu.js`
+19. `citrana-history.js`
+20. `citrana-session.js` — uses `CitranaZoom`
+21. `citrana-app.js` — **always last**; creates `window.app`
 
 **When adding a module:** insert it after everything it depends on and before anything that depends on it; update `index.html`, `.github/workflows/static.yml` (minify + `sed` rewrite), and this list. CI minifies files in alphabetical order for convenience — that order is **not** the browser load order.
 
@@ -201,7 +206,7 @@ See also [ARCHITECTURE.md](ARCHITECTURE.md) — Runtime Composition table.
 
 For system design, module boundaries, data flows, and extension points, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Main Application (citrana-app.js - ~2214 lines)
+### Main Application (citrana-app.js - ~2248 lines)
 The central coordinator that manages all application components and lifecycle.
 
 Key Responsibilities:
@@ -214,6 +219,7 @@ Key Responsibilities:
 - Manages chart display options modal and `localStorage` preferences (indicators, Save Chart Only, **Zoom Step**)
 - **Save/Open Session** via `CitranaSession` (`.citrana.json` files); shared progress dialog for save and open
 - Initialises **Canvas Items** panel (`CitranaItemsMenu`) and toolbar horizontal scroll
+- Initialises **Canvas onboarding hints** (`CitranaCanvasHints`) and refreshes on resize, Presentation View, and Graha library layout changes
 - Provides mobile touch support and Safari compatibility
 - Manages zoom controls, zoom lock (default locked), zoom level display, canvas resize (`visualViewport`), and **Presentation View**
 - Manages modal open/close, focus trap, and Escape dismiss for all overlays (including operation progress and **Canvas Items** modal)
@@ -223,8 +229,9 @@ Key Methods:
 - `setupCanvas()`: Konva stage; `scaleXChange`/`scaleYChange` → `updateZoomLevel()`
 - `setupToolbarScroll()`: Horizontal toolbar overflow with `#toolbar-scroll-wrap`, chevrons, and mobile edge fades (`toolbar-scroll-fade-start` / `toolbar-scroll-fade-end`)
 - `setupKeyboardShortcuts()`: Tool/action shortcuts; **I** toggles **Canvas Items** panel (open/close); **Escape** → `dismissActiveModalOnEscape()`; **Tab** → `trapModalFocus()` when a modal is open; otherwise blocked while inline Graha/text editors are focused or `isModalBlockingShortcuts()` (Help, Options, About, Welcome, Confirmation, Canvas Items, operation progress)
-- `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop `_modalFocusStack`; focus close button on open
-- `closeWelcomeModal()`: Welcome close + `localStorage.citrana_welcome_seen`
+- `openModal(modal)` / `closeModal(modal)`: Toggle `.active` and `aria-hidden`; push/pop `_modalFocusStack`; focus close button on open; toggles `#welcome-modal-backdrop` when welcome opens/closes
+- `closeWelcomeModal()`: Welcome close + `localStorage.citrana_welcome_seen`; refreshes canvas hints
+- `notifyCanvasContentCreated()` / `refreshCanvasHints()`: Dismiss or reposition onboarding hints
 - `getActiveModal()` / `dismissActiveModalOnEscape()`: Topmost modal; Escape dismiss (operation progress not dismissible)
 - `getModalFocusableElements()` / `getModalInitialFocusElement()` / `focusModalEntry()` / `trapModalFocus()`: Modal focus trap
 - `pushModalFocus()` / `popModalFocus()`: Focus restore on modal close
@@ -256,6 +263,25 @@ Key Methods:
 
 Keyboard shortcuts: `V` Select, `A` Arrow, `L` Line, `P` Pen, `K` Laser Pointer (when available), `T` Text, `H` Hand, `1`–`5` Graha Library pages, `I` Canvas Items (toggle open/close), `Ctrl+Z`/`Cmd+Z` undo, `Ctrl+Y`/`Ctrl+Shift+Z`/`Cmd+Shift+Z` redo, `+`/`-` zoom (when unlocked), `0` zoom to fit, `Delete` remove selected Graha or delete selected drawing (Select tool), `?`/`/` Help, **Escape** close modal. No Heading shortcut. Ignored when a modal is open (except **Escape**/**Tab** for modal UX, and **I** to close Canvas Items when open) or Graha/text inline editor is focused.
 
+### Canvas Hints (citrana-canvas-hints.js - ~397 lines)
+Blank-canvas onboarding overlay until the user creates content.
+
+Key Responsibilities:
+- Renders fixed DOM overlay (`.citrana-canvas-hints`) with PNG hint images (shared 2084×501 artboard)
+- Anchors UI hints to live elements via `arrowTip`, `attachEdge`, `attachX`/`attachY`, and `getTargetRect()`
+- Centred **start** stack: full-opacity Soothsayer Citrana logo + semi-transparent start message PNG
+- Hides anchored UI hints on narrow desktop viewports (`showUiHints()`); start hint remains
+- Layers with welcome modal: `#welcome-modal-backdrop` (8999) → hints (9000) → `#welcome-modal` dialog (9100)
+- Dismisses for the session when chart is created, a Graha is placed, or an Annotation is added (laser excluded)
+
+Key Methods:
+- `init(app)`: Create overlay DOM, bind resize/`visualViewport` listeners
+- `update()` / `scheduleUpdate()`: Show/hide root, position hints, toggle welcome z-index class
+- `dismiss()`: Hide overlay until page reload
+- `shouldShow()` / `isCanvasEmpty()`: Gated on `app.hasSessionContent()`, Presentation View, and dismiss flag
+
+Wired from `app.setupComponents()`, `notifyCanvasContentCreated()`, `refreshCanvasHints()`, `togglePresentationView()`, `handleResize()`, chart coordinator create, Graha drop, and drawing tools (non-laser).
+
 ### History Engine (citrana-history.js - ~94 lines)
 Unified undo/redo timeline for the entire session.
 
@@ -271,7 +297,7 @@ Key Methods:
 
 Wired in `app.setupComponents()` with `captureState` → `captureHistoryState()` and `restoreState` → `restoreHistoryState()`.
 
-### Chart Coordinator (citrana-chart-coordinator.js - ~320 lines)
+### Chart Coordinator (citrana-chart-coordinator.js - ~322 lines)
 Manages the relationship between South Indian and North Indian chart templates.
 
 Key Responsibilities:
@@ -837,6 +863,7 @@ Technical Implementation:
 - Keyboard Shortcuts: Tools, undo/redo, zoom (when unlocked), delete, help — see Main Application
 - Undo/Redo Toolbar: `#undo-btn` and `#redo-btn` in the top toolbar (first group); disabled when no steps available
 - Context Menus: Right-click or long-press on canvas, bhava, or Graha (Select/Hand when enabled; off by default on touch-primary devices; suppressed while drawing or when disabled via Canvas Items); chart-type-specific Bhava actions; Graha edit/delete; **Presentation View**
+- **Canvas hints:** On a blank canvas, illustrated tips highlight the Graha Library, toolbar, zoom bar, and Help (staggered fade-in); centred logo + start message; hidden after first chart/Graha/annotation or in Presentation View
 - **Canvas Items**: `#items-menu-btn` or **I** — chart/Bhava/Graha/Annotation actions; pinned Section Anchors; **Clear Selection**, **Context Menu**, **Graha Library** (On/Off with green/red row tint), and **Reset Graha Library Position**; row highlight syncs with canvas selection; desktop and touch workflow
 - **Selection Pill**: dashed outline behind selected Graha labels and Text/Heading/Pen Stroke Annotations; Bhava highlight in light grey
 - **Edit UI mobile scroll**: chevron buttons and edge fades scroll style controls when they overflow on narrow screens
@@ -844,7 +871,7 @@ Technical Implementation:
 - Ephemeral tab sessions: Refresh starts fresh — **Save Session** (`.citrana.json`) or export PNG to keep work
 - Help Modal (**Guide**): Desktop-first workspace intro (`.help-intro`); sections match README Usage Guide; keyboard shortcuts; portable `.citrana.json` session guidance; `#help-modal-description` / `.help-modal-description` spacing before shortcuts list
 - About Modal: Information about Citrana with creator details and links; mobile compact layout without scroll
-- Welcome Modal: First visit only; compact **Creating Your First Chart** (6 steps aligned with README — chart type, Lagna, Grahas, library pages, Annotations, Save Session / PNG); mobile note points to **Canvas Items** via layers icon in zoom bar (no keyboard shortcut); simulated loading bar with five title-case stages plus **Ready!** at 100%; `closeWelcomeModal()` marks seen in `localStorage`; timer cleared if dismissed early; mobile compact layout without scroll
+- Welcome Modal: First visit only; `#welcome-modal-backdrop` + dialog; peripheral canvas hints visible behind dialog; compact **Creating Your First Chart** (6 steps aligned with README — chart type, Lagna, Grahas, library pages, Annotations, Save Session / PNG); mobile note points to **Canvas Items** via layers icon in zoom bar (no keyboard shortcut); simulated loading bar with five title-case stages plus **Ready!** at 100%; `closeWelcomeModal()` marks seen in `localStorage`; backdrop click or close button dismisses; timer cleared if dismissed early; mobile compact layout without scroll
 - Options Modal: **Zoom Step**, chart indicator toggles, and **Save Chart Only** export; shared modal width with Help (`width: min(600px, 90vw)`)
 - Confirmation Modal: Destructive-action confirm; dynamic message + warning in `aria-describedby`
 - Export Progress Modal: Shared `#export-progress-modal` for export PNG, save session, and open session; non-dismissible; dynamic title; live status in `aria-describedby`; `aria-busy` while operation runs
@@ -1308,7 +1335,7 @@ Edit the Graha data objects in assets/js/citrana-planet-system.js:
 - **Trigger:** push to `main` only (`if: github.ref == 'refs/heads/main'`), plus `workflow_dispatch`
 - **paths-ignore:** `**/*.md`, `LICENSE`, `.gitignore`, `.cursorrules` — doc-only commits to `main` do not redeploy
 - **Steps:** checkout → Node 18 → `clean-css-cli` + `terser` → `styles.min.css` and `*.min.js` for all local JS → `sed` rewrites `index.html` script/link refs → configure-pages → upload artifact → deploy-pages
-- **Minified local JS:** all 20 `citrana-*.js` modules (alphabetically in `static.yml` terser step only — **not** browser load order): `citrana-annotation-fonts`, `citrana-app`, `citrana-arrow`, `citrana-chart-coordinator`, `citrana-chart-templates-north`, `citrana-chart-templates-south`, `citrana-colorpicker`, `citrana-context-menu`, `citrana-debug`, `citrana-device`, `citrana-drawing-tools`, `citrana-edit-ui`, `citrana-history`, `citrana-items-menu`, `citrana-laser`, `citrana-planet-system`, `citrana-rashis`, `citrana-selection`, `citrana-session`, `citrana-zoom`
+- **Minified local JS:** all 21 `citrana-*.js` modules (alphabetically in `static.yml` terser step only — **not** browser load order): `citrana-annotation-fonts`, `citrana-app`, `citrana-arrow`, `citrana-canvas-hints`, `citrana-chart-coordinator`, `citrana-chart-templates-north`, `citrana-chart-templates-south`, `citrana-colorpicker`, `citrana-context-menu`, `citrana-debug`, `citrana-device`, `citrana-drawing-tools`, `citrana-edit-ui`, `citrana-history`, `citrana-items-menu`, `citrana-laser`, `citrana-planet-system`, `citrana-rashis`, `citrana-selection`, `citrana-session`, `citrana-zoom`
 - **Not minified in CI:** `assets/vendor/*` (Konva, Lucide, JSColorPicker — already minified)
 
 ### Local development
