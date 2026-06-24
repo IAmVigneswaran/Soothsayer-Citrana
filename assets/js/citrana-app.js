@@ -47,6 +47,10 @@ class CitranaApp {
         // Show welcome modal on first visit
         this.showWelcomeModal();
 
+        requestAnimationFrame(() => {
+            CitranaCanvasHints?.update?.();
+        });
+
         citranaDebug('App initialization complete');
     }
 
@@ -123,6 +127,8 @@ class CitranaApp {
         });
         this.history.record('Start');
         this.updateHistoryButtons();
+
+        CitranaCanvasHints?.init?.(this);
 
         citranaDebug('Components setup complete');
     }
@@ -402,6 +408,7 @@ class CitranaApp {
         const aboutModal = document.getElementById('about-modal');
         const aboutModalClose = document.getElementById('about-modal-close');
         const welcomeModal = document.getElementById('welcome-modal');
+        const welcomeModalBackdrop = document.getElementById('welcome-modal-backdrop');
         const welcomeModalClose = document.getElementById('welcome-modal-close');
 
         if (aboutBtn && aboutModal && aboutModalClose) {
@@ -427,11 +434,9 @@ class CitranaApp {
                 this.closeWelcomeModal();
             });
 
-            // Close modal when clicking outside
-            welcomeModal.addEventListener('click', (e) => {
-                if (e.target === welcomeModal) {
-                    this.closeWelcomeModal();
-                }
+            // Close modal when clicking the dimmed backdrop
+            welcomeModalBackdrop?.addEventListener('click', () => {
+                this.closeWelcomeModal();
             });
         }
 
@@ -1601,6 +1606,12 @@ class CitranaApp {
         const wasActive = modal.classList.contains('active');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        if (modal.id === 'welcome-modal') {
+            const backdrop = document.getElementById('welcome-modal-backdrop');
+            backdrop?.classList.add('active');
+            backdrop?.setAttribute('aria-hidden', 'false');
+            CitranaCanvasHints?.scheduleUpdate?.();
+        }
         if (!wasActive) {
             this.pushModalFocus();
             requestAnimationFrame(() => this.focusModalEntry(modal));
@@ -1612,6 +1623,12 @@ class CitranaApp {
         const wasActive = modal.classList.contains('active');
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
+        if (modal.id === 'welcome-modal') {
+            const backdrop = document.getElementById('welcome-modal-backdrop');
+            backdrop?.classList.remove('active');
+            backdrop?.setAttribute('aria-hidden', 'true');
+            CitranaCanvasHints?.scheduleUpdate?.();
+        }
         if (wasActive) {
             this.popModalFocus();
         }
@@ -1623,6 +1640,15 @@ class CitranaApp {
         this.clearWelcomeLoadingInterval();
         this.closeModal(welcomeModal);
         localStorage.setItem('citrana_welcome_seen', 'true');
+        CitranaCanvasHints?.update?.();
+    }
+
+    notifyCanvasContentCreated() {
+        CitranaCanvasHints?.dismiss?.();
+    }
+
+    refreshCanvasHints() {
+        CitranaCanvasHints?.scheduleUpdate?.();
     }
 
     /**
@@ -1706,6 +1732,7 @@ class CitranaApp {
                 this.drawingTools.dismissPlanetEditing();
             }
         }
+        CitranaCanvasHints?.update?.();
         citranaDebug('Presentation view:', this.presentationView);
     }
 
@@ -1720,6 +1747,7 @@ class CitranaApp {
         this.stage.batchDraw();
         CitranaLaser?.resize?.();
         this.updateToolbarScrollButtons?.();
+        this.refreshCanvasHints?.();
     }
 
     updateZoomLevel() {
@@ -2128,6 +2156,12 @@ class CitranaApp {
         const baseline = this.captureHistoryState();
         this.history?.resetToState(baseline, 'Imported session');
         this.updateHistoryButtons();
+
+        if (this.hasSessionContent()) {
+            this.notifyCanvasContentCreated();
+        } else {
+            CitranaCanvasHints?.update?.();
+        }
     }
 
     undo() {

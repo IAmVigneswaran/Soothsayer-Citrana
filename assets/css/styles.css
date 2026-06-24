@@ -2517,20 +2517,38 @@ body.presentation-view .about-btn {
 }
 
 /* Welcome Modal Styles */
+.welcome-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 8999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.welcome-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
 .welcome-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  z-index: 9100;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
+  pointer-events: none;
 }
 
 .welcome-modal.active {
@@ -2547,6 +2565,7 @@ body.presentation-view .about-btn {
   width: 90%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   position: relative;
+  pointer-events: auto;
 }
 
 .welcome-modal-header {
@@ -3073,6 +3092,52 @@ body.presentation-view .about-btn {
 
   .export-progress-text {
     font-size: 0.8rem;
+  }
+}
+
+/* Canvas onboarding hints (blank canvas until first creation) */
+.citrana-canvas-hints {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 500;
+  overflow: hidden;
+}
+
+.citrana-canvas-hints.citrana-canvas-hints--with-welcome {
+  z-index: 9000;
+}
+
+.citrana-canvas-hints.is-hidden {
+  display: none;
+}
+
+body.presentation-view .citrana-canvas-hints {
+  display: none !important;
+}
+
+.citrana-canvas-hint {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.citrana-canvas-hint[hidden] {
+  display: none;
+}
+
+.citrana-canvas-hint img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+}
+
+@media (max-width: 768px) {
+  .citrana-canvas-hint--desktop {
+    display: none !important;
   }
 }
 

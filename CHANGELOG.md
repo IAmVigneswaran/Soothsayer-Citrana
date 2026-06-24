@@ -57,6 +57,7 @@ Citrana 2.0 is a major update focused on chart workflow, Annotations, sessions, 
 - **Graha Library paging** — swipe the dots bar on mobile (chevron hints; dots remain tappable)
 - **Mobile toolbar** — Arrow, Line, Pen, and Laser Pointer on narrow screens; chevron scroll on the toolbar and Edit UI when controls overflow
 - **Mobile layout** — improved spacing for iPhone home-screen install (notch and home bar); clearer default zoom on compact viewports
+- **Canvas hints** — on a blank canvas, illustrated tips point to the Graha Library, toolbar, zoom bar, and Help; they hide after you create a chart, place a Graha, or add an Annotation
 
 ### Undo and redo
 

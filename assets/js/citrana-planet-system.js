@@ -401,6 +401,7 @@ class PlanetSystem {
     applyGrahaLibraryVisibility() {
         if (!this.grahaLibrary) return;
         this.grahaLibrary.classList.toggle('graha-library-hidden', !this.isGrahaLibraryEnabled());
+        window.app?.refreshCanvasHints?.();
     }
 
     getGrahaLibraryItemsTitle() {
@@ -453,6 +454,8 @@ class PlanetSystem {
             planetGrid.style.removeProperty('maxHeight');
             planetGrid.style.removeProperty('overflow');
         }
+
+        window.app?.refreshCanvasHints?.();
     }
 
     // --- Graha Library Floating UI ---
@@ -867,6 +870,7 @@ class PlanetSystem {
         }
         // Add Graha to the specified Bhava
         this.chartTemplates.addPlanetToHouse(planetAbbr, houseIndex, label, id);
+        window.app?.notifyCanvasContentCreated?.();
     }
     getPlanetInfo(abbr) {
         // Check all five pages for Graha info

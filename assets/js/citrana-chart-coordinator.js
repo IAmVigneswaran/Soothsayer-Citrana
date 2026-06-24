@@ -96,12 +96,14 @@ class ChartCoordinator {
         this.clearChart();
         this.currentChartType = 'south-indian';
         this.southIndianTemplate.createSouthIndianChart();
+        window.app?.notifyCanvasContentCreated?.();
     }
 
     createNorthIndianChart() {
         this.clearChart();
         this.currentChartType = 'north-indian';
         this.northIndianTemplate.createNorthIndianChart();
+        window.app?.notifyCanvasContentCreated?.();
     }
 
     addPlanetToHouse(planetAbbr, houseNumber, label = null, id = null) {

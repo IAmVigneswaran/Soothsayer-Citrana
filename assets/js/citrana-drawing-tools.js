@@ -420,6 +420,10 @@ class DrawingTools {
             this.raiseDrawingsAboveChart();
         }
 
+        if (completedTool && completedTool !== 'laser') {
+            window.app?.notifyCanvasContentCreated?.();
+        }
+
         citranaDebug('Drawing stopped');
     }
 
