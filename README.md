@@ -99,6 +99,10 @@ This codebase is developed using AI agents.
 <p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-laser-pointer.gif?raw=true" alt="Using Laser Pointer"></p>
 </details>
 
+<details><summary>Presentation View</summary>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-presentation-view.gif?raw=true" alt="Presentation View"></p>
+</details>
+
 <details><summary>Using Citrana with tldraw for Loading Multiple Charts & Advance Annotation</summary>
 <p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-using-with-tldraw.gif?raw=true" alt="Using Citrana with tldraw"></p>
 </details>
