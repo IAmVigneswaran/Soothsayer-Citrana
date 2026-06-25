@@ -103,8 +103,16 @@ This codebase is developed using AI agents.
 <p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-presentation-view.gif?raw=true" alt="Presentation View"></p>
 </details>
 
+<details><summary>Options & Zoom Controls</summary>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-options-zoom-control.gif?raw=true" alt="Options & Zoom Controls"></p>
+</details>
+
 <details><summary>Using Citrana with tldraw for Loading Multiple Charts & Advance Annotation</summary>
 <p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-using-with-tldraw.gif?raw=true" alt="Using Citrana with tldraw"></p>
+</details>
+
+<details><summary>Save Session & Open Session</summary>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-save-open-session.gif?raw=true" alt="Save Session & Open Session"></p>
 </details>
 
 Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's interpretation and insights.
