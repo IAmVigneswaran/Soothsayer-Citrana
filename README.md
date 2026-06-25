@@ -115,6 +115,10 @@ This codebase is developed using AI agents.
 <p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-save-open-session.gif?raw=true" alt="Save Session & Open Session"></p>
 </details>
 
+<details><summary>Canvas Items</summary>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-canvas-items.gif?raw=true" alt="Canvas Items"></p>
+</details>
+
 Note: Bhagavan Sri Ram's Janma Kundali (Vedic chart) is based on K.N. Rao's interpretation and insights.
 
 ## Screenshot
