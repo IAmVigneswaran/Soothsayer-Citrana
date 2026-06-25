@@ -87,12 +87,16 @@ This codebase is developed using AI agents.
 <p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-tamil-editing.gif?raw=true" alt="Editing Grahas in Tamil"></p>
 </details>
 
-<details><summary>Creating Arrows</summary>
-<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-arrows.gif?raw=true" alt="Creating arrows"></p>
+<details><summary>Using Arrow Tool & Pen Tool</summary>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-arrows.gif?raw=true" alt="Using Arrow Tool & Pen Tool"></p>
 </details>
 
 <details><summary>North Indian Chart Rotation & Toggle Transparency</summary>
 <p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-english-rotation-transparency.gif?raw=true" alt="North Indian chart rotation and transparency"></p>
+</details>
+
+<details><summary>Using Laser Pointer</summary>
+<p align="center"><img src="https://github.com/IAmVigneswaran/Soothsayer-Citrana/blob/main/assets/images/demo-laser-pointer.gif?raw=true" alt="Using Laser Pointer"></p>
 </details>
 
 <details><summary>Using Citrana with tldraw for Loading Multiple Charts & Advance Annotation</summary>
