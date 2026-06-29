@@ -6,9 +6,9 @@ All notable user-facing changes to Citrana are documented here.
 
 ## 2.0.0
 
-**Released:** TBD
+**🎉 Released:** 29th June 2026
 
-Citrana 2.0 is a major update focused on chart workflow, Annotations, sessions, and a clearer experience on desktop and touch devices. Highlights include **Save Session**, undo/redo, the **Canvas Items** panel, **Presentation View**, and an expanded Graha library with Upagrahas.
+Citrana 2.0.0 is a major update focused on chart workflow, Annotations, sessions, and a clearer experience on desktop and touch devices. Highlights include **Save Session**, undo/redo, the **Canvas Items** panel, **Presentation View**, and an expanded Graha library with Upagrahas.
 
 ### Charts and Grahas
 
@@ -103,6 +103,6 @@ Citrana 2.0 is a major update focused on chart workflow, Annotations, sessions, 
 
 ## 1.0.0
 
-**Released:** 9 August 2025
+**🎉 Released:** 9th August 2025
 
 First public release of **Citrana**.
